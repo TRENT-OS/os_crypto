@@ -2,6 +2,16 @@
 
 project(seos_crypto C)
 
+add_library(
+    ${PROJECT_NAME} STATIC
+
+    "src/seos/SeosCrypto.c"
+    "src/seos/SeosCryptoRng.c"
+    "src/seos/SeosCryptoDigest.c"
+    "src/seos/SeosCryptoCipher.c"
+    "src/seos/SeosCryptoSignature.c"
+    "src/seos/SeosCryptoKey.c"
+)
 if (ENABLE_LINT)
         set(CMAKE_C_CPPCHECK "cppcheck;--enable=warning;--inline-suppr")
         set(CMAKE_C_CLANG_TIDY "clang-tidy;-checks=*")
@@ -54,16 +64,6 @@ if (SEOS_CRYPTO_IMPL_MBEDTLS)
         "3rdParty/mbedtls/library/rsa_internal.c"
     )
 endif()
-
-target_sources(${PROJECT_NAME}
-    PRIVATE
-    "src/seos/SeosCrypto.c"
-    "src/seos/SeosCryptoRng.c"
-    "src/seos/SeosCryptoDigest.c"
-    "src/seos/SeosCryptoCipher.c"
-    "src/seos/SeosCryptoSignature.c"
-    "src/seos/SeosCryptoKey.c"
-)
 
 if (SEOS_CRYPTO_COMPONENT)
     target_sources(${PROJECT_NAME}
