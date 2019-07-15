@@ -65,16 +65,10 @@ target_sources(${PROJECT_NAME}
     "src/seos/SeosCryptoKey.c"
 )
 
-if (SEOS_CRYPTO_CLIENT)
+if (SEOS_CRYPTO_COMPONENT)
     target_sources(${PROJECT_NAME}
         PRIVATE
         "src/seos/SeosCryptoClient.c"
-    )
-endif()
-
-if (SEOS_CRYPTO_SERVER)
-    target_sources(${PROJECT_NAME}
-        PRIVATE
         "src/seos/SeosCryptoRpc.c"
     )
 endif()
