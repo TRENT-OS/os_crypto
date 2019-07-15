@@ -11,6 +11,7 @@ add_library(
     "src/seos/SeosCryptoCipher.c"
     "src/seos/SeosCryptoSignature.c"
     "src/seos/SeosCryptoKey.c"
+    "src/seos/SeosKeyStore.c"
 )
 if (ENABLE_LINT)
         set(CMAKE_C_CPPCHECK "cppcheck;--enable=warning;--inline-suppr")
