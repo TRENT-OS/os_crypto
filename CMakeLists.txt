@@ -85,3 +85,7 @@ target_include_directories(${PROJECT_NAME}
         "include"
         "include/seos"
 )
+
+target_link_libraries(${PROJECT_NAME}
+    seos_libs
+)
