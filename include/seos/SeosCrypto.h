@@ -6,7 +6,7 @@
  *
  * @file SeosCrypto.h
  *
- * @brief SEOS Crypto API library
+ * @brief SEOS Crypto context and functions
  *
  */
 #pragma once
