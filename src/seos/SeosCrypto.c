@@ -17,12 +17,6 @@ SeosCrypto_init(SeosCrypto* self,
     self->mem.memIf.malloc   = malloc;
     self->mem.memIf.free     = free;
 
-    if (seos_rng_init(&self->rng,
-                      SeosCrypto_RANDOM_SEED_STR,
-                      sizeof(SeosCrypto_RANDOM_SEED_STR) - 1 ))
-    {
-        return SEOS_ERROR_ABORTED;
-    }
     return SEOS_SUCCESS;
 }
 
@@ -44,10 +38,22 @@ SeosCrypto_getRandomData(SeosCrypto* self,
     Debug_ASSERT_SELF(self);
     seos_err_t retval = SEOS_SUCCESS;
 
-    if (seos_rng_get_prng_bytes(&self->rng, buffer, bufferLen))
+    if (seos_rng_init(&self->rng,
+                      saltBuffer != NULL
+                        ? saltBuffer : SeosCrypto_RANDOM_SEED_STR,
+                      saltBuffer != NULL
+                        ? saltLen : sizeof(SeosCrypto_RANDOM_SEED_STR) - 1 ))
     {
-        Debug_LOG_DEBUG("%s: aborted", __func__);
         retval = SEOS_ERROR_ABORTED;
+    }
+    else
+    {
+        if (seos_rng_get_prng_bytes(&self->rng, buffer, bufferLen))
+        {
+            Debug_LOG_DEBUG("%s: aborted", __func__);
+            retval = SEOS_ERROR_ABORTED;
+        }
+        seos_rng_free(&self->rng);
     }
     return retval;
 }
