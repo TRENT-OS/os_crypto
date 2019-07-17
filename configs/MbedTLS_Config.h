@@ -27,7 +27,4 @@
 #define MBEDTLS_ENTROPY_MAX_SOURCES 2
 #include "mbedtls/check_config.h"
 
-// this is needed just by KeyStore, it will go away
-#define MBEDTLS_BASE64_C
-
 #endif /* MBEDTLS_CONFIG_H */

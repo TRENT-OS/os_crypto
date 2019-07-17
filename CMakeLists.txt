@@ -63,8 +63,6 @@ if (SEOS_CRYPTO_IMPL_MBEDTLS)
         "3rdParty/mbedtls/library/oid.c"
         "3rdParty/mbedtls/library/rsa.c"
         "3rdParty/mbedtls/library/rsa_internal.c"
-        # Used by KeyStore, shall go away
-        "3rdParty/mbedtls/library/base64.c"
     )
 endif()
 
