@@ -1,3 +1,7 @@
+/**
+ * Copyright (C) 2019, Hensoldt Cyber GmbH
+ */
+
 #include "SeosCryptoCipher.h"
 #include "LibDebug/Debug.h"
 

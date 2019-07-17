@@ -1,6 +1,7 @@
 /*
- *  Copyright (C) 2018, Hensoldt Cyber GmbH
+ *  Copyright (C) 2019, Hensoldt Cyber GmbH
  */
+
 /* Includes ------------------------------------------------------------------*/
 #include "SeosKeyStore.h"
 #include "seos/SeosCryptoDigest.h"

@@ -1,12 +1,7 @@
 /**
  * Copyright (C) 2019, Hensoldt Cyber GmbH
- *
- * @addtogroup SEOS
- * @{
- *
- * @file SeosCryptoRng.c
- *
  */
+
 #include "SeosCryptoRng.h"
 
 #include <string.h>
