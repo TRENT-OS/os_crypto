@@ -56,13 +56,15 @@ if (SEOS_CRYPTO_IMPL_MBEDTLS)
         "3rdParty/mbedtls/library/sha512.c"
         "3rdParty/mbedtls/library/sha256.c"
         "3rdParty/mbedtls/library/aes.c"
-        #RSA dependencies
+        # RSA dependencies
         "3rdParty/mbedtls/library/md.c"
         "3rdParty/mbedtls/library/md_wrap.c"
         "3rdParty/mbedtls/library/bignum.c"
         "3rdParty/mbedtls/library/oid.c"
         "3rdParty/mbedtls/library/rsa.c"
         "3rdParty/mbedtls/library/rsa_internal.c"
+        # Used by KeyStore, shall go away
+        "3rdParty/mbedtls/library/base64.c"
     )
 endif()
 
