@@ -31,7 +31,7 @@ static int glue_mbedtls_entropy_func(
     size_t len
 )
 {
-    printf( "%s(): buf %p, len = %d\n", __func__, output, len );
+    Debug_LOG_TRACE( "%s(): buf %p, len = %d\n", __func__, output, len );
 
     // seos_rng_t *seos_rng = (seos_rng_t *)ctx;
 
