@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  *
- * @addtogroup SEOS
+ * @addtogroup Wrappers
  * @{
  *
  * @file SeosCryptoCipher.h

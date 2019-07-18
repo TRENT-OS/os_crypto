@@ -31,22 +31,25 @@ SeosCrypto_deInit(SeosCrypto* self)
     return SEOS_SUCCESS;
 }
 
+
+//-------------------------- Crpyto API functions ------------------------------
+
 seos_err_t
-SeosCrypto_getRandomData(SeosCrypto* self,
-                         unsigned int flags,
-                         void const* saltBuffer,
-                         size_t saltLen,
-                         void*   buffer,
-                         size_t  bufferLen)
+SeosCrypto_getRandomData(SeosCrypto*    self,
+                         unsigned int   flags,
+                         void const*    saltBuffer,
+                         size_t         saltLen,
+                         void*          buffer,
+                         size_t         bufferLen)
 {
     Debug_ASSERT_SELF(self);
     seos_err_t retval = SEOS_SUCCESS;
 
     if (seos_rng_init(&self->rng,
                       saltBuffer != NULL
-                        ? saltBuffer : SeosCrypto_RANDOM_SEED_STR,
+                      ? saltBuffer : SeosCrypto_RANDOM_SEED_STR,
                       saltBuffer != NULL
-                        ? saltLen : sizeof(SeosCrypto_RANDOM_SEED_STR) - 1 ))
+                      ? saltLen : sizeof(SeosCrypto_RANDOM_SEED_STR) - 1 ))
     {
         retval = SEOS_ERROR_ABORTED;
     }

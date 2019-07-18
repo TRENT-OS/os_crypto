@@ -1,13 +1,6 @@
 /**
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  *
- * @addtogroup SEOS
- * @{
- *
- * @file SeosCryptoAPI.c
- *
- * @brief SEOS Crypto API library
- *
  */
 #include "SeosCryptoApi.h"
 #include "SeosCrypto.h"
