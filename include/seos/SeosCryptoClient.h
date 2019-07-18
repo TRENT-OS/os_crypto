@@ -69,8 +69,10 @@ SeosCryptoClient_deInit(SeosCryptoClient* self);
 seos_err_t
 SeosCryptoClient_getRandomData(SeosCryptoClient* self,
                                unsigned int flags,
-                               void const** buffer,
-                               size_t  dataLen);
+                               void const* saltBuffer,
+                               size_t saltLen,
+                               void** buffer,
+                               size_t dataLen);
 /**
  * @brief initializes the digest context owned by the client but leaving in the
  *  server

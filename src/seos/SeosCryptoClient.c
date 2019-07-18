@@ -37,23 +37,34 @@ SeosCryptoClient_deInit(SeosCryptoClient* self)
 seos_err_t
 SeosCryptoClient_getRandomData(SeosCryptoClient* self,
                                unsigned int flags,
-                               void const** buffer,
-                               size_t  dataLen)
+                               void const* saltBuffer,
+                               size_t saltLen,
+                               void** buffer,
+                               size_t dataLen)
 {
     Debug_ASSERT_SELF(self);
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
-    if (NULL == buffer || dataLen > PAGE_SIZE)
+    if (NULL == buffer || dataLen > PAGE_SIZE || saltLen > PAGE_SIZE)
     {
         retval = SEOS_ERROR_INVALID_PARAMETER;
     }
     else
     {
-        // we return the place of the answer in our address space
-        *buffer = self->clientDataport;
+        if (saltBuffer != NULL)
+        {
+            memcpy(self->clientDataport, saltBuffer, saltLen);
+        }
+        else
+        {
+            saltLen = 0;
+        }
         retval = SeosCryptoRpc_getRandomData(self->rpcHandle,
                                              flags,
+                                             saltLen,
                                              dataLen);
+        // we return the place of the answer in our address space
+        *buffer = self->clientDataport;
     }
     return retval;
 }
