@@ -1,3 +1,7 @@
+/**
+ * Copyright (C) 2019, Hensoldt Cyber GmbH
+ */
+
 #include "SeosCryptoKey.h"
 #include "SeosCryptoCipher.h"
 #include "SeosCryptoSignature.h"
@@ -33,25 +37,18 @@ SeosCryptoKey_init(SeosCryptoKey* self,
     {
         memset(self, 0, sizeof(*self));
 
-        if (BitMap_GET_BIT(flags, SeosCryptoKey_Flags_IS_ALGO_CIPHER))
+        switch (algorithm)
         {
-            switch (algorithm)
-            {
-            default:
-                self->algoKeyCtx    = algKeyCtx;
-                self->flags         = flags;
-                self->algorithm     = algorithm;
-                self->bytes         = bytes;
-                self->lenBits       = lenBits;
+        default:
+            self->algoKeyCtx    = algKeyCtx;
+            self->flags         = flags;
+            self->algorithm     = algorithm;
+            self->bytes         = bytes;
+            self->lenBits       = lenBits;
 
-                retval = SEOS_SUCCESS;
+            retval = SEOS_SUCCESS;
 
-                break;
-            }
-        }
-        else
-        {
-            retval = SEOS_ERROR_INVALID_PARAMETER;
+            break;
         }
     }
     return retval;
