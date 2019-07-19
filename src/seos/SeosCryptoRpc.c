@@ -45,9 +45,9 @@ deregisterHandle(SeosCryptoRpc* self)
 // Public Functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoRpc_init(SeosCryptoRpc* self,
-                   SeosCrypto* seosCryptoApiCtx,
-                   void* serverDataport)
+SeosCryptoRpc_init(SeosCryptoRpc*   self,
+                   SeosCrypto*      seosCryptoApiCtx,
+                   void*            serverDataport)
 {
     Debug_ASSERT_SELF(self);
     Debug_LOG_TRACE("%s", __func__);
@@ -59,15 +59,8 @@ SeosCryptoRpc_init(SeosCryptoRpc* self,
         retval = SEOS_ERROR_INVALID_PARAMETER;
         goto exit;
     }
-    if (seos_rng_init(&self->rng,
-                      SeosCrypto_RANDOM_SEED_STR,
-                      sizeof(SeosCrypto_RANDOM_SEED_STR) - 1 ))
-    {
-        retval = SEOS_ERROR_ABORTED;
-        goto exit;
-    }
     memset(self, 0, sizeof(*self));
-    self->seosCryptoApiCtx  = seosCryptoApiCtx;
+    self->seosCryptoCtx  = seosCryptoApiCtx;
     self->serverDataport    = serverDataport;
     retval                  = SEOS_SUCCESS;
 
@@ -83,7 +76,7 @@ exit:
 void
 SeosCryptoRpc_deInit(SeosCryptoRpc* self)
 {
-    seos_rng_free(&self->rng);
+    return;
 }
 
 seos_err_t
@@ -104,7 +97,7 @@ SeosCryptoRpc_getRandomData(SeosCryptoRpc* self,
     }
     else
     {
-        retval = SeosCrypto_getRandomData(self->seosCryptoApiCtx,
+        retval = SeosCrypto_getRandomData(self->seosCryptoCtx,
                                           flags,
                                           saltLen > 0
                                           ? self->serverDataport : NULL,
@@ -116,9 +109,10 @@ SeosCryptoRpc_getRandomData(SeosCryptoRpc* self,
 }
 
 seos_err_t
-SeosCryptoRpc_digestInit(SeosCryptoRpc* self,
+SeosCryptoRpc_digestInit(SeosCryptoRpc*             self,
+                         SeosCrypto_DigestHandle*   pDigestHandle,
                          SeosCryptoDigest_Algorithm algorithm,
-                         size_t ivLen)
+                         size_t                     ivLen)
 {
     Debug_LOG_TRACE("%s: algo %d, ivLen %u",
                     __func__,
@@ -131,50 +125,33 @@ SeosCryptoRpc_digestInit(SeosCryptoRpc* self,
     {
         retval = SEOS_ERROR_INVALID_HANDLE;
     }
-    else if (NULL == self->seosCryptoApiCtx->mem.memIf.malloc
-             || NULL == self->seosCryptoApiCtx->mem.memIf.free)
-    {
-        retval = SEOS_ERROR_ABORTED;
-    }
-    else if (self->seosCryptoDigest != NULL)
-    {
-        retval = SEOS_ERROR_OPERATION_DENIED;
-    }
     else
     {
-        self->seosCryptoDigest = malloc(sizeof(*self->seosCryptoDigest));
-        if (NULL == self->seosCryptoDigest)
-        {
-            retval = SEOS_ERROR_INSUFFICIENT_SPACE;
-        }
-        else
-        {
-            retval = SeosCryptoDigest_init(self->seosCryptoDigest,
-                                           algorithm,
-                                           self->serverDataport,
-                                           ivLen);
-        }
+        retval = SeosCrypto_digestInit(self->seosCryptoCtx,
+                                       pDigestHandle,
+                                       algorithm,
+                                       self->serverDataport,
+                                       ivLen);
     }
-
     return retval;
 }
 
 void
-SeosCryptoRpc_digestClose(SeosCryptoRpc* self)
+SeosCryptoRpc_digestClose(SeosCryptoRpc*            self,
+                          SeosCrypto_DigestHandle   digestHandle)
 {
     Debug_LOG_TRACE("%s", __func__);
 
-    if (isValidHandle(self) && self->seosCryptoDigest != NULL)
+    if (isValidHandle(self))
     {
-        SeosCryptoDigest_deInit(self->seosCryptoDigest);
-        self->seosCryptoApiCtx->mem.memIf.free(self->seosCryptoDigest);
-        self->seosCryptoDigest = NULL;
+        SeosCrypto_digestClose(self->seosCryptoCtx, digestHandle);
     }
 }
 
 seos_err_t
-SeosCryptoRpc_digestUpdate(SeosCryptoRpc* self,
-                           size_t len)
+SeosCryptoRpc_digestUpdate(SeosCryptoRpc*           self,
+                           SeosCrypto_DigestHandle  digestHandle,
+                           size_t                   len)
 {
     Debug_LOG_TRACE("%s", __func__);
 
@@ -190,7 +167,8 @@ SeosCryptoRpc_digestUpdate(SeosCryptoRpc* self,
     }
     else
     {
-        retval = SeosCryptoDigest_update(self->seosCryptoDigest,
+        retval = SeosCrypto_digestUpdate(self->seosCryptoCtx,
+                                         digestHandle,
                                          self->serverDataport,
                                          len);
     }
@@ -198,13 +176,14 @@ SeosCryptoRpc_digestUpdate(SeosCryptoRpc* self,
 }
 
 seos_err_t
-SeosCryptoRpc_digestFinalize(SeosCryptoRpc* self,
-                             size_t len)
+SeosCryptoRpc_digestFinalize(SeosCryptoRpc*             self,
+                             SeosCrypto_DigestHandle    digestHandle,
+                             size_t                     len)
 {
     Debug_LOG_TRACE("%s", __func__);
 
     seos_err_t  retval  = SEOS_ERROR_GENERIC;
-    char*       digest  = NULL;
+    void*       digest  = NULL;
     size_t      size    = 0;
 
     if (!isValidHandle(self))
@@ -217,7 +196,7 @@ SeosCryptoRpc_digestFinalize(SeosCryptoRpc* self,
     }
     else
     {
-        retval = SeosCryptoDigest_finalize(self->seosCryptoDigest,
+        retval = SeosCryptoDigest_finalize(digestHandle,
                                            len ?
                                            self->serverDataport : NULL,
                                            len,
@@ -258,8 +237,8 @@ SeosCryptoRpc_cipherInit(SeosCryptoRpc* self,
     {
         retval = SEOS_ERROR_INVALID_HANDLE;
     }
-    else if (NULL == self->seosCryptoApiCtx->mem.memIf.malloc
-             || NULL == self->seosCryptoApiCtx->mem.memIf.free)
+    else if (NULL == self->seosCryptoCtx->mem.memIf.malloc
+             || NULL == self->seosCryptoCtx->mem.memIf.free)
     {
         retval = SEOS_ERROR_ABORTED;
     }
@@ -321,7 +300,7 @@ SeosCryptoRpc_cipherClose(SeosCryptoRpc* self)
     {
         SeosCryptoCipher_deInit(self->seosCryptoCipher);
         SeosCryptoRng_deInit(&self->seosCryptoRng);
-        self->seosCryptoApiCtx->mem.memIf.free(self->seosCryptoCipher);
+        self->seosCryptoCtx->mem.memIf.free(self->seosCryptoCipher);
         self->seosCryptoCipher = NULL;
     }
 }
@@ -442,7 +421,7 @@ SeosCryptoRpc_keyCreate(SeosCryptoRpc* self,
     }
     else
     {
-        retval = SeosCrypto_keyCreate(self->seosCryptoApiCtx,
+        retval = SeosCrypto_keyCreate(self->seosCryptoCtx,
                                       algorithm,
                                       flags,
                                       lenBits,

@@ -21,13 +21,12 @@
 typedef struct
 {
     SeosCrypto*
-    seosCryptoApiCtx;   ///< crypto API context to be used by the RPC object
+    seosCryptoCtx;  ///< crypto context to be used by the RPC object
     void*
     serverDataport;     ///< the server's address of the dataport shared with the client
 
     seos_rng_t        rng;
     SeosCryptoRng     seosCryptoRng;
-    SeosCryptoDigest* seosCryptoDigest;
     SeosCryptoCipher* seosCryptoCipher;
 }
 SeosCryptoRpc;
@@ -90,9 +89,10 @@ SeosCryptoRpc_getRandomData(SeosCryptoRpc* self,
  *
  */
 seos_err_t
-SeosCryptoRpc_digestInit(SeosCryptoRpc* self,
+SeosCryptoRpc_digestInit(SeosCryptoRpc*             self,
+                         SeosCrypto_DigestHandle*   pDigestHandle,
                          SeosCryptoDigest_Algorithm algorithm,
-                         size_t ivLen);
+                         size_t                     ivLen);
 /**
  * @brief destroyes the instance of SeosCryptoDigest and frees resources
  *
@@ -102,7 +102,8 @@ SeosCryptoRpc_digestInit(SeosCryptoRpc* self,
  *
  */
 void
-SeosCryptoRpc_digestClose(SeosCryptoRpc* self);
+SeosCryptoRpc_digestClose(SeosCryptoRpc* self,
+                          SeosCrypto_DigestHandle   digestHandle);
 /**
  * @brief calls SeosCryptoDigest_update() using the server dataport as input
  *  buffer.
@@ -111,6 +112,7 @@ SeosCryptoRpc_digestClose(SeosCryptoRpc* self);
  */
 seos_err_t
 SeosCryptoRpc_digestUpdate(SeosCryptoRpc* self,
+                           SeosCrypto_DigestHandle  digestHandle,
                            size_t len);
 /**
  * @brief calls SeosCryptoDigest_finalize() using the server dataport as input
@@ -123,8 +125,9 @@ SeosCryptoRpc_digestUpdate(SeosCryptoRpc* self,
  * @retval SEOS_ERROR_INVALID_PARAMETER if dataLen > PAGE_SIZE
  */
 seos_err_t
-SeosCryptoRpc_digestFinalize(SeosCryptoRpc* self,
-                             size_t len);
+SeosCryptoRpc_digestFinalize(SeosCryptoRpc*             self,
+                             SeosCrypto_DigestHandle    digestHandle,
+                             size_t                     len);
 /**
  * @brief creates a new instance of SeosCryptoCipher
  *
