@@ -73,6 +73,25 @@ SeosCryptoClient_getRandomData(SeosCryptoClient*    self,
                                size_t               saltLen,
                                void**               buffer,
                                size_t               dataLen);
+INLINE seos_err_t
+SeosCryptoClient_getRandomData2(SeosCryptoClient*    self,
+                                unsigned int         flags,
+                                void const*          saltBuffer,
+                                size_t               saltLen,
+                                void*                buffer,
+                                size_t               dataLen)
+{
+    void* randomDataPtr = NULL;
+    seos_err_t retval = SeosCryptoClient_getRandomData(self,
+                                                       flags,
+                                                       saltBuffer,
+                                                       saltLen,
+                                                       &randomDataPtr,
+                                                       dataLen);
+    memcpy(buffer, randomDataPtr, dataLen);
+    return retval;
+}
+
 /**
  * @brief initializes the digest context owned by the client but leaving in the
  *  server
@@ -87,10 +106,11 @@ SeosCryptoClient_getRandomData(SeosCryptoClient*    self,
  *
  */
 seos_err_t
-SeosCryptoClient_digestInit(SeosCryptoClient* self,
-                            SeosCryptoDigest_Algorithm algorithm,
-                            char* iv,
-                            size_t ivLen);
+SeosCryptoClient_digestInit(SeosCryptoClient*           self,
+                            SeosCrypto_DigestHandle*    pDigestHandle,
+                            SeosCryptoDigest_Algorithm  algorithm,
+                            void*                       iv,
+                            size_t                      ivLen);
 /**
  * @brief closes the digest context owned by the client but leaving in the
  *  server
@@ -100,7 +120,8 @@ SeosCryptoClient_digestInit(SeosCryptoClient* self,
  *
  */
 void
-SeosCryptoClient_digestClose(SeosCryptoClient* self);
+SeosCryptoClient_digestClose(SeosCryptoClient*          self,
+                             SeosCrypto_DigestHandle    digestHandle);
 /**
  * @brief updates the computation of the digest providing a new block of data
  *
@@ -113,9 +134,10 @@ SeosCryptoClient_digestClose(SeosCryptoClient* self);
  *
  */
 seos_err_t
-SeosCryptoClient_digestUpdate(SeosCryptoClient* self,
-                              const char* data,
-                              size_t dataLen);
+SeosCryptoClient_digestUpdate(SeosCryptoClient*         self,
+                              SeosCrypto_DigestHandle   digestHandle,
+                              const void*               data,
+                              size_t                    dataLen);
 /**
  * @brief finalizes the computation of the digest providing a new block of data
  *  or padding (when data == NULL).
@@ -143,21 +165,24 @@ SeosCryptoClient_digestUpdate(SeosCryptoClient* self,
  *
  */
 seos_err_t
-SeosCryptoClient_digestFinalize(SeosCryptoClient* self,
-                                const char* data,
-                                size_t dataLen,
-                                char** digest,
-                                size_t* digestSize);
+SeosCryptoClient_digestFinalize(SeosCryptoClient*           self,
+                                SeosCrypto_DigestHandle     digestHandle,
+                                const void*                 data,
+                                size_t                      dataLen,
+                                void**                      digest,
+                                size_t*                     digestSize);
 
 INLINE seos_err_t
-SeosCryptoClient_digestFinalize2(SeosCryptoClient* self,
-                                 const char* data,
-                                 size_t len,
-                                 char* digest,
-                                 size_t digestSize)
+SeosCryptoClient_digestFinalize2(SeosCryptoClient*          self,
+                                 SeosCrypto_DigestHandle    digestHandle,
+                                 const void*                data,
+                                 size_t                     len,
+                                 void*                      digest,
+                                 size_t                     digestSize)
 {
-    char* pDigest = digest;
+    void* pDigest = digest;
     return SeosCryptoClient_digestFinalize(self,
+                                           digestHandle,
                                            data,
                                            len,
                                            &pDigest,
@@ -165,20 +190,28 @@ SeosCryptoClient_digestFinalize2(SeosCryptoClient* self,
 }
 
 INLINE seos_err_t
-SeosCryptoClient_digestFinalizeNoData(SeosCryptoClient* self,
-                                      char** digest,
-                                      size_t* digestSize)
+SeosCryptoClient_digestFinalizeNoData(SeosCryptoClient*         self,
+                                      SeosCrypto_DigestHandle   digestHandle,
+                                      void**                    digest,
+                                      size_t*                   digestSize)
 {
-    return SeosCryptoClient_digestFinalize(self, NULL, 0, digest, digestSize);
+    return SeosCryptoClient_digestFinalize(self,
+                                           digestHandle,
+                                           NULL, 0,
+                                           digest, digestSize);
 }
 
 INLINE seos_err_t
-SeosCryptoClient_digestFinalizeNoData2(SeosCryptoClient* self,
-                                       char* digest,
-                                       size_t digestSize)
+SeosCryptoClient_digestFinalizeNoData2(SeosCryptoClient*        self,
+                                       SeosCrypto_DigestHandle  digestHandle,
+                                       void*                    digest,
+                                       size_t                   digestSize)
 {
-    char* pDigest = digest;
-    return SeosCryptoClient_digestFinalizeNoData(self, &pDigest, &digestSize);
+    void* pDigest = digest;
+    return SeosCryptoClient_digestFinalizeNoData(self,
+                                                 digestHandle,
+                                                 &pDigest,
+                                                 &digestSize);
 }
 /**
  * @brief initializes the digest context owned by the client but leaving in the

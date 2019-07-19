@@ -70,10 +70,11 @@ SeosCryptoClient_getRandomData(SeosCryptoClient* self,
 }
 
 seos_err_t
-SeosCryptoClient_digestInit(SeosCryptoClient* self,
-                            SeosCryptoDigest_Algorithm algorithm,
-                            char* iv,
-                            size_t ivLen)
+SeosCryptoClient_digestInit(SeosCryptoClient*           self,
+                            SeosCrypto_DigestHandle*    pDigestHandle,
+                            SeosCryptoDigest_Algorithm  algorithm,
+                            void*                       iv,
+                            size_t                      ivLen)
 {
     Debug_ASSERT_SELF(self);
 
@@ -89,23 +90,28 @@ SeosCryptoClient_digestInit(SeosCryptoClient* self,
         {
             memcpy(self->clientDataport, iv, ivLen);
         }
-        retval = SeosCryptoRpc_digestInit(self->rpcHandle, algorithm, ivLen);
+        retval = SeosCryptoRpc_digestInit(self->rpcHandle,
+                                          pDigestHandle,
+                                          algorithm,
+                                          ivLen);
     }
     return retval;
 }
 
 void
-SeosCryptoClient_digestClose(SeosCryptoClient* self)
+SeosCryptoClient_digestClose(SeosCryptoClient*          self,
+                             SeosCrypto_DigestHandle    digestHandle)
 {
     Debug_ASSERT_SELF(self);
 
-    SeosCryptoRpc_digestClose(self->rpcHandle);
+    SeosCryptoRpc_digestClose(self->rpcHandle, digestHandle);
 }
 
 seos_err_t
-SeosCryptoClient_digestUpdate(SeosCryptoClient* self,
-                              const char* data,
-                              size_t dataLen)
+SeosCryptoClient_digestUpdate(SeosCryptoClient*         self,
+                              SeosCrypto_DigestHandle   digestHandle,
+                              const void*               data,
+                              size_t                    dataLen)
 {
     Debug_ASSERT_SELF(self);
 
@@ -118,17 +124,20 @@ SeosCryptoClient_digestUpdate(SeosCryptoClient* self,
     else
     {
         memcpy(self->clientDataport, data, dataLen);
-        retval = SeosCryptoRpc_digestUpdate(self->rpcHandle, dataLen);
+        retval = SeosCryptoRpc_digestUpdate(self->rpcHandle,
+                                            digestHandle,
+                                            dataLen);
     }
     return retval;
 }
 
 seos_err_t
-SeosCryptoClient_digestFinalize(SeosCryptoClient* self,
-                                const char* data,
-                                size_t dataLen,
-                                char** digest,
-                                size_t* digestSize)
+SeosCryptoClient_digestFinalize(SeosCryptoClient*       self,
+                                SeosCrypto_DigestHandle digestHandle,
+                                const void*             data,
+                                size_t                  dataLen,
+                                void**                  digest,
+                                size_t*                 digestSize)
 {
     Debug_ASSERT_SELF(self);
 
@@ -144,7 +153,9 @@ SeosCryptoClient_digestFinalize(SeosCryptoClient* self,
         {
             memcpy(self->clientDataport, data, dataLen);
         }
-        retval = SeosCryptoRpc_digestFinalize(self->rpcHandle, dataLen);
+        retval = SeosCryptoRpc_digestFinalize(self->rpcHandle,
+                                              digestHandle,
+                                              dataLen);
 
         if (SEOS_SUCCESS == retval)
         {
