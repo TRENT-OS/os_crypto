@@ -14,6 +14,8 @@
 #include "seos_err.h"
 #include "seos_rng.h"
 #include "SeosCryptoKey.h"
+#include "SeosCryptoDigest.h"
+#include "LibUtil/PointerVector.h"
 
 #define SeosCrypto_RANDOM_SEED_STR "SeosCryptoAPI"
 
@@ -34,7 +36,8 @@ typedef struct
 }
 SeosCrypto_StaticBuf;
 
-typedef SeosCryptoKey* SeosCrypto_KeyHandle;
+typedef void* SeosCrypto_KeyHandle;
+typedef void* SeosCrypto_DigestHandle;
 
 typedef struct
 {
@@ -45,6 +48,8 @@ typedef struct
     }
     mem;
     seos_rng_t rng;
+
+    PointerVector digestHandleVector;
 }
 SeosCrypto;
 
@@ -86,13 +91,8 @@ SeosCrypto_init(SeosCrypto* self,
  *
  * @param self (required) pointer to the seos_crypto context
  *
- * @return an error code
- * @retval SEOS_SUCCESS if all right
- * @retval SEOS_ERROR_INVALID_PARAMETER if any of the required parameters is
- *  missing or wrong
- *
  */
-seos_err_t
+void
 SeosCrypto_deInit(SeosCrypto* self);
 
 /**
@@ -321,4 +321,30 @@ SeosCrypto_deriveKey(SeosCrypto* self,
 //                       SeosCrypto_HKey* hKey,
 //                       void* keyBlobBuffer,
 //                       size_t* len_keyBlobBuffer);
+
+seos_err_t
+SeosCrypto_digestInit(SeosCrypto*                   self,
+                      SeosCrypto_DigestHandle*      pDigestHandle,
+                      unsigned                      algorithm,
+                      void*                         iv,
+                      size_t                        ivLen);
+
+void
+SeosCrypto_digestClose(SeosCrypto*              self,
+                       SeosCrypto_DigestHandle  digestHandle);
+
+
+seos_err_t
+SeosCrypto_digestUpdate(SeosCrypto*              self,
+                        SeosCrypto_DigestHandle  digestHandle,
+                        const void*              data,
+                        size_t                   len);
+seos_err_t
+SeosCrypto_digestFinalize(SeosCrypto*             self,
+                          SeosCrypto_DigestHandle digestHandle,
+                          const void*             data,
+                          size_t                  len,
+                          void*                   digest,
+                          size_t                  digestSize);
+
 /** @} */
