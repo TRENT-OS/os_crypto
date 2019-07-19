@@ -63,6 +63,7 @@ SeosCryptoApi_getRandomData(SeosCryptoApi* self,
                             void* buffer,
                             size_t dataLen)
 {
+    Debug_ASSERT_SELF(self);
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
     if (self->isLocalConnection)
@@ -76,14 +77,116 @@ SeosCryptoApi_getRandomData(SeosCryptoApi* self,
     }
     else
     {
-        void* randomDataPtr = NULL;
-        retval = SeosCryptoClient_getRandomData(self->connector.rpc.client,
-                                                flags,
-                                                saltBuffer,
-                                                saltLen,
-                                                &randomDataPtr,
-                                                dataLen);
-        memcpy(buffer, randomDataPtr, dataLen);
+        retval = SeosCryptoClient_getRandomData2(self->connector.rpc.client,
+                                                 flags,
+                                                 saltBuffer,
+                                                 saltLen,
+                                                 buffer,
+                                                 dataLen);
     }
     return retval;
 }
+
+seos_err_t
+SeosCryptoApi_digestInit(SeosCryptoApi*              self,
+                         SeosCrypto_DigestHandle*    pDigestHandle,
+                         SeosCryptoDigest_Algorithm  algorithm,
+                         char*                       iv,
+                         size_t                      ivLen)
+{
+    Debug_ASSERT_SELF(self);
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    if (self->isLocalConnection)
+    {
+        retval = SeosCrypto_digestInit(self->connector.local.crypto,
+                                       pDigestHandle,
+                                       algorithm,
+                                       iv,
+                                       ivLen);
+    }
+    else
+    {
+        retval = SeosCryptoClient_digestInit(self->connector.rpc.client,
+                                             pDigestHandle,
+                                             algorithm,
+                                             iv,
+                                             ivLen);
+    }
+    return retval;
+}
+
+void
+SeosCryptoApi_digestClose(SeosCryptoApi*             self,
+                          SeosCrypto_DigestHandle    digestHandle)
+{
+    Debug_ASSERT_SELF(self);
+
+    if (self->isLocalConnection)
+    {
+        SeosCrypto_digestClose(self->connector.local.crypto, digestHandle);
+    }
+    else
+    {
+        SeosCryptoClient_digestClose(self->connector.rpc.client, digestHandle);
+    }
+}
+
+seos_err_t
+SeosCryptoApi_digestUpdate(SeosCryptoApi*            self,
+                           SeosCrypto_DigestHandle   digestHandle,
+                           const void*               data,
+                           size_t                    dataLen)
+{
+    Debug_ASSERT_SELF(self);
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    if (self->isLocalConnection)
+    {
+        retval = SeosCrypto_digestUpdate(self->connector.local.crypto,
+                                         digestHandle,
+                                         data,
+                                         dataLen);
+    }
+    else
+    {
+        retval = SeosCryptoClient_digestUpdate(self->connector.rpc.client,
+                                               digestHandle,
+                                               data,
+                                               dataLen);
+    }
+    return retval;
+}
+
+seos_err_t
+SeosCryptoApi_digestFinalize(SeosCryptoApi*              self,
+                             SeosCrypto_DigestHandle     digestHandle,
+                             const void*                 data,
+                             size_t                      dataLen,
+                             void*                       digest,
+                             size_t                      digestSize)
+{
+    Debug_ASSERT_SELF(self);
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    if (self->isLocalConnection)
+    {
+        retval = SeosCrypto_digestFinalize(self->connector.local.crypto,
+                                           digestHandle,
+                                           data,
+                                           dataLen,
+                                           digest,
+                                           digestSize);
+    }
+    else
+    {
+        retval = SeosCryptoClient_digestFinalize2(self->connector.rpc.client,
+                                                  digestHandle,
+                                                  data,
+                                                  dataLen,
+                                                  digest,
+                                                  digestSize);
+    }
+    return retval;
+}
+

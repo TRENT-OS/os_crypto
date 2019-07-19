@@ -26,6 +26,7 @@ typedef struct
 }
 SeosCryptoApi_RpcConnector;
 
+/// Here we have to consider to make a vtable use a concept of inheritation
 typedef struct
 {
     union
@@ -37,8 +38,6 @@ typedef struct
     bool isLocalConnection;
 }
 SeosCryptoApi;
-
-typedef void* SeosCryptoApi_Handle;
 
 seos_err_t
 SeosCryptoApi_initAsLocal(SeosCryptoApi* self, SeosCrypto* crypto);
@@ -83,5 +82,30 @@ SeosCryptoApi_getRandomData(SeosCryptoApi*  self,
                             size_t          saltLen,
                             void*           buffer,
                             size_t          dataLen);
+
+seos_err_t
+SeosCryptoApi_digestInit(SeosCryptoApi*             self,
+                         SeosCrypto_DigestHandle*   pDigestHandle,
+                         SeosCryptoDigest_Algorithm algorithm,
+                         char*                      iv,
+                         size_t                     ivLen);
+
+void
+SeosCryptoApi_digestClose(SeosCryptoApi*             self,
+                          SeosCrypto_DigestHandle    digestHandle);
+
+seos_err_t
+SeosCryptoApi_digestUpdate(SeosCryptoApi*            self,
+                           SeosCrypto_DigestHandle   digestHandle,
+                           const void*               data,
+                           size_t                    dataLen);
+
+seos_err_t
+SeosCryptoApi_digestFinalize(SeosCryptoApi*              self,
+                             SeosCrypto_DigestHandle     digestHandle,
+                             const void*                 data,
+                             size_t                      dataLen,
+                             void*                       digest,
+                             size_t                      digestSize);
 
 /** @} */
