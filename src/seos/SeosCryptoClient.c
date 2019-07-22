@@ -188,6 +188,52 @@ SeosCryptoClient_digestFinalize(SeosCryptoClient*       self,
 }
 
 seos_err_t
+SeosCryptoClient_keyGenerate(SeosCryptoClient*        self,
+                             SeosCrypto_KeyHandle*    pKeyHandle,
+                             unsigned int             algorithm,
+                             unsigned int             flags,
+                             size_t                   lenBits)
+{
+    Debug_ASSERT_SELF(self);
+
+    return SeosCryptoRpc_keyGenerate(self->rpcHandle,
+                                     pKeyHandle,
+                                     algorithm,
+                                     flags,
+                                     lenBits);
+}
+
+seos_err_t
+SeosCryptoClient_keyImport(SeosCryptoClient*      self,
+                           SeosCrypto_KeyHandle*  pKeyHandle,
+                           unsigned int           algorithm,
+                           unsigned int           flags,
+                           void const*            keyImportBuffer,
+                           size_t                 keyImportLenBits)
+{
+    Debug_ASSERT_SELF(self);
+
+    seos_err_t retval   = SEOS_ERROR_GENERIC;
+    size_t sizeRawKey   = keyImportLenBits / CHAR_BIT
+                + ((keyImportLenBits % CHAR_BIT) ? 1 : 0);
+
+    if (sizeRawKey > PAGE_SIZE)
+    {
+        retval = SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else
+    {
+        memcpy(self->clientDataport, keyImportBuffer, sizeRawKey);
+        retval = SeosCryptoRpc_keyImport(self->rpcHandle,
+                                         pKeyHandle,
+                                         algorithm,
+                                         flags,
+                                         keyImportLenBits);
+    }
+    return retval;
+}
+
+seos_err_t
 SeosCryptoClient_cipherInit(SeosCryptoClient* self,
                             SeosCryptoCipher_Algorithm algorithm,
                             SeosCrypto_KeyHandle key,

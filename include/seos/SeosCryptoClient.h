@@ -213,6 +213,19 @@ SeosCryptoClient_digestFinalizeNoData2(SeosCryptoClient*        self,
                                                  &pDigest,
                                                  &digestSize);
 }
+seos_err_t
+SeosCryptoClient_keyGenerate(SeosCryptoClient*        self,
+                             SeosCrypto_KeyHandle*    pKeyHandle,
+                             unsigned int             algorithm,
+                             unsigned int             flags,
+                             size_t                   lenBits);
+seos_err_t
+SeosCryptoClient_keyImport(SeosCryptoClient*      self,
+                           SeosCrypto_KeyHandle*  pKeyHandle,
+                           unsigned int           algorithm,
+                           unsigned int           flags,
+                           void const*            keyImportBuffer,
+                           size_t                 keyImportLenBits);
 /**
  * @brief initializes the digest context owned by the client but leaving in the
  *  server
