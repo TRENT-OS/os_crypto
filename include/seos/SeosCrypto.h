@@ -49,6 +49,7 @@ typedef struct
     mem;
     seos_rng_t rng;
 
+    PointerVector keyHandleVector;
     PointerVector digestHandleVector;
 }
 SeosCrypto;
@@ -110,7 +111,7 @@ SeosCrypto_getRandomData(SeosCrypto*    self,
 
 // -------------------------------- Key API ------------------------------------
 /**
- * @brief creates a key and provides a handle to it. The number of key handles
+ * @brief generates a key and provides a handle to it. The number of key handles
  *  that are active in parallel can be limited
  *
  * @param self (optional) pointer to the seos_crypto context
@@ -153,13 +154,11 @@ SeosCrypto_getRandomData(SeosCrypto*    self,
  *
  */
 seos_err_t
-SeosCrypto_keyCreate(SeosCrypto* self,
-                     unsigned int algorithm,
-                     uint16_t flags,
-                     size_t lenBits,
-                     SeosCrypto_KeyHandle* hKey,
-                     void* keyBlobBuffer,
-                     size_t* len_keyBlobBuffer);
+SeosCrypto_keyGenerate(SeosCrypto*              self,
+                       SeosCrypto_KeyHandle*    pKeyHandle,
+                       unsigned int             algorithm,
+                       unsigned int             flags,
+                       size_t                   lenBits);
 /**
  * @brief imports a key and provides a handle to it. The number of key handles
  *  that are active in parallel can be limited
@@ -182,13 +181,12 @@ SeosCrypto_keyCreate(SeosCrypto* self,
  *
  */
 seos_err_t
-SeosCrypto_keyImport(SeosCrypto* self,
-                     unsigned int flags,
-                     void const* key_import_buffer,
-                     size_t key_import_len,
-                     SeosCrypto_KeyHandle* hKey,
-                     void* keyBlobBuffer,
-                     size_t* len_keyBlobBuffer);
+SeosCrypto_keyImport(SeosCrypto*            self,
+                     SeosCrypto_KeyHandle*  pKeyHandle,
+                     unsigned int           algorithm,
+                     unsigned int           flags,
+                     void const*            keyImportBuffer,
+                     size_t                 keyImportLenBits);
 /**
  * @brief export the key material. Export of certain keys may not be allowed.
  *  The public part of an asymmetric key is usually exportable
@@ -214,11 +212,10 @@ SeosCrypto_keyImport(SeosCrypto* self,
  *
  */
 seos_err_t
-SeosCrypto_keyExport(SeosCrypto* self,
-                     unsigned int flags,
-                     SeosCrypto_KeyHandle* hKey,
-                     void* buffer,
-                     size_t* buffer_len);
+SeosCrypto_keyExport(SeosCrypto*            self,
+                     SeosCrypto_KeyHandle   keyHandle,
+                     void*                  buffer,
+                     size_t                 bufferLen);
 /**
  * @brief closes a key handle. The buffer of the key will no longer be in use,
  *  however any pending operation with this key can continue
@@ -244,11 +241,8 @@ SeosCrypto_keyExport(SeosCrypto* self,
  *
  */
 seos_err_t
-SeosCrypto_keyClose(SeosCrypto* self,
-                    unsigned int flags,
-                    SeosCrypto_KeyHandle* hKey,
-                    void* buffer,
-                    size_t* buffer_len);
+SeosCrypto_keyClose(SeosCrypto*             self,
+                    SeosCrypto_KeyHandle    keyHandle);
 
 
 // ----------------------------- Key Derivation --------------------------------
