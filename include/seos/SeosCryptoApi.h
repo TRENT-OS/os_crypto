@@ -108,4 +108,18 @@ SeosCryptoApi_digestFinalize(SeosCryptoApi*              self,
                              void*                       digest,
                              size_t                      digestSize);
 
+seos_err_t
+SeosCryptoApi_keyGenerate(SeosCryptoApi*           self,
+                          SeosCrypto_KeyHandle*    pKeyHandle,
+                          unsigned int             algorithm,
+                          unsigned int             flags,
+                          size_t                   lenBits);
+seos_err_t
+SeosCryptoApi_keyImport(SeosCryptoApi*          self,
+                        SeosCrypto_KeyHandle*   pKeyHandle,
+                        unsigned int            algorithm,
+                        unsigned int            flags,
+                        void const*             keyImportBuffer,
+                        size_t                  keyImportLenBits);
+
 /** @} */

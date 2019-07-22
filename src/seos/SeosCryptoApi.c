@@ -190,3 +190,62 @@ SeosCryptoApi_digestFinalize(SeosCryptoApi*              self,
     return retval;
 }
 
+seos_err_t
+SeosCryptoApi_keyGenerate(SeosCryptoApi*           self,
+                          SeosCrypto_KeyHandle*    pKeyHandle,
+                          unsigned int             algorithm,
+                          unsigned int             flags,
+                          size_t                   lenBits)
+{
+    Debug_ASSERT_SELF(self);
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    if (self->isLocalConnection)
+    {
+        retval = SeosCrypto_keyGenerate(self->connector.local.crypto,
+                                        pKeyHandle,
+                                        algorithm,
+                                        flags,
+                                        lenBits);
+    }
+    else
+    {
+        retval = SeosCryptoClient_keyGenerate(self->connector.rpc.client,
+                                              pKeyHandle,
+                                              algorithm,
+                                              flags,
+                                              lenBits);
+    }
+    return retval;
+}
+seos_err_t
+SeosCryptoApi_keyImport(SeosCryptoApi*          self,
+                        SeosCrypto_KeyHandle*   pKeyHandle,
+                        unsigned int            algorithm,
+                        unsigned int            flags,
+                        void const*             keyImportBuffer,
+                        size_t                  keyImportLenBits)
+{
+    Debug_ASSERT_SELF(self);
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    if (self->isLocalConnection)
+    {
+        retval = SeosCrypto_keyImport(self->connector.local.crypto,
+                                      pKeyHandle,
+                                      algorithm,
+                                      flags,
+                                      keyImportBuffer,
+                                      keyImportLenBits);
+    }
+    else
+    {
+        retval = SeosCryptoClient_keyImport(self->connector.rpc.client,
+                                            pKeyHandle,
+                                            algorithm,
+                                            flags,
+                                            keyImportBuffer,
+                                            keyImportLenBits);
+    }
+    return retval;
+}
