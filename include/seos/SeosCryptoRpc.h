@@ -129,6 +129,30 @@ SeosCryptoRpc_digestFinalize(SeosCryptoRpc*             self,
                              SeosCrypto_DigestHandle    digestHandle,
                              size_t                     len);
 /**
+ * @brief creates a random key and gives back and handle
+ *
+ * @param self (required) pointer to the seos crypto rpc object to be used
+ * @param algorithm cipher algorithm for which the key is created
+ * @param flags (e.g.: SeosCrypto_KEY_FLAGS_128_BIT)
+ * @param pKeyHandle (required) pointer to the key handle.
+ *  This is an <b>output</b> parameter
+ *
+ * @return an error code. See SeosCrypto_keyCreate()
+ *
+ */
+seos_err_t
+SeosCryptoRpc_keyGenerate(SeosCryptoRpc*                self,
+                          SeosCrypto_KeyHandle*         pKeyHandle,
+                          unsigned int                  algorithm,
+                          unsigned int                  flags,
+                          size_t                        lenBits);
+seos_err_t
+SeosCryptoRpc_keyImport(SeosCryptoRpc*          self,
+                        SeosCrypto_KeyHandle*   pKeyHandle,
+                        unsigned int            algorithm,
+                        unsigned int            flags,
+                        size_t                  keyImportLenBits);
+/**
  * @brief creates a new instance of SeosCryptoCipher
  *
  * @param self (required) pointer to the seos crypto rpc object to be
@@ -185,23 +209,5 @@ SeosCryptoRpc_cipherUpdate(SeosCryptoRpc* self,
 seos_err_t
 SeosCryptoRpc_cipherFinalize(SeosCryptoRpc* self,
                              size_t len);
-/**
- * @brief creates a random key and gives back and handle
- *
- * @param self (required) pointer to the seos crypto rpc object to be used
- * @param algorithm cipher algorithm for which the key is created
- * @param flags (e.g.: SeosCrypto_KEY_FLAGS_128_BIT)
- * @param pKeyHandle (required) pointer to the key handle.
- *  This is an <b>output</b> parameter
- *
- * @return an error code. See SeosCrypto_keyCreate()
- *
- */
-seos_err_t
-SeosCryptoRpc_keyCreate(SeosCryptoRpc* self,
-                        SeosCryptoCipher_Algorithm algorithm,
-                        unsigned int flags,
-                        size_t lenBits,
-                        SeosCrypto_KeyHandle* pKeyHandle);
 
 /** @} */

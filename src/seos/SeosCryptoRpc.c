@@ -60,7 +60,7 @@ SeosCryptoRpc_init(SeosCryptoRpc*   self,
         goto exit;
     }
     memset(self, 0, sizeof(*self));
-    self->seosCryptoCtx  = seosCryptoApiCtx;
+    self->seosCryptoCtx     = seosCryptoApiCtx;
     self->serverDataport    = serverDataport;
     retval                  = SEOS_SUCCESS;
 
@@ -215,6 +215,95 @@ SeosCryptoRpc_digestFinalize(SeosCryptoRpc*             self,
                          + sizeof(size);
             memcpy(dest, digest, size);
         }
+    }
+    return retval;
+}
+
+seos_err_t
+SeosCryptoRpc_keyGenerate(SeosCryptoRpc*                self,
+                          SeosCrypto_KeyHandle*         pKeyHandle,
+                          unsigned int                  algorithm,
+                          unsigned int                  flags,
+                          size_t                        lenBits)
+{
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    if (!isValidHandle(self))
+    {
+        retval = SEOS_ERROR_INVALID_HANDLE;
+    }
+    else
+    {
+        retval = SeosCrypto_keyGenerate(self->seosCryptoCtx,
+                                        pKeyHandle,
+                                        algorithm,
+                                        flags,
+                                        lenBits);
+    }
+    return retval;
+}
+
+seos_err_t
+SeosCryptoRpc_keyImport(SeosCryptoRpc*          self,
+                        SeosCrypto_KeyHandle*   pKeyHandle,
+                        unsigned int            algorithm,
+                        unsigned int            flags,
+                        size_t                  keyImportLenBits)
+{
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    if (!isValidHandle(self))
+    {
+        retval = SEOS_ERROR_INVALID_HANDLE;
+    }
+    else
+    {
+        retval = SeosCrypto_keyImport(self->seosCryptoCtx,
+                                      pKeyHandle,
+                                      algorithm,
+                                      flags,
+                                      self->serverDataport,
+                                      keyImportLenBits);
+    }
+    return retval;
+}
+
+seos_err_t
+SeosCryptoRpc_keyExport(SeosCryptoRpc*         self,
+                        SeosCrypto_KeyHandle   keyHandle,
+                        void*                  buffer,
+                        size_t                 bufferLen)
+{
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    if (!isValidHandle(self))
+    {
+        retval = SEOS_ERROR_INVALID_HANDLE;
+    }
+    else
+    {
+        retval = SeosCrypto_keyExport(self->seosCryptoCtx,
+                                      keyHandle,
+                                      buffer,
+                                      bufferLen);
+    }
+    return retval;
+}
+
+seos_err_t
+SeosCryptoRpc_keyClose(SeosCryptoRpc*          self,
+                       SeosCrypto_KeyHandle    keyHandle)
+{
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    if (!isValidHandle(self))
+    {
+        retval = SEOS_ERROR_INVALID_HANDLE;
+    }
+    else
+    {
+        retval = SeosCrypto_keyClose(self->seosCryptoCtx,
+                                     keyHandle);
     }
     return retval;
 }
@@ -401,33 +490,6 @@ SeosCryptoRpc_cipherFinalize(SeosCryptoRpc* self,
             dest = memcpy(dest, &tagSize, sizeof(tagSize)) + sizeof(tagSize);
             memcpy(dest, tag, tagSize);
         }
-    }
-    return retval;
-}
-
-seos_err_t
-SeosCryptoRpc_keyCreate(SeosCryptoRpc* self,
-                        SeosCryptoCipher_Algorithm algorithm,
-                        unsigned int flags,
-                        size_t lenBits,
-                        SeosCrypto_KeyHandle* pKeyHandle)
-{
-    seos_err_t retval   = SEOS_ERROR_GENERIC;
-    size_t buffSize     = -1;
-
-    if (!isValidHandle(self))
-    {
-        retval = SEOS_ERROR_INVALID_HANDLE;
-    }
-    else
-    {
-        retval = SeosCrypto_keyCreate(self->seosCryptoCtx,
-                                      algorithm,
-                                      flags,
-                                      lenBits,
-                                      pKeyHandle,
-                                      NULL,
-                                      &buffSize);
     }
     return retval;
 }
