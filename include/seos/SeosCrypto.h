@@ -47,7 +47,8 @@ typedef struct
         SeosCrypto_StaticBuf    staticBuf;
     }
     mem;
-    seos_rng_t rng;
+    bool        isRngInitialized;
+    seos_rng_t  rng;
 
     PointerVector keyHandleVector;
     PointerVector digestHandleVector;
