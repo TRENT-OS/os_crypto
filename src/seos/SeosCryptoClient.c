@@ -215,7 +215,7 @@ SeosCryptoClient_keyImport(SeosCryptoClient*      self,
 
     seos_err_t retval   = SEOS_ERROR_GENERIC;
     size_t sizeRawKey   = keyImportLenBits / CHAR_BIT
-                + ((keyImportLenBits % CHAR_BIT) ? 1 : 0);
+                          + ((keyImportLenBits % CHAR_BIT) ? 1 : 0);
 
     if (sizeRawKey > PAGE_SIZE)
     {
