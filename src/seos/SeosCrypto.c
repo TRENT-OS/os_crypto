@@ -16,7 +16,7 @@
 
 // -1 = not found
 static size_t
-findHandle(PointerVector* v, Pointer handle)
+SeosCrypto_findHandle(PointerVector* v, Pointer handle)
 {
     size_t vectorSize = PointerVector_getSize(v);
 
@@ -27,11 +27,13 @@ findHandle(PointerVector* v, Pointer handle)
             return i;
         }
     }
+    Debug_LOG_ERROR("%s: unable to find handle %p, in vector %p",
+                    __func__, handle, v);
     return -1;
 }
 
 static void
-removeHandle(PointerVector* v, size_t pos)
+SeosCrypto_removeHandle(PointerVector* v, size_t pos)
 {
     PointerVector_replaceElementAt(v, pos, PointerVector_getBack(v));
     PointerVector_popBack(v);
@@ -67,6 +69,11 @@ SeosCrypto_init(SeosCrypto* self,
             retval = SEOS_ERROR_ABORTED;
             goto err0;
         }
+        else if (!PointerVector_ctor(&self->cipherHandleVector, 1))
+        {
+            retval = SEOS_ERROR_ABORTED;
+            goto err1;
+        }
         else
         {
             retval = SEOS_SUCCESS;
@@ -79,8 +86,10 @@ SeosCrypto_init(SeosCrypto* self,
         retval = SEOS_ERROR_INVALID_PARAMETER;
         goto exit;
     }
-err0:
+err1:
     PointerVector_dtor(&self->keyHandleVector);
+err0:
+    PointerVector_dtor(&self->digestHandleVector);
 exit:
     return retval;
 }
@@ -88,6 +97,7 @@ exit:
 void
 SeosCrypto_deInit(SeosCrypto* self)
 {
+    PointerVector_dtor(&self->cipherHandleVector);
     PointerVector_dtor(&self->keyHandleVector);
     PointerVector_dtor(&self->digestHandleVector);
 
@@ -111,10 +121,10 @@ SeosCrypto_getRandomData(SeosCrypto*    self,
     Debug_ASSERT_SELF(self);
     seos_err_t retval = SEOS_SUCCESS;
 
-    void const * seed   = (saltBuffer != NULL)
-            ? saltBuffer : SeosCrypto_RANDOM_SEED_STR;
+    void const* seed   = (saltBuffer != NULL)
+                         ? saltBuffer : SeosCrypto_RANDOM_SEED_STR;
     size_t seedLen      = (saltBuffer != NULL)
-            ? saltLen : sizeof(SeosCrypto_RANDOM_SEED_STR) - 1;
+                          ? saltLen : sizeof(SeosCrypto_RANDOM_SEED_STR) - 1;
 
     if (self->isRngInitialized && (saltBuffer != NULL))
     {
@@ -123,7 +133,7 @@ SeosCrypto_getRandomData(SeosCrypto*    self,
     }
 
     if (!self->isRngInitialized
-            && seos_rng_init(&self->rng, seed, seedLen))
+        && seos_rng_init(&self->rng, seed, seedLen))
     {
         retval = SEOS_ERROR_ABORTED;
     }
@@ -133,7 +143,7 @@ SeosCrypto_getRandomData(SeosCrypto*    self,
     }
 
     if (self->isRngInitialized
-            && seos_rng_get_prng_bytes(&self->rng, buffer, bufferLen))
+        && seos_rng_get_prng_bytes(&self->rng, buffer, bufferLen))
     {
         Debug_LOG_DEBUG("%s: aborted", __func__);
         retval = SEOS_ERROR_ABORTED;
@@ -188,19 +198,26 @@ exit:
     return retval;
 }
 
-void
+seos_err_t
 SeosCrypto_digestClose(SeosCrypto*              self,
                        SeosCrypto_DigestHandle  digestHandle)
 {
     Debug_ASSERT_SELF(self);
 
-    size_t handlePos = findHandle(&self->digestHandleVector, digestHandle);
+    seos_err_t retval = SEOS_SUCCESS;
+    size_t handlePos = SeosCrypto_findHandle(&self->digestHandleVector,
+                                             digestHandle);
     if (handlePos != -1)
     {
         SeosCryptoDigest_deInit(digestHandle);
-        removeHandle(&self->digestHandleVector, handlePos);
+        SeosCrypto_removeHandle(&self->digestHandleVector, handlePos);
         self->mem.memIf.free(digestHandle);
     }
+    else
+    {
+        retval = SEOS_ERROR_INVALID_HANDLE;
+    }
+    return retval;
 }
 
 seos_err_t
@@ -212,7 +229,8 @@ SeosCrypto_digestUpdate(SeosCrypto*              self,
     Debug_ASSERT_SELF(self);
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
-    size_t handlePos = findHandle(&self->digestHandleVector, digestHandle);
+    size_t handlePos = SeosCrypto_findHandle(&self->digestHandleVector,
+                                             digestHandle);
     if (handlePos != -1)
     {
         retval = SeosCryptoDigest_update(digestHandle, data, len);
@@ -229,20 +247,21 @@ SeosCrypto_digestFinalize(SeosCrypto*             self,
                           SeosCrypto_DigestHandle digestHandle,
                           const void*             data,
                           size_t                  len,
-                          void*                   digest,
-                          size_t                  digestSize)
+                          void**                  digest,
+                          size_t*                 digestSize)
 {
     Debug_ASSERT_SELF(self);
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
-    size_t handlePos = findHandle(&self->digestHandleVector, digestHandle);
+    size_t handlePos = SeosCrypto_findHandle(&self->digestHandleVector,
+                                             digestHandle);
     if (handlePos != -1)
     {
-        retval = SeosCryptoDigest_finalize2(digestHandle,
-                                            data,
-                                            len,
-                                            digest,
-                                            digestSize);
+        retval = SeosCryptoDigest_finalize(digestHandle,
+                                           data,
+                                           len,
+                                           digest,
+                                           digestSize);
     }
     else
     {
@@ -270,7 +289,7 @@ SeosCrypto_keyGenerate(SeosCrypto*              self,
     else
     {
         size_t sizeRawKey   = lenBits / CHAR_BIT
-                + ((lenBits % CHAR_BIT) ? 1 : 0);
+                              + ((lenBits % CHAR_BIT) ? 1 : 0);
         size_t sizeObjBytes = sizeof(SeosCryptoKey) + sizeRawKey;
 
         *pKeyHandle = self->mem.memIf.malloc(sizeObjBytes);
@@ -300,7 +319,6 @@ SeosCrypto_keyGenerate(SeosCrypto*              self,
                                         flags,
                                         keyBytes,
                                         lenBits);
-            Debug_PRINTF("2");
             if (retval != SEOS_SUCCESS)
             {
                 goto err0;
@@ -366,7 +384,8 @@ SeosCrypto_keyExport(SeosCrypto*            self,
     Debug_ASSERT_SELF(self);
     seos_err_t retval = SEOS_SUCCESS;
 
-    size_t handlePos = findHandle(&self->keyHandleVector, keyHandle);
+    size_t handlePos = SeosCrypto_findHandle(&self->keyHandleVector,
+                                             keyHandle);
     if (handlePos != -1)
     {
         SeosCryptoKey* pKey = keyHandle;
@@ -403,11 +422,12 @@ SeosCrypto_keyClose(SeosCrypto*             self,
     Debug_ASSERT_SELF(self);
     seos_err_t retval = SEOS_SUCCESS;
 
-    size_t handlePos = findHandle(&self->keyHandleVector, keyHandle);
+    size_t handlePos = SeosCrypto_findHandle(&self->keyHandleVector,
+                                             keyHandle);
     if (handlePos != -1)
     {
         SeosCryptoKey_deInit(keyHandle);
-        removeHandle(&self->keyHandleVector, handlePos);
+        SeosCrypto_removeHandle(&self->keyHandleVector, handlePos);
         self->mem.memIf.free(keyHandle);
     }
     else
@@ -417,4 +437,163 @@ SeosCrypto_keyClose(SeosCrypto*             self,
     return retval;
 }
 
-// Implement KeyRelease
+seos_err_t
+SeosCrypto_cipherInit(SeosCrypto*                   self,
+                      SeosCrypto_CipherHandle*      pCipherHandle,
+                      SeosCryptoCipher_Algorithm    algorithm,
+                      SeosCryptoKey const*          key,
+                      void*                         iv,
+                      size_t                        ivLen)
+{
+    Debug_ASSERT_SELF(self);
+
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    *pCipherHandle =
+        self->mem.memIf.malloc(sizeof(SeosCryptoCipher));
+    seos_rng_t* rng =
+        self->mem.memIf.malloc(sizeof(*rng));
+    SeosCryptoRng* seosCryptoRng =
+        self->mem.memIf.malloc(sizeof(*seosCryptoRng));
+
+    if (NULL == *pCipherHandle || NULL == rng || NULL == seosCryptoRng)
+    {
+        retval = SEOS_ERROR_INSUFFICIENT_SPACE;
+        goto exit;
+    }
+    else if (seos_rng_init(rng,
+                           SeosCrypto_RANDOM_SEED_STR,
+                           sizeof(SeosCrypto_RANDOM_SEED_STR) - 1))
+    {
+        retval = SEOS_ERROR_ABORTED;
+        goto err0;
+    }
+    else
+    {
+        retval = SeosCryptoRng_init(seosCryptoRng,
+                                    rng,
+                                    (SeosCryptoRng_ImplRngFunc)
+                                    seos_rng_get_prng_bytes);
+        if (retval != SEOS_SUCCESS)
+        {
+            goto err1;
+        }
+        retval = SeosCryptoCipher_init(*pCipherHandle,
+                                       algorithm,
+                                       key,
+                                       seosCryptoRng,
+                                       iv,
+                                       ivLen);
+        if (retval != SEOS_SUCCESS)
+        {
+            goto err2;
+        }
+        else if (!PointerVector_pushBack(&self->cipherHandleVector,
+                                         *pCipherHandle))
+        {
+            retval = SEOS_ERROR_INSUFFICIENT_SPACE;
+            goto err3;
+        }
+        else
+        {
+            goto exit;
+        }
+    }
+err3:
+    SeosCryptoCipher_deInit(*pCipherHandle);
+err2:
+    SeosCryptoRng_deInit(seosCryptoRng);
+err1:
+    seos_rng_free(rng);
+err0:
+    self->mem.memIf.free(rng);
+    self->mem.memIf.free(seosCryptoRng);
+    self->mem.memIf.free(*pCipherHandle);
+exit:
+    return retval;
+}
+
+seos_err_t
+SeosCrypto_cipherClose(SeosCrypto*              self,
+                       SeosCrypto_CipherHandle  cipherHandle)
+{
+    Debug_ASSERT_SELF(self);
+    seos_err_t retval = SEOS_SUCCESS;
+
+    size_t handlePos = SeosCrypto_findHandle(&self->cipherHandleVector,
+                                             cipherHandle);
+    if (handlePos != -1)
+    {
+        SeosCryptoCipher* cipher = cipherHandle;
+
+        SeosCryptoCipher_deInit(cipher);
+        SeosCrypto_removeHandle(&self->cipherHandleVector, handlePos);
+
+        SeosCryptoRng_deInit(cipher->rng);
+        seos_rng_free(cipher->rng->implCtx);
+
+        self->mem.memIf.free(cipher->rng->implCtx);
+        self->mem.memIf.free(cipher->rng);
+        self->mem.memIf.free(cipher);
+    }
+    else
+    {
+        retval = SEOS_ERROR_INVALID_HANDLE;
+    }
+    return retval;
+}
+
+seos_err_t
+SeosCrypto_cipherUpdate(SeosCrypto*             self,
+                        SeosCrypto_CipherHandle cipherHandle,
+                        const void*             input,
+                        size_t                  inputSize,
+                        void**                  output,
+                        size_t*                 outputSize)
+{
+    Debug_ASSERT_SELF(self);
+    seos_err_t retval = SEOS_SUCCESS;
+
+    size_t handlePos = SeosCrypto_findHandle(&self->cipherHandleVector,
+                                             cipherHandle);
+    if (handlePos != -1)
+    {
+        retval = SeosCryptoCipher_update(cipherHandle,
+                                         input, inputSize,
+                                         output, outputSize);
+    }
+    else
+    {
+        retval = SEOS_ERROR_INVALID_HANDLE;
+    }
+    return retval;
+}
+
+seos_err_t
+SeosCrypto_cipherFinalize(SeosCrypto*               self,
+                          SeosCrypto_CipherHandle   cipherHandle,
+                          const void*               input,
+                          size_t                    inputSize,
+                          void**                    output,
+                          size_t*                   outputSize,
+                          void**                    tag,
+                          size_t*                   tagSize)
+{
+    Debug_ASSERT_SELF(self);
+    seos_err_t retval = SEOS_SUCCESS;
+
+    size_t handlePos = SeosCrypto_findHandle(&self->cipherHandleVector,
+                                             cipherHandle);
+    if (handlePos != -1)
+    {
+        retval = SeosCryptoCipher_finalize(cipherHandle,
+                                           input, inputSize,
+                                           output, outputSize,
+                                           tag, tagSize);
+    }
+    else
+    {
+        retval = SEOS_ERROR_INVALID_HANDLE;
+    }
+    return retval;
+}

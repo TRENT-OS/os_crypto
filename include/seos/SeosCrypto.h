@@ -13,8 +13,11 @@
 
 #include "seos_err.h"
 #include "seos_rng.h"
+#include "SeosCryptoRng.h"
 #include "SeosCryptoKey.h"
 #include "SeosCryptoDigest.h"
+#include "SeosCryptoCipher.h"
+
 #include "LibUtil/PointerVector.h"
 
 #define SeosCrypto_RANDOM_SEED_STR "SeosCryptoAPI"
@@ -38,6 +41,7 @@ SeosCrypto_StaticBuf;
 
 typedef void* SeosCrypto_KeyHandle;
 typedef void* SeosCrypto_DigestHandle;
+typedef void* SeosCrypto_CipherHandle;
 
 typedef struct
 {
@@ -47,11 +51,12 @@ typedef struct
         SeosCrypto_StaticBuf    staticBuf;
     }
     mem;
-    bool        isRngInitialized;
-    seos_rng_t  rng;
+    bool            isRngInitialized;
+    seos_rng_t      rng;
 
     PointerVector keyHandleVector;
     PointerVector digestHandleVector;
+    PointerVector cipherHandleVector;
 }
 SeosCrypto;
 
@@ -109,6 +114,33 @@ SeosCrypto_getRandomData(SeosCrypto*    self,
                          size_t         saltLen,
                          void*          buffer,
                          size_t         buffer_len);
+
+
+// ------------------------------ Digest API -----------------------------------
+
+seos_err_t
+SeosCrypto_digestInit(SeosCrypto*                   self,
+                      SeosCrypto_DigestHandle*      pDigestHandle,
+                      unsigned                      algorithm,
+                      void*                         iv,
+                      size_t                        ivLen);
+
+seos_err_t
+SeosCrypto_digestClose(SeosCrypto*              self,
+                       SeosCrypto_DigestHandle  digestHandle);
+
+seos_err_t
+SeosCrypto_digestUpdate(SeosCrypto*              self,
+                        SeosCrypto_DigestHandle  digestHandle,
+                        const void*              data,
+                        size_t                   len);
+seos_err_t
+SeosCrypto_digestFinalize(SeosCrypto*             self,
+                          SeosCrypto_DigestHandle digestHandle,
+                          const void*             data,
+                          size_t                  len,
+                          void**                  digest,
+                          size_t*                 digestSize);
 
 // -------------------------------- Key API ------------------------------------
 /**
@@ -317,29 +349,36 @@ SeosCrypto_deriveKey(SeosCrypto* self,
 //                       void* keyBlobBuffer,
 //                       size_t* len_keyBlobBuffer);
 
+// ------------------------------ Cipher API -----------------------------------
+
 seos_err_t
-SeosCrypto_digestInit(SeosCrypto*                   self,
-                      SeosCrypto_DigestHandle*      pDigestHandle,
-                      unsigned                      algorithm,
+SeosCrypto_cipherInit(SeosCrypto*                   self,
+                      SeosCrypto_CipherHandle*      pCipherHandle,
+                      unsigned int                  algorithm,
+                      SeosCryptoKey const*          key,
                       void*                         iv,
                       size_t                        ivLen);
 
-void
-SeosCrypto_digestClose(SeosCrypto*              self,
-                       SeosCrypto_DigestHandle  digestHandle);
-
+seos_err_t
+SeosCrypto_cipherClose(SeosCrypto*              self,
+                       SeosCrypto_CipherHandle  cipherHandle);
 
 seos_err_t
-SeosCrypto_digestUpdate(SeosCrypto*              self,
-                        SeosCrypto_DigestHandle  digestHandle,
-                        const void*              data,
-                        size_t                   len);
+SeosCrypto_cipherUpdate(SeosCrypto*             self,
+                        SeosCrypto_CipherHandle cipherHandle,
+                        const void*             input,
+                        size_t                  inputSize,
+                        void**                  output,
+                        size_t*                 outputSize);
+
 seos_err_t
-SeosCrypto_digestFinalize(SeosCrypto*             self,
-                          SeosCrypto_DigestHandle digestHandle,
-                          const void*             data,
-                          size_t                  len,
-                          void*                   digest,
-                          size_t                  digestSize);
+SeosCrypto_cipherFinalize(SeosCrypto*               self,
+                          SeosCrypto_CipherHandle   cipherHandle,
+                          const void*               input,
+                          size_t                    inputSize,
+                          void**                    output,
+                          size_t*                   outputSize,
+                          void**                    tag,
+                          size_t*                   tagSize);
 
 /** @} */
