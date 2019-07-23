@@ -40,7 +40,7 @@ typedef struct
     SeosCryptoCipher_Algorithm  algorithm;
     SeosCryptoKey const*        key;
     SeosCryptoRng*              rng;
-    char*                       iv;
+    void*                       iv;
     size_t                      ivLen;
     union
     {
@@ -71,12 +71,12 @@ SeosCryptoCipher;
  *
  */
 seos_err_t
-SeosCryptoCipher_init(SeosCryptoCipher* self,
-                      SeosCryptoCipher_Algorithm algorithm,
-                      SeosCryptoKey const* key,
-                      SeosCryptoRng* rng,
-                      char* iv,
-                      size_t ivLen);
+SeosCryptoCipher_init(SeosCryptoCipher*             self,
+                      SeosCryptoCipher_Algorithm    algorithm,
+                      SeosCryptoKey const*          key,
+                      SeosCryptoRng*                rng,
+                      void*                         iv,
+                      size_t                        ivLen);
 /**
  * @brief closes a cipher context.
  *
@@ -128,11 +128,11 @@ SeosCryptoCipher_updateAd(SeosCryptoCipher* self,
  *
  */
 seos_err_t
-SeosCryptoCipher_update(SeosCryptoCipher* self,
-                        const char* input,
-                        size_t inputSize,
-                        char** output,
-                        size_t* outputSize);
+SeosCryptoCipher_update(SeosCryptoCipher*   self,
+                        const void*         input,
+                        size_t              inputSize,
+                        void**              output,
+                        size_t*             outputSize);
 /**
  * @brief perform operation on final block, applies padding automatically if
  *  requested
@@ -167,12 +167,12 @@ SeosCryptoCipher_update(SeosCryptoCipher* self,
  */
 seos_err_t
 SeosCryptoCipher_finalize(SeosCryptoCipher* self,
-                          const char* input,
-                          size_t inputSize,
-                          char** output,
-                          size_t* outputSize,
-                          char** tag,
-                          size_t* tagSize);
+                          const void*       input,
+                          size_t            inputSize,
+                          void**            output,
+                          size_t*           outputSize,
+                          void**            tag,
+                          size_t*           tagSize);
 /**
  * @brief checks the previously computed tag against the provided one
  *
@@ -188,6 +188,6 @@ SeosCryptoCipher_finalize(SeosCryptoCipher* self,
  *
  */
 seos_err_t
-SeosCryptoCipher_verifyTag(SeosCryptoCipher* self,
-                           char* tag,
-                           size_t tagSize);
+SeosCryptoCipher_verifyTag(SeosCryptoCipher*    self,
+                           char*                tag,
+                           size_t               tagSize);

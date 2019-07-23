@@ -91,9 +91,9 @@ setKeyImpl(SeosCryptoCipher* self)
 
 static seos_err_t
 updateImpl(SeosCryptoCipher* self,
-           const char* input,
+           const void* input,
            size_t inputSize,
-           char** output,
+           void** output,
            size_t* outputSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -188,12 +188,12 @@ updateImpl(SeosCryptoCipher* self,
 // Public functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoCipher_init(SeosCryptoCipher* self,
-                      SeosCryptoCipher_Algorithm algorithm,
-                      SeosCryptoKey const* key,
-                      SeosCryptoRng* rng,
-                      char* iv,
-                      size_t ivLen)
+SeosCryptoCipher_init(SeosCryptoCipher*             self,
+                      SeosCryptoCipher_Algorithm    algorithm,
+                      SeosCryptoKey const*          key,
+                      SeosCryptoRng*                rng,
+                      void*                         iv,
+                      size_t                        ivLen)
 {
     Debug_ASSERT_SELF(self);
 
@@ -268,11 +268,11 @@ SeosCryptoCipher_updateAd(SeosCryptoCipher* self,
 }
 
 seos_err_t
-SeosCryptoCipher_update(SeosCryptoCipher* self,
-                        const char* input,
-                        size_t inputSize,
-                        char** output,
-                        size_t* outputSize)
+SeosCryptoCipher_update(SeosCryptoCipher*   self,
+                        const void*         input,
+                        size_t              inputSize,
+                        void**              output,
+                        size_t*             outputSize)
 {
     Debug_ASSERT_SELF(self);
 
@@ -305,12 +305,12 @@ SeosCryptoCipher_update(SeosCryptoCipher* self,
 
 seos_err_t
 SeosCryptoCipher_finalize(SeosCryptoCipher* self,
-                          const char* input,
-                          size_t inputSize,
-                          char** output,
-                          size_t* outputSize,
-                          char** tag,
-                          size_t* tagSize)
+                          const void*       input,
+                          size_t            inputSize,
+                          void**            output,
+                          size_t*           outputSize,
+                          void**            tag,
+                          size_t*           tagSize)
 {
     Debug_ASSERT_SELF(self);
 
@@ -334,9 +334,9 @@ SeosCryptoCipher_finalize(SeosCryptoCipher* self,
 }
 
 seos_err_t
-SeosCryptoCipher_verifyTag(SeosCryptoCipher* self,
-                           char* tag,
-                           size_t tagSize)
+SeosCryptoCipher_verifyTag(SeosCryptoCipher*    self,
+                           char*                tag,
+                           size_t               tagSize)
 {
     Debug_ASSERT_SELF(self);
 
