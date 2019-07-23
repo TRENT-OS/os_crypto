@@ -252,7 +252,7 @@ SeosCryptoClient_keyClose(SeosCryptoClient*     self,
  */
 seos_err_t
 SeosCryptoClient_cipherInit(SeosCryptoClient*           self,
-                            SeosCrypto_KeyHandle*       pKeyHandle,
+                            SeosCrypto_CipherHandle*    pKeyHandle,
                             unsigned int                algorithm,
                             SeosCrypto_KeyHandle        key,
                             void*                       iv,

@@ -39,9 +39,9 @@ typedef struct
 }
 SeosCrypto_StaticBuf;
 
-typedef void* SeosCrypto_KeyHandle;
-typedef void* SeosCrypto_DigestHandle;
-typedef void* SeosCrypto_CipherHandle;
+typedef SeosCryptoKey*      SeosCrypto_KeyHandle;
+typedef SeosCryptoDigest*   SeosCrypto_DigestHandle;
+typedef SeosCryptoCipher*   SeosCrypto_CipherHandle;
 
 typedef struct
 {

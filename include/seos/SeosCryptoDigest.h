@@ -11,12 +11,13 @@
  */
 #pragma once
 
-#include "SeosCrypto.h"
 #include "compiler.h"
 
 #include "mbedtls/md.h"
 #include "mbedtls/md5.h"
 #include "mbedtls/sha256.h"
+
+#include "seos_err.h"
 
 #include <string.h>
 

@@ -11,7 +11,6 @@
  */
 #pragma once
 
-#include "SeosCrypto.h"
 #include "SeosCryptoRng.h"
 
 #include "mbedtls/aes.h"
