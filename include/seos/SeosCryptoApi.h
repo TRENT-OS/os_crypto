@@ -90,7 +90,7 @@ SeosCryptoApi_digestInit(SeosCryptoApi*             self,
                          char*                      iv,
                          size_t                     ivLen);
 
-void
+seos_err_t
 SeosCryptoApi_digestClose(SeosCryptoApi*             self,
                           SeosCrypto_DigestHandle    digestHandle);
 
@@ -105,8 +105,8 @@ SeosCryptoApi_digestFinalize(SeosCryptoApi*              self,
                              SeosCrypto_DigestHandle     digestHandle,
                              const void*                 data,
                              size_t                      dataLen,
-                             void*                       digest,
-                             size_t                      digestSize);
+                             void**                      digest,
+                             size_t*                     digestSize);
 
 seos_err_t
 SeosCryptoApi_keyGenerate(SeosCryptoApi*           self,
@@ -121,5 +121,28 @@ SeosCryptoApi_keyImport(SeosCryptoApi*          self,
                         unsigned int            flags,
                         void const*             keyImportBuffer,
                         size_t                  keyImportLenBits);
+
+seos_err_t
+SeosCryptoApi_keyClose(SeosCryptoApi*       self,
+                       SeosCrypto_KeyHandle keyHandle);
+
+seos_err_t
+SeosCryptoApi_cipherInit(SeosCryptoApi*             self,
+                         SeosCrypto_CipherHandle*   pCipherHandle,
+                         unsigned int               algorithm,
+                         SeosCrypto_KeyHandle       keyHandle,
+                         void*                      iv,
+                         size_t                     ivLen);
+
+seos_err_t
+SeosCryptoApi_cipherClose(SeosCryptoApi*            self,
+                          SeosCrypto_CipherHandle   cipherHandle);
+seos_err_t
+SeosCryptoApi_cipherUpdate(SeosCryptoApi*           self,
+                           SeosCrypto_CipherHandle  cipherHandle,
+                           const void*              data,
+                           size_t                   dataLen,
+                           void**                   output,
+                           size_t*                  outputSize);
 
 /** @} */

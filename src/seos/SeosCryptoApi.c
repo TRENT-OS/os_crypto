@@ -116,20 +116,24 @@ SeosCryptoApi_digestInit(SeosCryptoApi*              self,
     return retval;
 }
 
-void
+seos_err_t
 SeosCryptoApi_digestClose(SeosCryptoApi*             self,
                           SeosCrypto_DigestHandle    digestHandle)
 {
     Debug_ASSERT_SELF(self);
+    seos_err_t retval = SEOS_ERROR_GENERIC;
 
     if (self->isLocalConnection)
     {
-        SeosCrypto_digestClose(self->connector.local.crypto, digestHandle);
+        retval = SeosCrypto_digestClose(self->connector.local.crypto,
+                                        digestHandle);
     }
     else
     {
-        SeosCryptoClient_digestClose(self->connector.rpc.client, digestHandle);
+        retval = SeosCryptoClient_digestClose(self->connector.rpc.client,
+                                              digestHandle);
     }
+    return retval;
 }
 
 seos_err_t
@@ -163,8 +167,8 @@ SeosCryptoApi_digestFinalize(SeosCryptoApi*              self,
                              SeosCrypto_DigestHandle     digestHandle,
                              const void*                 data,
                              size_t                      dataLen,
-                             void*                       digest,
-                             size_t                      digestSize)
+                             void**                      digest,
+                             size_t*                     digestSize)
 {
     Debug_ASSERT_SELF(self);
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -180,12 +184,12 @@ SeosCryptoApi_digestFinalize(SeosCryptoApi*              self,
     }
     else
     {
-        retval = SeosCryptoClient_digestFinalize2(self->connector.rpc.client,
-                                                  digestHandle,
-                                                  data,
-                                                  dataLen,
-                                                  digest,
-                                                  digestSize);
+        retval = SeosCryptoClient_digestFinalize(self->connector.rpc.client,
+                                                 digestHandle,
+                                                 data,
+                                                 dataLen,
+                                                 digest,
+                                                 digestSize);
     }
     return retval;
 }
@@ -249,3 +253,104 @@ SeosCryptoApi_keyImport(SeosCryptoApi*          self,
     }
     return retval;
 }
+
+seos_err_t
+SeosCryptoApi_keyClose(SeosCryptoApi*       self,
+                       SeosCrypto_KeyHandle keyHandle)
+{
+    Debug_ASSERT_SELF(self);
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    if (self->isLocalConnection)
+    {
+        retval = SeosCrypto_keyClose(self->connector.local.crypto,
+                                     keyHandle);
+    }
+    else
+    {
+        retval = SeosCryptoClient_keyClose(self->connector.rpc.client,
+                                           keyHandle);
+    }
+    return retval;
+}
+
+seos_err_t
+SeosCryptoApi_cipherInit(SeosCryptoApi*             self,
+                         SeosCrypto_CipherHandle*   pCipherHandle,
+                         unsigned int               algorithm,
+                         SeosCrypto_KeyHandle       keyHandle,
+                         void*                      iv,
+                         size_t                     ivLen)
+{
+    Debug_ASSERT_SELF(self);
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    if (self->isLocalConnection)
+    {
+        retval = SeosCrypto_cipherInit(self->connector.local.crypto,
+                                       pCipherHandle,
+                                       algorithm,
+                                       keyHandle,
+                                       iv,
+                                       ivLen);
+    }
+    else
+    {
+        retval = SeosCryptoClient_cipherInit(self->connector.rpc.client,
+                                             pCipherHandle,
+                                             algorithm,
+                                             keyHandle,
+                                             iv,
+                                             ivLen);
+    }
+    return retval;
+}
+
+seos_err_t
+SeosCryptoApi_cipherClose(SeosCryptoApi*            self,
+                          SeosCrypto_CipherHandle   cipherHandle)
+{
+    Debug_ASSERT_SELF(self);
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    if (self->isLocalConnection)
+    {
+        retval = SeosCrypto_cipherClose(self->connector.local.crypto,
+                                        cipherHandle);
+    }
+    else
+    {
+        retval = SeosCryptoClient_cipherClose(self->connector.rpc.client,
+                                              cipherHandle);
+    }
+    return retval;
+}
+
+seos_err_t
+SeosCryptoApi_cipherUpdate(SeosCryptoApi*           self,
+                           SeosCrypto_CipherHandle  cipherHandle,
+                           const void*              data,
+                           size_t                   dataLen,
+                           void**                   output,
+                           size_t*                  outputSize)
+{
+    Debug_ASSERT_SELF(self);
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    if (self->isLocalConnection)
+    {
+        retval = SeosCrypto_cipherUpdate(self->connector.local.crypto,
+                                         cipherHandle,
+                                         data, dataLen,
+                                         output, outputSize);
+    }
+    else
+    {
+        retval = SeosCryptoClient_cipherUpdate(self->connector.rpc.client,
+                                               cipherHandle,
+                                               data, dataLen,
+                                               output, outputSize);
+    }
+    return retval;
+}
+
