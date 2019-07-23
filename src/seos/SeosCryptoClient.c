@@ -98,13 +98,13 @@ SeosCryptoClient_digestInit(SeosCryptoClient*           self,
     return retval;
 }
 
-void
+seos_err_t
 SeosCryptoClient_digestClose(SeosCryptoClient*          self,
                              SeosCrypto_DigestHandle    digestHandle)
 {
     Debug_ASSERT_SELF(self);
 
-    SeosCryptoRpc_digestClose(self->rpcHandle, digestHandle);
+    return SeosCryptoRpc_digestClose(self->rpcHandle, digestHandle);
 }
 
 seos_err_t
@@ -234,11 +234,19 @@ SeosCryptoClient_keyImport(SeosCryptoClient*      self,
 }
 
 seos_err_t
-SeosCryptoClient_cipherInit(SeosCryptoClient* self,
-                            SeosCryptoCipher_Algorithm algorithm,
-                            SeosCrypto_KeyHandle key,
-                            char* iv,
-                            size_t ivLen)
+SeosCryptoClient_keyClose(SeosCryptoClient*     self,
+                          SeosCrypto_KeyHandle  keyHandle)
+{
+    return SeosCryptoRpc_keyClose(self->rpcHandle, keyHandle);
+}
+
+seos_err_t
+SeosCryptoClient_cipherInit(SeosCryptoClient*           self,
+                            SeosCrypto_KeyHandle*       pKeyHandle,
+                            SeosCryptoCipher_Algorithm  algorithm,
+                            SeosCrypto_KeyHandle        key,
+                            void*                       iv,
+                            size_t                      ivLen)
 {
     Debug_ASSERT_SELF(self);
 
@@ -255,6 +263,7 @@ SeosCryptoClient_cipherInit(SeosCryptoClient* self,
             memcpy(self->clientDataport, iv, ivLen);
         }
         retval = SeosCryptoRpc_cipherInit(self->rpcHandle,
+                                          pKeyHandle,
                                           algorithm,
                                           key,
                                           ivLen);
@@ -262,20 +271,22 @@ SeosCryptoClient_cipherInit(SeosCryptoClient* self,
     return retval;
 }
 
-void
-SeosCryptoClient_cipherClose(SeosCryptoClient* self)
+seos_err_t
+SeosCryptoClient_cipherClose(SeosCryptoClient*          self,
+                             SeosCrypto_CipherHandle    cipherHandle)
 {
     Debug_ASSERT_SELF(self);
 
-    SeosCryptoRpc_cipherClose(self->rpcHandle);
+    return SeosCryptoRpc_cipherClose(self->rpcHandle, cipherHandle);
 }
 
 seos_err_t
-SeosCryptoClient_cipherUpdate(SeosCryptoClient* self,
-                              const char* data,
-                              size_t dataLen,
-                              char** output,
-                              size_t* outputSize)
+SeosCryptoClient_cipherUpdate(SeosCryptoClient*         self,
+                              SeosCrypto_CipherHandle   cipherHandle,
+                              const void*               data,
+                              size_t                    dataLen,
+                              void**                    output,
+                              size_t*                   outputSize)
 {
     Debug_ASSERT_SELF(self);
 
@@ -289,7 +300,9 @@ SeosCryptoClient_cipherUpdate(SeosCryptoClient* self,
     else
     {
         memcpy(self->clientDataport, data, dataLen);
-        retval = SeosCryptoRpc_cipherUpdate(self->rpcHandle, dataLen);
+        retval = SeosCryptoRpc_cipherUpdate(self->rpcHandle,
+                                            cipherHandle,
+                                            dataLen);
 
         if (SEOS_SUCCESS == retval)
         {
@@ -322,11 +335,12 @@ SeosCryptoClient_cipherUpdate(SeosCryptoClient* self,
 }
 
 seos_err_t
-SeosCryptoClient_cipherFinalize(SeosCryptoClient* self,
-                                const char* data,
-                                size_t dataLen,
-                                char** digest,
-                                size_t* digestSize)
+SeosCryptoClient_cipherFinalize(SeosCryptoClient*       self,
+                                SeosCrypto_CipherHandle cipherHandle,
+                                const void*             data,
+                                size_t                  dataLen,
+                                void**                  digest,
+                                size_t*                 digestSize)
 {
     Debug_ASSERT_SELF(self);
 

@@ -108,7 +108,7 @@ SeosCryptoClient_getRandomData2(SeosCryptoClient*    self,
 seos_err_t
 SeosCryptoClient_digestInit(SeosCryptoClient*           self,
                             SeosCrypto_DigestHandle*    pDigestHandle,
-                            SeosCryptoDigest_Algorithm  algorithm,
+                            unsigned int                algorithm,
                             void*                       iv,
                             size_t                      ivLen);
 /**
@@ -119,7 +119,7 @@ SeosCryptoClient_digestInit(SeosCryptoClient*           self,
  *  used
  *
  */
-void
+seos_err_t
 SeosCryptoClient_digestClose(SeosCryptoClient*          self,
                              SeosCrypto_DigestHandle    digestHandle);
 /**
@@ -226,6 +226,10 @@ SeosCryptoClient_keyImport(SeosCryptoClient*      self,
                            unsigned int           flags,
                            void const*            keyImportBuffer,
                            size_t                 keyImportLenBits);
+
+seos_err_t
+SeosCryptoClient_keyClose(SeosCryptoClient*     self,
+                          SeosCrypto_KeyHandle  keyHandle);
 /**
  * @brief initializes the digest context owned by the client but leaving in the
  *  server
@@ -247,11 +251,12 @@ SeosCryptoClient_keyImport(SeosCryptoClient*      self,
  *
  */
 seos_err_t
-SeosCryptoClient_cipherInit(SeosCryptoClient* self,
-                            SeosCryptoCipher_Algorithm algorithm,
-                            SeosCrypto_KeyHandle key,
-                            char* iv,
-                            size_t ivLen);
+SeosCryptoClient_cipherInit(SeosCryptoClient*           self,
+                            SeosCrypto_KeyHandle*       pKeyHandle,
+                            unsigned int                algorithm,
+                            SeosCrypto_KeyHandle        key,
+                            void*                       iv,
+                            size_t                      ivLen);
 /**
  * @brief closes the digest context owned by the client but leaving in the
  *  server
@@ -260,8 +265,9 @@ SeosCryptoClient_cipherInit(SeosCryptoClient* self,
  *  used
  *
  */
-void
-SeosCryptoClient_cipherClose(SeosCryptoClient* self);
+seos_err_t
+SeosCryptoClient_cipherClose(SeosCryptoClient*          self,
+                             SeosCrypto_CipherHandle    cipherHandle);
 /**
  * @brief perform cipher operation on a block
  *
@@ -290,11 +296,12 @@ SeosCryptoClient_cipherClose(SeosCryptoClient* self);
  *
  */
 seos_err_t
-SeosCryptoClient_cipherUpdate(SeosCryptoClient* self,
-                              const char* data,
-                              size_t dataLen,
-                              char** output,
-                              size_t* outputSize);
+SeosCryptoClient_cipherUpdate(SeosCryptoClient*         self,
+                              SeosCrypto_CipherHandle   cipherHandle,
+                              const void*               data,
+                              size_t                    dataLen,
+                              void**                    output,
+                              size_t*                   outputSize);
 /**
  * @brief perform operation on final block, applies padding automatically if
  *  requested
@@ -331,10 +338,11 @@ SeosCryptoClient_cipherUpdate(SeosCryptoClient* self,
  *
  */
 seos_err_t
-SeosCryptoClient_cipherFinalize(SeosCryptoClient* self,
-                                const char* data,
-                                size_t dataLen,
-                                char** digest,
-                                size_t* digestSize);
+SeosCryptoClient_cipherFinalize(SeosCryptoClient*       self,
+                                SeosCrypto_CipherHandle cipherHandle,
+                                const void*             data,
+                                size_t                  dataLen,
+                                void**                  digest,
+                                size_t*                 digestSize);
 
 /** @} */
