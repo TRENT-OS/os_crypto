@@ -24,10 +24,6 @@ typedef struct
     seosCryptoCtx;  ///< crypto context to be used by the RPC object
     void*
     serverDataport;     ///< the server's address of the dataport shared with the client
-
-    seos_rng_t        rng;
-    SeosCryptoRng     seosCryptoRng;
-    SeosCryptoCipher* seosCryptoCipher;
 }
 SeosCryptoRpc;
 
@@ -101,7 +97,7 @@ SeosCryptoRpc_digestInit(SeosCryptoRpc*             self,
  * @return an error code. See SeosCryptoDigest_dtor()
  *
  */
-void
+seos_err_t
 SeosCryptoRpc_digestClose(SeosCryptoRpc* self,
                           SeosCrypto_DigestHandle   digestHandle);
 /**
@@ -152,6 +148,11 @@ SeosCryptoRpc_keyImport(SeosCryptoRpc*          self,
                         unsigned int            algorithm,
                         unsigned int            flags,
                         size_t                  keyImportLenBits);
+
+seos_err_t
+SeosCryptoRpc_keyClose(SeosCryptoRpc*          self,
+                       SeosCrypto_KeyHandle    keyHandle);
+
 /**
  * @brief creates a new instance of SeosCryptoCipher
  *
@@ -167,10 +168,11 @@ SeosCryptoRpc_keyImport(SeosCryptoRpc*          self,
  *
  */
 seos_err_t
-SeosCryptoRpc_cipherInit(SeosCryptoRpc* self,
+SeosCryptoRpc_cipherInit(SeosCryptoRpc*             self,
+                         SeosCrypto_CipherHandle*   pCipherHandle,
                          SeosCryptoCipher_Algorithm algorithm,
-                         SeosCrypto_KeyHandle keyHandle,
-                         size_t ivLen);
+                         SeosCrypto_KeyHandle       keyHandle,
+                         size_t                     ivLen);
 /**
  * @brief destroyes the instance of SeosCryptoCipher and frees resources
  *
@@ -179,8 +181,9 @@ SeosCryptoRpc_cipherInit(SeosCryptoRpc* self,
  * @return an error code. See SeosCryptoCipher_dtor()
  *
  */
-void
-SeosCryptoRpc_cipherClose(SeosCryptoRpc* self);
+seos_err_t
+SeosCryptoRpc_cipherClose(SeosCryptoRpc*            self,
+                          SeosCrypto_CipherHandle   cipherHandle);
 /**
  * @brief calls SeosCryptoCipher_update() using the server dataport as input
  *  buffer. The result is consequently written in the same dataport. The first
@@ -193,8 +196,9 @@ SeosCryptoRpc_cipherClose(SeosCryptoRpc* self);
  *
  */
 seos_err_t
-SeosCryptoRpc_cipherUpdate(SeosCryptoRpc* self,
-                           size_t len);
+SeosCryptoRpc_cipherUpdate(SeosCryptoRpc*           self,
+                           SeosCrypto_CipherHandle  cipherHandle,
+                           size_t                   len);
 /**
  * @brief calls SeosCryptoCipher_finalize() using the server dataport as input
  *  buffer. The result is consequently written in the same dataport. The first
@@ -207,7 +211,8 @@ SeosCryptoRpc_cipherUpdate(SeosCryptoRpc* self,
  * @retval SEOS_ERROR_ABORTED if the result cannot fit in the server dataport
  */
 seos_err_t
-SeosCryptoRpc_cipherFinalize(SeosCryptoRpc* self,
-                             size_t len);
+SeosCryptoRpc_cipherFinalize(SeosCryptoRpc*             self,
+                             SeosCrypto_CipherHandle    cipherHandle,
+                             size_t                     len);
 
 /** @} */

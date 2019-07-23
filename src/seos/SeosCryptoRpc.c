@@ -136,16 +136,22 @@ SeosCryptoRpc_digestInit(SeosCryptoRpc*             self,
     return retval;
 }
 
-void
+seos_err_t
 SeosCryptoRpc_digestClose(SeosCryptoRpc*            self,
                           SeosCrypto_DigestHandle   digestHandle)
 {
     Debug_LOG_TRACE("%s", __func__);
+    seos_err_t retval = SEOS_ERROR_GENERIC;
 
-    if (isValidHandle(self))
+    if (!isValidHandle(self))
     {
-        SeosCrypto_digestClose(self->seosCryptoCtx, digestHandle);
+        retval = SEOS_ERROR_INVALID_HANDLE;
     }
+    else
+    {
+        retval = SeosCrypto_digestClose(self->seosCryptoCtx, digestHandle);
+    }
+    return retval;
 }
 
 seos_err_t
@@ -196,7 +202,8 @@ SeosCryptoRpc_digestFinalize(SeosCryptoRpc*             self,
     }
     else
     {
-        retval = SeosCryptoDigest_finalize(digestHandle,
+        retval = SeosCrypto_digestFinalize(self->seosCryptoCtx,
+                                           digestHandle,
                                            len ?
                                            self->serverDataport : NULL,
                                            len,
@@ -309,99 +316,62 @@ SeosCryptoRpc_keyClose(SeosCryptoRpc*          self,
 }
 
 seos_err_t
-SeosCryptoRpc_cipherInit(SeosCryptoRpc* self,
+SeosCryptoRpc_cipherInit(SeosCryptoRpc*             self,
+                         SeosCrypto_CipherHandle*   pCipherHandle,
                          SeosCryptoCipher_Algorithm algorithm,
-                         SeosCrypto_KeyHandle keyHandle,
-                         size_t ivLen)
+                         SeosCrypto_KeyHandle       keyHandle,
+                         size_t                     ivLen)
 {
     Debug_LOG_TRACE("%s: algo %d, keyHandle %p, ivLen %zu",
                     __func__,
                     algorithm,
                     keyHandle
                     ivLen);
-
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
     if (!isValidHandle(self))
     {
         retval = SEOS_ERROR_INVALID_HANDLE;
     }
-    else if (NULL == self->seosCryptoCtx->mem.memIf.malloc
-             || NULL == self->seosCryptoCtx->mem.memIf.free)
-    {
-        retval = SEOS_ERROR_ABORTED;
-    }
-    else if (self->seosCryptoCipher != NULL)
-    {
-        retval = SEOS_ERROR_INSUFFICIENT_SPACE;
-    }
     else
     {
-        self->seosCryptoCipher = malloc(sizeof(*self->seosCryptoCipher));
-        if (NULL == self->seosCryptoCipher)
-        {
-            retval = SEOS_ERROR_ABORTED;
-        }
-        else
-        {
-            if (seos_rng_init(&self->rng,
-                              SeosCrypto_RANDOM_SEED_STR,
-                              sizeof(SeosCrypto_RANDOM_SEED_STR) - 1 ))
-            {
-                retval = SEOS_ERROR_ABORTED;
-                goto exit;
-            }
-            retval = SeosCryptoRng_init(&self->seosCryptoRng,
-                                        &self->rng,
-                                        (SeosCryptoRng_ImplRngFunc)
-                                        seos_rng_get_prng_bytes);
-            if (retval != SEOS_SUCCESS)
-            {
-                goto err0;
-            }
-            retval = SeosCryptoCipher_init(self->seosCryptoCipher,
-                                           algorithm,
-                                           keyHandle,
-                                           &self->seosCryptoRng,
-                                           self->serverDataport,
-                                           ivLen);
-            if (retval != SEOS_SUCCESS)
-            {
-                goto err1;
-            }
-        }
+        retval = SeosCrypto_cipherInit(self->seosCryptoCtx,
+                                       pCipherHandle,
+                                       algorithm,
+                                       keyHandle,
+                                       self->serverDataport,
+                                       ivLen);
     }
-    goto exit;
-err1:
-    SeosCryptoRng_deInit(&self->seosCryptoRng);
-err0:
-    seos_rng_free(&self->rng);
-exit:
     return retval;
 }
 
-void
-SeosCryptoRpc_cipherClose(SeosCryptoRpc* self)
+seos_err_t
+SeosCryptoRpc_cipherClose(SeosCryptoRpc*            self,
+                          SeosCrypto_CipherHandle   cipherHandle)
 {
     Debug_LOG_TRACE("%s", __func__);
+    seos_err_t retval = SEOS_ERROR_GENERIC;
 
-    if (isValidHandle(self) && self->seosCryptoCipher != NULL)
+    if (isValidHandle(self))
     {
-        SeosCryptoCipher_deInit(self->seosCryptoCipher);
-        SeosCryptoRng_deInit(&self->seosCryptoRng);
-        self->seosCryptoCtx->mem.memIf.free(self->seosCryptoCipher);
-        self->seosCryptoCipher = NULL;
+        retval = SeosCrypto_cipherClose(self->seosCryptoCtx, cipherHandle);
     }
+    else
+    {
+        retval = SEOS_ERROR_INVALID_HANDLE;
+    }
+    return retval;
 }
 
 seos_err_t
-SeosCryptoRpc_cipherUpdate(SeosCryptoRpc* self,
-                           size_t len)
+SeosCryptoRpc_cipherUpdate(SeosCryptoRpc*           self,
+                           SeosCrypto_CipherHandle  cipherHandle,
+                           size_t                   len)
 {
     Debug_LOG_TRACE("%s", __func__);
 
     seos_err_t  retval      = SEOS_ERROR_GENERIC;
-    char*       output      = NULL;
+    void*       output      = NULL;
     size_t      outputSize  = 0;
 
     if (!isValidHandle(self))
@@ -414,7 +384,8 @@ SeosCryptoRpc_cipherUpdate(SeosCryptoRpc* self,
     }
     else
     {
-        retval = SeosCryptoCipher_update(self->seosCryptoCipher,
+        retval = SeosCrypto_cipherUpdate(self->seosCryptoCtx,
+                                         cipherHandle,
                                          self->serverDataport,
                                          len,
                                          &output,
@@ -442,14 +413,15 @@ SeosCryptoRpc_cipherUpdate(SeosCryptoRpc* self,
 }
 
 seos_err_t
-SeosCryptoRpc_cipherFinalize(SeosCryptoRpc* self,
-                             size_t len)
+SeosCryptoRpc_cipherFinalize(SeosCryptoRpc*             self,
+                             SeosCrypto_CipherHandle    cipherHandle,
+                             size_t                     len)
 {
     Debug_LOG_TRACE("%s", __func__);
 
     seos_err_t retval   = SEOS_ERROR_GENERIC;
-    char*   output      = NULL;
-    char*   tag         = NULL;
+    void*   output      = NULL;
+    void*   tag         = NULL;
     size_t  outputSize  = 0;
     size_t  tagSize     = 0;
 
@@ -463,7 +435,8 @@ SeosCryptoRpc_cipherFinalize(SeosCryptoRpc* self,
     }
     else
     {
-        retval = SeosCryptoCipher_finalize(self->seosCryptoCipher,
+        retval = SeosCrypto_cipherFinalize(self->seosCryptoCtx,
+                                           cipherHandle,
                                            self->serverDataport,
                                            len,
                                            &output,
