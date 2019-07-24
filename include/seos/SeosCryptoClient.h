@@ -138,7 +138,8 @@ SeosCryptoClient_digestFinalize2(SeosCryptoClient*          self,
                                  size_t                     digestSize)
 {
     void* pDigest = digest;
-    return SeosCryptoClient_digestFinalize(SeosCryptoClient_TO_SEOS_CRYPTO_API(self),
+    return SeosCryptoClient_digestFinalize(SeosCryptoClient_TO_SEOS_CRYPTO_API(
+                                               self),
                                            digestHandle,
                                            data,
                                            len,
@@ -152,7 +153,8 @@ SeosCryptoClient_digestFinalizeNoData(SeosCryptoClient*             self,
                                       void**                        digest,
                                       size_t*                       digestSize)
 {
-    return SeosCryptoClient_digestFinalize(SeosCryptoClient_TO_SEOS_CRYPTO_API(self),
+    return SeosCryptoClient_digestFinalize(SeosCryptoClient_TO_SEOS_CRYPTO_API(
+                                               self),
                                            digestHandle,
                                            NULL, 0,
                                            digest, digestSize);

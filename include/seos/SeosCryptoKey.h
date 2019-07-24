@@ -41,7 +41,7 @@ typedef struct
 SeosCryptoKey;
 
 Debug_STATIC_ASSERT(SeosCryptoKey_Flags_MAX\
-        <= sizeof(((SeosCryptoKey *)0)->flags) * CHAR_BIT);
+                    <= sizeof(((SeosCryptoKey*)0)->flags) * CHAR_BIT);
 
 /**
  * @brief initializes a SeosCryptoKey context
@@ -83,5 +83,5 @@ INLINE size_t
 SeosCryptoKey_getSize(SeosCryptoKey* self)
 {
     return self->lenBits / CHAR_BIT
-            + ((self->lenBits % CHAR_BIT) ? 1 : 0);
+           + ((self->lenBits % CHAR_BIT) ? 1 : 0);
 }
