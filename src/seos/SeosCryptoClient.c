@@ -22,6 +22,7 @@ static const SeosCryptoApi_Vtable SeosCryptoClient_vtable =
     .deInit         = SeosCryptoClient_deInit
 };
 
+// Public functions ------------------------------------------------------------
 seos_err_t
 SeosCryptoClient_init(SeosCryptoClient* self,
                       SeosCryptoRpc_Handle rpcHandle,
@@ -123,6 +124,7 @@ SeosCryptoClient_digestInit(SeosCryptoApi*                  api,
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
     Debug_ASSERT_SELF(self);
+    Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
 
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -150,6 +152,7 @@ SeosCryptoClient_digestClose(SeosCryptoApi*             api,
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
     Debug_ASSERT_SELF(self);
+    Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
 
     return SeosCryptoRpc_digestClose(self->rpcHandle, digestHandle);
 }
@@ -162,6 +165,7 @@ SeosCryptoClient_digestUpdate(SeosCryptoApi*                api,
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
     Debug_ASSERT_SELF(self);
+    Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
 
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -189,6 +193,7 @@ SeosCryptoClient_digestFinalize(SeosCryptoApi*              api,
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
     Debug_ASSERT_SELF(self);
+    Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
 
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -245,6 +250,7 @@ SeosCryptoClient_keyGenerate(SeosCryptoApi*             api,
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
     Debug_ASSERT_SELF(self);
+    Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
 
     return SeosCryptoRpc_keyGenerate(self->rpcHandle,
                                      pKeyHandle,
@@ -263,6 +269,7 @@ SeosCryptoClient_keyImport(SeosCryptoApi*           api,
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
     Debug_ASSERT_SELF(self);
+    Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
 
     seos_err_t retval   = SEOS_ERROR_GENERIC;
     size_t sizeRawKey   = keyImportLenBits / CHAR_BIT
@@ -289,6 +296,8 @@ SeosCryptoClient_keyClose(SeosCryptoApi*            api,
                           SeosCryptoApi_KeyHandle   keyHandle)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
+    Debug_ASSERT(self);
+    Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
     return SeosCryptoRpc_keyClose(self->rpcHandle, keyHandle);
 }
 
@@ -302,6 +311,7 @@ SeosCryptoClient_cipherInit(SeosCryptoApi*                  api,
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
     Debug_ASSERT_SELF(self);
+    Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
 
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -330,6 +340,7 @@ SeosCryptoClient_cipherClose(SeosCryptoApi*             api,
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
     Debug_ASSERT_SELF(self);
+    Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
 
     return SeosCryptoRpc_cipherClose(self->rpcHandle, cipherHandle);
 }
@@ -344,6 +355,7 @@ SeosCryptoClient_cipherUpdate(SeosCryptoApi*                api,
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
     Debug_ASSERT_SELF(self);
+    Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
 
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -399,6 +411,7 @@ SeosCryptoClient_cipherFinalize(SeosCryptoApi*              api,
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
     Debug_ASSERT_SELF(self);
+    Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
 
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
