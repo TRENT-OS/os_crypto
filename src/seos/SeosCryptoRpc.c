@@ -60,7 +60,7 @@ SeosCryptoRpc_init(SeosCryptoRpc*   self,
         goto exit;
     }
     memset(self, 0, sizeof(*self));
-    self->seosCryptoCtx     = seosCryptoApiCtx;
+    self->seosCryptoApi     = SeosCrypto_TO_SEOS_CRYPTO_API(seosCryptoApiCtx);
     self->serverDataport    = serverDataport;
     retval                  = SEOS_SUCCESS;
 
@@ -97,7 +97,7 @@ SeosCryptoRpc_getRandomData(SeosCryptoRpc* self,
     }
     else
     {
-        retval = SeosCrypto_getRandomData(self->seosCryptoCtx,
+        retval = SeosCrypto_getRandomData(self->seosCryptoApi,
                                           flags,
                                           saltLen > 0
                                           ? self->serverDataport : NULL,
@@ -109,10 +109,10 @@ SeosCryptoRpc_getRandomData(SeosCryptoRpc* self,
 }
 
 seos_err_t
-SeosCryptoRpc_digestInit(SeosCryptoRpc*             self,
-                         SeosCrypto_DigestHandle*   pDigestHandle,
-                         SeosCryptoDigest_Algorithm algorithm,
-                         size_t                     ivLen)
+SeosCryptoRpc_digestInit(SeosCryptoRpc*                 self,
+                         SeosCryptoApi_DigestHandle*    pDigestHandle,
+                         SeosCryptoDigest_Algorithm     algorithm,
+                         size_t                         ivLen)
 {
     Debug_LOG_TRACE("%s: algo %d, ivLen %u",
                     __func__,
@@ -127,7 +127,7 @@ SeosCryptoRpc_digestInit(SeosCryptoRpc*             self,
     }
     else
     {
-        retval = SeosCrypto_digestInit(self->seosCryptoCtx,
+        retval = SeosCrypto_digestInit(self->seosCryptoApi,
                                        pDigestHandle,
                                        algorithm,
                                        self->serverDataport,
@@ -138,7 +138,7 @@ SeosCryptoRpc_digestInit(SeosCryptoRpc*             self,
 
 seos_err_t
 SeosCryptoRpc_digestClose(SeosCryptoRpc*            self,
-                          SeosCrypto_DigestHandle   digestHandle)
+                          SeosCryptoApi_DigestHandle   digestHandle)
 {
     Debug_LOG_TRACE("%s", __func__);
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -149,14 +149,15 @@ SeosCryptoRpc_digestClose(SeosCryptoRpc*            self,
     }
     else
     {
-        retval = SeosCrypto_digestClose(self->seosCryptoCtx, digestHandle);
+        retval = SeosCrypto_digestClose(self->seosCryptoApi,
+                                        digestHandle);
     }
     return retval;
 }
 
 seos_err_t
 SeosCryptoRpc_digestUpdate(SeosCryptoRpc*           self,
-                           SeosCrypto_DigestHandle  digestHandle,
+                           SeosCryptoApi_DigestHandle  digestHandle,
                            size_t                   len)
 {
     Debug_LOG_TRACE("%s", __func__);
@@ -173,7 +174,7 @@ SeosCryptoRpc_digestUpdate(SeosCryptoRpc*           self,
     }
     else
     {
-        retval = SeosCrypto_digestUpdate(self->seosCryptoCtx,
+        retval = SeosCrypto_digestUpdate(self->seosCryptoApi,
                                          digestHandle,
                                          self->serverDataport,
                                          len);
@@ -183,7 +184,7 @@ SeosCryptoRpc_digestUpdate(SeosCryptoRpc*           self,
 
 seos_err_t
 SeosCryptoRpc_digestFinalize(SeosCryptoRpc*             self,
-                             SeosCrypto_DigestHandle    digestHandle,
+                             SeosCryptoApi_DigestHandle    digestHandle,
                              size_t                     len)
 {
     Debug_LOG_TRACE("%s", __func__);
@@ -202,7 +203,7 @@ SeosCryptoRpc_digestFinalize(SeosCryptoRpc*             self,
     }
     else
     {
-        retval = SeosCrypto_digestFinalize(self->seosCryptoCtx,
+        retval = SeosCrypto_digestFinalize(self->seosCryptoApi,
                                            digestHandle,
                                            len ?
                                            self->serverDataport : NULL,
@@ -228,7 +229,7 @@ SeosCryptoRpc_digestFinalize(SeosCryptoRpc*             self,
 
 seos_err_t
 SeosCryptoRpc_keyGenerate(SeosCryptoRpc*                self,
-                          SeosCrypto_KeyHandle*         pKeyHandle,
+                          SeosCryptoApi_KeyHandle*      pKeyHandle,
                           unsigned int                  algorithm,
                           unsigned int                  flags,
                           size_t                        lenBits)
@@ -241,7 +242,7 @@ SeosCryptoRpc_keyGenerate(SeosCryptoRpc*                self,
     }
     else
     {
-        retval = SeosCrypto_keyGenerate(self->seosCryptoCtx,
+        retval = SeosCrypto_keyGenerate(self->seosCryptoApi,
                                         pKeyHandle,
                                         algorithm,
                                         flags,
@@ -251,11 +252,11 @@ SeosCryptoRpc_keyGenerate(SeosCryptoRpc*                self,
 }
 
 seos_err_t
-SeosCryptoRpc_keyImport(SeosCryptoRpc*          self,
-                        SeosCrypto_KeyHandle*   pKeyHandle,
-                        unsigned int            algorithm,
-                        unsigned int            flags,
-                        size_t                  keyImportLenBits)
+SeosCryptoRpc_keyImport(SeosCryptoRpc*              self,
+                        SeosCryptoApi_KeyHandle*    pKeyHandle,
+                        unsigned int                algorithm,
+                        unsigned int                flags,
+                        size_t                      keyImportLenBits)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -265,7 +266,7 @@ SeosCryptoRpc_keyImport(SeosCryptoRpc*          self,
     }
     else
     {
-        retval = SeosCrypto_keyImport(self->seosCryptoCtx,
+        retval = SeosCrypto_keyImport(self->seosCryptoApi,
                                       pKeyHandle,
                                       algorithm,
                                       flags,
@@ -277,7 +278,7 @@ SeosCryptoRpc_keyImport(SeosCryptoRpc*          self,
 
 seos_err_t
 SeosCryptoRpc_keyExport(SeosCryptoRpc*         self,
-                        SeosCrypto_KeyHandle   keyHandle,
+                        SeosCryptoApi_KeyHandle   keyHandle,
                         void*                  buffer,
                         size_t                 bufferLen)
 {
@@ -289,7 +290,7 @@ SeosCryptoRpc_keyExport(SeosCryptoRpc*         self,
     }
     else
     {
-        retval = SeosCrypto_keyExport(self->seosCryptoCtx,
+        retval = SeosCrypto_keyExport(self->seosCryptoApi,
                                       keyHandle,
                                       buffer,
                                       bufferLen);
@@ -299,7 +300,7 @@ SeosCryptoRpc_keyExport(SeosCryptoRpc*         self,
 
 seos_err_t
 SeosCryptoRpc_keyClose(SeosCryptoRpc*          self,
-                       SeosCrypto_KeyHandle    keyHandle)
+                       SeosCryptoApi_KeyHandle    keyHandle)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -309,7 +310,7 @@ SeosCryptoRpc_keyClose(SeosCryptoRpc*          self,
     }
     else
     {
-        retval = SeosCrypto_keyClose(self->seosCryptoCtx,
+        retval = SeosCrypto_keyClose(self->seosCryptoApi,
                                      keyHandle);
     }
     return retval;
@@ -317,9 +318,9 @@ SeosCryptoRpc_keyClose(SeosCryptoRpc*          self,
 
 seos_err_t
 SeosCryptoRpc_cipherInit(SeosCryptoRpc*             self,
-                         SeosCrypto_CipherHandle*   pCipherHandle,
+                         SeosCryptoApi_CipherHandle*   pCipherHandle,
                          SeosCryptoCipher_Algorithm algorithm,
-                         SeosCrypto_KeyHandle       keyHandle,
+                         SeosCryptoApi_KeyHandle       keyHandle,
                          size_t                     ivLen)
 {
     Debug_LOG_TRACE("%s: algo %d, keyHandle %p, ivLen %zu",
@@ -335,7 +336,7 @@ SeosCryptoRpc_cipherInit(SeosCryptoRpc*             self,
     }
     else
     {
-        retval = SeosCrypto_cipherInit(self->seosCryptoCtx,
+        retval = SeosCrypto_cipherInit(self->seosCryptoApi,
                                        pCipherHandle,
                                        algorithm,
                                        keyHandle,
@@ -347,14 +348,14 @@ SeosCryptoRpc_cipherInit(SeosCryptoRpc*             self,
 
 seos_err_t
 SeosCryptoRpc_cipherClose(SeosCryptoRpc*            self,
-                          SeosCrypto_CipherHandle   cipherHandle)
+                          SeosCryptoApi_CipherHandle   cipherHandle)
 {
     Debug_LOG_TRACE("%s", __func__);
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
     if (isValidHandle(self))
     {
-        retval = SeosCrypto_cipherClose(self->seosCryptoCtx, cipherHandle);
+        retval = SeosCrypto_cipherClose(self->seosCryptoApi, cipherHandle);
     }
     else
     {
@@ -365,7 +366,7 @@ SeosCryptoRpc_cipherClose(SeosCryptoRpc*            self,
 
 seos_err_t
 SeosCryptoRpc_cipherUpdate(SeosCryptoRpc*           self,
-                           SeosCrypto_CipherHandle  cipherHandle,
+                           SeosCryptoApi_CipherHandle  cipherHandle,
                            size_t                   len)
 {
     Debug_LOG_TRACE("%s", __func__);
@@ -384,7 +385,7 @@ SeosCryptoRpc_cipherUpdate(SeosCryptoRpc*           self,
     }
     else
     {
-        retval = SeosCrypto_cipherUpdate(self->seosCryptoCtx,
+        retval = SeosCrypto_cipherUpdate(self->seosCryptoApi,
                                          cipherHandle,
                                          self->serverDataport,
                                          len,
@@ -414,7 +415,7 @@ SeosCryptoRpc_cipherUpdate(SeosCryptoRpc*           self,
 
 seos_err_t
 SeosCryptoRpc_cipherFinalize(SeosCryptoRpc*             self,
-                             SeosCrypto_CipherHandle    cipherHandle,
+                             SeosCryptoApi_CipherHandle    cipherHandle,
                              size_t                     len)
 {
     Debug_LOG_TRACE("%s", __func__);
@@ -435,7 +436,7 @@ SeosCryptoRpc_cipherFinalize(SeosCryptoRpc*             self,
     }
     else
     {
-        retval = SeosCrypto_cipherFinalize(self->seosCryptoCtx,
+        retval = SeosCrypto_cipherFinalize(self->seosCryptoApi,
                                            cipherHandle,
                                            self->serverDataport,
                                            len,

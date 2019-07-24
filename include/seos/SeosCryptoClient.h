@@ -14,11 +14,15 @@
  */
 #pragma once
 
-#include "seos/seos_err.h"
-#include "seos/SeosCryptoRpc.h"
+#include "seos_err.h"
+#include "SeosCryptoRpc.h"
+#include "SeosCryptoApi.h"
+
+#define SeosCryptoClient_TO_SEOS_CRYPTO_API(self) (&(self)->parent)
 
 typedef struct
 {
+    SeosCryptoApi   parent;
     SeosCryptoRpc_Handle
     rpcHandle;      ///< pointer to be used in the rpc call, this pointer is not valid in our address space but will be used as a handle to tell the server which is the correct object in his address space
     void*
@@ -41,9 +45,9 @@ SeosCryptoClient;
  *
  */
 seos_err_t
-SeosCryptoClient_init(SeosCryptoClient* self,
-                      SeosCryptoRpc_Handle rpcHandle,
-                      void* dataport);
+SeosCryptoClient_init(SeosCryptoClient*     self,
+                      SeosCryptoRpc_Handle  rpcHandle,
+                      void*                 dataport);
 /**
  * @brief destructor of a seos crypto client
  *
@@ -52,7 +56,7 @@ SeosCryptoClient_init(SeosCryptoClient* self,
  *
  */
 void
-SeosCryptoClient_deInit(SeosCryptoClient* self);
+SeosCryptoClient_deInit(SeosCryptoApi* api);
 /**
  * @brief calls the remote seos crypto API. See SeosCryptoRpc_getRandomData()
  * and SeosCrypto_getRandomData()
@@ -73,24 +77,13 @@ SeosCryptoClient_getRandomData(SeosCryptoClient*    self,
                                size_t               saltLen,
                                void**               buffer,
                                size_t               dataLen);
-INLINE seos_err_t
-SeosCryptoClient_getRandomData2(SeosCryptoClient*    self,
-                                unsigned int         flags,
-                                void const*          saltBuffer,
-                                size_t               saltLen,
-                                void*                buffer,
-                                size_t               dataLen)
-{
-    void* randomDataPtr = NULL;
-    seos_err_t retval = SeosCryptoClient_getRandomData(self,
-                                                       flags,
-                                                       saltBuffer,
-                                                       saltLen,
-                                                       &randomDataPtr,
-                                                       dataLen);
-    memcpy(buffer, randomDataPtr, dataLen);
-    return retval;
-}
+seos_err_t
+SeosCryptoClient_getRandomData2(SeosCryptoApi*   api,
+                                unsigned int     flags,
+                                void const*      saltBuffer,
+                                size_t           saltLen,
+                                void*            buffer,
+                                size_t           dataLen);
 
 /**
  * @brief initializes the digest context owned by the client but leaving in the
@@ -106,8 +99,8 @@ SeosCryptoClient_getRandomData2(SeosCryptoClient*    self,
  *
  */
 seos_err_t
-SeosCryptoClient_digestInit(SeosCryptoClient*           self,
-                            SeosCrypto_DigestHandle*    pDigestHandle,
+SeosCryptoClient_digestInit(SeosCryptoApi*              api,
+                            SeosCryptoApi_DigestHandle* pDigestHandle,
                             unsigned int                algorithm,
                             void*                       iv,
                             size_t                      ivLen);
@@ -120,8 +113,8 @@ SeosCryptoClient_digestInit(SeosCryptoClient*           self,
  *
  */
 seos_err_t
-SeosCryptoClient_digestClose(SeosCryptoClient*          self,
-                             SeosCrypto_DigestHandle    digestHandle);
+SeosCryptoClient_digestClose(SeosCryptoApi*             api,
+                             SeosCryptoApi_DigestHandle digestHandle);
 /**
  * @brief updates the computation of the digest providing a new block of data
  *
@@ -134,10 +127,10 @@ SeosCryptoClient_digestClose(SeosCryptoClient*          self,
  *
  */
 seos_err_t
-SeosCryptoClient_digestUpdate(SeosCryptoClient*         self,
-                              SeosCrypto_DigestHandle   digestHandle,
-                              const void*               data,
-                              size_t                    dataLen);
+SeosCryptoClient_digestUpdate(SeosCryptoApi*                api,
+                              SeosCryptoApi_DigestHandle    digestHandle,
+                              const void*                   data,
+                              size_t                        dataLen);
 /**
  * @brief finalizes the computation of the digest providing a new block of data
  *  or padding (when data == NULL).
@@ -165,23 +158,23 @@ SeosCryptoClient_digestUpdate(SeosCryptoClient*         self,
  *
  */
 seos_err_t
-SeosCryptoClient_digestFinalize(SeosCryptoClient*           self,
-                                SeosCrypto_DigestHandle     digestHandle,
+SeosCryptoClient_digestFinalize(SeosCryptoApi*              api,
+                                SeosCryptoApi_DigestHandle  digestHandle,
                                 const void*                 data,
                                 size_t                      dataLen,
                                 void**                      digest,
                                 size_t*                     digestSize);
 
 INLINE seos_err_t
-SeosCryptoClient_digestFinalize2(SeosCryptoClient*          self,
-                                 SeosCrypto_DigestHandle    digestHandle,
+SeosCryptoClient_digestFinalize2(SeosCryptoApi*             api,
+                                 SeosCryptoApi_DigestHandle digestHandle,
                                  const void*                data,
                                  size_t                     len,
                                  void*                      digest,
                                  size_t                     digestSize)
 {
     void* pDigest = digest;
-    return SeosCryptoClient_digestFinalize(self,
+    return SeosCryptoClient_digestFinalize(api,
                                            digestHandle,
                                            data,
                                            len,
@@ -190,46 +183,46 @@ SeosCryptoClient_digestFinalize2(SeosCryptoClient*          self,
 }
 
 INLINE seos_err_t
-SeosCryptoClient_digestFinalizeNoData(SeosCryptoClient*         self,
-                                      SeosCrypto_DigestHandle   digestHandle,
-                                      void**                    digest,
-                                      size_t*                   digestSize)
+SeosCryptoClient_digestFinalizeNoData(SeosCryptoApi*                api,
+                                      SeosCryptoApi_DigestHandle    digestHandle,
+                                      void**                        digest,
+                                      size_t*                       digestSize)
 {
-    return SeosCryptoClient_digestFinalize(self,
+    return SeosCryptoClient_digestFinalize(api,
                                            digestHandle,
                                            NULL, 0,
                                            digest, digestSize);
 }
 
 INLINE seos_err_t
-SeosCryptoClient_digestFinalizeNoData2(SeosCryptoClient*        self,
-                                       SeosCrypto_DigestHandle  digestHandle,
-                                       void*                    digest,
-                                       size_t                   digestSize)
+SeosCryptoClient_digestFinalizeNoData2(SeosCryptoApi*               api,
+                                       SeosCryptoApi_DigestHandle   digestHandle,
+                                       void*                        digest,
+                                       size_t                       digestSize)
 {
     void* pDigest = digest;
-    return SeosCryptoClient_digestFinalizeNoData(self,
+    return SeosCryptoClient_digestFinalizeNoData(api,
                                                  digestHandle,
                                                  &pDigest,
                                                  &digestSize);
 }
 seos_err_t
-SeosCryptoClient_keyGenerate(SeosCryptoClient*        self,
-                             SeosCrypto_KeyHandle*    pKeyHandle,
-                             unsigned int             algorithm,
-                             unsigned int             flags,
-                             size_t                   lenBits);
+SeosCryptoClient_keyGenerate(SeosCryptoApi*             api,
+                             SeosCryptoApi_KeyHandle*   pKeyHandle,
+                             unsigned int               algorithm,
+                             unsigned int               flags,
+                             size_t                     lenBits);
 seos_err_t
-SeosCryptoClient_keyImport(SeosCryptoClient*      self,
-                           SeosCrypto_KeyHandle*  pKeyHandle,
-                           unsigned int           algorithm,
-                           unsigned int           flags,
-                           void const*            keyImportBuffer,
-                           size_t                 keyImportLenBits);
+SeosCryptoClient_keyImport(SeosCryptoApi*               api,
+                           SeosCryptoApi_KeyHandle*     pKeyHandle,
+                           unsigned int                 algorithm,
+                           unsigned int                 flags,
+                           void const*                  keyImportBuffer,
+                           size_t                       keyImportLenBits);
 
 seos_err_t
-SeosCryptoClient_keyClose(SeosCryptoClient*     self,
-                          SeosCrypto_KeyHandle  keyHandle);
+SeosCryptoClient_keyClose(SeosCryptoApi*            api,
+                          SeosCryptoApi_KeyHandle   keyHandle);
 /**
  * @brief initializes the digest context owned by the client but leaving in the
  *  server
@@ -251,12 +244,12 @@ SeosCryptoClient_keyClose(SeosCryptoClient*     self,
  *
  */
 seos_err_t
-SeosCryptoClient_cipherInit(SeosCryptoClient*           self,
-                            SeosCrypto_CipherHandle*    pKeyHandle,
-                            unsigned int                algorithm,
-                            SeosCrypto_KeyHandle        key,
-                            void*                       iv,
-                            size_t                      ivLen);
+SeosCryptoClient_cipherInit(SeosCryptoApi*                  api,
+                            SeosCryptoApi_CipherHandle*     pKeyHandle,
+                            unsigned int                    algorithm,
+                            SeosCryptoApi_KeyHandle         key,
+                            void*                           iv,
+                            size_t                          ivLen);
 /**
  * @brief closes the digest context owned by the client but leaving in the
  *  server
@@ -266,8 +259,8 @@ SeosCryptoClient_cipherInit(SeosCryptoClient*           self,
  *
  */
 seos_err_t
-SeosCryptoClient_cipherClose(SeosCryptoClient*          self,
-                             SeosCrypto_CipherHandle    cipherHandle);
+SeosCryptoClient_cipherClose(SeosCryptoApi*                 api,
+                             SeosCryptoApi_CipherHandle     cipherHandle);
 /**
  * @brief perform cipher operation on a block
  *
@@ -296,12 +289,12 @@ SeosCryptoClient_cipherClose(SeosCryptoClient*          self,
  *
  */
 seos_err_t
-SeosCryptoClient_cipherUpdate(SeosCryptoClient*         self,
-                              SeosCrypto_CipherHandle   cipherHandle,
-                              const void*               data,
-                              size_t                    dataLen,
-                              void**                    output,
-                              size_t*                   outputSize);
+SeosCryptoClient_cipherUpdate(SeosCryptoApi*                api,
+                              SeosCryptoApi_CipherHandle    cipherHandle,
+                              const void*                   data,
+                              size_t                        dataLen,
+                              void**                        output,
+                              size_t*                       outputSize);
 /**
  * @brief perform operation on final block, applies padding automatically if
  *  requested
@@ -338,11 +331,11 @@ SeosCryptoClient_cipherUpdate(SeosCryptoClient*         self,
  *
  */
 seos_err_t
-SeosCryptoClient_cipherFinalize(SeosCryptoClient*       self,
-                                SeosCrypto_CipherHandle cipherHandle,
-                                const void*             data,
-                                size_t                  dataLen,
-                                void**                  digest,
-                                size_t*                 digestSize);
+SeosCryptoClient_cipherFinalize(SeosCryptoApi*              api,
+                                SeosCryptoApi_CipherHandle  cipherHandle,
+                                const void*                 data,
+                                size_t                      dataLen,
+                                void**                      digest,
+                                size_t*                     digestSize);
 
 /** @} */

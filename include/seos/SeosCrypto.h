@@ -17,10 +17,14 @@
 #include "SeosCryptoKey.h"
 #include "SeosCryptoDigest.h"
 #include "SeosCryptoCipher.h"
+#include "SeosCryptoApi.h"
 
 #include "LibUtil/PointerVector.h"
 
+#define SeosCrypto_TO_SEOS_CRYPTO_API(self) (&(self)->parent)
 #define SeosCrypto_RANDOM_SEED_STR "SeosCryptoAPI"
+
+typedef struct SeosCrypto SeosCrypto;
 
 typedef void* (SeosCrypto_MallocFunc)(size_t size);
 typedef void  (SeosCrypto_FreeFunc)(void* ptr);
@@ -39,12 +43,9 @@ typedef struct
 }
 SeosCrypto_StaticBuf;
 
-typedef SeosCryptoKey*      SeosCrypto_KeyHandle;
-typedef SeosCryptoDigest*   SeosCrypto_DigestHandle;
-typedef SeosCryptoCipher*   SeosCrypto_CipherHandle;
-
-typedef struct
+struct SeosCrypto
 {
+    SeosCryptoApi   parent;
     union
     {
         SeosCrypto_MemIf        memIf;
@@ -57,8 +58,7 @@ typedef struct
     PointerVector keyHandleVector;
     PointerVector digestHandleVector;
     PointerVector cipherHandleVector;
-}
-SeosCrypto;
+};
 
 /**
  * @brief initializes a crypto API context. Usually, no crypto context is needed
@@ -100,7 +100,7 @@ SeosCrypto_init(SeosCrypto* self,
  *
  */
 void
-SeosCrypto_deInit(SeosCrypto* self);
+SeosCrypto_deInit(SeosCryptoApi* api);
 
 /**
  * @brief implements \ref SeosCryptoApi_getRandomData in a local connection
@@ -108,7 +108,7 @@ SeosCrypto_deInit(SeosCrypto* self);
  *
  */
 seos_err_t
-SeosCrypto_getRandomData(SeosCrypto*    self,
+SeosCrypto_getRandomData(SeosCryptoApi* api,
                          unsigned int   flags,
                          void const*    saltBuffer,
                          size_t         saltLen,
@@ -119,35 +119,35 @@ SeosCrypto_getRandomData(SeosCrypto*    self,
 // ------------------------------ Digest API -----------------------------------
 
 seos_err_t
-SeosCrypto_digestInit(SeosCrypto*                   self,
-                      SeosCrypto_DigestHandle*      pDigestHandle,
+SeosCrypto_digestInit(SeosCryptoApi*                api,
+                      SeosCryptoApi_DigestHandle*   pDigestHandle,
                       unsigned                      algorithm,
                       void*                         iv,
                       size_t                        ivLen);
 
 seos_err_t
-SeosCrypto_digestClose(SeosCrypto*              self,
-                       SeosCrypto_DigestHandle  digestHandle);
+SeosCrypto_digestClose(SeosCryptoApi*               api,
+                       SeosCryptoApi_DigestHandle   digestHandle);
 
 seos_err_t
-SeosCrypto_digestUpdate(SeosCrypto*              self,
-                        SeosCrypto_DigestHandle  digestHandle,
-                        const void*              data,
-                        size_t                   len);
+SeosCrypto_digestUpdate(SeosCryptoApi*              api,
+                        SeosCryptoApi_DigestHandle  digestHandle,
+                        const void*                 data,
+                        size_t                      len);
 seos_err_t
-SeosCrypto_digestFinalize(SeosCrypto*             self,
-                          SeosCrypto_DigestHandle digestHandle,
-                          const void*             data,
-                          size_t                  len,
-                          void**                  digest,
-                          size_t*                 digestSize);
+SeosCrypto_digestFinalize(SeosCryptoApi*                api,
+                          SeosCryptoApi_DigestHandle    digestHandle,
+                          const void*                   data,
+                          size_t                        len,
+                          void**                        digest,
+                          size_t*                       digestSize);
 
 // -------------------------------- Key API ------------------------------------
 /**
  * @brief generates a key and provides a handle to it. The number of key handles
  *  that are active in parallel can be limited
  *
- * @param self (optional) pointer to the seos_crypto context
+ * @param api (optional) pointer to the seos_crypto context
  * @param algorithm ///TODO: NOT DOCUMENTED in Wiki
  * @param flags ///TODO: NOT DOCUMENTED in Wiki
  * @param lenBits length of the key in bits
@@ -187,8 +187,8 @@ SeosCrypto_digestFinalize(SeosCrypto*             self,
  *
  */
 seos_err_t
-SeosCrypto_keyGenerate(SeosCrypto*              self,
-                       SeosCrypto_KeyHandle*    pKeyHandle,
+SeosCrypto_keyGenerate(SeosCryptoApi*           api,
+                       SeosCryptoApi_KeyHandle* pKeyHandle,
                        unsigned int             algorithm,
                        unsigned int             flags,
                        size_t                   lenBits);
@@ -196,7 +196,7 @@ SeosCrypto_keyGenerate(SeosCrypto*              self,
  * @brief imports a key and provides a handle to it. The number of key handles
  *  that are active in parallel can be limited
  *
- * @param self (optional) pointer to the seos_crypto context
+ * @param api (optional) pointer to the seos_crypto context
  * @paeam flags ///TODO: NOT DOCUMENTED in Wiki
  * @param hKey (required) will receive a key handle, that is used to work with
  *  the key. It must be closed with key_close() when the key is not longer
@@ -214,17 +214,17 @@ SeosCrypto_keyGenerate(SeosCrypto*              self,
  *
  */
 seos_err_t
-SeosCrypto_keyImport(SeosCrypto*            self,
-                     SeosCrypto_KeyHandle*  pKeyHandle,
-                     unsigned int           algorithm,
-                     unsigned int           flags,
-                     void const*            keyImportBuffer,
-                     size_t                 keyImportLenBits);
+SeosCrypto_keyImport(SeosCryptoApi*             api,
+                     SeosCryptoApi_KeyHandle*   pKeyHandle,
+                     unsigned int               algorithm,
+                     unsigned int               flags,
+                     void const*                keyImportBuffer,
+                     size_t                     keyImportLenBits);
 /**
  * @brief export the key material. Export of certain keys may not be allowed.
  *  The public part of an asymmetric key is usually exportable
  *
- * @param self (optional) pointer to the seos_crypto context
+ * @param api (optional) pointer to the seos_crypto context
  * @param flags contains key specific setting about what to export and which
  *  format is used the format of the key material is specific to the key type
  * @param hKey ///TODO: NOT DOCUMENTED in Wiki
@@ -245,15 +245,15 @@ SeosCrypto_keyImport(SeosCrypto*            self,
  *
  */
 seos_err_t
-SeosCrypto_keyExport(SeosCrypto*            self,
-                     SeosCrypto_KeyHandle   keyHandle,
-                     void*                  buffer,
-                     size_t                 bufferLen);
+SeosCrypto_keyExport(SeosCryptoApi*             api,
+                     SeosCryptoApi_KeyHandle    keyHandle,
+                     void*                      buffer,
+                     size_t                     bufferLen);
 /**
  * @brief closes a key handle. The buffer of the key will no longer be in use,
  *  however any pending operation with this key can continue
  *
- * @param self (optional) pointer to the seos_crypto context
+ * @param api (optional) pointer to the seos_crypto context
  * @param flags contains key specific setting about what to export and which
  *  format is used the format of the key material is specific to the key type
  * @param hKey ///TODO: NOT DOCUMENTED in Wiki
@@ -274,8 +274,8 @@ SeosCrypto_keyExport(SeosCrypto*            self,
  *
  */
 seos_err_t
-SeosCrypto_keyClose(SeosCrypto*             self,
-                    SeosCrypto_KeyHandle    keyHandle);
+SeosCrypto_keyClose(SeosCryptoApi*          api,
+                    SeosCryptoApi_KeyHandle keyHandle);
 
 
 // ----------------------------- Key Derivation --------------------------------
@@ -284,7 +284,7 @@ SeosCrypto_keyClose(SeosCrypto*             self,
  * @brief closes a key handle. The buffer of the key will no longer be in use,
  *  however any pending operation with this key can continue
  *
- * @param self (optional) pointer to the seos_crypto context
+ * @param api (optional) pointer to the seos_crypto context
  * @param flags contains key specific setting about what to export and which
  *  format is used the format of the key material is specific to the key type
  * @param hKey ///TODO: NOT DOCUMENTED in Wiki
@@ -305,20 +305,20 @@ SeosCrypto_keyClose(SeosCrypto*             self,
  *
  */
 seos_err_t
-SeosCrypto_deriveKey(SeosCrypto* self,
-                     SeosCrypto_KeyHandle hParentKey,
+SeosCrypto_deriveKey(SeosCryptoApi* api,
+                     SeosCryptoApi_KeyHandle hParentKey,
                      unsigned int lifetime,
                      unsigned int algorithm,
                      void const* saltBuffer,
                      size_t saltLen,
-                     SeosCrypto_KeyHandle* hKey,
+                     SeosCryptoApi_KeyHandle* hKey,
                      void* keyBlobBuffer,
                      size_t* lenKeyBlobBuffer);
 /**
  * @brief closes a key handle. The buffer of the key will no longer be in use,
  *  however any pending operation with this key can continue
  *
- * @param self (optional) pointer to the seos_crypto context
+ * @param api (optional) pointer to the seos_crypto context
  * @param flags contains key specific setting about what to export and which
  *  format is used the format of the key material is specific to the key type
  * @param hKey ///TODO: NOT DOCUMENTED in Wiki
@@ -339,7 +339,7 @@ SeosCrypto_deriveKey(SeosCrypto* self,
  *
  */
 //seos_err_t
-//SeosCrypto_deriveKey(SeosCrypto* self,
+//SeosCrypto_deriveKey(SeosCrypto* api,
 //                       SeosCrypto_HKey hParentKey,
 //                       unsigned int lifetime,
 //                       unsigned int algorithm,
@@ -352,33 +352,33 @@ SeosCrypto_deriveKey(SeosCrypto* self,
 // ------------------------------ Cipher API -----------------------------------
 
 seos_err_t
-SeosCrypto_cipherInit(SeosCrypto*                   self,
-                      SeosCrypto_CipherHandle*      pCipherHandle,
+SeosCrypto_cipherInit(SeosCryptoApi*                api,
+                      SeosCryptoApi_CipherHandle*   pCipherHandle,
                       unsigned int                  algorithm,
-                      SeosCryptoKey const*          key,
+                      SeosCryptoApi_KeyHandle       keyHandle,
                       void*                         iv,
                       size_t                        ivLen);
 
 seos_err_t
-SeosCrypto_cipherClose(SeosCrypto*              self,
-                       SeosCrypto_CipherHandle  cipherHandle);
+SeosCrypto_cipherClose(SeosCryptoApi*               api,
+                       SeosCryptoApi_CipherHandle   cipherHandle);
 
 seos_err_t
-SeosCrypto_cipherUpdate(SeosCrypto*             self,
-                        SeosCrypto_CipherHandle cipherHandle,
-                        const void*             input,
-                        size_t                  inputSize,
-                        void**                  output,
-                        size_t*                 outputSize);
+SeosCrypto_cipherUpdate(SeosCryptoApi*              api,
+                        SeosCryptoApi_CipherHandle  cipherHandle,
+                        const void*                 input,
+                        size_t                      inputSize,
+                        void**                      output,
+                        size_t*                     outputSize);
 
 seos_err_t
-SeosCrypto_cipherFinalize(SeosCrypto*               self,
-                          SeosCrypto_CipherHandle   cipherHandle,
-                          const void*               input,
-                          size_t                    inputSize,
-                          void**                    output,
-                          size_t*                   outputSize,
-                          void**                    tag,
-                          size_t*                   tagSize);
+SeosCrypto_cipherFinalize(SeosCryptoApi*                api,
+                          SeosCryptoApi_CipherHandle    cipherHandle,
+                          const void*                   input,
+                          size_t                        inputSize,
+                          void**                        output,
+                          size_t*                       outputSize,
+                          void**                        tag,
+                          size_t*                       tagSize);
 
 /** @} */

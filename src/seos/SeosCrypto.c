@@ -11,6 +11,21 @@
 #include "SeosCryptoDigest.h"
 #include "limits.h"
 
+static const SeosCryptoApi_Vtable SeosCrypto_vtable =
+{
+    .getRandomData  = SeosCrypto_getRandomData,
+    .digestInit     = SeosCrypto_digestInit,
+    .digestClose    = SeosCrypto_digestClose,
+    .digestUpdate   = SeosCrypto_digestUpdate,
+    .digestFinalize = SeosCrypto_digestFinalize,
+    .keyGenerate    = SeosCrypto_keyGenerate,
+    .keyImport      = SeosCrypto_keyImport,
+    .keyClose       = SeosCrypto_keyClose,
+    .cipherInit     = SeosCrypto_cipherInit,
+    .cipherClose    = SeosCrypto_cipherClose,
+    .cipherUpdate   = SeosCrypto_cipherUpdate,
+    .deInit         = SeosCrypto_deInit
+};
 
 // Private static functions ----------------------------------------------------
 
@@ -76,6 +91,7 @@ SeosCrypto_init(SeosCrypto* self,
         }
         else
         {
+            self->parent.vtable = &SeosCrypto_vtable;
             retval = SEOS_SUCCESS;
             goto exit;
         }
@@ -95,8 +111,11 @@ exit:
 }
 
 void
-SeosCrypto_deInit(SeosCrypto* self)
+SeosCrypto_deInit(SeosCryptoApi* api)
 {
+    SeosCrypto* self = (SeosCrypto*) api;
+    Debug_ASSERT_SELF(self);
+
     PointerVector_dtor(&self->cipherHandleVector);
     PointerVector_dtor(&self->keyHandleVector);
     PointerVector_dtor(&self->digestHandleVector);
@@ -111,14 +130,16 @@ SeosCrypto_deInit(SeosCrypto* self)
 //-------------------------- Crpyto API functions ------------------------------
 
 seos_err_t
-SeosCrypto_getRandomData(SeosCrypto*    self,
+SeosCrypto_getRandomData(SeosCryptoApi* api,
                          unsigned int   flags,
                          void const*    saltBuffer,
                          size_t         saltLen,
                          void*          buffer,
                          size_t         bufferLen)
 {
+    SeosCrypto* self = (SeosCrypto*) api;
     Debug_ASSERT_SELF(self);
+
     seos_err_t retval = SEOS_SUCCESS;
 
     void const* seed   = (saltBuffer != NULL)
@@ -152,12 +173,13 @@ SeosCrypto_getRandomData(SeosCrypto*    self,
 }
 
 seos_err_t
-SeosCrypto_digestInit(SeosCrypto*                   self,
-                      SeosCrypto_DigestHandle*      pDigestHandle,
+SeosCrypto_digestInit(SeosCryptoApi*                api,
+                      SeosCryptoApi_DigestHandle*   pDigestHandle,
                       unsigned                      algorithm,
                       void*                         iv,
                       size_t                        ivLen)
 {
+    SeosCrypto* self = (SeosCrypto*) api;
     Debug_ASSERT_SELF(self);
 
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -199,9 +221,10 @@ exit:
 }
 
 seos_err_t
-SeosCrypto_digestClose(SeosCrypto*              self,
-                       SeosCrypto_DigestHandle  digestHandle)
+SeosCrypto_digestClose(SeosCryptoApi*           api,
+                       SeosCryptoApi_DigestHandle  digestHandle)
 {
+    SeosCrypto* self = (SeosCrypto*) api;
     Debug_ASSERT_SELF(self);
 
     seos_err_t retval = SEOS_SUCCESS;
@@ -221,11 +244,12 @@ SeosCrypto_digestClose(SeosCrypto*              self,
 }
 
 seos_err_t
-SeosCrypto_digestUpdate(SeosCrypto*              self,
-                        SeosCrypto_DigestHandle  digestHandle,
+SeosCrypto_digestUpdate(SeosCryptoApi*           api,
+                        SeosCryptoApi_DigestHandle  digestHandle,
                         const void*              data,
                         size_t                   len)
 {
+    SeosCrypto* self = (SeosCrypto*) api;
     Debug_ASSERT_SELF(self);
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -243,14 +267,16 @@ SeosCrypto_digestUpdate(SeosCrypto*              self,
 }
 
 seos_err_t
-SeosCrypto_digestFinalize(SeosCrypto*             self,
-                          SeosCrypto_DigestHandle digestHandle,
+SeosCrypto_digestFinalize(SeosCryptoApi*          api,
+                          SeosCryptoApi_DigestHandle digestHandle,
                           const void*             data,
                           size_t                  len,
                           void**                  digest,
                           size_t*                 digestSize)
 {
+    SeosCrypto* self = (SeosCrypto*) api;
     Debug_ASSERT_SELF(self);
+
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
     size_t handlePos = SeosCrypto_findHandle(&self->digestHandleVector,
@@ -271,12 +297,13 @@ SeosCrypto_digestFinalize(SeosCrypto*             self,
 }
 
 seos_err_t
-SeosCrypto_keyGenerate(SeosCrypto*              self,
-                       SeosCrypto_KeyHandle*    pKeyHandle,
+SeosCrypto_keyGenerate(SeosCryptoApi*           api,
+                       SeosCryptoApi_KeyHandle* pKeyHandle,
                        unsigned int             algorithm,
                        unsigned int             flags,
                        size_t                   lenBits)
 {
+    SeosCrypto* self = (SeosCrypto*) api;
     Debug_ASSERT_SELF(self);
 
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -304,7 +331,7 @@ SeosCrypto_keyGenerate(SeosCrypto*              self,
             char* keyBytes
                 = & (((char*) *pKeyHandle)[sizeof(SeosCryptoKey)]);
 
-            retval = SeosCrypto_getRandomData(self,
+            retval = SeosCrypto_getRandomData(api,
                                               0,
                                               NULL, 0,
                                               keyBytes,
@@ -344,13 +371,14 @@ exit:
 }
 
 seos_err_t
-SeosCrypto_keyImport(SeosCrypto*            self,
-                     SeosCrypto_KeyHandle*  pKeyHandle,
+SeosCrypto_keyImport(SeosCryptoApi*         api,
+                     SeosCryptoApi_KeyHandle*  pKeyHandle,
                      unsigned int           algorithm,
                      unsigned int           flags,
                      void const*            keyImportBuffer,
                      size_t                 keyImportLenBits)
 {
+    SeosCrypto* self = (SeosCrypto*) api;
     Debug_ASSERT_SELF(self);
 
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -361,7 +389,7 @@ SeosCrypto_keyImport(SeosCrypto*            self,
     }
     else
     {
-        retval = SeosCrypto_keyGenerate(self,
+        retval = SeosCrypto_keyGenerate(api,
                                         pKeyHandle,
                                         algorithm,
                                         flags,
@@ -376,12 +404,14 @@ SeosCrypto_keyImport(SeosCrypto*            self,
 }
 
 seos_err_t
-SeosCrypto_keyExport(SeosCrypto*            self,
-                     SeosCrypto_KeyHandle   keyHandle,
+SeosCrypto_keyExport(SeosCryptoApi*         api,
+                     SeosCryptoApi_KeyHandle   keyHandle,
                      void*                  buffer,
                      size_t                 bufferLen)
 {
+    SeosCrypto* self = (SeosCrypto*) api;
     Debug_ASSERT_SELF(self);
+
     seos_err_t retval = SEOS_SUCCESS;
 
     size_t handlePos = SeosCrypto_findHandle(&self->keyHandleVector,
@@ -416,10 +446,12 @@ SeosCrypto_keyExport(SeosCrypto*            self,
 }
 
 seos_err_t
-SeosCrypto_keyClose(SeosCrypto*             self,
-                    SeosCrypto_KeyHandle    keyHandle)
+SeosCrypto_keyClose(SeosCryptoApi*          api,
+                    SeosCryptoApi_KeyHandle    keyHandle)
 {
+    SeosCrypto* self = (SeosCrypto*) api;
     Debug_ASSERT_SELF(self);
+
     seos_err_t retval = SEOS_SUCCESS;
 
     size_t handlePos = SeosCrypto_findHandle(&self->keyHandleVector,
@@ -438,13 +470,14 @@ SeosCrypto_keyClose(SeosCrypto*             self,
 }
 
 seos_err_t
-SeosCrypto_cipherInit(SeosCrypto*                   self,
-                      SeosCrypto_CipherHandle*      pCipherHandle,
-                      SeosCryptoCipher_Algorithm    algorithm,
-                      SeosCryptoKey const*          key,
+SeosCrypto_cipherInit(SeosCryptoApi*                api,
+                      SeosCryptoApi_CipherHandle*      pCipherHandle,
+                      unsigned int                  algorithm,
+                      SeosCryptoApi_KeyHandle          key,
                       void*                         iv,
                       size_t                        ivLen)
 {
+    SeosCrypto* self = (SeosCrypto*) api;
     Debug_ASSERT_SELF(self);
 
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -514,10 +547,12 @@ exit:
 }
 
 seos_err_t
-SeosCrypto_cipherClose(SeosCrypto*              self,
-                       SeosCrypto_CipherHandle  cipherHandle)
+SeosCrypto_cipherClose(SeosCryptoApi*           api,
+                       SeosCryptoApi_CipherHandle  cipherHandle)
 {
+    SeosCrypto* self = (SeosCrypto*) api;
     Debug_ASSERT_SELF(self);
+
     seos_err_t retval = SEOS_SUCCESS;
 
     size_t handlePos = SeosCrypto_findHandle(&self->cipherHandleVector,
@@ -544,14 +579,16 @@ SeosCrypto_cipherClose(SeosCrypto*              self,
 }
 
 seos_err_t
-SeosCrypto_cipherUpdate(SeosCrypto*             self,
-                        SeosCrypto_CipherHandle cipherHandle,
+SeosCrypto_cipherUpdate(SeosCryptoApi*          api,
+                        SeosCryptoApi_CipherHandle cipherHandle,
                         const void*             input,
                         size_t                  inputSize,
                         void**                  output,
                         size_t*                 outputSize)
 {
+    SeosCrypto* self = (SeosCrypto*) api;
     Debug_ASSERT_SELF(self);
+
     seos_err_t retval = SEOS_SUCCESS;
 
     size_t handlePos = SeosCrypto_findHandle(&self->cipherHandleVector,
@@ -570,8 +607,8 @@ SeosCrypto_cipherUpdate(SeosCrypto*             self,
 }
 
 seos_err_t
-SeosCrypto_cipherFinalize(SeosCrypto*               self,
-                          SeosCrypto_CipherHandle   cipherHandle,
+SeosCrypto_cipherFinalize(SeosCryptoApi*            api,
+                          SeosCryptoApi_CipherHandle   cipherHandle,
                           const void*               input,
                           size_t                    inputSize,
                           void**                    output,
@@ -579,7 +616,9 @@ SeosCrypto_cipherFinalize(SeosCrypto*               self,
                           void**                    tag,
                           size_t*                   tagSize)
 {
+    SeosCrypto* self = (SeosCrypto*) api;
     Debug_ASSERT_SELF(self);
+
     seos_err_t retval = SEOS_SUCCESS;
 
     size_t handlePos = SeosCrypto_findHandle(&self->cipherHandleVector,
