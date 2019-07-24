@@ -91,9 +91,8 @@ SeosCryptoDigest_deInit(SeosCryptoDigest* self);
  * @brief updates the computation of the digest providing a new block of data
  *
  * @param self (required) pointer to the SeosCryptoDigest context
- *
- * @params data (required) the data block
- * @params dataLen the length of the data block
+ * @param data (required) the data block
+ * @param dataLen the length of the data block
  *
  * @return an error code.
  *
@@ -115,7 +114,6 @@ SeosCryptoDigest_update(SeosCryptoDigest*   self,
  *  or padding (when data == NULL).
  *
  * @param self (required) pointer to the SeosCryptoDigest context
- *
  * @param data (optional) the data block. When not provided (== NULL) then
  *  padding is done
  * @param dataLen the length of the data block

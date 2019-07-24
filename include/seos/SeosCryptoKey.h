@@ -43,13 +43,20 @@ SeosCryptoKey;
 Debug_STATIC_ASSERT(SeosCryptoKey_Flags_MAX\
         <= sizeof(((SeosCryptoKey *)0)->flags) * CHAR_BIT);
 
+/**
+ * @brief initializes a SeosCryptoKey context
+ *
+ */
 seos_err_t
-SeosCryptoKey_init(SeosCryptoKey*    self,
+SeosCryptoKey_init(SeosCryptoKey*   self,
                    void*            algKeyCtx,
                    unsigned         algorithm,
                    BitMap32         flags,
                    char*            bytes,
                    size_t           lenBits);
+
+void
+SeosCryptoKey_deInit(SeosCryptoKey* self);
 
 seos_err_t
 SeosCryptoKey_initRsaPublic(SeosCryptoKey*  self,
@@ -71,8 +78,6 @@ SeosCryptoKey_initRsaPrivate(SeosCryptoKey* self,
                              size_t         lenP,
                              const char*    q,
                              size_t         lenQ);
-void
-SeosCryptoKey_deInit(SeosCryptoKey* self);
 
 INLINE size_t
 SeosCryptoKey_getSize(SeosCryptoKey* self)

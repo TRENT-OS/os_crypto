@@ -103,8 +103,8 @@ void
 SeosCrypto_deInit(SeosCryptoApi* api);
 
 /**
- * @brief implements \ref SeosCryptoApi_getRandomData in a local connection
- * (function call, no rpc)
+ * @brief implements SeosCryptoApi_getRandomData() in a local connection
+ *  (function call, no rpc)
  *
  */
 seos_err_t
@@ -117,23 +117,40 @@ SeosCrypto_getRandomData(SeosCryptoApi* api,
 
 
 // ------------------------------ Digest API -----------------------------------
-
+/**
+ * @brief implements SeosCryptoApi_digestInit() in a local connection
+ * (function call, no rpc)
+ *
+ */
 seos_err_t
 SeosCrypto_digestInit(SeosCryptoApi*                api,
                       SeosCryptoApi_DigestHandle*   pDigestHandle,
                       unsigned                      algorithm,
                       void*                         iv,
                       size_t                        ivLen);
-
+/**
+ * @brief implements SeosCryptoApi_digestInit() in a local connection
+ * (function call, no rpc)
+ *
+ */
 seos_err_t
 SeosCrypto_digestClose(SeosCryptoApi*               api,
                        SeosCryptoApi_DigestHandle   digestHandle);
-
+/**
+ * @brief implements SeosCryptoApi_digestUpdate() in a local connection
+ * (function call, no rpc)
+ *
+ */
 seos_err_t
 SeosCrypto_digestUpdate(SeosCryptoApi*              api,
                         SeosCryptoApi_DigestHandle  digestHandle,
                         const void*                 data,
                         size_t                      len);
+/**
+ * @brief implements SeosCryptoApi_digestFinalize() in a local connection
+ * (function call, no rpc)
+ *
+ */
 seos_err_t
 SeosCrypto_digestFinalize(SeosCryptoApi*                api,
                           SeosCryptoApi_DigestHandle    digestHandle,
@@ -144,46 +161,8 @@ SeosCrypto_digestFinalize(SeosCryptoApi*                api,
 
 // -------------------------------- Key API ------------------------------------
 /**
- * @brief generates a key and provides a handle to it. The number of key handles
- *  that are active in parallel can be limited
- *
- * @param api (optional) pointer to the seos_crypto context
- * @param algorithm ///TODO: NOT DOCUMENTED in Wiki
- * @param flags ///TODO: NOT DOCUMENTED in Wiki
- * @param lenBits length of the key in bits
- * @param hKey (required) will receive a key handle, that is used to work with
- *  the key. It must be closed with key_close() when the key is not longer
- *  needed
- * @param keyBlobBuffer (optional) can be: a pointer to a buffer where the key
- *  blob is put into. The buffer must be kept as long as the key handle is not
- *  closed. If the key handle is passed to another crypto function that creates
- *  it's own context, the key details are copied into this context and thus this
- *  does not depend on the key's buffer any longer. NULL if this function is
- *  just used for probing the required buffer size or if the function should
- *  allocate the memory internally
- * @param len_keyBlobBuffer (required) depends on the parameter
- *  key_bob_buffer:
- *  if key_bob_buffer is not NULL, it must contain the size of the buffer on
- *  input and will be set to the size that is actually used on return. If
- *  key_bob_buffer is NULL, then is must be:
- *  0 to indicate that the function is called for probing, on return it will
- *  contains the size that would be needed for the key blob. In this case the
- *  parameter hKey is ignored and should be NULL.
- *  -1 to indicate the function should allocate the buffer internally.
- *  If crypto_api_self has been set up to use a custom allocator, this one will
- *  be used. The buffer will be associated with hKey and will be relased when
- *  the key handle is closed. Any other value will make the function fail with
- *  SEOS_ERROR_INVALID_PARAMETER.
- *
- * @return an error code
- * @retval SEOS_SUCCESS if all right
- * @retval SEOS_ERROR_INVALID_PARAMETER if any of the required parameters is
- *  missing or if any parameter is invalid
- * @retval SEOS_ERROR_INVALID_HANDLE invalid key store handle
- * @retval SEOS_ERROR_ACCESS_DENIED read-only key store or insufficient rights
- *  to create a key
- * @retval SEOS_ERROR_BUFFER_TOO_SMALL len_keyBlobBuffer contains the size
- *  that would be needed for the key blob
+ * @brief implements SeosCryptoApi_keyGenerate() in a local connection
+ * (function call, no rpc)
  *
  */
 seos_err_t
@@ -193,24 +172,8 @@ SeosCrypto_keyGenerate(SeosCryptoApi*           api,
                        unsigned int             flags,
                        size_t                   lenBits);
 /**
- * @brief imports a key and provides a handle to it. The number of key handles
- *  that are active in parallel can be limited
- *
- * @param api (optional) pointer to the seos_crypto context
- * @paeam flags ///TODO: NOT DOCUMENTED in Wiki
- * @param hKey (required) will receive a key handle, that is used to work with
- *  the key. It must be closed with key_close() when the key is not longer
- *  needed
- * @param keyBlobBuffer (optional) works as described in key_create()
- * @param len_keyBlobBuffer (required) works as described in key_create()
- *
- * @return an error code
- * @retval SEOS_SUCCESS if all right
- * @retval SEOS_ERROR_INVALID_PARAMETER if any of the required parameters is
- *  missing or if any parameter is invalid
- * @retval SEOS_ERROR_INVALID_HANDLE invalid key store handle
- * @retval SEOS_ERROR_BUFFER_TOO_SMALL len_keyBlobBuffer contains the size
- *  that would be needed for the key blob
+ * @brief implements SeosCryptoApi_keyImport() in a local connection
+ * (function call, no rpc)
  *
  */
 seos_err_t
@@ -250,27 +213,8 @@ SeosCrypto_keyExport(SeosCryptoApi*             api,
                      void*                      buffer,
                      size_t                     bufferLen);
 /**
- * @brief closes a key handle. The buffer of the key will no longer be in use,
- *  however any pending operation with this key can continue
- *
- * @param api (optional) pointer to the seos_crypto context
- * @param flags contains key specific setting about what to export and which
- *  format is used the format of the key material is specific to the key type
- * @param hKey ///TODO: NOT DOCUMENTED in Wiki
- * @param buffer (optional) if NULL, then the parameter len_buffer contains the
- *  buffer size that is needed on output
- * @param buffer_len (optional) if the parameter buffer is not NULL, the
- *  parameter len_buffer must contain the buffer size on input and will contain
- *  the length used on return
- *
- * @return an error code
- * @retval SEOS_SUCCESS if all right
- * @retval SEOS_ERROR_INVALID_PARAMETER if any of the required parameters is
- *  missing or if any parameter is invalid
- * @retval SEOS_ERROR_INVALID_HANDLE invalid key store handle
- * @retval SEOS_ERROR_BUFFER_TOO_SMALL len_keyBlobBuffer contains the size
- *  that would be needed for the key blob
- * @retval SEOS_ERROR_ACCESS_DENIED export denied
+ * @brief implements SeosCryptoApi_digestInit() in a local connection
+ * (function call, no rpc)
  *
  */
 seos_err_t
@@ -350,7 +294,11 @@ SeosCrypto_deriveKey(SeosCryptoApi* api,
 //                       size_t* len_keyBlobBuffer);
 
 // ------------------------------ Cipher API -----------------------------------
-
+/**
+ * @brief implements SeosCryptoApi_cipherInit() in a local connection
+ * (function call, no rpc)
+ *
+ */
 seos_err_t
 SeosCrypto_cipherInit(SeosCryptoApi*                api,
                       SeosCryptoApi_CipherHandle*   pCipherHandle,
@@ -358,11 +306,19 @@ SeosCrypto_cipherInit(SeosCryptoApi*                api,
                       SeosCryptoApi_KeyHandle       keyHandle,
                       void*                         iv,
                       size_t                        ivLen);
-
+/**
+ * @brief implements SeosCryptoApi_cipherClose() in a local connection
+ * (function call, no rpc)
+ *
+ */
 seos_err_t
 SeosCrypto_cipherClose(SeosCryptoApi*               api,
                        SeosCryptoApi_CipherHandle   cipherHandle);
-
+/**
+ * @brief implements SeosCryptoApi_cipherUpdate() in a local connection
+ * (function call, no rpc)
+ *
+ */
 seos_err_t
 SeosCrypto_cipherUpdate(SeosCryptoApi*              api,
                         SeosCryptoApi_CipherHandle  cipherHandle,
@@ -370,7 +326,11 @@ SeosCrypto_cipherUpdate(SeosCryptoApi*              api,
                         size_t                      inputSize,
                         void**                      output,
                         size_t*                     outputSize);
-
+/**
+ * @brief implements SeosCryptoApi_cipherFinalize() in a local connection
+ * (function call, no rpc)
+ *
+ */
 seos_err_t
 SeosCrypto_cipherFinalize(SeosCryptoApi*                api,
                           SeosCryptoApi_CipherHandle    cipherHandle,

@@ -130,7 +130,7 @@ struct SeosCryptoApi
  * @param saltBuffer (optional) is used with PRNGs only, it may be ignore if
  *  random data is obtained from a HW source
  * @param saltLen capacity of saltBuffer
- * @param buffer ///TODO: NOT DOCUMENTED in Wiki
+ * @param buffer random data buffer container
  * @param len capacity of buffer
  *
  * @return an error code
@@ -151,24 +151,48 @@ SeosCryptoApi_getRandomData(SeosCryptoApi*  self,
                             size_t          saltLen,
                             void*           buffer,
                             size_t          dataLen);
-
+/**
+ * @brief initializes a digest context (local or remote) with the semantic of
+ * SeosCryptoDigest_init() and gives back an handle to it
+ *
+ * @retval SEOS_ERROR_INSUFFICIENT_SPACE
+ * @retval SEOS_ERROR_INVALID_PARAMETER
+ *
+ */
 seos_err_t
 SeosCryptoApi_digestInit(SeosCryptoApi*                 self,
                          SeosCryptoApi_DigestHandle*    pDigestHandle,
                          unsigned int                   algorithm,
                          void*                          iv,
                          size_t                         ivLen);
-
+/**
+ * @brief closes the digest context referred by \p digestHandle
+ *
+ * @retval SEOS_ERROR_INVALID_HANDLE
+ *
+ */
 seos_err_t
 SeosCryptoApi_digestClose(SeosCryptoApi*                self,
                           SeosCryptoApi_DigestHandle    digestHandle);
-
+/**
+ * @brief given the reference to the digest context \p digestHandle, it performs
+ * the semantic of SeosCryptoDigest_update()
+ *
+ * @retval SEOS_ERROR_INVALID_HANDLE
+ *
+ */
 seos_err_t
 SeosCryptoApi_digestUpdate(SeosCryptoApi*               self,
                            SeosCryptoApi_DigestHandle   digestHandle,
                            const void*                  data,
                            size_t                       dataLen);
-
+/**
+ * @brief given the reference to the digest context \p digestHandle, it performs
+ * the semantic of SeosCryptoDigest_finalize()
+ *
+ * @retval SEOS_ERROR_INVALID_HANDLE
+ *
+ */
 seos_err_t
 SeosCryptoApi_digestFinalize(SeosCryptoApi*             self,
                              SeosCryptoApi_DigestHandle digestHandle,
@@ -176,13 +200,32 @@ SeosCryptoApi_digestFinalize(SeosCryptoApi*             self,
                              size_t                     dataLen,
                              void**                     digest,
                              size_t*                    digestSize);
-
+/**
+ * @brief creates a random key and gives back an handle
+ *
+ * @param self (required) pointer to the seos crypto rpc object to be used
+ * @param pKeyHandle (required) pointer to the key handle.
+ *  This is an <b>output</b> parameter
+ * @param algorithm cipher algorithm for which the key is created
+ * @param flags \see SeosCryptoKey_Flags
+ * @param lenBits lenth of the key in bits
+ *
+ * @return an error code
+ * @retval SEOS_ERROR_INSUFFICIENT_SPACE
+ * @retval SEOS_ERROR_INVALID_PARAMETER
+ *
+ */
 seos_err_t
 SeosCryptoApi_keyGenerate(SeosCryptoApi*            self,
                           SeosCryptoApi_KeyHandle*  pKeyHandle,
                           unsigned int              algorithm,
                           unsigned int              flags,
                           size_t                    lenBits);
+/**
+ * @brief imports a raw key via \p keyImportBuffer and gives back an handle.
+ * Remaining parameters are like for SeosCryptoApi_keyGenerate()
+ *
+ */
 seos_err_t
 SeosCryptoApi_keyImport(SeosCryptoApi*              self,
                         SeosCryptoApi_KeyHandle*    pKeyHandle,
@@ -190,11 +233,22 @@ SeosCryptoApi_keyImport(SeosCryptoApi*              self,
                         unsigned int                flags,
                         void const*                 keyImportBuffer,
                         size_t                      keyImportLenBits);
-
+/**
+ * @brief closes the key context referred by \p keyHandle
+ *
+ * @retval SEOS_ERROR_INVALID_HANDLE
+ *
+ */
 seos_err_t
 SeosCryptoApi_keyClose(SeosCryptoApi*           self,
                        SeosCryptoApi_KeyHandle  keyHandle);
-
+/**
+ * @brief initializes a cipher context (local or remote) with the semantic of
+ * SeosCryptoCipher_init() and gives back an handle to it
+ *
+ * @retval SEOS_ERROR_INSUFFICIENT_SPACE
+ * @retval SEOS_ERROR_INVALID_PARAMETER
+ */
 seos_err_t
 SeosCryptoApi_cipherInit(SeosCryptoApi*                 self,
                          SeosCryptoApi_CipherHandle*    pCipherHandle,
@@ -202,10 +256,22 @@ SeosCryptoApi_cipherInit(SeosCryptoApi*                 self,
                          SeosCryptoApi_KeyHandle        keyHandle,
                          void*                          iv,
                          size_t                         ivLen);
-
+/**
+ * @brief closes the cipher context referred by \p digestHandle
+ *
+ * @retval SEOS_ERROR_INVALID_HANDLE
+ *
+ */
 seos_err_t
 SeosCryptoApi_cipherClose(SeosCryptoApi*                self,
                           SeosCryptoApi_CipherHandle    cipherHandle);
+/**
+ * @brief given the reference to the cipher context \p digestHandle, it performs
+ * the semantic of SeosCryptoCipher_update()
+ *
+ * @retval SEOS_ERROR_INVALID_HANDLE
+ *
+ */
 seos_err_t
 SeosCryptoApi_cipherUpdate(SeosCryptoApi*               self,
                            SeosCryptoApi_CipherHandle   cipherHandle,
