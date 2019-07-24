@@ -54,9 +54,9 @@ SeosCryptoApi_digestUpdate(SeosCryptoApi*            self,
 {
     Debug_ASSERT_SELF(self);
     return self->vtable->digestUpdate(self,
-                                    digestHandle,
+                                      digestHandle,
                                       data,
-                                    dataLen);
+                                      dataLen);
 }
 
 seos_err_t
@@ -69,7 +69,7 @@ SeosCryptoApi_digestFinalize(SeosCryptoApi*              self,
 {
     Debug_ASSERT_SELF(self);
     return self->vtable->digestFinalize(self,
-                                    digestHandle,
+                                        digestHandle,
                                         data,
                                         dataLen,
                                         digest,
@@ -86,9 +86,9 @@ SeosCryptoApi_keyGenerate(SeosCryptoApi*           self,
     Debug_ASSERT_SELF(self);
     return self->vtable->keyGenerate(self,
                                      pKeyHandle,
-                                    algorithm,
+                                     algorithm,
                                      flags,
-                                    lenBits);
+                                     lenBits);
 }
 seos_err_t
 SeosCryptoApi_keyImport(SeosCryptoApi*          self,
@@ -100,11 +100,11 @@ SeosCryptoApi_keyImport(SeosCryptoApi*          self,
 {
     Debug_ASSERT_SELF(self);
     return self->vtable->keyImport(self,
-                                    pKeyHandle,
-                                    algorithm,
-                                    flags,
-                                    keyImportBuffer,
-                                    keyImportLenBits);
+                                   pKeyHandle,
+                                   algorithm,
+                                   flags,
+                                   keyImportBuffer,
+                                   keyImportLenBits);
 }
 
 seos_err_t
@@ -113,7 +113,7 @@ SeosCryptoApi_keyClose(SeosCryptoApi*       self,
 {
     Debug_ASSERT_SELF(self);
     return self->vtable->keyClose(self,
-                                 keyHandle);
+                                  keyHandle);
 }
 
 seos_err_t
@@ -139,7 +139,7 @@ SeosCryptoApi_cipherClose(SeosCryptoApi*            self,
 {
     Debug_ASSERT_SELF(self);
     return self->vtable->cipherClose(self,
-                                    cipherHandle);
+                                     cipherHandle);
 }
 
 seos_err_t
@@ -152,7 +152,7 @@ SeosCryptoApi_cipherUpdate(SeosCryptoApi*           self,
 {
     Debug_ASSERT_SELF(self);
     return self->vtable->cipherUpdate(self,
-                                    cipherHandle,
+                                      cipherHandle,
                                       data,
                                       dataLen,
                                       output,
