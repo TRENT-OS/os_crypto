@@ -12,11 +12,6 @@
 #pragma once
 
 #include "compiler.h"
-
-#include "mbedtls/md.h"
-#include "mbedtls/md5.h"
-#include "mbedtls/sha256.h"
-
 #include "seos_err.h"
 
 #include <string.h>
@@ -26,37 +21,26 @@
 
 #define SeosCryptoDigest_MAX_DIGEST_SIZE SeosCryptoDigest_SIZE_SHA256
 
-
 typedef enum
 {
     // be aware!! At the moment those enums are matching those of
     // mbedtls_md_type_t for convenience reasons. Do not change values unless
     // you know what you are doing.
-    SeosCryptoDigest_Algorithm_NONE     = MBEDTLS_MD_NONE,
-    SeosCryptoDigest_Algorithm_MD2      = MBEDTLS_MD_MD2,
-    SeosCryptoDigest_Algorithm_MD4      = MBEDTLS_MD_MD4,
-    SeosCryptoDigest_Algorithm_MD5      = MBEDTLS_MD_MD5,
-    SeosCryptoDigest_Algorithm_SHA1     = MBEDTLS_MD_SHA1,
-    SeosCryptoDigest_Algorithm_SHA224   = MBEDTLS_MD_SHA224,
-    SeosCryptoDigest_Algorithm_SHA256   = MBEDTLS_MD_SHA256,
-    SeosCryptoDigest_Algorithm_SHA384   = MBEDTLS_MD_SHA384,
-    SeosCryptoDigest_Algorithm_SHA512   = MBEDTLS_MD_SHA512,
-    SeosCryptoDigest_Algorithm_RIPEMD160 = MBEDTLS_MD_RIPEMD160
+    SeosCryptoDigest_Algorithm_NONE,
+    SeosCryptoDigest_Algorithm_MD2,
+    SeosCryptoDigest_Algorithm_MD4,
+    SeosCryptoDigest_Algorithm_MD5,
+    SeosCryptoDigest_Algorithm_SHA1,
+    SeosCryptoDigest_Algorithm_SHA224,
+    SeosCryptoDigest_Algorithm_SHA256,
+    SeosCryptoDigest_Algorithm_SHA384,
+    SeosCryptoDigest_Algorithm_SHA512,
+    SeosCryptoDigest_Algorithm_RIPEMD160
 }
 SeosCryptoDigest_Algorithm;
 
-typedef struct
-{
-    SeosCryptoDigest_Algorithm algorithm;
-    union
-    {
-        mbedtls_md5_context     md5;
-        mbedtls_sha256_context  sha256;
-    }
-    agorithmCtx;
-    char digest[SeosCryptoDigest_MAX_DIGEST_SIZE];
-}
-SeosCryptoDigest;
+#include "SeosCryptoDigest_Impl.h"
+typedef struct SeosCryptoDigest SeosCryptoDigest;
 
 /**
  * @brief initializes a digest context

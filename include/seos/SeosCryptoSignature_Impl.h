@@ -11,16 +11,17 @@
 
 #pragma once
 
-#include "compiler.h"
 #include "mbedtls/rsa.h"
 
-typedef struct
+struct SeosCryptoSignature
 {
     union
     {
         mbedtls_rsa_context     rsa;
     }
     agorithmCtx;
-}
-SeosCryptoSignature_Impl;
 
+    SeosCryptoSignature_Algorithm   algorithm;
+    SeosCryptoKey const*            key;
+    SeosCryptoRng*                  rng;
+};

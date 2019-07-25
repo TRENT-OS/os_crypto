@@ -14,7 +14,6 @@
 #include "SeosCrypto.h"
 #include "SeosCryptoDigest.h"
 #include "SeosCryptoRng.h"
-#include "SeosCryptoSignature_Impl.h"
 
 #include <limits.h>
 
@@ -25,14 +24,8 @@ typedef enum
 }
 SeosCryptoSignature_Algorithm;
 
-typedef struct
-{
-    SeosCryptoSignature_Algorithm   algorithm;
-    SeosCryptoKey const*            key;
-    SeosCryptoRng*                  rng;
-    SeosCryptoSignature_Impl        impl;
-}
-SeosCryptoSignature;
+#include "SeosCryptoSignature_Impl.h"
+typedef struct SeosCryptoSignature SeosCryptoSignature;
 
 /**
  * @brief initializes a signature context
