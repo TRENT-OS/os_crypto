@@ -20,7 +20,7 @@
 
 typedef struct
 {
-    SeosCryptoApi*
+    SeosCryptoCtx*
     seosCryptoApi;  ///< crypto context to be used by the RPC object
     void*
     serverDataport;     ///< the server's address of the dataport shared with the client

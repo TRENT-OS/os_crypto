@@ -2,12 +2,12 @@
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  *
  */
-#include "SeosCrypto_Handles.h"
+#include "SeosCryptoCtx.h"
 #include "SeosCryptoApi.h"
 
 /***************************** Crypto functions *******************************/
 seos_err_t
-SeosCryptoApi_getRandomData(SeosCryptoApi* self,
+SeosCryptoApi_getRandomData(SeosCryptoCtx* self,
                             unsigned int flags,
                             void const* saltBuffer,
                             size_t saltLen,
@@ -24,7 +24,7 @@ SeosCryptoApi_getRandomData(SeosCryptoApi* self,
 }
 
 seos_err_t
-SeosCryptoApi_digestInit(SeosCryptoApi*              self,
+SeosCryptoApi_digestInit(SeosCryptoCtx*              self,
                          SeosCrypto_DigestHandle*    pDigestHandle,
                          unsigned int                algorithm,
                          void*                       iv,
@@ -39,7 +39,7 @@ SeosCryptoApi_digestInit(SeosCryptoApi*              self,
 }
 
 seos_err_t
-SeosCryptoApi_digestClose(SeosCryptoApi*             self,
+SeosCryptoApi_digestClose(SeosCryptoCtx*             self,
                           SeosCrypto_DigestHandle    digestHandle)
 {
     Debug_ASSERT_SELF(self);
@@ -48,7 +48,7 @@ SeosCryptoApi_digestClose(SeosCryptoApi*             self,
 }
 
 seos_err_t
-SeosCryptoApi_digestUpdate(SeosCryptoApi*            self,
+SeosCryptoApi_digestUpdate(SeosCryptoCtx*            self,
                            SeosCrypto_DigestHandle   digestHandle,
                            const void*               data,
                            size_t                    dataLen)
@@ -61,7 +61,7 @@ SeosCryptoApi_digestUpdate(SeosCryptoApi*            self,
 }
 
 seos_err_t
-SeosCryptoApi_digestFinalize(SeosCryptoApi*              self,
+SeosCryptoApi_digestFinalize(SeosCryptoCtx*              self,
                              SeosCrypto_DigestHandle     digestHandle,
                              const void*                 data,
                              size_t                      dataLen,
@@ -78,7 +78,7 @@ SeosCryptoApi_digestFinalize(SeosCryptoApi*              self,
 }
 
 seos_err_t
-SeosCryptoApi_keyGenerate(SeosCryptoApi*           self,
+SeosCryptoApi_keyGenerate(SeosCryptoCtx*           self,
                           SeosCrypto_KeyHandle*    pKeyHandle,
                           unsigned int             algorithm,
                           unsigned int             flags,
@@ -92,7 +92,7 @@ SeosCryptoApi_keyGenerate(SeosCryptoApi*           self,
                                      lenBits);
 }
 seos_err_t
-SeosCryptoApi_keyImport(SeosCryptoApi*          self,
+SeosCryptoApi_keyImport(SeosCryptoCtx*          self,
                         SeosCrypto_KeyHandle*   pKeyHandle,
                         unsigned int            algorithm,
                         unsigned int            flags,
@@ -109,7 +109,7 @@ SeosCryptoApi_keyImport(SeosCryptoApi*          self,
 }
 
 seos_err_t
-SeosCryptoApi_keyClose(SeosCryptoApi*       self,
+SeosCryptoApi_keyClose(SeosCryptoCtx*       self,
                        SeosCrypto_KeyHandle keyHandle)
 {
     Debug_ASSERT_SELF(self);
@@ -118,7 +118,7 @@ SeosCryptoApi_keyClose(SeosCryptoApi*       self,
 }
 
 seos_err_t
-SeosCryptoApi_cipherInit(SeosCryptoApi*             self,
+SeosCryptoApi_cipherInit(SeosCryptoCtx*             self,
                          SeosCrypto_CipherHandle*   pCipherHandle,
                          unsigned int               algorithm,
                          SeosCrypto_KeyHandle       keyHandle,
@@ -135,7 +135,7 @@ SeosCryptoApi_cipherInit(SeosCryptoApi*             self,
 }
 
 seos_err_t
-SeosCryptoApi_cipherClose(SeosCryptoApi*            self,
+SeosCryptoApi_cipherClose(SeosCryptoCtx*            self,
                           SeosCrypto_CipherHandle   cipherHandle)
 {
     Debug_ASSERT_SELF(self);
@@ -144,7 +144,7 @@ SeosCryptoApi_cipherClose(SeosCryptoApi*            self,
 }
 
 seos_err_t
-SeosCryptoApi_cipherUpdate(SeosCryptoApi*           self,
+SeosCryptoApi_cipherUpdate(SeosCryptoCtx*           self,
                            SeosCrypto_CipherHandle  cipherHandle,
                            const void*              data,
                            size_t                   dataLen,
@@ -161,7 +161,7 @@ SeosCryptoApi_cipherUpdate(SeosCryptoApi*           self,
 }
 
 void
-SeosCryptoApi_deInit(SeosCryptoApi* self)
+SeosCryptoApi_deInit(SeosCryptoCtx* self)
 {
     Debug_ASSERT_SELF(self);
     self->vtable->deInit(self);

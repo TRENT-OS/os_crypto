@@ -60,7 +60,7 @@ SeosCryptoRpc_init(SeosCryptoRpc*   self,
         goto exit;
     }
     memset(self, 0, sizeof(*self));
-    self->seosCryptoApi     = SeosCrypto_TO_SEOS_CRYPTO_API(seosCryptoApiCtx);
+    self->seosCryptoApi     = SeosCrypto_TO_SEOS_CRYPTO_CTX(seosCryptoApiCtx);
     self->serverDataport    = serverDataport;
     retval                  = SEOS_SUCCESS;
 

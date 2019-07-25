@@ -11,103 +11,6 @@
  */
 #pragma once
 
-typedef struct SeosCryptoApi SeosCryptoApi;
-
-typedef seos_err_t
-(*SeosCryptoApi_GetRandomDataT)(SeosCryptoApi*  self,
-                                unsigned int    flags,
-                                void const*     saltBuffer,
-                                size_t          saltLen,
-                                void*           buffer,
-                                size_t          dataLen);
-
-typedef seos_err_t
-(*SeosCryptoApi_digestInitT)(SeosCryptoApi*                 self,
-                             SeosCrypto_DigestHandle*       pDigestHandle,
-                             unsigned int                   algorithm,
-                             void*                          iv,
-                             size_t                         ivLen);
-
-typedef seos_err_t
-(*SeosCryptoApi_digestCloseT)(SeosCryptoApi*                self,
-                              SeosCrypto_DigestHandle       digestHandle);
-
-typedef seos_err_t
-(*SeosCryptoApi_digestUpdateT)(SeosCryptoApi*               self,
-                               SeosCrypto_DigestHandle      digestHandle,
-                               const void*                  data,
-                               size_t                       dataLen);
-
-typedef seos_err_t
-(*SeosCryptoApi_digestFinalizeT)(SeosCryptoApi*             self,
-                                 SeosCrypto_DigestHandle    digestHandle,
-                                 const void*                data,
-                                 size_t                     dataLen,
-                                 void**                     digest,
-                                 size_t*                    digestSize);
-
-typedef seos_err_t
-(*SeosCryptoApi_keyGenerateT)(SeosCryptoApi*            self,
-                              SeosCrypto_KeyHandle*     pKeyHandle,
-                              unsigned int              algorithm,
-                              unsigned int              flags,
-                              size_t                    lenBits);
-typedef seos_err_t
-(*SeosCryptoApi_keyImportT)(SeosCryptoApi*              self,
-                            SeosCrypto_KeyHandle*       pKeyHandle,
-                            unsigned int                algorithm,
-                            unsigned int                flags,
-                            void const*                 keyImportBuffer,
-                            size_t                      keyImportLenBits);
-
-typedef seos_err_t
-(*SeosCryptoApi_keyCloseT)(SeosCryptoApi*           self,
-                           SeosCrypto_KeyHandle     keyHandle);
-
-typedef seos_err_t
-(*SeosCryptoApi_cipherInitT)(SeosCryptoApi*                 self,
-                             SeosCrypto_CipherHandle*       pCipherHandle,
-                             unsigned int                   algorithm,
-                             SeosCrypto_KeyHandle           keyHandle,
-                             void*                          iv,
-                             size_t                         ivLen);
-
-typedef seos_err_t
-(*SeosCryptoApi_cipherCloseT)(SeosCryptoApi*                self,
-                              SeosCrypto_CipherHandle       cipherHandle);
-typedef seos_err_t
-(*SeosCryptoApi_cipherUpdateT)(SeosCryptoApi*               self,
-                               SeosCrypto_CipherHandle      cipherHandle,
-                               const void*                  data,
-                               size_t                       dataLen,
-                               void**                       output,
-                               size_t*                      outputSize);
-typedef void
-(*SeosCryptoApi_deInitT)(SeosCryptoApi* self);
-
-typedef struct
-{
-    SeosCryptoApi_GetRandomDataT    getRandomData;
-    SeosCryptoApi_digestInitT       digestInit;
-    SeosCryptoApi_digestCloseT      digestClose;
-    SeosCryptoApi_digestUpdateT     digestUpdate;
-    SeosCryptoApi_digestFinalizeT   digestFinalize;
-    SeosCryptoApi_keyGenerateT      keyGenerate;
-    SeosCryptoApi_keyImportT        keyImport;
-    SeosCryptoApi_keyCloseT         keyClose;
-    SeosCryptoApi_cipherInitT       cipherInit;
-    SeosCryptoApi_cipherCloseT      cipherClose;
-    SeosCryptoApi_cipherUpdateT     cipherUpdate;
-
-    SeosCryptoApi_deInitT           deInit;
-}
-SeosCryptoApi_Vtable;
-
-struct SeosCryptoApi
-{
-    const SeosCryptoApi_Vtable* vtable;
-};
-
 /***************************** Crypto functions *******************************/
 /**
  * @brief generate random number
@@ -135,7 +38,7 @@ struct SeosCryptoApi
  *
  */
 seos_err_t
-SeosCryptoApi_getRandomData(SeosCryptoApi*  self,
+SeosCryptoApi_getRandomData(SeosCryptoCtx*  self,
                             unsigned int    flags,
                             void const*     saltBuffer,
                             size_t          saltLen,
@@ -150,7 +53,7 @@ SeosCryptoApi_getRandomData(SeosCryptoApi*  self,
  *
  */
 seos_err_t
-SeosCryptoApi_digestInit(SeosCryptoApi*                 self,
+SeosCryptoApi_digestInit(SeosCryptoCtx*                 self,
                          SeosCrypto_DigestHandle*       pDigestHandle,
                          unsigned int                   algorithm,
                          void*                          iv,
@@ -162,7 +65,7 @@ SeosCryptoApi_digestInit(SeosCryptoApi*                 self,
  *
  */
 seos_err_t
-SeosCryptoApi_digestClose(SeosCryptoApi*                self,
+SeosCryptoApi_digestClose(SeosCryptoCtx*                self,
                           SeosCrypto_DigestHandle       digestHandle);
 /**
  * @brief given the reference to the digest context \p digestHandle, it performs
@@ -172,7 +75,7 @@ SeosCryptoApi_digestClose(SeosCryptoApi*                self,
  *
  */
 seos_err_t
-SeosCryptoApi_digestUpdate(SeosCryptoApi*               self,
+SeosCryptoApi_digestUpdate(SeosCryptoCtx*               self,
                            SeosCrypto_DigestHandle      digestHandle,
                            const void*                  data,
                            size_t                       dataLen);
@@ -184,7 +87,7 @@ SeosCryptoApi_digestUpdate(SeosCryptoApi*               self,
  *
  */
 seos_err_t
-SeosCryptoApi_digestFinalize(SeosCryptoApi*             self,
+SeosCryptoApi_digestFinalize(SeosCryptoCtx*             self,
                              SeosCrypto_DigestHandle    digestHandle,
                              const void*                data,
                              size_t                     dataLen,
@@ -206,7 +109,7 @@ SeosCryptoApi_digestFinalize(SeosCryptoApi*             self,
  *
  */
 seos_err_t
-SeosCryptoApi_keyGenerate(SeosCryptoApi*            self,
+SeosCryptoApi_keyGenerate(SeosCryptoCtx*            self,
                           SeosCrypto_KeyHandle*     pKeyHandle,
                           unsigned int              algorithm,
                           unsigned int              flags,
@@ -217,7 +120,7 @@ SeosCryptoApi_keyGenerate(SeosCryptoApi*            self,
  *
  */
 seos_err_t
-SeosCryptoApi_keyImport(SeosCryptoApi*              self,
+SeosCryptoApi_keyImport(SeosCryptoCtx*              self,
                         SeosCrypto_KeyHandle*       pKeyHandle,
                         unsigned int                algorithm,
                         unsigned int                flags,
@@ -230,7 +133,7 @@ SeosCryptoApi_keyImport(SeosCryptoApi*              self,
  *
  */
 seos_err_t
-SeosCryptoApi_keyClose(SeosCryptoApi*           self,
+SeosCryptoApi_keyClose(SeosCryptoCtx*           self,
                        SeosCrypto_KeyHandle     keyHandle);
 /**
  * @brief initializes a cipher context (local or remote) with the semantic of
@@ -240,7 +143,7 @@ SeosCryptoApi_keyClose(SeosCryptoApi*           self,
  * @retval SEOS_ERROR_INVALID_PARAMETER
  */
 seos_err_t
-SeosCryptoApi_cipherInit(SeosCryptoApi*                 self,
+SeosCryptoApi_cipherInit(SeosCryptoCtx*                 self,
                          SeosCrypto_CipherHandle*       pCipherHandle,
                          unsigned int                   algorithm,
                          SeosCrypto_KeyHandle           keyHandle,
@@ -253,7 +156,7 @@ SeosCryptoApi_cipherInit(SeosCryptoApi*                 self,
  *
  */
 seos_err_t
-SeosCryptoApi_cipherClose(SeosCryptoApi*                self,
+SeosCryptoApi_cipherClose(SeosCryptoCtx*                self,
                           SeosCrypto_CipherHandle       cipherHandle);
 /**
  * @brief given the reference to the cipher context \p digestHandle, it performs
@@ -263,7 +166,7 @@ SeosCryptoApi_cipherClose(SeosCryptoApi*                self,
  *
  */
 seos_err_t
-SeosCryptoApi_cipherUpdate(SeosCryptoApi*               self,
+SeosCryptoApi_cipherUpdate(SeosCryptoCtx*               self,
                            SeosCrypto_CipherHandle      cipherHandle,
                            const void*                  data,
                            size_t                       dataLen,
