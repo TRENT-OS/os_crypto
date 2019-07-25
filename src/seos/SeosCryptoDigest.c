@@ -12,9 +12,9 @@
 
 static seos_err_t
 finalize(SeosCryptoDigest* self,
-         char const* data,
+         void const* data,
          size_t len,
-         char* digest)
+         void* digest)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -23,19 +23,19 @@ finalize(SeosCryptoDigest* self,
     case SeosCryptoDigest_Algorithm_MD5:
         retval = (data != NULL &&
                   mbedtls_md5_update_ret(&self->agorithmCtx.md5,
-                                         (const unsigned char*) data,
+                                         data,
                                          len))
                  || mbedtls_md5_finish_ret(&self->agorithmCtx.md5,
-                                           (unsigned char*) digest) ?
+                                           digest) ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
     case SeosCryptoDigest_Algorithm_SHA256:
         retval = (data != NULL &&
                   mbedtls_sha256_update_ret(&self->agorithmCtx.sha256,
-                                            (const unsigned char*) data,
+                                            data,
                                             len))
                  || mbedtls_sha256_finish_ret(&self->agorithmCtx.sha256,
-                                              (unsigned char*) digest) ?
+                                              digest) ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
     default:
@@ -47,7 +47,7 @@ finalize(SeosCryptoDigest* self,
 
 seos_err_t
 update(SeosCryptoDigest* self,
-       const char* data,
+       const void* data,
        size_t len)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -56,13 +56,13 @@ update(SeosCryptoDigest* self,
     {
     case SeosCryptoDigest_Algorithm_MD5:
         retval = mbedtls_md5_update_ret(&self->agorithmCtx.md5,
-                                        (unsigned char*) data,
+                                        data,
                                         len) ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
     case SeosCryptoDigest_Algorithm_SHA256:
         retval = mbedtls_sha256_update_ret(&self->agorithmCtx.sha256,
-                                           (unsigned char*) data,
+                                           data,
                                            len) ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
@@ -76,10 +76,10 @@ update(SeosCryptoDigest* self,
 // Public Functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoDigest_init(SeosCryptoDigest* self,
-                      SeosCryptoDigest_Algorithm algorithm,
-                      char* iv,
-                      size_t ivLen)
+SeosCryptoDigest_init(SeosCryptoDigest*             self,
+                      SeosCryptoDigest_Algorithm    algorithm,
+                      void*                         iv,
+                      size_t                        ivLen)
 {
     Debug_ASSERT_SELF(self);
 
@@ -124,9 +124,9 @@ SeosCryptoDigest_deInit(SeosCryptoDigest* self)
 }
 
 seos_err_t
-SeosCryptoDigest_update(SeosCryptoDigest* self,
-                        const char* data,
-                        size_t len)
+SeosCryptoDigest_update(SeosCryptoDigest*   self,
+                        const void*         data,
+                        size_t              len)
 {
     Debug_ASSERT_SELF(self);
 
@@ -145,10 +145,10 @@ SeosCryptoDigest_update(SeosCryptoDigest* self,
 
 seos_err_t
 SeosCryptoDigest_finalize(SeosCryptoDigest* self,
-                          const char* data,
-                          size_t len,
-                          char** digest,
-                          size_t* digestSize)
+                          const void*       data,
+                          size_t            len,
+                          void**            digest,
+                          size_t*           digestSize)
 {
     Debug_ASSERT_SELF(self);
 
@@ -185,9 +185,9 @@ SeosCryptoDigest_finalize(SeosCryptoDigest* self,
 
 seos_err_t
 SeosCryptoDigest_verify(SeosCryptoDigest* self,
-                        const char* data,
+                        const void* data,
                         size_t len,
-                        char* expectedDigest)
+                        void* expectedDigest)
 {
     Debug_ASSERT_SELF(self);
 
@@ -199,7 +199,7 @@ SeosCryptoDigest_verify(SeosCryptoDigest* self,
     }
     else
     {
-        char* digest = NULL;
+        void* digest = NULL;
         size_t digestSize = 0;
         seos_err_t retval = SeosCryptoDigest_finalize(self,
                                                       data,

@@ -1,7 +1,7 @@
 /**
  * Copyright(C) 2019, Hensoldt Cyber GmbH
  *
- * @addtogroup SEOS
+ * @addtogroup Wrappers
  * @{
  *
  * @file SeosCryptoDigest.h
@@ -11,12 +11,13 @@
  */
 #pragma once
 
-#include "SeosCrypto.h"
 #include "compiler.h"
 
 #include "mbedtls/md.h"
 #include "mbedtls/md5.h"
 #include "mbedtls/sha256.h"
+
+#include "seos_err.h"
 
 #include <string.h>
 
@@ -74,10 +75,10 @@ SeosCryptoDigest;
  *
  */
 seos_err_t
-SeosCryptoDigest_init(SeosCryptoDigest* self,
-                      SeosCryptoDigest_Algorithm algorithm,
-                      char* iv,
-                      size_t ivLen);
+SeosCryptoDigest_init(SeosCryptoDigest*             self,
+                      SeosCryptoDigest_Algorithm    algorithm,
+                      void*                         iv,
+                      size_t                        ivLen);
 /**
  * @brief closes a cipher context.
  *
@@ -90,9 +91,8 @@ SeosCryptoDigest_deInit(SeosCryptoDigest* self);
  * @brief updates the computation of the digest providing a new block of data
  *
  * @param self (required) pointer to the SeosCryptoDigest context
- *
- * @params data (required) the data block
- * @params dataLen the length of the data block
+ * @param data (required) the data block
+ * @param dataLen the length of the data block
  *
  * @return an error code.
  *
@@ -106,15 +106,14 @@ SeosCryptoDigest_deInit(SeosCryptoDigest* self);
  *
  */
 seos_err_t
-SeosCryptoDigest_update(SeosCryptoDigest* self,
-                        const char* data,
-                        size_t dataLen);
+SeosCryptoDigest_update(SeosCryptoDigest*   self,
+                        const void*         data,
+                        size_t              dataLen);
 /**
  * @brief finalizes the computation of the digest providing a new block of data
  *  or padding (when data == NULL).
  *
  * @param self (required) pointer to the SeosCryptoDigest context
- *
  * @param data (optional) the data block. When not provided (== NULL) then
  *  padding is done
  * @param dataLen the length of the data block
@@ -141,35 +140,39 @@ SeosCryptoDigest_update(SeosCryptoDigest* self,
  */
 seos_err_t
 SeosCryptoDigest_finalize(SeosCryptoDigest* self,
-                          const char* data,
-                          size_t len,
-                          char** digest,
-                          size_t* digestSize);
+                          const void*       data,
+                          size_t            len,
+                          void**            digest,
+                          size_t*           digestSize);
 INLINE seos_err_t
-SeosCryptoDigest_finalize2(SeosCryptoDigest* self,
-                           const char* data,
-                           size_t len,
-                           char* digest,
-                           size_t digestSize)
+SeosCryptoDigest_finalize2(SeosCryptoDigest*    self,
+                           const void*          data,
+                           size_t               len,
+                           void*                digest,
+                           size_t               digestSize)
 {
-    char* pDigest = digest;
-    return SeosCryptoDigest_finalize(self, data, len, &pDigest, &digestSize);
+    void* pDigest = digest;
+    return SeosCryptoDigest_finalize(self,
+                                     data,
+                                     len,
+                                     &pDigest,
+                                     &digestSize);
 }
 
 INLINE seos_err_t
-SeosCryptoDigest_finalizeNoData(SeosCryptoDigest* self,
-                                char** digest,
-                                size_t* digestSize)
+SeosCryptoDigest_finalizeNoData(SeosCryptoDigest*   self,
+                                void**              digest,
+                                size_t*             digestSize)
 {
     return SeosCryptoDigest_finalize(self, NULL, 0, digest, digestSize);
 }
 
 INLINE seos_err_t
-SeosCryptoDigest_finalizeNoData2(SeosCryptoDigest* self,
-                                 char* digest,
-                                 size_t digestSize)
+SeosCryptoDigest_finalizeNoData2(SeosCryptoDigest*  self,
+                                 void*              digest,
+                                 size_t             digestSize)
 {
-    char* pDigest = digest;
+    void* pDigest = digest;
     return SeosCryptoDigest_finalizeNoData(self, &pDigest, &digestSize);
 }
 /**
@@ -191,10 +194,10 @@ SeosCryptoDigest_finalizeNoData2(SeosCryptoDigest* self,
  *
  */
 seos_err_t
-SeosCryptoDigest_verify(SeosCryptoDigest* self,
-                        const char* data,
-                        size_t len,
-                        char* expectedDigest);
+SeosCryptoDigest_verify(SeosCryptoDigest*   self,
+                        const void*         data,
+                        size_t              len,
+                        void*               expectedDigest);
 /**
  * @brief gets the size of digest for the selected algorithm of the given
  *  context

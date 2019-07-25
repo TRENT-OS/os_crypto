@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  *
- * @addtogroup SEOS
+ * @addtogroup Server
  * @{
  *
  * @file SeosCryptoRpc.h
@@ -20,15 +20,10 @@
 
 typedef struct
 {
-    SeosCrypto*
-    seosCryptoApiCtx;   ///< crypto API context to be used by the RPC object
+    SeosCryptoApi*
+    seosCryptoApi;  ///< crypto context to be used by the RPC object
     void*
     serverDataport;     ///< the server's address of the dataport shared with the client
-
-    seos_rng_t        rng;
-    SeosCryptoRng     seosCryptoRng;
-    SeosCryptoDigest* seosCryptoDigest;
-    SeosCryptoCipher* seosCryptoCipher;
 }
 SeosCryptoRpc;
 
@@ -63,10 +58,7 @@ SeosCryptoRpc_init(SeosCryptoRpc* self,
 void
 SeosCryptoRpc_deInit(SeosCryptoRpc* self);
 /**
- * @brief calls SeosCrypto_getRandomData() using the server dataport as output
- *  buffer
- *
- * @return an error code. See SeosCrypto_getRandomData()
+ * @brief rpc management of SeosCrypto_getRandomData()
  *
  * @retval SEOS_ERROR_INVALID_PARAMETER if dataLen > PAGE_SIZE
  *
@@ -74,130 +66,106 @@ SeosCryptoRpc_deInit(SeosCryptoRpc* self);
 seos_err_t
 SeosCryptoRpc_getRandomData(SeosCryptoRpc* self,
                             unsigned int flags,
+                            size_t saltLen,
                             size_t dataLen);
 /**
- * @brief creates a new instance of SeosCryptoDigest
- *
- * @param self (required) pointer to the seos crypto rpc object to be
- * @param algorithm
- * @param ivLen the initialization vector length saved in the server dataport
- *
- * @return an error code. See SeosCryptoDigest_ctor()
- *
- * @retval SEOS_ERROR_OPERATION_DENIED if an instance is already created
- * @retval SEOS_ERROR_INSUFFICIENT_SPACE if out of memory resources
+ * @brief rpc management of SeosCrypto_digestInit()
  *
  */
 seos_err_t
-SeosCryptoRpc_digestInit(SeosCryptoRpc* self,
-                         SeosCryptoDigest_Algorithm algorithm,
-                         size_t ivLen);
+SeosCryptoRpc_digestInit(SeosCryptoRpc*                 self,
+                         SeosCryptoApi_DigestHandle*    pDigestHandle,
+                         SeosCryptoDigest_Algorithm     algorithm,
+                         size_t                         ivLen);
 /**
- * @brief destroyes the instance of SeosCryptoDigest and frees resources
- *
- * @param self (required) pointer to the seos crypto rpc object to be used
- *
- * @return an error code. See SeosCryptoDigest_dtor()
+ * @brief rpc management of SeosCrypto_digestClose()
  *
  */
-void
-SeosCryptoRpc_digestClose(SeosCryptoRpc* self);
+seos_err_t
+SeosCryptoRpc_digestClose(SeosCryptoRpc* self,
+                          SeosCryptoApi_DigestHandle   digestHandle);
 /**
- * @brief calls SeosCryptoDigest_update() using the server dataport as input
- *  buffer.
- *  See SeosCryptoDigest_update()
+ * @brief rpc management of SeosCrypto_digestUpdate() using the server dataport
+ *  as input
  *
  */
 seos_err_t
 SeosCryptoRpc_digestUpdate(SeosCryptoRpc* self,
+                           SeosCryptoApi_DigestHandle  digestHandle,
                            size_t len);
 /**
- * @brief calls SeosCryptoDigest_finalize() using the server dataport as input
- *  buffer if len > 0 (otherwise paddinf happens). The result is consequently
- *  written in the same dataport. The first sizeof(size_t) bytes are the size
- *  of the result and the following bytes (according to the size stored as
- *  header) are the result itself.
- *  See SeosCryptoDigest_finalize()
+ * @brief rpc management of SeosCrypto_digestFinalize(). It uses the server
+ *  dataport as input buffer if len > 0 (otherwise padding happens). The result
+ *  is consequently written in the same dataport. The first sizeof(size_t)
+ *  bytes are the size of the result and the following bytes (according to the
+ *  size stored as header) are the result itself.
  *
  * @retval SEOS_ERROR_INVALID_PARAMETER if dataLen > PAGE_SIZE
  */
 seos_err_t
-SeosCryptoRpc_digestFinalize(SeosCryptoRpc* self,
-                             size_t len);
+SeosCryptoRpc_digestFinalize(SeosCryptoRpc*                 self,
+                             SeosCryptoApi_DigestHandle     digestHandle,
+                             size_t                         len);
 /**
- * @brief creates a new instance of SeosCryptoCipher
- *
- * @param self (required) pointer to the seos crypto rpc object to be
- * @param algorithm selected cipher algorithm
- * @param keyHandle handle of the key created by the client on the server
- * @param ivLen the initialization vector length saved in the server dataport
- *
- * @return an error code. See SeosCryptoCipher_ctor()
- *
- * @retval SEOS_ERROR_OPERATION_DENIED if an instance is already created
- * @retval SEOS_ERROR_INSUFFICIENT_SPACE if out of memory resources
+ * @brief rpc management of SeosCrypto_keyGenerate()
  *
  */
 seos_err_t
-SeosCryptoRpc_cipherInit(SeosCryptoRpc* self,
-                         SeosCryptoCipher_Algorithm algorithm,
-                         SeosCrypto_KeyHandle keyHandle,
-                         size_t ivLen);
+SeosCryptoRpc_keyGenerate(SeosCryptoRpc*            self,
+                          SeosCryptoApi_KeyHandle*  pKeyHandle,
+                          unsigned int              algorithm,
+                          unsigned int              flags,
+                          size_t                    lenBits);
 /**
- * @brief destroyes the instance of SeosCryptoCipher and frees resources
- *
- * @param self (required) pointer to the seos crypto rpc object to be used
- *
- * @return an error code. See SeosCryptoCipher_dtor()
- *
- */
-void
-SeosCryptoRpc_cipherClose(SeosCryptoRpc* self);
-/**
- * @brief calls SeosCryptoCipher_update() using the server dataport as input
- *  buffer. The result is consequently written in the same dataport. The first
- *  sizeof(size_t) bytes are the size of the result and the following bytes
- *  (according to the size stored as header) are the result itself.
- *  See SeosCryptoDigest_finalize()
- *
- * @retval SEOS_ERROR_INVALID_PARAMETER if dataLen > PAGE_SIZE
- * @retval SEOS_ERROR_ABORTED if the result cannot fit in the server dataport
+ * @brief rpc management of SeosCrypto_keyImport()
  *
  */
 seos_err_t
-SeosCryptoRpc_cipherUpdate(SeosCryptoRpc* self,
-                           size_t len);
+SeosCryptoRpc_keyImport(SeosCryptoRpc*          self,
+                        SeosCryptoApi_KeyHandle*   pKeyHandle,
+                        unsigned int            algorithm,
+                        unsigned int            flags,
+                        size_t                  keyImportLenBits);
 /**
- * @brief calls SeosCryptoCipher_finalize() using the server dataport as input
- *  buffer. The result is consequently written in the same dataport. The first
- *  sizeof(size_t) bytes are the size of the result (cipher data) and the
- *  following bytes (according to the size stored as header) are the result
- *  itself. With same schema ([SIZE][DATA]) the tag is appended
- *  See SeosCryptoDigest_finalize()
- *
- * @retval SEOS_ERROR_INVALID_PARAMETER if dataLen > PAGE_SIZE
- * @retval SEOS_ERROR_ABORTED if the result cannot fit in the server dataport
- */
-seos_err_t
-SeosCryptoRpc_cipherFinalize(SeosCryptoRpc* self,
-                             size_t len);
-/**
- * @brief creates a random key and gives back and handle
- *
- * @param self (required) pointer to the seos crypto rpc object to be used
- * @param algorithm cipher algorithm for which the key is created
- * @param flags (e.g.: SeosCrypto_KEY_FLAGS_128_BIT)
- * @param pKeyHandle (required) pointer to the key handle.
- *  This is an <b>output</b> parameter
- *
- * @return an error code. See SeosCrypto_keyCreate()
+ * @brief rpc management of SeosCrypto_keyClose()
  *
  */
 seos_err_t
-SeosCryptoRpc_keyCreate(SeosCryptoRpc* self,
-                        SeosCryptoCipher_Algorithm algorithm,
-                        unsigned int flags,
-                        size_t lenBits,
-                        SeosCrypto_KeyHandle* pKeyHandle);
+SeosCryptoRpc_keyClose(SeosCryptoRpc*          self,
+                       SeosCryptoApi_KeyHandle    keyHandle);
+
+/**
+ * @brief rpc management of SeosCrypto_cipherInit()
+ *
+ */
+seos_err_t
+SeosCryptoRpc_cipherInit(SeosCryptoRpc*                 self,
+                         SeosCryptoApi_CipherHandle*    pCipherHandle,
+                         SeosCryptoCipher_Algorithm     algorithm,
+                         SeosCryptoApi_KeyHandle        keyHandle,
+                         size_t                         ivLen);
+/**
+ * @brief rpc management of SeosCrypto_cipherClose()
+ *
+ */
+seos_err_t
+SeosCryptoRpc_cipherClose(SeosCryptoRpc*                self,
+                          SeosCryptoApi_CipherHandle    cipherHandle);
+/**
+ * @brief rpc management of SeosCrypto_cipherUpdate()
+ *
+ */
+seos_err_t
+SeosCryptoRpc_cipherUpdate(SeosCryptoRpc*               self,
+                           SeosCryptoApi_CipherHandle   cipherHandle,
+                           size_t                       len);
+/**
+ * @brief rpc management of SeosCrypto_cipherFinalize()
+ *
+ */
+seos_err_t
+SeosCryptoRpc_cipherFinalize(SeosCryptoRpc*             self,
+                             SeosCryptoApi_CipherHandle cipherHandle,
+                             size_t                     len);
 
 /** @} */

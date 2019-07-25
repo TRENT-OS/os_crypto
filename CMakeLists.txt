@@ -11,6 +11,8 @@ add_library(
     "src/seos/SeosCryptoCipher.c"
     "src/seos/SeosCryptoSignature.c"
     "src/seos/SeosCryptoKey.c"
+    "src/seos/SeosCryptoApi.c"
+    "src/seos/SeosCryptoClient.c"
 )
 if (ENABLE_LINT)
         set(CMAKE_C_CPPCHECK "cppcheck;--enable=warning;--inline-suppr")
@@ -62,14 +64,6 @@ if (SEOS_CRYPTO_IMPL_MBEDTLS)
         "3rdParty/mbedtls/library/oid.c"
         "3rdParty/mbedtls/library/rsa.c"
         "3rdParty/mbedtls/library/rsa_internal.c"
-    )
-endif()
-
-if (SEOS_CRYPTO_COMPONENT)
-    target_sources(${PROJECT_NAME}
-        PRIVATE
-        "src/seos/SeosCryptoClient.c"
-        "src/seos/SeosCryptoRpc.c"
     )
 endif()
 
