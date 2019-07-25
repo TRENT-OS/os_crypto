@@ -11,7 +11,6 @@
  */
 #pragma once
 
-#include "SeosCrypto.h"
 #include "SeosCryptoDigest.h"
 #include "SeosCryptoRng.h"
 

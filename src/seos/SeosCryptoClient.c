@@ -117,7 +117,7 @@ SeosCryptoClient_getRandomData2(SeosCryptoApi*   api,
 
 seos_err_t
 SeosCryptoClient_digestInit(SeosCryptoApi*                  api,
-                            SeosCryptoApi_DigestHandle*     pDigestHandle,
+                            SeosCrypto_DigestHandle*        pDigestHandle,
                             SeosCryptoDigest_Algorithm      algorithm,
                             void*                           iv,
                             size_t                          ivLen)
@@ -148,7 +148,7 @@ SeosCryptoClient_digestInit(SeosCryptoApi*                  api,
 
 seos_err_t
 SeosCryptoClient_digestClose(SeosCryptoApi*             api,
-                             SeosCryptoApi_DigestHandle digestHandle)
+                             SeosCrypto_DigestHandle digestHandle)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
     Debug_ASSERT_SELF(self);
@@ -159,7 +159,7 @@ SeosCryptoClient_digestClose(SeosCryptoApi*             api,
 
 seos_err_t
 SeosCryptoClient_digestUpdate(SeosCryptoApi*                api,
-                              SeosCryptoApi_DigestHandle    digestHandle,
+                              SeosCrypto_DigestHandle       digestHandle,
                               const void*                   data,
                               size_t                        dataLen)
 {
@@ -185,7 +185,7 @@ SeosCryptoClient_digestUpdate(SeosCryptoApi*                api,
 
 seos_err_t
 SeosCryptoClient_digestFinalize(SeosCryptoApi*              api,
-                                SeosCryptoApi_DigestHandle  digestHandle,
+                                SeosCrypto_DigestHandle     digestHandle,
                                 const void*                 data,
                                 size_t                      dataLen,
                                 void**                      digest,
@@ -243,7 +243,7 @@ SeosCryptoClient_digestFinalize(SeosCryptoApi*              api,
 
 seos_err_t
 SeosCryptoClient_keyGenerate(SeosCryptoApi*             api,
-                             SeosCryptoApi_KeyHandle*   pKeyHandle,
+                             SeosCrypto_KeyHandle*      pKeyHandle,
                              unsigned int               algorithm,
                              unsigned int               flags,
                              size_t                     lenBits)
@@ -261,7 +261,7 @@ SeosCryptoClient_keyGenerate(SeosCryptoApi*             api,
 
 seos_err_t
 SeosCryptoClient_keyImport(SeosCryptoApi*           api,
-                           SeosCryptoApi_KeyHandle* pKeyHandle,
+                           SeosCrypto_KeyHandle*    pKeyHandle,
                            unsigned int             algorithm,
                            unsigned int             flags,
                            void const*              keyImportBuffer,
@@ -292,8 +292,8 @@ SeosCryptoClient_keyImport(SeosCryptoApi*           api,
 }
 
 seos_err_t
-SeosCryptoClient_keyClose(SeosCryptoApi*            api,
-                          SeosCryptoApi_KeyHandle   keyHandle)
+SeosCryptoClient_keyClose(SeosCryptoApi*        api,
+                          SeosCrypto_KeyHandle  keyHandle)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
     Debug_ASSERT(self);
@@ -303,9 +303,9 @@ SeosCryptoClient_keyClose(SeosCryptoApi*            api,
 
 seos_err_t
 SeosCryptoClient_cipherInit(SeosCryptoApi*                  api,
-                            SeosCryptoApi_CipherHandle*     pKeyHandle,
+                            SeosCrypto_CipherHandle*        pKeyHandle,
                             SeosCryptoCipher_Algorithm      algorithm,
-                            SeosCryptoApi_KeyHandle         key,
+                            SeosCrypto_KeyHandle            key,
                             void*                           iv,
                             size_t                          ivLen)
 {
@@ -336,7 +336,7 @@ SeosCryptoClient_cipherInit(SeosCryptoApi*                  api,
 
 seos_err_t
 SeosCryptoClient_cipherClose(SeosCryptoApi*             api,
-                             SeosCryptoApi_CipherHandle cipherHandle)
+                             SeosCrypto_CipherHandle    cipherHandle)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
     Debug_ASSERT_SELF(self);
@@ -347,7 +347,7 @@ SeosCryptoClient_cipherClose(SeosCryptoApi*             api,
 
 seos_err_t
 SeosCryptoClient_cipherUpdate(SeosCryptoApi*                api,
-                              SeosCryptoApi_CipherHandle    cipherHandle,
+                              SeosCrypto_CipherHandle       cipherHandle,
                               const void*                   data,
                               size_t                        dataLen,
                               void**                        output,
@@ -403,7 +403,7 @@ SeosCryptoClient_cipherUpdate(SeosCryptoApi*                api,
 
 seos_err_t
 SeosCryptoClient_cipherFinalize(SeosCryptoApi*              api,
-                                SeosCryptoApi_CipherHandle  cipherHandle,
+                                SeosCrypto_CipherHandle     cipherHandle,
                                 const void*                 data,
                                 size_t                      dataLen,
                                 void**                      digest,

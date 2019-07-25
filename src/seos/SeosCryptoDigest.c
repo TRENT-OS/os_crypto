@@ -184,10 +184,10 @@ SeosCryptoDigest_finalize(SeosCryptoDigest* self,
 }
 
 seos_err_t
-SeosCryptoDigest_verify(SeosCryptoDigest* self,
-                        const void* data,
-                        size_t len,
-                        void* expectedDigest)
+SeosCryptoDigest_verify(SeosCryptoDigest*   self,
+                        const void*         data,
+                        size_t              len,
+                        void*               expectedDigest)
 {
     Debug_ASSERT_SELF(self);
 

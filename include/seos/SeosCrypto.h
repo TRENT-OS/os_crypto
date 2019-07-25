@@ -17,6 +17,7 @@
 #include "SeosCryptoKey.h"
 #include "SeosCryptoDigest.h"
 #include "SeosCryptoCipher.h"
+#include "SeosCrypto_Handles.h"
 #include "SeosCryptoApi.h"
 
 #include "LibUtil/PointerVector.h"
@@ -124,7 +125,7 @@ SeosCrypto_getRandomData(SeosCryptoApi* api,
  */
 seos_err_t
 SeosCrypto_digestInit(SeosCryptoApi*                api,
-                      SeosCryptoApi_DigestHandle*   pDigestHandle,
+                      SeosCrypto_DigestHandle*   pDigestHandle,
                       unsigned                      algorithm,
                       void*                         iv,
                       size_t                        ivLen);
@@ -135,7 +136,7 @@ SeosCrypto_digestInit(SeosCryptoApi*                api,
  */
 seos_err_t
 SeosCrypto_digestClose(SeosCryptoApi*               api,
-                       SeosCryptoApi_DigestHandle   digestHandle);
+                       SeosCrypto_DigestHandle   digestHandle);
 /**
  * @brief implements SeosCryptoApi_digestUpdate() in a local connection
  * (function call, no rpc)
@@ -143,7 +144,7 @@ SeosCrypto_digestClose(SeosCryptoApi*               api,
  */
 seos_err_t
 SeosCrypto_digestUpdate(SeosCryptoApi*              api,
-                        SeosCryptoApi_DigestHandle  digestHandle,
+                        SeosCrypto_DigestHandle  digestHandle,
                         const void*                 data,
                         size_t                      len);
 /**
@@ -153,7 +154,7 @@ SeosCrypto_digestUpdate(SeosCryptoApi*              api,
  */
 seos_err_t
 SeosCrypto_digestFinalize(SeosCryptoApi*                api,
-                          SeosCryptoApi_DigestHandle    digestHandle,
+                          SeosCrypto_DigestHandle    digestHandle,
                           const void*                   data,
                           size_t                        len,
                           void**                        digest,
@@ -167,7 +168,7 @@ SeosCrypto_digestFinalize(SeosCryptoApi*                api,
  */
 seos_err_t
 SeosCrypto_keyGenerate(SeosCryptoApi*           api,
-                       SeosCryptoApi_KeyHandle* pKeyHandle,
+                       SeosCrypto_KeyHandle* pKeyHandle,
                        unsigned int             algorithm,
                        unsigned int             flags,
                        size_t                   lenBits);
@@ -178,7 +179,7 @@ SeosCrypto_keyGenerate(SeosCryptoApi*           api,
  */
 seos_err_t
 SeosCrypto_keyImport(SeosCryptoApi*             api,
-                     SeosCryptoApi_KeyHandle*   pKeyHandle,
+                     SeosCrypto_KeyHandle*   pKeyHandle,
                      unsigned int               algorithm,
                      unsigned int               flags,
                      void const*                keyImportBuffer,
@@ -209,7 +210,7 @@ SeosCrypto_keyImport(SeosCryptoApi*             api,
  */
 seos_err_t
 SeosCrypto_keyExport(SeosCryptoApi*             api,
-                     SeosCryptoApi_KeyHandle    keyHandle,
+                     SeosCrypto_KeyHandle    keyHandle,
                      void*                      buffer,
                      size_t                     bufferLen);
 /**
@@ -219,7 +220,7 @@ SeosCrypto_keyExport(SeosCryptoApi*             api,
  */
 seos_err_t
 SeosCrypto_keyClose(SeosCryptoApi*          api,
-                    SeosCryptoApi_KeyHandle keyHandle);
+                    SeosCrypto_KeyHandle keyHandle);
 
 
 // ----------------------------- Key Derivation --------------------------------
@@ -250,12 +251,12 @@ SeosCrypto_keyClose(SeosCryptoApi*          api,
  */
 seos_err_t
 SeosCrypto_deriveKey(SeosCryptoApi* api,
-                     SeosCryptoApi_KeyHandle hParentKey,
+                     SeosCrypto_KeyHandle hParentKey,
                      unsigned int lifetime,
                      unsigned int algorithm,
                      void const* saltBuffer,
                      size_t saltLen,
-                     SeosCryptoApi_KeyHandle* hKey,
+                     SeosCrypto_KeyHandle* hKey,
                      void* keyBlobBuffer,
                      size_t* lenKeyBlobBuffer);
 /**
@@ -301,9 +302,9 @@ SeosCrypto_deriveKey(SeosCryptoApi* api,
  */
 seos_err_t
 SeosCrypto_cipherInit(SeosCryptoApi*                api,
-                      SeosCryptoApi_CipherHandle*   pCipherHandle,
+                      SeosCrypto_CipherHandle*   pCipherHandle,
                       unsigned int                  algorithm,
-                      SeosCryptoApi_KeyHandle       keyHandle,
+                      SeosCrypto_KeyHandle       keyHandle,
                       void*                         iv,
                       size_t                        ivLen);
 /**
@@ -313,7 +314,7 @@ SeosCrypto_cipherInit(SeosCryptoApi*                api,
  */
 seos_err_t
 SeosCrypto_cipherClose(SeosCryptoApi*               api,
-                       SeosCryptoApi_CipherHandle   cipherHandle);
+                       SeosCrypto_CipherHandle   cipherHandle);
 /**
  * @brief implements SeosCryptoApi_cipherUpdate() in a local connection
  * (function call, no rpc)
@@ -321,7 +322,7 @@ SeosCrypto_cipherClose(SeosCryptoApi*               api,
  */
 seos_err_t
 SeosCrypto_cipherUpdate(SeosCryptoApi*              api,
-                        SeosCryptoApi_CipherHandle  cipherHandle,
+                        SeosCrypto_CipherHandle  cipherHandle,
                         const void*                 input,
                         size_t                      inputSize,
                         void**                      output,
@@ -333,7 +334,7 @@ SeosCrypto_cipherUpdate(SeosCryptoApi*              api,
  */
 seos_err_t
 SeosCrypto_cipherFinalize(SeosCryptoApi*                api,
-                          SeosCryptoApi_CipherHandle    cipherHandle,
+                          SeosCrypto_CipherHandle    cipherHandle,
                           const void*                   input,
                           size_t                        inputSize,
                           void**                        output,
