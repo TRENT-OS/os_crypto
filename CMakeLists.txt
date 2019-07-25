@@ -5,14 +5,14 @@ project(seos_crypto C)
 add_library(
     ${PROJECT_NAME} STATIC
 
-    "src/seos/SeosCrypto.c"
-    "src/seos/SeosCryptoRng.c"
-    "src/seos/SeosCryptoDigest.c"
-    "src/seos/SeosCryptoCipher.c"
-    "src/seos/SeosCryptoSignature.c"
-    "src/seos/SeosCryptoKey.c"
-    "src/seos/SeosCryptoApi.c"
-    "src/seos/SeosCryptoClient.c"
+    "src/SeosCrypto.c"
+    "src/SeosCryptoRng.c"
+    "src/SeosCryptoDigest.c"
+    "src/SeosCryptoCipher.c"
+    "src/SeosCryptoSignature.c"
+    "src/SeosCryptoKey.c"
+    "src/SeosCryptoApi.c"
+    "src/SeosCryptoClient.c"
 )
 if (ENABLE_LINT)
         set(CMAKE_C_CPPCHECK "cppcheck;--enable=warning;--inline-suppr")
@@ -47,7 +47,7 @@ if (SEOS_CRYPTO_IMPL_MBEDTLS)
     )
     target_sources(${PROJECT_NAME}
         PRIVATE
-        "src/seos/seos_rng.c"
+        "src/seos_rng.c"
         "3rdParty/mbedtls/library/md5.c"
         "3rdParty/mbedtls/library/platform_util.c"
         "3rdParty/mbedtls/library/entropy.c"
@@ -77,7 +77,6 @@ target_compile_definitions(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME}
     PUBLIC
         "include"
-        "include/seos"
 )
 
 target_link_libraries(${PROJECT_NAME}
