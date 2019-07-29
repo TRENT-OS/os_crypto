@@ -15,7 +15,7 @@
 /**
  * @brief generate random number
  *
- * @param self (optional) pointer to the seos_crypto context
+ * @param cryptoCtx (required) pointer to the seos_crypto context
  * @param flags allows selecting a fast random source for bulk data or more
  *  secure source for cryptographically secure random data. Fast random data
  *  generation is usually implemented uses a PRNG seeded by a nonce obtained
@@ -38,7 +38,7 @@
  *
  */
 seos_err_t
-SeosCryptoApi_getRandomData(SeosCryptoCtx*  self,
+SeosCryptoApi_getRandomData(SeosCryptoCtx*  cryptoCtx,
                             unsigned int    flags,
                             void const*     saltBuffer,
                             size_t          saltLen,
@@ -53,7 +53,7 @@ SeosCryptoApi_getRandomData(SeosCryptoCtx*  self,
  *
  */
 seos_err_t
-SeosCryptoApi_digestInit(SeosCryptoCtx*                 self,
+SeosCryptoApi_digestInit(SeosCryptoCtx*                 cryptoCtx,
                          SeosCrypto_DigestHandle*       pDigestHandle,
                          unsigned int                   algorithm,
                          void*                          iv,
@@ -65,7 +65,7 @@ SeosCryptoApi_digestInit(SeosCryptoCtx*                 self,
  *
  */
 seos_err_t
-SeosCryptoApi_digestClose(SeosCryptoCtx*                self,
+SeosCryptoApi_digestClose(SeosCryptoCtx*                cryptoCtx,
                           SeosCrypto_DigestHandle       digestHandle);
 /**
  * @brief given the reference to the digest context \p digestHandle, it performs
@@ -75,7 +75,7 @@ SeosCryptoApi_digestClose(SeosCryptoCtx*                self,
  *
  */
 seos_err_t
-SeosCryptoApi_digestUpdate(SeosCryptoCtx*               self,
+SeosCryptoApi_digestUpdate(SeosCryptoCtx*               cryptoCtx,
                            SeosCrypto_DigestHandle      digestHandle,
                            const void*                  data,
                            size_t                       dataLen);
@@ -87,7 +87,7 @@ SeosCryptoApi_digestUpdate(SeosCryptoCtx*               self,
  *
  */
 seos_err_t
-SeosCryptoApi_digestFinalize(SeosCryptoCtx*             self,
+SeosCryptoApi_digestFinalize(SeosCryptoCtx*             cryptoCtx,
                              SeosCrypto_DigestHandle    digestHandle,
                              const void*                data,
                              size_t                     dataLen,
@@ -96,7 +96,7 @@ SeosCryptoApi_digestFinalize(SeosCryptoCtx*             self,
 /**
  * @brief creates a random key and gives back an handle
  *
- * @param self (required) pointer to the seos crypto rpc object to be used
+ * @param cryptoCtx (required) pointer to the seos crypto rpc object to be used
  * @param pKeyHandle (required) pointer to the key handle.
  *  This is an <b>output</b> parameter
  * @param algorithm cipher algorithm for which the key is created
@@ -109,7 +109,7 @@ SeosCryptoApi_digestFinalize(SeosCryptoCtx*             self,
  *
  */
 seos_err_t
-SeosCryptoApi_keyGenerate(SeosCryptoCtx*            self,
+SeosCryptoApi_keyGenerate(SeosCryptoCtx*            cryptoCtx,
                           SeosCrypto_KeyHandle*     pKeyHandle,
                           unsigned int              algorithm,
                           unsigned int              flags,
@@ -120,7 +120,7 @@ SeosCryptoApi_keyGenerate(SeosCryptoCtx*            self,
  *
  */
 seos_err_t
-SeosCryptoApi_keyImport(SeosCryptoCtx*              self,
+SeosCryptoApi_keyImport(SeosCryptoCtx*              cryptoCtx,
                         SeosCrypto_KeyHandle*       pKeyHandle,
                         unsigned int                algorithm,
                         unsigned int                flags,
@@ -133,7 +133,7 @@ SeosCryptoApi_keyImport(SeosCryptoCtx*              self,
  *
  */
 seos_err_t
-SeosCryptoApi_keyClose(SeosCryptoCtx*           self,
+SeosCryptoApi_keyClose(SeosCryptoCtx*           cryptoCtx,
                        SeosCrypto_KeyHandle     keyHandle);
 /**
  * @brief initializes a cipher context (local or remote) with the semantic of
@@ -143,7 +143,7 @@ SeosCryptoApi_keyClose(SeosCryptoCtx*           self,
  * @retval SEOS_ERROR_INVALID_PARAMETER
  */
 seos_err_t
-SeosCryptoApi_cipherInit(SeosCryptoCtx*                 self,
+SeosCryptoApi_cipherInit(SeosCryptoCtx*                 cryptoCtx,
                          SeosCrypto_CipherHandle*       pCipherHandle,
                          unsigned int                   algorithm,
                          SeosCrypto_KeyHandle           keyHandle,
@@ -156,7 +156,7 @@ SeosCryptoApi_cipherInit(SeosCryptoCtx*                 self,
  *
  */
 seos_err_t
-SeosCryptoApi_cipherClose(SeosCryptoCtx*                self,
+SeosCryptoApi_cipherClose(SeosCryptoCtx*                cryptoCtx,
                           SeosCrypto_CipherHandle       cipherHandle);
 /**
  * @brief given the reference to the cipher context \p digestHandle, it performs
@@ -166,7 +166,7 @@ SeosCryptoApi_cipherClose(SeosCryptoCtx*                self,
  *
  */
 seos_err_t
-SeosCryptoApi_cipherUpdate(SeosCryptoCtx*               self,
+SeosCryptoApi_cipherUpdate(SeosCryptoCtx*               cryptoCtx,
                            SeosCrypto_CipherHandle      cipherHandle,
                            const void*                  data,
                            size_t                       dataLen,
