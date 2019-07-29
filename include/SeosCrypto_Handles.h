@@ -17,3 +17,5 @@
 typedef SeosCryptoKey*      SeosCrypto_KeyHandle;
 typedef SeosCryptoDigest*   SeosCrypto_DigestHandle;
 typedef SeosCryptoCipher*   SeosCrypto_CipherHandle;
+
+/** @} */

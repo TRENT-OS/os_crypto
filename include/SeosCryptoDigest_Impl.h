@@ -52,3 +52,4 @@ Debug_STATIC_ASSERT(SeosCryptoDigest_Algorithm_SHA512   ==
                     (int) MBEDTLS_MD_SHA512);
 Debug_STATIC_ASSERT(SeosCryptoDigest_Algorithm_RIPEMD160 ==
                     (int) MBEDTLS_MD_RIPEMD160);
+/** @} */

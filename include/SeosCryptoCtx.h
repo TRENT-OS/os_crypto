@@ -9,6 +9,9 @@
  * @brief SEOS Crypto API interface context
  *
  */
+
+#pragma once
+
 #include "SeosCrypto_Handles.h"
 
 typedef struct SeosCryptoCtx SeosCryptoCtx;
@@ -107,3 +110,5 @@ struct SeosCryptoCtx
 {
     const SeosCryptoCtx_Vtable* vtable;
 };
+
+/** @} */

@@ -31,3 +31,5 @@ struct SeosCryptoCipher
     char                        outputBuf[SeosCryptoCipher_OUTPUT_BUFFER_SIZE];
     char                        tag[SeosCryptoCipher_TAG_BUFFER_SIZE];
 };
+
+/** @} */
