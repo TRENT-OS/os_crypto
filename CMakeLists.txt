@@ -81,4 +81,12 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     seos_libs
+    seos_core_api
 )
+
+get_target_property(SEOS_CORE_API_INCLUDES seos_core_api INTERFACE_INCLUDE_DIRECTORIES)
+find_file(SEOS_CRYPTO_API_HEADER SeosCryptoApi.h PATHS ${SEOS_CORE_API_INCLUDES} CMAKE_FIND_ROOT_PATH_BOTH)
+if (SEOS_CRYPTO_API_HEADER)
+    execute_process(COMMAND ln -sf ${SEOS_CRYPTO_API_HEADER} ${CMAKE_CURRENT_SOURCE_DIR}/include)
+endif(SEOS_CRYPTO_API_HEADER)
+
