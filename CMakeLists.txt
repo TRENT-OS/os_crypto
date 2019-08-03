@@ -81,4 +81,26 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     seos_libs
+    seos_core_api
 )
+
+get_target_property(SEOS_CORE_API_INCLUDES seos_core_api INTERFACE_INCLUDE_DIRECTORIES)
+find_file(SEOS_CRYPTO_API_HEADER SeosCryptoApi.h PATHS ${SEOS_CORE_API_INCLUDES} CMAKE_FIND_ROOT_PATH_BOTH)
+if (SEOS_CRYPTO_API_HEADER)
+    execute_process(COMMAND ln -sf ${SEOS_CRYPTO_API_HEADER} ${CMAKE_CURRENT_SOURCE_DIR}/include)
+endif(SEOS_CRYPTO_API_HEADER)
+
+find_package(Doxygen
+             REQUIRED dot
+             OPTIONAL_COMPONENTS mscgen dia)
+if (DOXYGEN_FOUND)
+    # note the option ALL which allows to build the docs together with the application
+    add_custom_target( seos_crypto_doc
+        COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile && ln -sf ${CMAKE_CURRENT_SOURCE_DIR}/html ${CMAKE_CURRENT_BINARY_DIR}/seos_crypto_doc
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMENT "Generating API documentation with Doxygen"
+        VERBATIM )
+else(DOXYGEN_FOUND)
+    message("Doxygen needs to be installed to generate the doxygen documentation")
+endif(DOXYGEN_FOUND)
+
