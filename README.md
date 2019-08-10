@@ -1,13 +1,16 @@
 # seos\_crypto
 
-SeOS Crypto Library that allows client/server components in order to run crypto
-routines either via RPCs or locally
+## Overview
 
-## Getting Started
+SEOS Crypto Library provides a library that allows components to run crypto
+routines either locally or via the CryptoServer
 
-The project is for a static library that can be build including his
- CMakelists.txt to the cmake build.
+## Usage
 
-### Build Dependencies
+The project creates a library seos_libs. Just include CMakelists.txt in the
+cmake build.
 
-* configs
+### Dependencies
+
+* configuration files
+* mbedTLS (provides the actual crypto implementation)
