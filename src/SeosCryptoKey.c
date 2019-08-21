@@ -186,7 +186,6 @@ SeosCryptoKey_deInit(SeosCryptoKey* self)
 
     if (BitMap_GET_BIT(self->flags, SeosCryptoKey_Flags_IS_ALGO_CIPHER))
     {
-        // TBD
         memset(self, 0, sizeof(SeosCryptoKey));
     }
     else
