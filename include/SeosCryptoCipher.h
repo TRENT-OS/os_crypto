@@ -13,9 +13,6 @@
 
 #include "SeosCryptoRng.h"
 
-#include "mbedtls/aes.h"
-#include "mbedtls/rsa.h"
-
 #include <limits.h>
 
 #define SeosCryptoCipher_OUTPUT_BUFFER_SIZE     PAGE_SIZE
@@ -34,23 +31,8 @@ typedef enum
 }
 SeosCryptoCipher_Algorithm;
 
-typedef struct
-{
-    SeosCryptoCipher_Algorithm  algorithm;
-    SeosCryptoKey const*        key;
-    SeosCryptoRng*              rng;
-    void*                       iv;
-    size_t                      ivLen;
-    union
-    {
-        mbedtls_aes_context     aes;
-        mbedtls_rsa_context     rsa;
-    }
-    agorithmCtx;
-    char                        outputBuf[SeosCryptoCipher_OUTPUT_BUFFER_SIZE];
-    char                        tag[SeosCryptoCipher_TAG_BUFFER_SIZE];
-}
-SeosCryptoCipher;
+#include "SeosCryptoCipher_Impl.h"
+typedef struct SeosCryptoCipher SeosCryptoCipher;
 
 /**
  * @brief initializes a cipher context

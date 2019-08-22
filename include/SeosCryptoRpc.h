@@ -20,7 +20,7 @@
 
 typedef struct
 {
-    SeosCryptoApi*
+    SeosCryptoCtx*
     seosCryptoApi;  ///< crypto context to be used by the RPC object
     void*
     serverDataport;     ///< the server's address of the dataport shared with the client
@@ -74,7 +74,7 @@ SeosCryptoRpc_getRandomData(SeosCryptoRpc* self,
  */
 seos_err_t
 SeosCryptoRpc_digestInit(SeosCryptoRpc*                 self,
-                         SeosCryptoApi_DigestHandle*    pDigestHandle,
+                         SeosCrypto_DigestHandle*       pDigestHandle,
                          SeosCryptoDigest_Algorithm     algorithm,
                          size_t                         ivLen);
 /**
@@ -82,17 +82,17 @@ SeosCryptoRpc_digestInit(SeosCryptoRpc*                 self,
  *
  */
 seos_err_t
-SeosCryptoRpc_digestClose(SeosCryptoRpc* self,
-                          SeosCryptoApi_DigestHandle   digestHandle);
+SeosCryptoRpc_digestClose(SeosCryptoRpc*            self,
+                          SeosCrypto_DigestHandle   digestHandle);
 /**
  * @brief rpc management of SeosCrypto_digestUpdate() using the server dataport
  *  as input
  *
  */
 seos_err_t
-SeosCryptoRpc_digestUpdate(SeosCryptoRpc* self,
-                           SeosCryptoApi_DigestHandle  digestHandle,
-                           size_t len);
+SeosCryptoRpc_digestUpdate(SeosCryptoRpc*           self,
+                           SeosCrypto_DigestHandle  digestHandle,
+                           size_t                   len);
 /**
  * @brief rpc management of SeosCrypto_digestFinalize(). It uses the server
  *  dataport as input buffer if len > 0 (otherwise padding happens). The result
@@ -103,16 +103,16 @@ SeosCryptoRpc_digestUpdate(SeosCryptoRpc* self,
  * @retval SEOS_ERROR_INVALID_PARAMETER if dataLen > PAGE_SIZE
  */
 seos_err_t
-SeosCryptoRpc_digestFinalize(SeosCryptoRpc*                 self,
-                             SeosCryptoApi_DigestHandle     digestHandle,
-                             size_t                         len);
+SeosCryptoRpc_digestFinalize(SeosCryptoRpc*             self,
+                             SeosCrypto_DigestHandle    digestHandle,
+                             size_t                     len);
 /**
  * @brief rpc management of SeosCrypto_keyGenerate()
  *
  */
 seos_err_t
 SeosCryptoRpc_keyGenerate(SeosCryptoRpc*            self,
-                          SeosCryptoApi_KeyHandle*  pKeyHandle,
+                          SeosCrypto_KeyHandle*     pKeyHandle,
                           unsigned int              algorithm,
                           unsigned int              flags,
                           size_t                    lenBits);
@@ -122,7 +122,7 @@ SeosCryptoRpc_keyGenerate(SeosCryptoRpc*            self,
  */
 seos_err_t
 SeosCryptoRpc_keyImport(SeosCryptoRpc*          self,
-                        SeosCryptoApi_KeyHandle*   pKeyHandle,
+                        SeosCrypto_KeyHandle*   pKeyHandle,
                         unsigned int            algorithm,
                         unsigned int            flags,
                         size_t                  keyImportLenBits);
@@ -132,7 +132,7 @@ SeosCryptoRpc_keyImport(SeosCryptoRpc*          self,
  */
 seos_err_t
 SeosCryptoRpc_keyClose(SeosCryptoRpc*          self,
-                       SeosCryptoApi_KeyHandle    keyHandle);
+                       SeosCrypto_KeyHandle    keyHandle);
 
 /**
  * @brief rpc management of SeosCrypto_cipherInit()
@@ -140,9 +140,9 @@ SeosCryptoRpc_keyClose(SeosCryptoRpc*          self,
  */
 seos_err_t
 SeosCryptoRpc_cipherInit(SeosCryptoRpc*                 self,
-                         SeosCryptoApi_CipherHandle*    pCipherHandle,
+                         SeosCrypto_CipherHandle*       pCipherHandle,
                          SeosCryptoCipher_Algorithm     algorithm,
-                         SeosCryptoApi_KeyHandle        keyHandle,
+                         SeosCrypto_KeyHandle           keyHandle,
                          size_t                         ivLen);
 /**
  * @brief rpc management of SeosCrypto_cipherClose()
@@ -150,14 +150,14 @@ SeosCryptoRpc_cipherInit(SeosCryptoRpc*                 self,
  */
 seos_err_t
 SeosCryptoRpc_cipherClose(SeosCryptoRpc*                self,
-                          SeosCryptoApi_CipherHandle    cipherHandle);
+                          SeosCrypto_CipherHandle       cipherHandle);
 /**
  * @brief rpc management of SeosCrypto_cipherUpdate()
  *
  */
 seos_err_t
 SeosCryptoRpc_cipherUpdate(SeosCryptoRpc*               self,
-                           SeosCryptoApi_CipherHandle   cipherHandle,
+                           SeosCrypto_CipherHandle      cipherHandle,
                            size_t                       len);
 /**
  * @brief rpc management of SeosCrypto_cipherFinalize()
@@ -165,7 +165,7 @@ SeosCryptoRpc_cipherUpdate(SeosCryptoRpc*               self,
  */
 seos_err_t
 SeosCryptoRpc_cipherFinalize(SeosCryptoRpc*             self,
-                             SeosCryptoApi_CipherHandle cipherHandle,
+                             SeosCrypto_CipherHandle    cipherHandle,
                              size_t                     len);
 
 /** @} */

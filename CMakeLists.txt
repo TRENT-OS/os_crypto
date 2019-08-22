@@ -5,14 +5,14 @@ project(seos_crypto C)
 add_library(
     ${PROJECT_NAME} STATIC
 
-    "src/seos/SeosCrypto.c"
-    "src/seos/SeosCryptoRng.c"
-    "src/seos/SeosCryptoDigest.c"
-    "src/seos/SeosCryptoCipher.c"
-    "src/seos/SeosCryptoSignature.c"
-    "src/seos/SeosCryptoKey.c"
-    "src/seos/SeosCryptoApi.c"
-    "src/seos/SeosCryptoClient.c"
+    "src/SeosCrypto.c"
+    "src/SeosCryptoRng.c"
+    "src/SeosCryptoDigest.c"
+    "src/SeosCryptoCipher.c"
+    "src/SeosCryptoSignature.c"
+    "src/SeosCryptoKey.c"
+    "src/SeosCryptoApi.c"
+    "src/SeosCryptoClient.c"
 )
 if (ENABLE_LINT)
         set(CMAKE_C_CPPCHECK "cppcheck;--enable=warning;--inline-suppr")
@@ -47,7 +47,7 @@ if (SEOS_CRYPTO_IMPL_MBEDTLS)
     )
     target_sources(${PROJECT_NAME}
         PRIVATE
-        "src/seos/seos_rng.c"
+        "src/seos_rng.c"
         "3rdParty/mbedtls/library/md5.c"
         "3rdParty/mbedtls/library/platform_util.c"
         "3rdParty/mbedtls/library/entropy.c"
@@ -77,9 +77,30 @@ target_compile_definitions(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME}
     PUBLIC
         "include"
-        "include/seos"
 )
 
 target_link_libraries(${PROJECT_NAME}
     seos_libs
+    seos_core_api
 )
+
+get_target_property(SEOS_CORE_API_INCLUDES seos_core_api INTERFACE_INCLUDE_DIRECTORIES)
+find_file(SEOS_CRYPTO_API_HEADER SeosCryptoApi.h PATHS ${SEOS_CORE_API_INCLUDES} CMAKE_FIND_ROOT_PATH_BOTH)
+if (SEOS_CRYPTO_API_HEADER)
+    execute_process(COMMAND ln -sf ${SEOS_CRYPTO_API_HEADER} ${CMAKE_CURRENT_SOURCE_DIR}/include)
+endif(SEOS_CRYPTO_API_HEADER)
+
+find_package(Doxygen
+             REQUIRED dot
+             OPTIONAL_COMPONENTS mscgen dia)
+if (DOXYGEN_FOUND)
+    # note the option ALL which allows to build the docs together with the application
+    add_custom_target( seos_crypto_doc
+        COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile && ln -sf ${CMAKE_CURRENT_SOURCE_DIR}/html ${CMAKE_CURRENT_BINARY_DIR}/seos_crypto_doc
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMENT "Generating API documentation with Doxygen"
+        VERBATIM )
+else(DOXYGEN_FOUND)
+    message("Doxygen needs to be installed to generate the doxygen documentation")
+endif(DOXYGEN_FOUND)
+
