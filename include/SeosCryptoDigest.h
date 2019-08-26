@@ -200,3 +200,5 @@ void SeosCryptoDigest_clone(SeosCryptoDigest* dest,
 {
     memcpy(dest, source, sizeof(*dest));
 }
+
+///@}

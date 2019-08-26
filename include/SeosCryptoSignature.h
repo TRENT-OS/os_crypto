@@ -133,3 +133,5 @@ SeosCryptoSignature_verify(SeosCryptoSignature* self,
                            size_t hashSize,
                            const char* signature,
                            size_t signatureSize);
+
+///@}

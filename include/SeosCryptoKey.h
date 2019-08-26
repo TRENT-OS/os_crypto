@@ -85,3 +85,5 @@ SeosCryptoKey_getSize(SeosCryptoKey* self)
     return self->lenBits / CHAR_BIT
            + ((self->lenBits % CHAR_BIT) ? 1 : 0);
 }
+
+///@}

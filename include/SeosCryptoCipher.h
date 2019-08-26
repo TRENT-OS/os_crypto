@@ -172,3 +172,5 @@ seos_err_t
 SeosCryptoCipher_verifyTag(SeosCryptoCipher*    self,
                            char*                tag,
                            size_t               tagSize);
+
+///@}
