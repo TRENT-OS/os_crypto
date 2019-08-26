@@ -23,8 +23,8 @@ initImpl(SeosCryptoCipher* self)
             retval = SEOS_ERROR_INVALID_PARAMETER;
             break;
         }
-    case SeosCryptoCipher_Algorithm_AES_EBC_ENC:
-    case SeosCryptoCipher_Algorithm_AES_EBC_DEC:
+    case SeosCryptoCipher_Algorithm_AES_ECB_ENC:
+    case SeosCryptoCipher_Algorithm_AES_ECB_DEC:
         mbedtls_aes_init(&self->agorithmCtx.aes);
         retval = SEOS_SUCCESS;
         break;
@@ -46,8 +46,8 @@ deInitImpl(SeosCryptoCipher* self)
 {
     switch (self->algorithm)
     {
-    case SeosCryptoCipher_Algorithm_AES_EBC_ENC:
-    case SeosCryptoCipher_Algorithm_AES_EBC_DEC:
+    case SeosCryptoCipher_Algorithm_AES_ECB_ENC:
+    case SeosCryptoCipher_Algorithm_AES_ECB_DEC:
     case SeosCryptoCipher_Algorithm_AES_CBC_ENC:
     case SeosCryptoCipher_Algorithm_AES_CBC_DEC:
         mbedtls_aes_free(&self->agorithmCtx.aes);
@@ -64,14 +64,14 @@ setKeyImpl(SeosCryptoCipher* self)
 
     switch (self->algorithm)
     {
-    case SeosCryptoCipher_Algorithm_AES_EBC_ENC:
+    case SeosCryptoCipher_Algorithm_AES_ECB_ENC:
     case SeosCryptoCipher_Algorithm_AES_CBC_ENC:
         retval = mbedtls_aes_setkey_enc(&self->agorithmCtx.aes,
                                         (const unsigned char*) self->key->bytes,
                                         self->key->lenBits) ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
-    case SeosCryptoCipher_Algorithm_AES_EBC_DEC:
+    case SeosCryptoCipher_Algorithm_AES_ECB_DEC:
     case SeosCryptoCipher_Algorithm_AES_CBC_DEC:
         retval = mbedtls_aes_setkey_dec(&self->agorithmCtx.aes,
                                         (const unsigned char*) self->key->bytes,
@@ -100,8 +100,8 @@ updateImpl(SeosCryptoCipher* self,
 
     switch (self->algorithm)
     {
-    case SeosCryptoCipher_Algorithm_AES_EBC_ENC:
-    case SeosCryptoCipher_Algorithm_AES_EBC_DEC:
+    case SeosCryptoCipher_Algorithm_AES_ECB_ENC:
+    case SeosCryptoCipher_Algorithm_AES_ECB_DEC:
     {
         if (inputSize != SeosCryptoCipher_AES_BLOCK_SIZE)
         {
@@ -110,7 +110,7 @@ updateImpl(SeosCryptoCipher* self,
         else
         {
             int mode =
-                (self->algorithm == SeosCryptoCipher_Algorithm_AES_EBC_ENC) ?
+                (self->algorithm == SeosCryptoCipher_Algorithm_AES_ECB_ENC) ?
                 MBEDTLS_AES_ENCRYPT : MBEDTLS_AES_DECRYPT;
             retval = (*outputSize < inputSize)
                      || mbedtls_aes_crypt_ecb(&self->agorithmCtx.aes,
