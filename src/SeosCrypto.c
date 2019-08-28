@@ -492,6 +492,12 @@ SeosCrypto_cipherInit(SeosCryptoCtx*                api,
 
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
+    if (SeosCrypto_findHandle(&self->keyHandleVector, key) == -1)
+    {
+        retval = SEOS_ERROR_INVALID_HANDLE;
+        goto exit;
+    }
+
     *pCipherHandle =
         self->mem.memIf.malloc(sizeof(SeosCryptoCipher));
     seos_rng_t* rng =
