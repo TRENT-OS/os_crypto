@@ -93,12 +93,11 @@ find_package(Doxygen
 if (DOXYGEN_FOUND)
     add_custom_target( seos_crypto_doc
         COMMAND
+            export DOXYGEN_OUTPUT_DIR=${CMAKE_CURRENT_BINARY_DIR}
             # link the API file SeosCryptoApi.h from seos_core_api in order to produce a complete doxygen documentation
-            ln -sf ${SEOS_CRYPTO_API_HEADER} ${CMAKE_CURRENT_SOURCE_DIR}/include
+            && ln -sf ${SEOS_CRYPTO_API_HEADER} ${CMAKE_CURRENT_SOURCE_DIR}/include
             # run doxygen
             && ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile
-            # move the html directory into the binary dir
-            && rm -rf ${CMAKE_CURRENT_BINARY_DIR}/html && mv -f ${CMAKE_CURRENT_SOURCE_DIR}/html ${CMAKE_CURRENT_BINARY_DIR}
             # remove the link to SeosCryptoApi.h
             && rm -f ${CMAKE_CURRENT_SOURCE_DIR}/include/SeosCryptoApi.h
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
