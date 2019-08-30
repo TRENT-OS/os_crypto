@@ -16,7 +16,7 @@
 
 #include "seos_err.h"
 #include "SeosCryptoRpc.h"
-#include "SeosCryptoApi.h"
+#include "SeosCryptoCtx.h"
 
 #define SeosCryptoClient_TO_SEOS_CRYPTO_CTX(self) (&(self)->parent)
 
