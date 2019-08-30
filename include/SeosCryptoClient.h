@@ -209,7 +209,7 @@ SeosCryptoClient_cipherInit(SeosCryptoCtx*                  api,
                             SeosCrypto_CipherHandle*        pKeyHandle,
                             unsigned int                    algorithm,
                             SeosCrypto_KeyHandle            key,
-                            void*                           iv,
+                            const void*                     iv,
                             size_t                          ivLen);
 /**
  * @brief implements SeosCryptoApi_cipherClose() in a rpc connection
@@ -246,12 +246,8 @@ SeosCryptoClient_cipherUpdateAd(SeosCryptoCtx*                api,
 seos_err_t
 SeosCryptoClient_cipherFinalize(SeosCryptoCtx*              api,
                                 SeosCrypto_CipherHandle     cipherHandle,
-                                const void*                 input,
-                                size_t                      inputSize,
                                 void**                      output,
-                                size_t*                     outputSize,
-                                void**                      tag,
-                                size_t*                     tagSize);
+                                size_t*                     outputSize);
 /**
  * @brief implements SeosCryptoApi_cipherVerifyTag() in a rpc connection
  *

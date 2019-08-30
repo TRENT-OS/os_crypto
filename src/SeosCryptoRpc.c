@@ -439,43 +439,28 @@ SeosCryptoRpc_cipherUpdateAd(SeosCryptoRpc*           self,
 
 seos_err_t
 SeosCryptoRpc_cipherFinalize(SeosCryptoRpc*             self,
-                             SeosCrypto_CipherHandle    cipherHandle,
-                             size_t                     len)
+                             SeosCrypto_CipherHandle    cipherHandle)
 {
     Debug_LOG_TRACE("%s", __func__);
 
-    seos_err_t retval   = SEOS_ERROR_GENERIC;
-    void*   output      = NULL;
-    void*   tag         = NULL;
-    size_t  outputSize  = 0;
-    size_t  tagSize     = 0;
+    seos_err_t  retval      = SEOS_ERROR_GENERIC;
+    void*       output      = NULL;
+    size_t      outputSize  = 0;
 
     if (!isValidHandle(self))
     {
         retval = SEOS_ERROR_INVALID_HANDLE;
     }
-    else if (len > PAGE_SIZE)
-    {
-        retval = SEOS_ERROR_INVALID_PARAMETER;
-    }
     else
     {
         retval = SeosCrypto_cipherFinalize(self->seosCryptoApi,
                                            cipherHandle,
-                                           self->serverDataport,
-                                           len,
                                            &output,
-                                           &outputSize,
-                                           &tag,
-                                           &tagSize);
+                                           &outputSize);
     }
     if (SEOS_SUCCESS == retval)
     {
-        if (NULL == output || NULL == tag)
-        {
-            retval = SEOS_ERROR_ABORTED;
-        }
-        else if (outputSize + sizeof(outputSize) * 2 + tagSize > PAGE_SIZE)
+        if (outputSize + sizeof(outputSize) > PAGE_SIZE)
         {
             retval = SEOS_ERROR_ABORTED;
         }
@@ -484,11 +469,10 @@ SeosCryptoRpc_cipherFinalize(SeosCryptoRpc*             self,
             void* dest = memcpy(self->serverDataport,
                                 &outputSize,
                                 sizeof(outputSize)) + sizeof(outputSize);
-            dest = memcpy(dest, output, outputSize) + outputSize;
-            dest = memcpy(dest, &tagSize, sizeof(tagSize)) + sizeof(tagSize);
-            memcpy(dest, tag, tagSize);
+            memcpy(dest, output, outputSize);
         }
     }
+
     return retval;
 }
 

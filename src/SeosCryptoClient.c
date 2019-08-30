@@ -309,7 +309,7 @@ SeosCryptoClient_cipherInit(SeosCryptoCtx*                  api,
                             SeosCrypto_CipherHandle*        pKeyHandle,
                             SeosCryptoCipher_Algorithm      algorithm,
                             SeosCrypto_KeyHandle            key,
-                            void*                           iv,
+                            const void*                     iv,
                             size_t                          ivLen)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
@@ -433,12 +433,8 @@ SeosCryptoClient_cipherUpdateAd(SeosCryptoCtx*                api,
 seos_err_t
 SeosCryptoClient_cipherFinalize(SeosCryptoCtx*              api,
                                 SeosCrypto_CipherHandle     cipherHandle,
-                                const void*                 input,
-                                size_t                      inputSize,
                                 void**                      output,
-                                size_t*                     outputSize,
-                                void**                      tag,
-                                size_t*                     tagSize)
+                                size_t*                     outputSize)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
     Debug_ASSERT_SELF(self);
@@ -452,7 +448,7 @@ SeosCryptoClient_cipherFinalize(SeosCryptoCtx*              api,
     }
     else
     {
-        retval = SeosCryptoRpc_cipherFinalize(self->rpcHandle, cipherHandle, inputSize);
+        retval = SeosCryptoRpc_cipherFinalize(self->rpcHandle, cipherHandle);
         if (SEOS_SUCCESS == retval)
         {
             size_t* obtainedOutputSize  = (size_t*) self->clientDataport;

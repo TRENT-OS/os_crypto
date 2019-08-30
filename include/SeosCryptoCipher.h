@@ -59,7 +59,7 @@ SeosCryptoCipher_init(SeosCryptoCipher*             self,
                       SeosCryptoCipher_Algorithm    algorithm,
                       SeosCryptoKey const*          key,
                       SeosCryptoRng*                rng,
-                      void*                         iv,
+                      const void*                   iv,
                       size_t                        ivLen);
 /**
  * @brief closes a cipher context.
@@ -122,9 +122,7 @@ SeosCryptoCipher_update(SeosCryptoCipher*   self,
  *  requested
  *
  * @param self (required) pointer to context
- * @param input (required) input buffer
- * @param inputSize input buffer size
- * @param output (required) input/output parameter cointaining the pointer to
+ * @param output (required) output parameter cointaining the pointer to
  *  the output buffer. If content is == NULL, then it is set to a local (to the
  *  context) buffer and the content of \p outputSize is set to the correct value
  *  of the amount of written data. Otherwise (!= NULL) the given buffer is used
@@ -134,10 +132,6 @@ SeosCryptoCipher_update(SeosCryptoCipher*   self,
  *  written data.
  * @param outputSize (required) input/output parameter holding the capacity/size
  *  of \p output
- * @param tag (optional) input/output parameter cointaining the pointer to
- *  the final tag buffer. It follows the same logic as output parameter.
- * @param tagSize (required) input/output parameter holding the capacity/size
- *  of \p tag
  *
  * @return an error code
  * @retval SEOS_SUCCESS if all right
@@ -151,12 +145,8 @@ SeosCryptoCipher_update(SeosCryptoCipher*   self,
  */
 seos_err_t
 SeosCryptoCipher_finalize(SeosCryptoCipher* self,
-                          const void*       input,
-                          size_t            inputSize,
                           void**            output,
-                          size_t*           outputSize,
-                          void**            tag,
-                          size_t*           tagSize);
+                          size_t*           outputSize);
 /**
  * @brief checks the previously computed tag against the provided one
  *

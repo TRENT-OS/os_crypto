@@ -174,8 +174,7 @@ SeosCryptoRpc_cipherUpdateAd(SeosCryptoRpc*             self,
  */
 seos_err_t
 SeosCryptoRpc_cipherFinalize(SeosCryptoRpc*             self,
-                             SeosCrypto_CipherHandle    cipherHandle,
-                             size_t                     len);
+                             SeosCrypto_CipherHandle    cipherHandle);
 
 /**
  * @brief rpc management of SeosCrypto_cipherVerifyTag()

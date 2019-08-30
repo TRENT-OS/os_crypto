@@ -486,7 +486,7 @@ SeosCrypto_cipherInit(SeosCryptoCtx*                api,
                       SeosCrypto_CipherHandle*      pCipherHandle,
                       unsigned int                  algorithm,
                       SeosCrypto_KeyHandle          key,
-                      void*                         iv,
+                      const void*                   iv,
                       size_t                        ivLen)
 {
     SeosCrypto* self = (SeosCrypto*) api;
@@ -656,12 +656,8 @@ SeosCrypto_cipherUpdateAd(SeosCryptoCtx*          api,
 seos_err_t
 SeosCrypto_cipherFinalize(SeosCryptoCtx*            api,
                           SeosCrypto_CipherHandle   cipherHandle,
-                          const void*               input,
-                          size_t                    inputSize,
                           void**                    output,
-                          size_t*                   outputSize,
-                          void**                    tag,
-                          size_t*                   tagSize)
+                          size_t*                   outputSize)
 {
     SeosCrypto* self = (SeosCrypto*) api;
     Debug_ASSERT_SELF(self);
@@ -674,9 +670,7 @@ SeosCrypto_cipherFinalize(SeosCryptoCtx*            api,
     if (handlePos != -1)
     {
         retval = SeosCryptoCipher_finalize(cipherHandle,
-                                           input, inputSize,
-                                           output, outputSize,
-                                           tag, tagSize);
+                                           output, outputSize);
     }
     else
     {

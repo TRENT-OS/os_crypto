@@ -18,7 +18,7 @@ initImpl(SeosCryptoCipher* self)
     {
     case SeosCryptoCipher_Algorithm_AES_CBC_ENC:
     case SeosCryptoCipher_Algorithm_AES_CBC_DEC:
-        if ((NULL == self->iv) || (self->ivLen != SeosCryptoCipher_AES_BLOCK_SIZE))
+        if (self->ivLen != SeosCryptoCipher_AES_BLOCK_SIZE)
         {
             retval = SEOS_ERROR_INVALID_PARAMETER;
         }
@@ -37,7 +37,7 @@ initImpl(SeosCryptoCipher* self)
 
     case SeosCryptoCipher_Algorithm_AES_GCM_DEC:
     case SeosCryptoCipher_Algorithm_AES_GCM_ENC:
-        if (self->ivLen != SeosCryptoCipher_AES_BLOCK_SIZE || NULL == self->iv)
+        if (self->ivLen != SeosCryptoCipher_AES_BLOCK_SIZE)
         {
             retval = SEOS_ERROR_INVALID_PARAMETER;
         }
@@ -361,14 +361,14 @@ SeosCryptoCipher_init(SeosCryptoCipher*             self,
                       SeosCryptoCipher_Algorithm    algorithm,
                       SeosCryptoKey const*          key,
                       SeosCryptoRng*                rng,
-                      void*                         iv,
+                      const void*                   iv,
                       size_t                        ivLen)
 {
     seos_err_t retval;
 
     Debug_ASSERT_SELF(self);
 
-    if (NULL == key)
+    if (NULL == key || ivLen > SeosCryptoCipher_AES_BLOCK_SIZE)
     {
         retval = SEOS_ERROR_INVALID_PARAMETER;
         goto exit;
@@ -378,10 +378,13 @@ SeosCryptoCipher_init(SeosCryptoCipher*             self,
 
     self->algorithm  = algorithm;
     self->key        = key;
-    self->iv         = iv;
-    self->ivLen      = ivLen;
     self->rng        = rng;
     self->inputLen   = 0;
+    self->ivLen      = ivLen;
+    if (NULL != iv)
+    {
+        memcpy(self->iv, iv, ivLen);
+    }
 
     retval = initImpl(self);
     if (retval != SEOS_SUCCESS)
@@ -465,12 +468,8 @@ SeosCryptoCipher_update(SeosCryptoCipher*   self,
 
 seos_err_t
 SeosCryptoCipher_finalize(SeosCryptoCipher* self,
-                          const void*       input,
-                          size_t            inputSize,
                           void**            output,
-                          size_t*           outputSize,
-                          void**            tag,
-                          size_t*           tagSize)
+                          size_t*           outputSize)
 {
     seos_err_t retval;
 

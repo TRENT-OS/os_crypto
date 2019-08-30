@@ -30,11 +30,10 @@ struct SeosCryptoCipher
     SeosCryptoCipher_Algorithm  algorithm;
     SeosCryptoKey const*        key;
     SeosCryptoRng*              rng;
-    void*                       iv;
+    unsigned char               iv[SeosCryptoCipher_AES_BLOCK_SIZE];
     size_t                      ivLen;
     size_t                      inputLen;
     char                        outputBuf[SeosCryptoCipher_OUTPUT_BUFFER_SIZE];
-    char                        tagBuf[SeosCryptoCipher_TAG_BUFFER_SIZE];
 };
 
 /** @} */

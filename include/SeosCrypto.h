@@ -301,19 +301,19 @@ SeosCrypto_deriveKey(SeosCryptoCtx* api,
  *
  */
 seos_err_t
-SeosCrypto_cipherInit(SeosCryptoCtx*                api,
+SeosCrypto_cipherInit(SeosCryptoCtx*             api,
                       SeosCrypto_CipherHandle*   pCipherHandle,
-                      unsigned int                  algorithm,
+                      unsigned int               algorithm,
                       SeosCrypto_KeyHandle       keyHandle,
-                      void*                         iv,
-                      size_t                        ivLen);
+                      const void*                iv,
+                      size_t                     ivLen);
 /**
  * @brief implements SeosCryptoApi_cipherClose() in a local connection
  * (function call, no rpc)
  *
  */
 seos_err_t
-SeosCrypto_cipherClose(SeosCryptoCtx*               api,
+SeosCrypto_cipherClose(SeosCryptoCtx*            api,
                        SeosCrypto_CipherHandle   cipherHandle);
 /**
  * @brief implements SeosCryptoApi_cipherUpdate() in a local connection
@@ -345,12 +345,9 @@ SeosCrypto_cipherUpdateAd(SeosCryptoCtx*              api,
 seos_err_t
 SeosCrypto_cipherFinalize(SeosCryptoCtx*                api,
                           SeosCrypto_CipherHandle       cipherHandle,
-                          const void*                   input,
-                          size_t                        inputSize,
                           void**                        output,
-                          size_t*                       outputSize,
-                          void**                        tag,
-                          size_t*                       tagSize);
+                          size_t*                       outputSize);
+
 /**
  * @brief implements SeosCryptoApi_cipherVerifyTag() in a local connection
  * (function call, no rpc)

@@ -72,12 +72,13 @@ typedef seos_err_t
                              SeosCrypto_CipherHandle*       pCipherHandle,
                              unsigned int                   algorithm,
                              SeosCrypto_KeyHandle           keyHandle,
-                             void*                          iv,
+                             const void*                    iv,
                              size_t                         ivLen);
 
 typedef seos_err_t
 (*SeosCryptoCtx_cipherCloseT)(SeosCryptoCtx*                self,
                               SeosCrypto_CipherHandle       cipherHandle);
+
 typedef seos_err_t
 (*SeosCryptoCtx_cipherUpdateT)(SeosCryptoCtx*               self,
                                SeosCrypto_CipherHandle      cipherHandle,
@@ -95,12 +96,8 @@ typedef seos_err_t
 typedef seos_err_t
 (*SeosCryptoCtx_cipherFinalizeT)(SeosCryptoCtx*               self,
                                  SeosCrypto_CipherHandle      cipherHandle,
-                                 const void*                  input,
-                                 size_t                       inputSize,
                                  void**                       output,
-                                 size_t*                      outputSize,
-                                 void**                       tag,
-                                 size_t*                      tagSize);
+                                 size_t*                      outputSize);
 
 typedef seos_err_t
 (*SeosCryptoCtx_cipherVerifyTagT)(SeosCryptoCtx*               self,

@@ -96,7 +96,7 @@ SeosCryptoApi_keyImport(SeosCryptoCtx*          cryptoCtx,
                         SeosCrypto_KeyHandle*   pKeyHandle,
                         unsigned int            algorithm,
                         unsigned int            flags,
-                        void const*             keyImportBuffer,
+                        const void*             keyImportBuffer,
                         size_t                  keyImportLenBits)
 {
     Debug_ASSERT_SELF(cryptoCtx);
@@ -122,7 +122,7 @@ SeosCryptoApi_cipherInit(SeosCryptoCtx*             cryptoCtx,
                          SeosCrypto_CipherHandle*   pCipherHandle,
                          unsigned int               algorithm,
                          SeosCrypto_KeyHandle       keyHandle,
-                         void*                      iv,
+                         const void*                iv,
                          size_t                     ivLen)
 {
     Debug_ASSERT_SELF(cryptoCtx);
@@ -176,22 +176,14 @@ SeosCryptoApi_cipherUpdateAd(SeosCryptoCtx*           cryptoCtx,
 seos_err_t
 SeosCryptoApi_cipherFinalize(SeosCryptoCtx*           cryptoCtx,
                              SeosCrypto_CipherHandle  cipherHandle,
-                             const void*              input,
-                             size_t                   inputSize,
                              void**                   output,
-                             size_t*                  outputSize,
-                             void**                   tag,
-                             size_t*                  tagSize)
+                             size_t*                  outputSize)
 {
     Debug_ASSERT_SELF(cryptoCtx);
     return cryptoCtx->vtable->cipherFinalize(cryptoCtx,
                                              cipherHandle,
-                                             input,
-                                             inputSize,
                                              output,
-                                             outputSize,
-                                             tag,
-                                             tagSize);
+                                             outputSize);
 
 }
 
