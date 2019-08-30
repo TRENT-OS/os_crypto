@@ -229,6 +229,16 @@ SeosCryptoClient_cipherUpdate(SeosCryptoCtx*                api,
                               size_t                        dataLen,
                               void**                        output,
                               size_t*                       outputSize);
+
+/**
+ * @brief implements SeosCryptoApi_cipherUpdateAd() in a rpc connection
+ *
+ */
+seos_err_t
+SeosCryptoClient_cipherUpdateAd(SeosCryptoCtx*                api,
+                                SeosCrypto_CipherHandle       cipherHandle,
+                                const void*                   ad,
+                                size_t                        adLen);
 /**
  * @brief implements SeosCryptoApi_cipherFinalize() in a rpc connection
  *
@@ -236,9 +246,20 @@ SeosCryptoClient_cipherUpdate(SeosCryptoCtx*                api,
 seos_err_t
 SeosCryptoClient_cipherFinalize(SeosCryptoCtx*              api,
                                 SeosCrypto_CipherHandle     cipherHandle,
-                                const void*                 data,
-                                size_t                      dataLen,
-                                void**                      digest,
-                                size_t*                     digestSize);
+                                const void*                 input,
+                                size_t                      inputSize,
+                                void**                      output,
+                                size_t*                     outputSize,
+                                void**                      tag,
+                                size_t*                     tagSize);
+/**
+ * @brief implements SeosCryptoApi_cipherVerifyTag() in a rpc connection
+ *
+ */
+seos_err_t
+SeosCryptoClient_cipherVerifyTag(SeosCryptoCtx*              api,
+                                 SeosCrypto_CipherHandle     cipherHandle,
+                                 const void*                 tag,
+                                 size_t                      tagLen);
 
 /** @} */

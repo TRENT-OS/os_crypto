@@ -8,18 +8,21 @@
 
 static const SeosCryptoCtx_Vtable SeosCryptoClient_vtable =
 {
-    .getRandomData  = SeosCryptoClient_getRandomData2,
-    .digestInit     = SeosCryptoClient_digestInit,
-    .digestClose    = SeosCryptoClient_digestClose,
-    .digestUpdate   = SeosCryptoClient_digestUpdate,
-    .digestFinalize = SeosCryptoClient_digestFinalize,
-    .keyGenerate    = SeosCryptoClient_keyGenerate,
-    .keyImport      = SeosCryptoClient_keyImport,
-    .keyClose       = SeosCryptoClient_keyClose,
-    .cipherInit     = SeosCryptoClient_cipherInit,
-    .cipherClose    = SeosCryptoClient_cipherClose,
-    .cipherUpdate   = SeosCryptoClient_cipherUpdate,
-    .deInit         = SeosCryptoClient_deInit
+    .getRandomData   = SeosCryptoClient_getRandomData2,
+    .digestInit      = SeosCryptoClient_digestInit,
+    .digestClose     = SeosCryptoClient_digestClose,
+    .digestUpdate    = SeosCryptoClient_digestUpdate,
+    .digestFinalize  = SeosCryptoClient_digestFinalize,
+    .keyGenerate     = SeosCryptoClient_keyGenerate,
+    .keyImport       = SeosCryptoClient_keyImport,
+    .keyClose        = SeosCryptoClient_keyClose,
+    .cipherInit      = SeosCryptoClient_cipherInit,
+    .cipherClose     = SeosCryptoClient_cipherClose,
+    .cipherUpdate    = SeosCryptoClient_cipherUpdate,
+    .cipherUpdateAd  = SeosCryptoClient_cipherUpdateAd,
+    .cipherFinalize  = SeosCryptoClient_cipherFinalize,
+    .cipherVerifyTag = SeosCryptoClient_cipherVerifyTag,
+    .deInit          = SeosCryptoClient_deInit
 };
 
 // Public functions ------------------------------------------------------------
@@ -398,16 +401,15 @@ SeosCryptoClient_cipherUpdate(SeosCryptoCtx*                api,
             }
         }
     }
+
     return retval;
 }
 
 seos_err_t
-SeosCryptoClient_cipherFinalize(SeosCryptoCtx*              api,
-                                SeosCrypto_CipherHandle     cipherHandle,
-                                const void*                 data,
-                                size_t                      dataLen,
-                                void**                      digest,
-                                size_t*                     digestSize)
+SeosCryptoClient_cipherUpdateAd(SeosCryptoCtx*                api,
+                                SeosCrypto_CipherHandle       cipherHandle,
+                                const void*                   data,
+                                size_t                        dataLen)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
     Debug_ASSERT_SELF(self);
@@ -415,6 +417,94 @@ SeosCryptoClient_cipherFinalize(SeosCryptoCtx*              api,
 
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
-    /// TBD
+    if (NULL == data || dataLen > PAGE_SIZE)
+    {
+        retval = SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else
+    {
+        memcpy(self->clientDataport, data, dataLen);
+        retval = SeosCryptoRpc_cipherUpdateAd(self->rpcHandle, cipherHandle, dataLen);
+    }
+
+    return retval;
+}
+
+seos_err_t
+SeosCryptoClient_cipherFinalize(SeosCryptoCtx*              api,
+                                SeosCrypto_CipherHandle     cipherHandle,
+                                const void*                 input,
+                                size_t                      inputSize,
+                                void**                      output,
+                                size_t*                     outputSize,
+                                void**                      tag,
+                                size_t*                     tagSize)
+{
+    SeosCryptoClient* self = (SeosCryptoClient*) api;
+    Debug_ASSERT_SELF(self);
+    Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
+
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    if (NULL == output || NULL == outputSize)
+    {
+        retval = SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else
+    {
+        retval = SeosCryptoRpc_cipherFinalize(self->rpcHandle, cipherHandle, inputSize);
+        if (SEOS_SUCCESS == retval)
+        {
+            size_t* obtainedOutputSize  = (size_t*) self->clientDataport;
+            char*   obtainedOutput      = &(((char*) self->clientDataport)
+                                            [sizeof(*outputSize)]);
+
+            if (*output != NULL)
+            {
+                if (*outputSize < *obtainedOutputSize)
+                {
+                    retval = SEOS_ERROR_BUFFER_TOO_SMALL;
+                }
+                else
+                {
+                    *outputSize = *obtainedOutputSize;
+                    memcpy(*output, obtainedOutput, *outputSize);
+                    retval = SEOS_SUCCESS;
+                }
+            }
+            else
+            {
+                *outputSize = *obtainedOutputSize;
+                *output     = obtainedOutput;
+                retval      = SEOS_SUCCESS;
+            }
+        }
+    }
+
+    return retval;
+}
+
+seos_err_t
+SeosCryptoClient_cipherVerifyTag(SeosCryptoCtx*              api,
+                                 SeosCrypto_CipherHandle     cipherHandle,
+                                 const void*                 tag,
+                                 size_t                      tagLen)
+{
+    SeosCryptoClient* self = (SeosCryptoClient*) api;
+    Debug_ASSERT_SELF(self);
+    Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
+
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    if (NULL == tag || tagLen > PAGE_SIZE)
+    {
+        retval = SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else
+    {
+        memcpy(self->clientDataport, tag, tagLen);
+        retval = SeosCryptoRpc_cipherVerifyTag(self->rpcHandle, cipherHandle, tagLen);
+    }
+
     return retval;
 }

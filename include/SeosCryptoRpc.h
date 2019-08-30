@@ -160,6 +160,15 @@ SeosCryptoRpc_cipherUpdate(SeosCryptoRpc*               self,
                            SeosCrypto_CipherHandle      cipherHandle,
                            size_t                       len);
 /**
+ * @brief rpc management of SeosCrypto_cipherUpdateAd()
+ *
+ */
+seos_err_t
+SeosCryptoRpc_cipherUpdateAd(SeosCryptoRpc*             self,
+                             SeosCrypto_CipherHandle    cipherHandle,
+                             size_t                     len);
+
+/**
  * @brief rpc management of SeosCrypto_cipherFinalize()
  *
  */
@@ -167,5 +176,14 @@ seos_err_t
 SeosCryptoRpc_cipherFinalize(SeosCryptoRpc*             self,
                              SeosCrypto_CipherHandle    cipherHandle,
                              size_t                     len);
+
+/**
+ * @brief rpc management of SeosCrypto_cipherVerifyTag()
+ *
+ */
+seos_err_t
+SeosCryptoRpc_cipherVerifyTag(SeosCryptoRpc*             self,
+                              SeosCrypto_CipherHandle    cipherHandle,
+                              size_t                     len);
 
 /** @} */

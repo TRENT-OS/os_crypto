@@ -394,11 +394,7 @@ SeosCryptoRpc_cipherUpdate(SeosCryptoRpc*           self,
     }
     if (SEOS_SUCCESS == retval)
     {
-        if (NULL == output)
-        {
-            retval = SEOS_ERROR_ABORTED;
-        }
-        else if (outputSize + sizeof(outputSize) > PAGE_SIZE)
+        if (outputSize + sizeof(outputSize) > PAGE_SIZE)
         {
             retval = SEOS_ERROR_ABORTED;
         }
@@ -410,6 +406,34 @@ SeosCryptoRpc_cipherUpdate(SeosCryptoRpc*           self,
             memcpy(dest, output, outputSize);
         }
     }
+    return retval;
+}
+
+seos_err_t
+SeosCryptoRpc_cipherUpdateAd(SeosCryptoRpc*           self,
+                             SeosCrypto_CipherHandle  cipherHandle,
+                             size_t                   len)
+{
+    Debug_LOG_TRACE("%s", __func__);
+
+    seos_err_t  retval      = SEOS_ERROR_GENERIC;
+
+    if (!isValidHandle(self))
+    {
+        retval = SEOS_ERROR_INVALID_HANDLE;
+    }
+    else if (len > PAGE_SIZE)
+    {
+        retval = SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else
+    {
+        retval = SeosCrypto_cipherUpdateAd(self->seosCryptoApi,
+                                           cipherHandle,
+                                           self->serverDataport,
+                                           len);
+    }
+
     return retval;
 }
 
@@ -465,5 +489,33 @@ SeosCryptoRpc_cipherFinalize(SeosCryptoRpc*             self,
             memcpy(dest, tag, tagSize);
         }
     }
+    return retval;
+}
+
+seos_err_t
+SeosCryptoRpc_cipherVerifyTag(SeosCryptoRpc*             self,
+                              SeosCrypto_CipherHandle    cipherHandle,
+                              size_t                     len)
+{
+    Debug_LOG_TRACE("%s", __func__);
+
+    seos_err_t  retval      = SEOS_ERROR_GENERIC;
+
+    if (!isValidHandle(self))
+    {
+        retval = SEOS_ERROR_INVALID_HANDLE;
+    }
+    else if (len > PAGE_SIZE)
+    {
+        retval = SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else
+    {
+        retval = SeosCrypto_cipherVerifyTag(self->seosCryptoApi,
+                                            cipherHandle,
+                                            self->serverDataport,
+                                            len);
+    }
+
     return retval;
 }
