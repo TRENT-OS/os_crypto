@@ -8,8 +8,11 @@
 #include "SeosCryptoAgreement.h"
 
 #include "LibDebug/Debug.h"
+
 #include "mbedtls/rsa.h"
 #include "mbedtls/dhm.h"
+#include "mbedtls/ecdh.h"
+#include "mbedtls/ecp.h"
 
 #include <string.h>
 
@@ -27,10 +30,7 @@
  *  http://www.cl.cam.ac.uk/~rja14/Papers/psandqs.pdf
  *  http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2005-2643
  */
-static int
-dhm_check_range(
-    const mbedtls_mpi* param,
-    const mbedtls_mpi* P)
+static int dhm_check_range( const mbedtls_mpi* param, const mbedtls_mpi* P )
 {
     mbedtls_mpi L, U;
     int ret = 0;
@@ -52,6 +52,7 @@ cleanup:
     mbedtls_mpi_free( &U );
     return ( ret );
 }
+
 // Public functions ------------------------------------------------------------
 
 seos_err_t
@@ -95,7 +96,7 @@ SeosCryptoKey_init(SeosCryptoKey*   self,
 }
 
 seos_err_t
-SeosCryptoKey_initDhPublic(SeosCryptoKey*           self,
+SeosCryptoKey_initDhPublic(SeosCryptoKey*          self,
                            void*                   algoKeyCtx,
                            const unsigned char*    p,
                            size_t                  lenP,
@@ -104,43 +105,29 @@ SeosCryptoKey_initDhPublic(SeosCryptoKey*           self,
                            const unsigned char*    gy,
                            size_t                  lenGY)
 {
-    Debug_ASSERT_SELF(self);
+    mbedtls_dhm_context* dh = (mbedtls_dhm_context*) algoKeyCtx;
 
-    seos_err_t retval           = SEOS_ERROR_GENERIC;
-    mbedtls_dhm_context* dh    = (mbedtls_dhm_context*) algoKeyCtx;
-
-    if (NULL == dh || NULL == p || NULL == g || NULL == gy)
+    if (NULL == self || NULL == dh || NULL == p || NULL == g || NULL == gy)
     {
-        retval = SEOS_ERROR_INVALID_PARAMETER;
-    }
-    else
-    {
-        memset(self, 0, sizeof(*self));
-        if (   mbedtls_mpi_read_binary(&dh->P, p, lenP) != 0
-               || mbedtls_mpi_read_binary(&dh->G, g, lenG) != 0
-               || mbedtls_mpi_read_binary(&dh->GY, gy, lenGY) != 0)
-        {
-            retval = SEOS_ERROR_ABORTED;
-        }
-        else
-        {
-            // Check GY is in 2 < GY < P-2
-            if (dhm_check_range(&dh->GY, &dh->P) != 0)
-            {
-                retval = SEOS_ERROR_ABORTED;
-            }
-            else
-            {
-                dh->len          = mbedtls_mpi_size(&dh->P);
-                self->lenBits    = dh->len * CHAR_BIT;
-                self->algoKeyCtx = algoKeyCtx;
-                self->algorithm  = SeosCryptoAgreement_Algorithm_DH;
-                retval = SEOS_SUCCESS;
-            }
-        }
+        return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return retval;
+    // Set DH group params and public part of the key; make sure the key is
+    // in range 2 < GY < P-2
+    if (   mbedtls_mpi_read_binary(&dh->P,  p,  lenP)  != 0
+           || mbedtls_mpi_read_binary(&dh->G,  g,  lenG)  != 0
+           || mbedtls_mpi_read_binary(&dh->GY, gy, lenGY) != 0
+           || dhm_check_range(&dh->GY, &dh->P) != 0)
+    {
+        return SEOS_ERROR_ABORTED;
+    }
+
+    memset(self, 0, sizeof(*self));
+    self->lenBits    = mbedtls_mpi_size(&dh->P) * CHAR_BIT;
+    self->algoKeyCtx = algoKeyCtx;
+    self->algorithm  = SeosCryptoAgreement_Algorithm_DH;
+
+    return SEOS_SUCCESS;
 }
 
 seos_err_t
@@ -153,43 +140,95 @@ SeosCryptoKey_initDhPrivate(SeosCryptoKey*          self,
                             const unsigned char*    x,
                             size_t                  lenX)
 {
-    Debug_ASSERT_SELF(self);
-
-    seos_err_t retval           = SEOS_ERROR_GENERIC;
     mbedtls_dhm_context* dh    = (mbedtls_dhm_context*) algoKeyCtx;
 
-    if (NULL == dh || NULL == p || NULL == g || NULL == x)
+    if (NULL ==  self || NULL == dh || NULL == p || NULL == g || NULL == x)
     {
-        retval = SEOS_ERROR_INVALID_PARAMETER;
-    }
-    else
-    {
-        memset(self, 0, sizeof(*self));
-        if (   mbedtls_mpi_read_binary(&dh->P, p, lenP) != 0
-               || mbedtls_mpi_read_binary(&dh->G, g, lenG) != 0
-               || mbedtls_mpi_read_binary(&dh->X, x, lenX) != 0)
-        {
-            retval = SEOS_ERROR_ABORTED;
-        }
-        else
-        {
-            // Check X is in 2 < X < P-2
-            if (dhm_check_range(&dh->X, &dh->P) != 0)
-            {
-                retval = SEOS_ERROR_ABORTED;
-            }
-            else
-            {
-                dh->len          = mbedtls_mpi_size(&dh->P);
-                self->lenBits    = dh->len * CHAR_BIT;
-                self->algoKeyCtx = algoKeyCtx;
-                self->algorithm  = SeosCryptoAgreement_Algorithm_DH;
-                retval = SEOS_SUCCESS;
-            }
-        }
+        return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return retval;
+    // Set DH group params and private part of the key; make sure the key is
+    // in range 2 < X < P-2
+    if (mbedtls_mpi_read_binary(&dh->P, p, lenP) != 0
+        || mbedtls_mpi_read_binary(&dh->G, g, lenG) != 0
+        || mbedtls_mpi_read_binary(&dh->X, x, lenX) != 0
+        || dhm_check_range(&dh->X, &dh->P) != 0)
+    {
+        return SEOS_ERROR_ABORTED;
+    }
+
+    memset(self, 0, sizeof(*self));
+    self->lenBits    = mbedtls_mpi_size(&dh->P) * CHAR_BIT;
+    self->algoKeyCtx = algoKeyCtx;
+    self->algorithm  = SeosCryptoAgreement_Algorithm_DH;
+
+    return SEOS_SUCCESS;
+}
+
+seos_err_t
+SeosCryptoKey_initEcdhPrivate(SeosCryptoKey*          self,
+                              void*                   algoKeyCtx,
+                              unsigned int            curveId,
+                              const unsigned char*    d,
+                              size_t                  lenD)
+{
+    mbedtls_ecp_keypair* ecp = (mbedtls_ecp_keypair*) algoKeyCtx;
+
+    if (NULL == self || NULL == ecp || NULL == d)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    // Set the group (based on internal mbedTLS curve id) and the scalar
+    // we use as secret key.
+    if (mbedtls_ecp_group_load(&ecp->grp, curveId) != 0
+        || mbedtls_mpi_read_binary(&ecp->d, d, lenD) != 0)
+    {
+        return SEOS_ERROR_ABORTED;
+    }
+
+    memset(self, 0, sizeof(*self));
+    self->lenBits    = mbedtls_mpi_size(&ecp->grp.P) * CHAR_BIT;
+    self->algoKeyCtx = algoKeyCtx;
+    self->algorithm  = SeosCryptoAgreement_Algorithm_ECDH;
+
+    return SEOS_SUCCESS;
+}
+
+seos_err_t
+SeosCryptoKey_initEcdhPublic(SeosCryptoKey*          self,
+                             void*                   algoKeyCtx,
+                             unsigned int            curveId,
+                             const unsigned char*    qX,
+                             size_t                  lenQX,
+                             const unsigned char*    qY,
+                             size_t                  lenQY)
+{
+    mbedtls_ecp_keypair* ecp = (mbedtls_ecp_keypair*) algoKeyCtx;
+
+    if (NULL == self || NULL == ecp || NULL == qX || NULL == qY)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    // Set the group (based on internal mbedTLS curve id) and the X, Y and Z
+    // coordinates of the point Q, which represents the public key. Finally,
+    // also make sure that the point is ACTUALLY on the curve..
+    if (mbedtls_ecp_group_load(&ecp->grp, curveId) != 0
+        || mbedtls_mpi_read_binary(&ecp->Q.X, qX, lenQX) != 0
+        || mbedtls_mpi_read_binary(&ecp->Q.Y, qY, lenQY) != 0
+        || mbedtls_mpi_lset(&ecp->Q.Z, 1) != 0
+        || mbedtls_ecp_check_pubkey(&ecp->grp, &ecp->Q) != 0)
+    {
+        return SEOS_ERROR_ABORTED;
+    }
+
+    memset(self, 0, sizeof(*self));
+    self->lenBits    = mbedtls_mpi_size(&ecp->grp.P) * CHAR_BIT;
+    self->algoKeyCtx = algoKeyCtx;
+    self->algorithm  = SeosCryptoAgreement_Algorithm_ECDH;
+
+    return SEOS_SUCCESS;
 }
 
 seos_err_t
