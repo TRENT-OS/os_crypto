@@ -322,11 +322,21 @@ SeosCrypto_cipherClose(SeosCryptoCtx*               api,
  */
 seos_err_t
 SeosCrypto_cipherUpdate(SeosCryptoCtx*              api,
-                        SeosCrypto_CipherHandle  cipherHandle,
+                        SeosCrypto_CipherHandle     cipherHandle,
                         const void*                 input,
                         size_t                      inputSize,
                         void**                      output,
                         size_t*                     outputSize);
+/**
+ * @brief implements SeosCryptoApi_cipherUpdateAd() in a local connection
+ * (function call, no rpc)
+ *
+ */
+seos_err_t
+SeosCrypto_cipherUpdateAd(SeosCryptoCtx*              api,
+                          SeosCrypto_CipherHandle     cipherHandle,
+                          const void*                 input,
+                          size_t                      inputSize);
 /**
  * @brief implements SeosCryptoApi_cipherFinalize() in a local connection
  * (function call, no rpc)
@@ -334,12 +344,22 @@ SeosCrypto_cipherUpdate(SeosCryptoCtx*              api,
  */
 seos_err_t
 SeosCrypto_cipherFinalize(SeosCryptoCtx*                api,
-                          SeosCrypto_CipherHandle    cipherHandle,
+                          SeosCrypto_CipherHandle       cipherHandle,
                           const void*                   input,
                           size_t                        inputSize,
                           void**                        output,
                           size_t*                       outputSize,
                           void**                        tag,
                           size_t*                       tagSize);
+/**
+ * @brief implements SeosCryptoApi_cipherVerifyTag() in a local connection
+ * (function call, no rpc)
+ *
+ */
+seos_err_t
+SeosCrypto_cipherVerifyTag(SeosCryptoCtx*                api,
+                           SeosCrypto_CipherHandle       cipherHandle,
+                           const void*                   tag,
+                           size_t                        tagSize);
 
 /** @} */

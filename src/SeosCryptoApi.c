@@ -160,6 +160,55 @@ SeosCryptoApi_cipherUpdate(SeosCryptoCtx*           cryptoCtx,
                                            outputSize);
 }
 
+seos_err_t
+SeosCryptoApi_cipherUpdateAd(SeosCryptoCtx*           cryptoCtx,
+                             SeosCrypto_CipherHandle  cipherHandle,
+                             const void*              ad,
+                             size_t                   adLen)
+{
+    Debug_ASSERT_SELF(cryptoCtx);
+    return cryptoCtx->vtable->cipherUpdateAd(cryptoCtx,
+                                             cipherHandle,
+                                             ad,
+                                             adLen);
+}
+
+seos_err_t
+SeosCryptoApi_cipherFinalize(SeosCryptoCtx*           cryptoCtx,
+                             SeosCrypto_CipherHandle  cipherHandle,
+                             const void*              input,
+                             size_t                   inputSize,
+                             void**                   output,
+                             size_t*                  outputSize,
+                             void**                   tag,
+                             size_t*                  tagSize)
+{
+    Debug_ASSERT_SELF(cryptoCtx);
+    return cryptoCtx->vtable->cipherFinalize(cryptoCtx,
+                                             cipherHandle,
+                                             input,
+                                             inputSize,
+                                             output,
+                                             outputSize,
+                                             tag,
+                                             tagSize);
+
+}
+
+seos_err_t
+SeosCryptoApi_cipherVerifyTag(SeosCryptoCtx*           cryptoCtx,
+                              SeosCrypto_CipherHandle  cipherHandle,
+                              const void*              tag,
+                              size_t                   tagSize)
+{
+    Debug_ASSERT_SELF(cryptoCtx);
+    return cryptoCtx->vtable->cipherVerifyTag(cryptoCtx,
+                                              cipherHandle,
+                                              tag,
+                                              tagSize);
+
+}
+
 void
 SeosCryptoApi_deInit(SeosCryptoCtx* cryptoCtx)
 {

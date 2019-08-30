@@ -80,8 +80,8 @@ SeosCryptoCipher_deInit(SeosCryptoCipher* self);
  */
 seos_err_t
 SeosCryptoCipher_updateAd(SeosCryptoCipher* self,
-                          const char* input,
-                          size_t inputSize);
+                          const void*       input,
+                          size_t            inputSize);
 /**
  * @brief perform cipher operation on a block
  *
@@ -171,7 +171,7 @@ SeosCryptoCipher_finalize(SeosCryptoCipher* self,
  */
 seos_err_t
 SeosCryptoCipher_verifyTag(SeosCryptoCipher*    self,
-                           char*                tag,
+                           const void*          tag,
                            size_t               tagSize);
 
 ///@}

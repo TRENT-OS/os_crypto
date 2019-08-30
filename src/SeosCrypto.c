@@ -13,18 +13,21 @@
 
 static const SeosCryptoCtx_Vtable SeosCrypto_vtable =
 {
-    .getRandomData  = SeosCrypto_getRandomData,
-    .digestInit     = SeosCrypto_digestInit,
-    .digestClose    = SeosCrypto_digestClose,
-    .digestUpdate   = SeosCrypto_digestUpdate,
-    .digestFinalize = SeosCrypto_digestFinalize,
-    .keyGenerate    = SeosCrypto_keyGenerate,
-    .keyImport      = SeosCrypto_keyImport,
-    .keyClose       = SeosCrypto_keyClose,
-    .cipherInit     = SeosCrypto_cipherInit,
-    .cipherClose    = SeosCrypto_cipherClose,
-    .cipherUpdate   = SeosCrypto_cipherUpdate,
-    .deInit         = SeosCrypto_deInit
+    .getRandomData   = SeosCrypto_getRandomData,
+    .digestInit      = SeosCrypto_digestInit,
+    .digestClose     = SeosCrypto_digestClose,
+    .digestUpdate    = SeosCrypto_digestUpdate,
+    .digestFinalize  = SeosCrypto_digestFinalize,
+    .keyGenerate     = SeosCrypto_keyGenerate,
+    .keyImport       = SeosCrypto_keyImport,
+    .keyClose        = SeosCrypto_keyClose,
+    .cipherInit      = SeosCrypto_cipherInit,
+    .cipherClose     = SeosCrypto_cipherClose,
+    .cipherUpdate    = SeosCrypto_cipherUpdate,
+    .cipherUpdateAd  = SeosCrypto_cipherUpdateAd,
+    .cipherFinalize  = SeosCrypto_cipherFinalize,
+    .cipherVerifyTag = SeosCrypto_cipherVerifyTag,
+    .deInit          = SeosCrypto_deInit
 };
 
 // Private static functions ----------------------------------------------------
@@ -625,6 +628,32 @@ SeosCrypto_cipherUpdate(SeosCryptoCtx*          api,
 }
 
 seos_err_t
+SeosCrypto_cipherUpdateAd(SeosCryptoCtx*          api,
+                          SeosCrypto_CipherHandle cipherHandle,
+                          const void*             input,
+                          size_t                  inputSize)
+{
+    SeosCrypto* self = (SeosCrypto*) api;
+    Debug_ASSERT_SELF(self);
+    Debug_ASSERT(self->parent.vtable == &SeosCrypto_vtable);
+
+    seos_err_t retval = SEOS_SUCCESS;
+
+    size_t handlePos = SeosCrypto_findHandle(&self->cipherHandleVector,
+                                             cipherHandle);
+    if (handlePos != -1)
+    {
+        retval = SeosCryptoCipher_updateAd(cipherHandle,
+                                         input, inputSize);
+    }
+    else
+    {
+        retval = SEOS_ERROR_INVALID_HANDLE;
+    }
+    return retval;
+}
+
+seos_err_t
 SeosCrypto_cipherFinalize(SeosCryptoCtx*            api,
                           SeosCrypto_CipherHandle   cipherHandle,
                           const void*               input,
@@ -655,3 +684,31 @@ SeosCrypto_cipherFinalize(SeosCryptoCtx*            api,
     }
     return retval;
 }
+
+
+seos_err_t
+SeosCrypto_cipherVerifyTag(SeosCryptoCtx*            api,
+                           SeosCrypto_CipherHandle   cipherHandle,
+                           const void*               tag,
+                           size_t                    tagSize)
+{
+    SeosCrypto* self = (SeosCrypto*) api;
+    Debug_ASSERT_SELF(self);
+    Debug_ASSERT(self->parent.vtable == &SeosCrypto_vtable);
+
+    seos_err_t retval = SEOS_SUCCESS;
+
+    size_t handlePos = SeosCrypto_findHandle(&self->cipherHandleVector,
+                                             cipherHandle);
+    if (handlePos != -1)
+    {
+        retval = SeosCryptoCipher_verifyTag(cipherHandle,
+                                            tag, tagSize);
+    }
+    else
+    {
+        retval = SEOS_ERROR_INVALID_HANDLE;
+    }
+    return retval;
+}
+

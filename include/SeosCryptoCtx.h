@@ -85,8 +85,32 @@ typedef seos_err_t
                                size_t                       dataLen,
                                void**                       output,
                                size_t*                      outputSize);
+
+typedef seos_err_t
+(*SeosCryptoCtx_cipherUpdateAdT)(SeosCryptoCtx*               self,
+                                 SeosCrypto_CipherHandle      cipherHandle,
+                                 const void*                  data,
+                                 size_t                       dataLen);
+
+typedef seos_err_t
+(*SeosCryptoCtx_cipherFinalizeT)(SeosCryptoCtx*               self,
+                                 SeosCrypto_CipherHandle      cipherHandle,
+                                 const void*                  input,
+                                 size_t                       inputSize,
+                                 void**                       output,
+                                 size_t*                      outputSize,
+                                 void**                       tag,
+                                 size_t*                      tagSize);
+
+typedef seos_err_t
+(*SeosCryptoCtx_cipherVerifyTagT)(SeosCryptoCtx*               self,
+                                  SeosCrypto_CipherHandle      cipherHandle,
+                                  const void*                  tag,
+                                  size_t                       tagSize);
+
 typedef void
 (*SeosCryptoCtx_deInitT)(SeosCryptoCtx* self);
+
 
 typedef struct
 {
@@ -101,7 +125,9 @@ typedef struct
     SeosCryptoCtx_cipherInitT       cipherInit;
     SeosCryptoCtx_cipherCloseT      cipherClose;
     SeosCryptoCtx_cipherUpdateT     cipherUpdate;
-
+    SeosCryptoCtx_cipherUpdateAdT   cipherUpdateAd;
+    SeosCryptoCtx_cipherFinalizeT   cipherFinalize;
+    SeosCryptoCtx_cipherVerifyTagT  cipherVerifyTag;
     SeosCryptoCtx_deInitT           deInit;
 }
 SeosCryptoCtx_Vtable;
