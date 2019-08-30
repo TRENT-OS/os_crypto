@@ -23,7 +23,7 @@ struct SeosCryptoCipher
         mbedtls_aes_context     aes;
         mbedtls_rsa_context     rsa;
     }
-    agorithmCtx;
+    algorithmCtx;
 
     SeosCryptoCipher_Algorithm  algorithm;
     SeosCryptoKey const*        key;
