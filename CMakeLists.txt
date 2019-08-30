@@ -6,6 +6,7 @@ add_library(
     ${PROJECT_NAME} STATIC
 
     "src/SeosCrypto.c"
+    "src/SeosCryptoAgreement.c"
     "src/SeosCryptoRng.c"
     "src/SeosCryptoDigest.c"
     "src/SeosCryptoCipher.c"
@@ -57,6 +58,11 @@ if (SEOS_CRYPTO_IMPL_MBEDTLS)
         "3rdParty/mbedtls/library/sha512.c"
         "3rdParty/mbedtls/library/sha256.c"
         "3rdParty/mbedtls/library/aes.c"
+        "3rdParty/mbedtls/library/dhm.c"
+        "3rdParty/mbedtls/library/ecdh.c"
+        # EC dependencies
+        "3rdParty/mbedtls/library/ecp.c"
+        "3rdParty/mbedtls/library/ecp_curves.c"
         # RSA dependencies
         "3rdParty/mbedtls/library/md.c"
         "3rdParty/mbedtls/library/md_wrap.c"

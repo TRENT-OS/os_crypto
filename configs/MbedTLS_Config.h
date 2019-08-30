@@ -19,6 +19,12 @@
 #define MBEDTLS_PKCS1_V21
 #define MBEDTLS_SHA1_C
 #define MBEDTLS_RSA_C
+
+#define MBEDTLS_ECP_C
+#define MBEDTLS_ECP_DP_SECP256R1_ENABLED
+#define MBEDTLS_ECDH_C
+
+#define MBEDTLS_DHM_C
 /*
  * You should adjust this to the exact number of sources you're using: default
  * is the "platform_entropy_poll" source, but you may want to add other ones
