@@ -14,6 +14,8 @@
 #include "mbedtls/rsa.h"
 #include "mbedtls/aes.h"
 
+#include "SeosCryptoKey.h"
+
 struct SeosCryptoCipher
 {
     union

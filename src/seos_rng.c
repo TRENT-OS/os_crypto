@@ -22,6 +22,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "LibDebug/Debug.h"
+
 #include "seos_rng.h"
 
 //------------------------------------------------------------------------------

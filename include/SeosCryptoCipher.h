@@ -12,6 +12,7 @@
 #pragma once
 
 #include "SeosCryptoRng.h"
+#include "SeosCryptoKey.h"
 
 #include <limits.h>
 

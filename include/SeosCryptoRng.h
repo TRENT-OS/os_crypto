@@ -14,6 +14,8 @@
 #include "seos_err.h"
 #include "seos_rng.h"
 
+#include "LibDebug/Debug.h"
+
 #include "compiler.h"
 
 /**

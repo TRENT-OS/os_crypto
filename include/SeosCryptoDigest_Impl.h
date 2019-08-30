@@ -18,6 +18,7 @@
 #include "mbedtls/sha256.h"
 
 #include "SeosCryptoDigest.h"
+#include "SeosCryptoKey.h"
 
 struct SeosCryptoDigest
 {
