@@ -644,7 +644,7 @@ SeosCrypto_cipherUpdateAd(SeosCryptoCtx*          api,
     if (handlePos != -1)
     {
         retval = SeosCryptoCipher_updateAd(cipherHandle,
-                                         input, inputSize);
+                                           input, inputSize);
     }
     else
     {

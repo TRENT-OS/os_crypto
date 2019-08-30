@@ -35,6 +35,19 @@ initImpl(SeosCryptoCipher* self)
         retval = SEOS_SUCCESS;
         break;
 
+    case SeosCryptoCipher_Algorithm_AES_GCM_DEC:
+    case SeosCryptoCipher_Algorithm_AES_GCM_ENC:
+        if (self->ivLen != SeosCryptoCipher_AES_BLOCK_SIZE || NULL == self->iv)
+        {
+            retval = SEOS_ERROR_INVALID_PARAMETER;
+        }
+        else
+        {
+            mbedtls_gcm_init(&self->algorithmCtx.gcm);
+            retval = SEOS_SUCCESS;
+        }
+        break;
+
 #if 0
     case SeosCryptoCipher_Algorithm_RSA_PKCS1_ENC:
     case SeosCryptoCipher_Algorithm_RSA_PKCS1_DEC:
@@ -60,6 +73,12 @@ deInitImpl(SeosCryptoCipher* self)
     case SeosCryptoCipher_Algorithm_AES_CBC_DEC:
         mbedtls_aes_free(&self->algorithmCtx.aes);
         break;
+
+    case SeosCryptoCipher_Algorithm_AES_GCM_DEC:
+    case SeosCryptoCipher_Algorithm_AES_GCM_ENC:
+        mbedtls_gcm_free(&self->algorithmCtx.gcm);
+        break;
+
     default:
         break;
     }
@@ -85,6 +104,15 @@ setKeyImpl(SeosCryptoCipher* self)
         retval = mbedtls_aes_setkey_dec(&self->algorithmCtx.aes,
                                         (const unsigned char*) self->key->bytes,
                                         self->key->lenBits) ?
+                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+        break;
+
+    case SeosCryptoCipher_Algorithm_AES_GCM_ENC:
+    case SeosCryptoCipher_Algorithm_AES_GCM_DEC:
+        retval = mbedtls_gcm_setkey(&self->algorithmCtx.gcm,
+                                    MBEDTLS_CIPHER_ID_AES,
+                                    (const unsigned char*) self->key->bytes,
+                                    self->key->lenBits) ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
 
@@ -161,6 +189,24 @@ updateImpl(SeosCryptoCipher* self,
     }
     break;
 
+    case SeosCryptoCipher_Algorithm_AES_GCM_ENC:
+    case SeosCryptoCipher_Algorithm_AES_GCM_DEC:
+    {
+        // mbedtls allows us to feed it an inputSize which is not a multiple of the
+        // blocksize ONLY if we do it in the last call before calling finish. Here
+        // we check that the user is not calling update after having already fed a
+        // non-aligned block.
+        retval = (*outputSize < inputSize)
+                 || (self->inputLen % SeosCryptoCipher_AES_BLOCK_SIZE)
+                 || mbedtls_gcm_update(&self->algorithmCtx.gcm,
+                                       inputSize,
+                                       (const unsigned char*) input,
+                                       (unsigned char*) *output) ?
+                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+        *outputSize = inputSize;
+    }
+    break;
+
 #if 0
     case SeosCryptoCipher_Algorithm_RSA_PKCS1_ENC:
     {
@@ -190,10 +236,121 @@ updateImpl(SeosCryptoCipher* self,
     }
     break;
 #endif
+
     default:
         retval = SEOS_ERROR_NOT_SUPPORTED;
         break;
     }
+    return retval;
+}
+
+static seos_err_t
+updateAdImpl(SeosCryptoCipher* self,
+             const void* ad,
+             size_t adLen)
+{
+    int mode;
+
+    switch (self->algorithm)
+    {
+    case SeosCryptoCipher_Algorithm_AES_GCM_ENC:
+        mode = MBEDTLS_GCM_ENCRYPT;
+        break;
+    case SeosCryptoCipher_Algorithm_AES_GCM_DEC:
+        mode = MBEDTLS_GCM_DECRYPT;
+        break;
+    default:
+        return SEOS_ERROR_NOT_SUPPORTED;
+    }
+
+    return mbedtls_gcm_starts( &self->algorithmCtx.gcm, mode,
+                               self->iv, self->ivLen, ad,
+                               adLen ) ?
+           SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+}
+
+static seos_err_t
+finalizeImpl(SeosCryptoCipher* self,
+             void**            output,
+             size_t*           outputSize)
+{
+    seos_err_t retval;
+
+    retval = SEOS_SUCCESS;
+    switch (self->algorithm)
+    {
+    case SeosCryptoCipher_Algorithm_AES_GCM_DEC:
+    case SeosCryptoCipher_Algorithm_AES_GCM_ENC:
+        // For GCM the last output block is the authentication tag; the maximum
+        // size of which is determined by the AES blocksize
+        *outputSize = (*outputSize > SeosCryptoCipher_AES_BLOCK_SIZE) ?
+                      SeosCryptoCipher_AES_BLOCK_SIZE : *outputSize;
+        retval = mbedtls_gcm_finish(&self->algorithmCtx.gcm,
+                                    (unsigned char*) *output,
+                                    *outputSize) ?
+                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+
+        break;
+    case SeosCryptoCipher_Algorithm_AES_ECB_ENC:
+    case SeosCryptoCipher_Algorithm_AES_ECB_DEC:
+    case SeosCryptoCipher_Algorithm_AES_CBC_ENC:
+    case SeosCryptoCipher_Algorithm_AES_CBC_DEC:
+        // ECB and CBC can all call finalize as well, but it won't do anything
+        // for now; later we may want to apply some padding..
+        *outputSize = 0;
+        retval = SEOS_SUCCESS;
+        break;
+    default:
+        retval = SEOS_ERROR_NOT_SUPPORTED;
+        break;
+    }
+
+    return retval;
+}
+
+/* Compare the contents of two buffers in constant time.
+ * Returns 0 if the contents are bitwise identical, otherwise returns
+ * a non-zero value.
+ */
+static int
+cmemcmp(const void* v1,
+        const void* v2,
+        size_t      len)
+{
+    const unsigned char* p1 = (const unsigned char*) v1;
+    const unsigned char* p2 = (const unsigned char*) v2;
+    size_t i;
+    unsigned char diff;
+
+    for (diff = 0, i = 0; i < len; i++ )
+    {
+        diff |= p1[i] ^ p2[i];
+    }
+
+    return ((int)diff);
+}
+
+static seos_err_t
+verifyTagImpl(SeosCryptoCipher* self,
+              const void*       tag,
+              size_t            tagSize)
+{
+    seos_err_t retval;
+    unsigned char check[SeosCryptoCipher_TAG_BUFFER_SIZE];
+
+    switch (self->algorithm)
+    {
+    case SeosCryptoCipher_Algorithm_AES_GCM_DEC:
+    case SeosCryptoCipher_Algorithm_AES_GCM_ENC:
+        retval = mbedtls_gcm_finish(&self->algorithmCtx.gcm, check, tagSize) ||
+                 cmemcmp(tag, check, tagSize) ?
+                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+        break;
+    default:
+        retval = SEOS_ERROR_NOT_SUPPORTED;
+        break;
+    }
+
     return retval;
 }
 
@@ -207,11 +364,9 @@ SeosCryptoCipher_init(SeosCryptoCipher*             self,
                       void*                         iv,
                       size_t                        ivLen)
 {
+    seos_err_t retval;
+
     Debug_ASSERT_SELF(self);
-
-    Debug_LOG_TRACE("%s: algorithm -> %d", __func__, algorithm);
-
-    seos_err_t retval = SEOS_ERROR_GENERIC;
 
     if (NULL == key)
     {
@@ -226,6 +381,7 @@ SeosCryptoCipher_init(SeosCryptoCipher*             self,
     self->iv         = iv;
     self->ivLen      = ivLen;
     self->rng        = rng;
+    self->inputLen   = 0;
 
     retval = initImpl(self);
     if (retval != SEOS_SUCCESS)
@@ -259,24 +415,18 @@ SeosCryptoCipher_updateAd(SeosCryptoCipher* self,
                           const void*       input,
                           size_t            inputSize)
 {
+    seos_err_t retval;
+
     Debug_ASSERT_SELF(self);
 
-    seos_err_t retval = SEOS_ERROR_GENERIC;
-
-    if (NULL == input)
+    if (NULL == input || 0 == inputSize)
     {
         retval = SEOS_ERROR_INVALID_PARAMETER;
     }
     else
     {
-        switch (self->algorithm)
-        {
-        default:
-            retval = SEOS_ERROR_NOT_SUPPORTED;
-            break;
-        }
+        retval = updateAdImpl(self, input, inputSize);
     }
-
     return retval;
 }
 
@@ -287,11 +437,12 @@ SeosCryptoCipher_update(SeosCryptoCipher*   self,
                         void**              output,
                         size_t*             outputSize)
 {
+    seos_err_t retval;
+
     Debug_ASSERT_SELF(self);
 
-    seos_err_t retval = SEOS_ERROR_GENERIC;
-
-    if (NULL == input || 0 == inputSize || NULL == outputSize)
+    if (NULL == input || 0 == inputSize ||
+        NULL == outputSize || NULL == output)
     {
         retval = SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -302,9 +453,13 @@ SeosCryptoCipher_update(SeosCryptoCipher*   self,
             *output     = self->outputBuf;
             *outputSize = sizeof(self->outputBuf);
         }
-        retval = updateImpl(self, input, inputSize, output, outputSize);
-    }
+        if ((retval = updateImpl(self, input, inputSize, output,
+                                 outputSize)) == SEOS_SUCCESS)
+        {
+            self->inputLen += inputSize;
+        }
 
+    }
     return retval;
 }
 
@@ -317,23 +472,22 @@ SeosCryptoCipher_finalize(SeosCryptoCipher* self,
                           void**            tag,
                           size_t*           tagSize)
 {
+    seos_err_t retval;
+
     Debug_ASSERT_SELF(self);
 
-    seos_err_t retval = SEOS_ERROR_GENERIC;
-
-    if (NULL == input || 0 == inputSize
-        || NULL == outputSize || NULL == tagSize)
+    if (NULL == output || NULL == outputSize)
     {
         retval = SEOS_ERROR_INVALID_PARAMETER;
     }
     else
     {
-        switch (self->algorithm)
+        if (NULL == *output)
         {
-        default:
-            retval = SEOS_ERROR_NOT_SUPPORTED;
-            break;
+            *output     = self->outputBuf;
+            *outputSize = sizeof(self->outputBuf);
         }
+        retval = finalizeImpl(self, output, outputSize);
     }
 
     return retval;
@@ -344,9 +498,9 @@ SeosCryptoCipher_verifyTag(SeosCryptoCipher*    self,
                            const void*          tag,
                            size_t               tagSize)
 {
-    Debug_ASSERT_SELF(self);
+    seos_err_t retval;
 
-    seos_err_t retval = SEOS_ERROR_GENERIC;
+    Debug_ASSERT_SELF(self);
 
     if (NULL == tag)
     {
@@ -354,12 +508,7 @@ SeosCryptoCipher_verifyTag(SeosCryptoCipher*    self,
     }
     else
     {
-        switch (self->algorithm)
-        {
-        default:
-            retval = SEOS_ERROR_NOT_SUPPORTED;
-            break;
-        }
+        retval = verifyTagImpl(self, tag, tagSize);
     }
 
     return retval;

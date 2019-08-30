@@ -58,9 +58,14 @@ if (SEOS_CRYPTO_IMPL_MBEDTLS)
         "3rdParty/mbedtls/library/sha512.c"
         "3rdParty/mbedtls/library/sha256.c"
         "3rdParty/mbedtls/library/aes.c"
+        # GCM 
+        "3rdParty/mbedtls/library/gcm.c"
+        "3rdParty/mbedtls/library/cipher.c"
+        "3rdParty/mbedtls/library/cipher_wrap.c"
+        # DH 
         "3rdParty/mbedtls/library/dhm.c"
-        "3rdParty/mbedtls/library/ecdh.c"
         # EC dependencies
+        "3rdParty/mbedtls/library/ecdh.c"
         "3rdParty/mbedtls/library/ecp.c"
         "3rdParty/mbedtls/library/ecp_curves.c"
         # RSA dependencies

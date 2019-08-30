@@ -27,6 +27,8 @@ typedef enum
     SeosCryptoCipher_Algorithm_AES_ECB_DEC,
     SeosCryptoCipher_Algorithm_AES_CBC_ENC,
     SeosCryptoCipher_Algorithm_AES_CBC_DEC,
+    SeosCryptoCipher_Algorithm_AES_GCM_ENC,
+    SeosCryptoCipher_Algorithm_AES_GCM_DEC,
     SeosCryptoCipher_Algorithm_RSA_PKCS1_ENC,
     SeosCryptoCipher_Algorithm_RSA_PKCS1_DEC
 }

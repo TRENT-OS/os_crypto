@@ -13,6 +13,7 @@
 
 #include "mbedtls/rsa.h"
 #include "mbedtls/aes.h"
+#include "mbedtls/gcm.h"
 
 #include "SeosCryptoKey.h"
 
@@ -22,6 +23,7 @@ struct SeosCryptoCipher
     {
         mbedtls_aes_context     aes;
         mbedtls_rsa_context     rsa;
+        mbedtls_gcm_context     gcm;
     }
     algorithmCtx;
 
@@ -30,6 +32,7 @@ struct SeosCryptoCipher
     SeosCryptoRng*              rng;
     void*                       iv;
     size_t                      ivLen;
+    size_t                      inputLen;
     char                        outputBuf[SeosCryptoCipher_OUTPUT_BUFFER_SIZE];
     char                        tagBuf[SeosCryptoCipher_TAG_BUFFER_SIZE];
 };
