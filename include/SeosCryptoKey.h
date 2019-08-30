@@ -79,6 +79,26 @@ SeosCryptoKey_initRsaPrivate(SeosCryptoKey* self,
                              const char*    q,
                              size_t         lenQ);
 
+seos_err_t
+SeosCryptoKey_initDhPublic(SeosCryptoKey*          self,
+                           void*                   algoKeyCtx,
+                           const unsigned char*    p,
+                           size_t                  lenP,
+                           const unsigned char*    g,
+                           size_t                  lenG,
+                           const unsigned char*    gy,
+                           size_t                  lenGY);
+
+seos_err_t
+SeosCryptoKey_initDhPrivate(SeosCryptoKey*          self,
+                            void*                   algoKeyCtx,
+                            const unsigned char*    p,
+                            size_t                  lenP,
+                            const unsigned char*    g,
+                            size_t                  lenG,
+                            const unsigned char*    x,
+                            size_t                  lenX);
+
 INLINE size_t
 SeosCryptoKey_getSize(SeosCryptoKey* self)
 {

@@ -5,13 +5,53 @@
 #include "SeosCryptoKey.h"
 #include "SeosCryptoCipher.h"
 #include "SeosCryptoSignature.h"
+#include "SeosCryptoAgreement.h"
 
 #include "LibDebug/Debug.h"
 #include "mbedtls/rsa.h"
+#include "mbedtls/dhm.h"
 
 #include <string.h>
 
 // Private static functions ----------------------------------------------------
+
+/*
+ * Verify sanity of parameter with regards to P
+ *
+ * Parameter should be: 2 <= public_param <= P - 2
+ *
+ * This means that we need to return an error if
+ *              public_param < 2 or public_param > P-2
+ *
+ * For more information on the attack, see:
+ *  http://www.cl.cam.ac.uk/~rja14/Papers/psandqs.pdf
+ *  http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2005-2643
+ */
+static int
+dhm_check_range(
+    const mbedtls_mpi* param,
+    const mbedtls_mpi* P)
+{
+    mbedtls_mpi L, U;
+    int ret = 0;
+
+    mbedtls_mpi_init( &L );
+    mbedtls_mpi_init( &U );
+
+    MBEDTLS_MPI_CHK( mbedtls_mpi_lset( &L, 2 ) );
+    MBEDTLS_MPI_CHK( mbedtls_mpi_sub_int( &U, P, 2 ) );
+
+    if ( mbedtls_mpi_cmp_mpi( param, &L ) < 0 ||
+         mbedtls_mpi_cmp_mpi( param, &U ) > 0 )
+    {
+        ret = MBEDTLS_ERR_DHM_BAD_INPUT_DATA;
+    }
+
+cleanup:
+    mbedtls_mpi_free( &L );
+    mbedtls_mpi_free( &U );
+    return ( ret );
+}
 // Public functions ------------------------------------------------------------
 
 seos_err_t
@@ -51,6 +91,104 @@ SeosCryptoKey_init(SeosCryptoKey*   self,
             break;
         }
     }
+    return retval;
+}
+
+seos_err_t
+SeosCryptoKey_initDhPublic(SeosCryptoKey*           self,
+                           void*                   algoKeyCtx,
+                           const unsigned char*    p,
+                           size_t                  lenP,
+                           const unsigned char*    g,
+                           size_t                  lenG,
+                           const unsigned char*    gy,
+                           size_t                  lenGY)
+{
+    Debug_ASSERT_SELF(self);
+
+    seos_err_t retval           = SEOS_ERROR_GENERIC;
+    mbedtls_dhm_context* dh    = (mbedtls_dhm_context*) algoKeyCtx;
+
+    if (NULL == dh || NULL == p || NULL == g || NULL == gy)
+    {
+        retval = SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else
+    {
+        memset(self, 0, sizeof(*self));
+        if (   mbedtls_mpi_read_binary(&dh->P, p, lenP) != 0
+               || mbedtls_mpi_read_binary(&dh->G, g, lenG) != 0
+               || mbedtls_mpi_read_binary(&dh->GY, gy, lenGY) != 0)
+        {
+            retval = SEOS_ERROR_ABORTED;
+        }
+        else
+        {
+            // Check GY is in 2 < GY < P-2
+            if (dhm_check_range(&dh->GY, &dh->P) != 0)
+            {
+                retval = SEOS_ERROR_ABORTED;
+            }
+            else
+            {
+                dh->len          = mbedtls_mpi_size(&dh->P);
+                self->lenBits    = dh->len * CHAR_BIT;
+                self->algoKeyCtx = algoKeyCtx;
+                self->algorithm  = SeosCryptoAgreement_Algorithm_DH;
+                retval = SEOS_SUCCESS;
+            }
+        }
+    }
+
+    return retval;
+}
+
+seos_err_t
+SeosCryptoKey_initDhPrivate(SeosCryptoKey*          self,
+                            void*                   algoKeyCtx,
+                            const unsigned char*    p,
+                            size_t                  lenP,
+                            const unsigned char*    g,
+                            size_t                  lenG,
+                            const unsigned char*    x,
+                            size_t                  lenX)
+{
+    Debug_ASSERT_SELF(self);
+
+    seos_err_t retval           = SEOS_ERROR_GENERIC;
+    mbedtls_dhm_context* dh    = (mbedtls_dhm_context*) algoKeyCtx;
+
+    if (NULL == dh || NULL == p || NULL == g || NULL == x)
+    {
+        retval = SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else
+    {
+        memset(self, 0, sizeof(*self));
+        if (   mbedtls_mpi_read_binary(&dh->P, p, lenP) != 0
+               || mbedtls_mpi_read_binary(&dh->G, g, lenG) != 0
+               || mbedtls_mpi_read_binary(&dh->X, x, lenX) != 0)
+        {
+            retval = SEOS_ERROR_ABORTED;
+        }
+        else
+        {
+            // Check X is in 2 < X < P-2
+            if (dhm_check_range(&dh->X, &dh->P) != 0)
+            {
+                retval = SEOS_ERROR_ABORTED;
+            }
+            else
+            {
+                dh->len          = mbedtls_mpi_size(&dh->P);
+                self->lenBits    = dh->len * CHAR_BIT;
+                self->algoKeyCtx = algoKeyCtx;
+                self->algorithm  = SeosCryptoAgreement_Algorithm_DH;
+                retval = SEOS_SUCCESS;
+            }
+        }
+    }
+
     return retval;
 }
 
