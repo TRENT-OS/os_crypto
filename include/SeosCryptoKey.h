@@ -36,7 +36,7 @@ typedef struct
     unsigned                algorithm;
     void*                   algoKeyCtx;
     unsigned                lenBits;
-    char*                   bytes;
+    void*                   bytes;
 }
 SeosCryptoKey;
 
@@ -52,7 +52,7 @@ SeosCryptoKey_init(SeosCryptoKey*   self,
                    void*            algKeyCtx,
                    unsigned         algorithm,
                    BitMap32         flags,
-                   char*            bytes,
+                   void*            bytes,
                    size_t           lenBits);
 
 void
@@ -61,22 +61,22 @@ SeosCryptoKey_deInit(SeosCryptoKey* self);
 seos_err_t
 SeosCryptoKey_initRsaPublic(SeosCryptoKey*  self,
                             void*           algoKeyCtx,
-                            const char*     n,
+                            const void*     n,
                             size_t          lenN,
-                            const char*     e,
+                            const void*     e,
                             size_t          lenE);
 seos_err_t
 SeosCryptoKey_initRsaPrivate(SeosCryptoKey* self,
                              void*          algoKeyCtx,
-                             const char*    n,
+                             const void*    n,
                              size_t         lenN,
-                             const char*    e,
+                             const void*    e,
                              size_t         lenE,
-                             const char*    d,
+                             const void*    d,
                              size_t         lenD,
-                             const char*    p,
+                             const void*    p,
                              size_t         lenP,
-                             const char*    q,
+                             const void*    q,
                              size_t         lenQ);
 
 seos_err_t

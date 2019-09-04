@@ -60,7 +60,7 @@ SeosCryptoKey_init(SeosCryptoKey*   self,
                    void*            algKeyCtx,
                    unsigned         algorithm,
                    BitMap32         flags,
-                   char*            bytes,
+                   void*            bytes,
                    size_t           lenBits)
 {
     Debug_ASSERT_SELF(self);
@@ -234,9 +234,9 @@ SeosCryptoKey_initEcdhPublic(SeosCryptoKey*    self,
 seos_err_t
 SeosCryptoKey_initRsaPublic(SeosCryptoKey*  self,
                             void*           algoKeyCtx,
-                            const char*     n,
+                            const void*     n,
                             size_t          lenN,
-                            const char*     e,
+                            const void*     e,
                             size_t          lenE)
 {
     Debug_ASSERT_SELF(self);
@@ -253,7 +253,7 @@ SeosCryptoKey_initRsaPublic(SeosCryptoKey*  self,
         memset(self, 0, sizeof(*self));
 
         if (mbedtls_rsa_import_raw(rsa,
-                                   (unsigned char*) n, lenN,
+                                   n, lenN,
                                    NULL, 0,
                                    NULL, 0,
                                    NULL, 0,
@@ -263,7 +263,7 @@ SeosCryptoKey_initRsaPublic(SeosCryptoKey*  self,
                                       NULL, 0,
                                       NULL, 0,
                                       NULL, 0,
-                                      (unsigned char*) e, lenE) != 0
+                                      e, lenE) != 0
             || mbedtls_rsa_complete(rsa) != 0
             || mbedtls_rsa_check_pubkey(rsa) != 0)
         {
@@ -285,15 +285,15 @@ SeosCryptoKey_initRsaPublic(SeosCryptoKey*  self,
 seos_err_t
 SeosCryptoKey_initRsaPrivate(SeosCryptoKey* self,
                              void*          algoKeyCtx,
-                             const char*    n,
+                             const void*    n,
                              size_t         lenN,
-                             const char*    e,
+                             const void*    e,
                              size_t         lenE,
-                             const char*    d,
+                             const void*    d,
                              size_t         lenD,
-                             const char*    p,
+                             const void*    p,
                              size_t         lenP,
-                             const char*    q,
+                             const void*    q,
                              size_t         lenQ)
 {
     Debug_ASSERT_SELF(self);
@@ -310,7 +310,7 @@ SeosCryptoKey_initRsaPrivate(SeosCryptoKey* self,
         memset(self, 0, sizeof(*self));
 
         if (mbedtls_rsa_import_raw(rsa,
-                                   (unsigned char*) n, lenN,
+                                   n, lenN,
                                    NULL, 0,
                                    NULL, 0,
                                    NULL, 0,
@@ -320,23 +320,23 @@ SeosCryptoKey_initRsaPrivate(SeosCryptoKey* self,
                                       NULL, 0,
                                       NULL, 0,
                                       NULL, 0,
-                                      (unsigned char*) e, lenE) != 0
+                                      e, lenE) != 0
             || mbedtls_rsa_import_raw(rsa,
                                       NULL, 0,
                                       NULL, 0,
                                       NULL, 0,
-                                      (unsigned char*) d, lenD,
+                                      d, lenD,
                                       NULL, 0)
             || mbedtls_rsa_import_raw(rsa,
                                       NULL, 0,
-                                      (unsigned char*) p, lenP,
+                                      p, lenP,
                                       NULL, 0,
                                       NULL, 0,
                                       NULL, 0)
             || mbedtls_rsa_import_raw(rsa,
                                       NULL, 0,
                                       NULL, 0,
-                                      (unsigned char*) q, lenQ,
+                                      q, lenQ,
                                       NULL, 0,
                                       NULL, 0 )
             || mbedtls_rsa_complete(rsa) != 0
