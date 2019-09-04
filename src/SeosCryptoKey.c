@@ -96,14 +96,14 @@ SeosCryptoKey_init(SeosCryptoKey*   self,
 }
 
 seos_err_t
-SeosCryptoKey_initDhPublic(SeosCryptoKey*          self,
-                           void*                   algoKeyCtx,
-                           const unsigned char*    p,
-                           size_t                  lenP,
-                           const unsigned char*    g,
-                           size_t                  lenG,
-                           const unsigned char*    gy,
-                           size_t                  lenGY)
+SeosCryptoKey_initDhPublic(SeosCryptoKey*   self,
+                           void*            algoKeyCtx,
+                           const void*      p,
+                           size_t           lenP,
+                           const void*      g,
+                           size_t           lenG,
+                           const void*      gy,
+                           size_t           lenGY)
 {
     mbedtls_dhm_context* dh = (mbedtls_dhm_context*) algoKeyCtx;
 
@@ -131,14 +131,14 @@ SeosCryptoKey_initDhPublic(SeosCryptoKey*          self,
 }
 
 seos_err_t
-SeosCryptoKey_initDhPrivate(SeosCryptoKey*          self,
-                            void*                   algoKeyCtx,
-                            const unsigned char*    p,
-                            size_t                  lenP,
-                            const unsigned char*    g,
-                            size_t                  lenG,
-                            const unsigned char*    x,
-                            size_t                  lenX)
+SeosCryptoKey_initDhPrivate(SeosCryptoKey*    self,
+                            void*             algoKeyCtx,
+                            const void*       p,
+                            size_t            lenP,
+                            const void*       g,
+                            size_t            lenG,
+                            const void*       x,
+                            size_t            lenX)
 {
     mbedtls_dhm_context* dh    = (mbedtls_dhm_context*) algoKeyCtx;
 
@@ -166,11 +166,11 @@ SeosCryptoKey_initDhPrivate(SeosCryptoKey*          self,
 }
 
 seos_err_t
-SeosCryptoKey_initEcdhPrivate(SeosCryptoKey*          self,
-                              void*                   algoKeyCtx,
-                              unsigned int            curveId,
-                              const unsigned char*    d,
-                              size_t                  lenD)
+SeosCryptoKey_initEcdhPrivate(SeosCryptoKey*     self,
+                              void*              algoKeyCtx,
+                              unsigned int       curveId,
+                              const void*        d,
+                              size_t             lenD)
 {
     mbedtls_ecp_keypair* ecp = (mbedtls_ecp_keypair*) algoKeyCtx;
 
@@ -196,13 +196,13 @@ SeosCryptoKey_initEcdhPrivate(SeosCryptoKey*          self,
 }
 
 seos_err_t
-SeosCryptoKey_initEcdhPublic(SeosCryptoKey*          self,
-                             void*                   algoKeyCtx,
-                             unsigned int            curveId,
-                             const unsigned char*    qX,
-                             size_t                  lenQX,
-                             const unsigned char*    qY,
-                             size_t                  lenQY)
+SeosCryptoKey_initEcdhPublic(SeosCryptoKey*    self,
+                             void*             algoKeyCtx,
+                             unsigned int      curveId,
+                             const void*       qX,
+                             size_t            lenQX,
+                             const void*       qY,
+                             size_t            lenQY)
 {
     mbedtls_ecp_keypair* ecp = (mbedtls_ecp_keypair*) algoKeyCtx;
 

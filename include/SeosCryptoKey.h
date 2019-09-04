@@ -80,40 +80,40 @@ SeosCryptoKey_initRsaPrivate(SeosCryptoKey* self,
                              size_t         lenQ);
 
 seos_err_t
-SeosCryptoKey_initDhPublic(SeosCryptoKey*          self,
-                           void*                   algoKeyCtx,
-                           const unsigned char*    p,
-                           size_t                  lenP,
-                           const unsigned char*    g,
-                           size_t                  lenG,
-                           const unsigned char*    gy,
-                           size_t                  lenGY);
+SeosCryptoKey_initDhPublic(SeosCryptoKey*     self,
+                           void*              algoKeyCtx,
+                           const void*        p,
+                           size_t             lenP,
+                           const void*        g,
+                           size_t             lenG,
+                           const void*        gy,
+                           size_t             lenGY);
 
 seos_err_t
-SeosCryptoKey_initDhPrivate(SeosCryptoKey*          self,
-                            void*                   algoKeyCtx,
-                            const unsigned char*    p,
-                            size_t                  lenP,
-                            const unsigned char*    g,
-                            size_t                  lenG,
-                            const unsigned char*    x,
-                            size_t                  lenX);
+SeosCryptoKey_initDhPrivate(SeosCryptoKey*    self,
+                            void*             algoKeyCtx,
+                            const void*       p,
+                            size_t            lenP,
+                            const void*       g,
+                            size_t            lenG,
+                            const void*       x,
+                            size_t            lenX);
 
 seos_err_t
-SeosCryptoKey_initEcdhPublic(SeosCryptoKey*          self,
-                             void*                   algoKeyCtx,
-                             unsigned int            curveId,
-                             const unsigned char*    qX,
-                             size_t                  lenQX,
-                             const unsigned char*    qY,
-                             size_t                  lenQY);
+SeosCryptoKey_initEcdhPublic(SeosCryptoKey*   self,
+                             void*            algoKeyCtx,
+                             unsigned int     curveId,
+                             const void*      qX,
+                             size_t           lenQX,
+                             const void*      qY,
+                             size_t           lenQY);
 
 seos_err_t
-SeosCryptoKey_initEcdhPrivate(SeosCryptoKey*          self,
-                              void*                   algoKeyCtx,
-                              unsigned int            curveId,
-                              const unsigned char*    d,
-                              size_t                  lenD);
+SeosCryptoKey_initEcdhPrivate(SeosCryptoKey*  self,
+                              void*           algoKeyCtx,
+                              unsigned int    curveId,
+                              const void*     d,
+                              size_t          lenD);
 
 INLINE size_t
 SeosCryptoKey_getSize(SeosCryptoKey* self)
