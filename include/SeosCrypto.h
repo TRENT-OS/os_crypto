@@ -75,11 +75,6 @@ struct SeosCrypto
  * @param self (required) pointer to the seos_crypto context to initialize
  * @param malloc (required) provided malloc function
  * @param free (required) provided free function
- * @param bufferCtx if NULL and lenBufferCtx is 0, then this will be set to
- *  the buffer size that is needed for bufferCtx. If bufferCtx is NULL and
- *  lenBufferCtx is -1, then the function from malloc will be called to
- *  allocate a context.
- * @param lenBufferCtx (required) length of lenBufferCtx
  *
  * @return an error code
  * @retval SEOS_SUCCESS if all right
@@ -90,9 +85,7 @@ struct SeosCrypto
 seos_err_t
 SeosCrypto_init(SeosCrypto* self,
                 SeosCrypto_MallocFunc malloc,
-                SeosCrypto_FreeFunc free,
-                void* bufferCtx,
-                size_t* lenBufferCtx);
+                SeosCrypto_FreeFunc free);
 /**
  * @brief closes the initialized crypto context and releases all the allocated
  *  resources

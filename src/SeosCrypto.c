@@ -62,9 +62,7 @@ SeosCrypto_removeHandle(PointerVector* v, size_t pos)
 seos_err_t
 SeosCrypto_init(SeosCrypto* self,
                 SeosCrypto_MallocFunc malloc,
-                SeosCrypto_FreeFunc free,
-                void* bufferCtx,
-                size_t* lenBufferCtx)
+                SeosCrypto_FreeFunc free)
 {
     Debug_ASSERT_SELF(self);
 
