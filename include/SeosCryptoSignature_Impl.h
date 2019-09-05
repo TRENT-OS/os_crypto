@@ -23,5 +23,4 @@ struct SeosCryptoSignature
 
     SeosCryptoSignature_Algorithm   algorithm;
     SeosCryptoKey const*            key;
-    SeosCryptoRng*                  rng;
 };

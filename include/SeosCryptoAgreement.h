@@ -11,7 +11,6 @@
  */
 #pragma once
 
-#include "SeosCryptoRng.h"
 #include "SeosCryptoKey.h"
 
 #include "mbedtls/dhm.h"
@@ -36,7 +35,6 @@ typedef struct
         mbedtls_ecdh_context    ecdh;
     }
     algCtx;
-    SeosCryptoRng*              rng;
     SeosCryptoKey*              privateKey;
 }
 SeosCryptoAgreement;
@@ -47,7 +45,6 @@ SeosCryptoAgreement;
  * @param self (required) pointer to context to initialize
  * @param algorithm the key agreement algorithm
  * @param privateKey (required) our private key
- * @param rng (required) random number generator
  *
  * @return an error code
  * @retval SEOS_SUCCESS if all right
@@ -60,8 +57,7 @@ SeosCryptoAgreement;
 seos_err_t
 SeosCryptoAgreement_init(SeosCryptoAgreement*              self,
                          SeosCryptoAgreement_Algorithm     algorithm,
-                         SeosCryptoKey*                    privateKey,
-                         SeosCryptoRng*                    rng);
+                         SeosCryptoKey*                    privateKey);
 
 /**
  * @brief computes a shared secret

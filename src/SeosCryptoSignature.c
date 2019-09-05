@@ -87,8 +87,7 @@ verifyHashImpl(SeosCryptoSignature* self,
         mbedtls_rsa_context* rsa = (mbedtls_rsa_context*) self->key->algoKeyCtx;
 
         if (mbedtls_rsa_pkcs1_verify(rsa,
-                                     (int (*)(void*, unsigned char*, size_t)) SeosCryptoRng_nextBytes,
-                                     self->rng,
+                                     NULL, NULL,
                                      MBEDTLS_RSA_PUBLIC,
                                      TO_MBEDTL_MD_ALGO(digestAlgo),
                                      (unsigned int) hashSize,
@@ -135,8 +134,7 @@ signHashImpl(SeosCryptoSignature* self,
         else
         {
             int err = mbedtls_rsa_pkcs1_sign(rsa,
-                                             (int (*)(void*, unsigned char*, size_t)) SeosCryptoRng_nextBytes,
-                                             self->rng,
+                                             NULL, NULL, 
                                              MBEDTLS_RSA_PRIVATE,
                                              TO_MBEDTL_MD_ALGO(digestAlgo),
                                              (unsigned int) hashSize,
@@ -170,7 +168,6 @@ seos_err_t
 SeosCryptoSignature_init(SeosCryptoSignature* self,
                          SeosCryptoSignature_Algorithm algorithm,
                          SeosCryptoKey const* key,
-                         SeosCryptoRng* rng,
                          char* iv,
                          size_t ivLen)
 {
@@ -188,7 +185,6 @@ SeosCryptoSignature_init(SeosCryptoSignature* self,
 
     self->algorithm  = algorithm;
     self->key        = key;
-    self->rng        = rng;
 
     retval = initImpl(self);
     if (retval != SEOS_SUCCESS)

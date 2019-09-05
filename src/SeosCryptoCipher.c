@@ -214,8 +214,8 @@ updateImpl(SeosCryptoCipher* self,
 
         retval = *outputSize >= rsa->len
                  || mbedtls_rsa_pkcs1_encrypt(self->key->algoKeyCtx,
-                                              (int (*)(void*, unsigned char*, size_t)) SeosCryptoRng_nextBytes,
-                                              &self->rng,
+                                              NULL,
+                                              NULL,
                                               MBEDTLS_RSA_PUBLIC,
                                               inputSize,
                                               (unsigned const char*) input,
@@ -225,8 +225,8 @@ updateImpl(SeosCryptoCipher* self,
     case SeosCryptoCipher_Algorithm_RSA_PKCS1_DEC:
     {
         retval = mbedtls_rsa_pkcs1_decrypt(self->key->algoKeyCtx,
-                                           (int (*)(void*, unsigned char*, size_t)) SeosCryptoRng_nextBytes,
-                                           &self->rng,
+                                           NULL,
+                                           NULL,
                                            MBEDTLS_RSA_PRIVATE,
                                            outputSize,
                                            (unsigned const char*) input,
@@ -360,7 +360,6 @@ seos_err_t
 SeosCryptoCipher_init(SeosCryptoCipher*             self,
                       SeosCryptoCipher_Algorithm    algorithm,
                       SeosCryptoKey const*          key,
-                      SeosCryptoRng*                rng,
                       const void*                   iv,
                       size_t                        ivLen)
 {
@@ -378,7 +377,6 @@ SeosCryptoCipher_init(SeosCryptoCipher*             self,
 
     self->algorithm  = algorithm;
     self->key        = key;
-    self->rng        = rng;
     self->inputLen   = 0;
     self->ivLen      = ivLen;
     if (NULL != iv)

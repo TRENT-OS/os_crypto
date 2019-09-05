@@ -12,7 +12,6 @@
 #pragma once
 
 #include "SeosCryptoDigest.h"
-#include "SeosCryptoRng.h"
 
 #include <limits.h>
 
@@ -47,7 +46,6 @@ seos_err_t
 SeosCryptoSignature_init(SeosCryptoSignature* self,
                          SeosCryptoSignature_Algorithm algorithm,
                          SeosCryptoKey const* key,
-                         SeosCryptoRng* rng,
                          char* iv,
                          size_t ivLen);
 /**

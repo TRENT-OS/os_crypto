@@ -58,7 +58,6 @@ seos_err_t
 SeosCryptoCipher_init(SeosCryptoCipher*             self,
                       SeosCryptoCipher_Algorithm    algorithm,
                       SeosCryptoKey const*          key,
-                      SeosCryptoRng*                rng,
                       const void*                   iv,
                       size_t                        ivLen);
 /**

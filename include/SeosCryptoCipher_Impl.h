@@ -29,7 +29,6 @@ struct SeosCryptoCipher
 
     SeosCryptoCipher_Algorithm  algorithm;
     SeosCryptoKey const*        key;
-    SeosCryptoRng*              rng;
     unsigned char               iv[SeosCryptoCipher_AES_BLOCK_SIZE];
     size_t                      ivLen;
     size_t                      inputLen;

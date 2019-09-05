@@ -14,13 +14,11 @@
 seos_err_t
 SeosCryptoAgreement_init(SeosCryptoAgreement*            self,
                          SeosCryptoAgreement_Algorithm   algorithm,
-                         SeosCryptoKey*                  privateKey,
-                         SeosCryptoRng*                  rng)
+                         SeosCryptoKey*                  privateKey)
 {
     seos_err_t retval;
 
-    if (NULL == self || NULL == privateKey || NULL == rng
-        || privateKey->algorithm != algorithm)
+    if (NULL == self || NULL == privateKey || privateKey->algorithm != algorithm)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -57,7 +55,6 @@ SeosCryptoAgreement_init(SeosCryptoAgreement*            self,
     }
 
     self->algorithm  = algorithm;
-    self->rng        = rng;
     self->privateKey = privateKey;
 
     return retval;
@@ -103,10 +100,7 @@ SeosCryptoAgreement_computeShared(SeosCryptoAgreement*  self,
             || mbedtls_mpi_copy(&dh.G,  &priv->G) != 0
             || mbedtls_mpi_copy(&dh.GY, &pub->GY) != 0
             || mbedtls_mpi_copy(&dh.X,  &priv->X) != 0
-            || mbedtls_dhm_calc_secret(&dh, buf, bufSize, outLen,
-                                       (int (*)(void*, unsigned char*, unsigned int))
-                                       self->rng->rngFunc,
-                                       self->rng->implCtx) != 0)
+            || mbedtls_dhm_calc_secret(&dh, buf, bufSize, outLen, NULL, NULL) != 0)
         {
             retval = SEOS_ERROR_ABORTED;
         }
@@ -132,9 +126,7 @@ SeosCryptoAgreement_computeShared(SeosCryptoAgreement*  self,
         if (mbedtls_ecp_group_copy(&ecdh.grp, &priv->grp) != 0
             || mbedtls_ecp_copy(&ecdh.Qp, &pub->Q) != 0
             || mbedtls_mpi_copy(&ecdh.d, &priv->d) != 0
-            || mbedtls_ecdh_calc_secret(&ecdh, outLen, buf, bufSize,
-                                        (int (*)(void*, unsigned char*, unsigned int)) self->rng->rngFunc,
-                                        self->rng->implCtx) != 0)
+            || mbedtls_ecdh_calc_secret(&ecdh, outLen, buf, bufSize, NULL, NULL) != 0)
         {
             retval = SEOS_ERROR_ABORTED;
         }
