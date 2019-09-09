@@ -63,33 +63,16 @@ SeosCryptoClient_deInit(SeosCryptoCtx* api);
  *
  * @param self (required) pointer to the seos crypto client object to be
  *  used
- * @param flags see SeosCrypto_getRandomData()
- * @param saltBuffer data to reseed the Rng
- * @param saltLen len of \p saltBuffer
- * @param buffer pointer to the memory where the return data is
+  * @param buffer pointer to the memory where the return data is
  * @param dataLen data length
  *
  * @return an error code. See SeosCrypto_getRandomData()
  *
  */
 seos_err_t
-SeosCryptoClient_getRandomData(SeosCryptoClient*    self,
-                               unsigned int         flags,
-                               void const*          saltBuffer,
-                               size_t               saltLen,
+SeosCryptoClient_getRandomData(SeosCryptoCtx*       self,
                                void**               buffer,
                                size_t               dataLen);
-/**
- * @brief Implements SeosCryptoApi_getRandomData() in a rpc connection
- *
- */
-seos_err_t
-SeosCryptoClient_getRandomData2(SeosCryptoCtx*   api,
-                                unsigned int     flags,
-                                void const*      saltBuffer,
-                                size_t           saltLen,
-                                void*            buffer,
-                                size_t           dataLen);
 
 /**
  * @brief implements SeosCryptoApi_digestInit() in a rpc connection

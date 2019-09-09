@@ -8,7 +8,7 @@
 
 static const SeosCryptoCtx_Vtable SeosCryptoClient_vtable =
 {
-    .getRandomData   = SeosCryptoClient_getRandomData2,
+    .getRandomData  = SeosCryptoClient_getRandomData,
     .digestInit      = SeosCryptoClient_digestInit,
     .digestClose     = SeosCryptoClient_digestClose,
     .digestUpdate    = SeosCryptoClient_digestUpdate,
@@ -57,64 +57,38 @@ SeosCryptoClient_deInit(SeosCryptoCtx* api)
 }
 
 seos_err_t
-SeosCryptoClient_getRandomData(SeosCryptoClient*    self,
-                               unsigned int         flags,
-                               void const*          saltBuffer,
-                               size_t               saltLen,
+SeosCryptoClient_getRandomData(SeosCryptoCtx*       api,
                                void**               buffer,
                                size_t               dataLen)
 {
+    SeosCryptoClient* self = (SeosCryptoClient*) api;
     Debug_ASSERT_SELF(self);
+    Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
 
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
-    if (NULL == buffer || dataLen > PAGE_SIZE || saltLen > PAGE_SIZE)
+    if (NULL == buffer || dataLen > PAGE_SIZE)
     {
         retval = SEOS_ERROR_INVALID_PARAMETER;
     }
     else
     {
-        if (saltBuffer != NULL)
-        {
-            memcpy(self->clientDataport, saltBuffer, saltLen);
-        }
-        else
-        {
-            saltLen = 0;
-        }
         retval = SeosCryptoRpc_getRandomData(self->rpcHandle,
-                                             flags,
-                                             saltLen,
                                              dataLen);
-        // we return the place of the answer in our address space
-        *buffer = self->clientDataport;
+
+        if (SEOS_SUCCESS == retval)
+        {
+            if (*buffer != NULL)
+            {
+                memcpy(*buffer, self->clientDataport, dataLen);
+            }
+            else
+            {
+                *buffer = self->clientDataport;            
+            }
+        }
     }
-    return retval;
-}
 
-seos_err_t
-SeosCryptoClient_getRandomData2(SeosCryptoCtx*   api,
-                                unsigned int     flags,
-                                void const*      saltBuffer,
-                                size_t           saltLen,
-                                void*            buffer,
-                                size_t           dataLen)
-{
-    SeosCryptoClient* self = (SeosCryptoClient*) api;
-
-    seos_err_t retval   = SEOS_SUCCESS;
-    void* data          = NULL;
-
-    retval = SeosCryptoClient_getRandomData(self,
-                                            flags,
-                                            saltBuffer,
-                                            saltLen,
-                                            &data,
-                                            dataLen);
-    if (SEOS_SUCCESS == retval)
-    {
-        memcpy(buffer, data, dataLen);
-    }
     return retval;
 }
 

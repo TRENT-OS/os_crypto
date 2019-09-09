@@ -8,17 +8,11 @@
 /***************************** Crypto functions *******************************/
 seos_err_t
 SeosCryptoApi_getRandomData(SeosCryptoCtx* cryptoCtx,
-                            unsigned int flags,
-                            void const* saltBuffer,
-                            size_t saltLen,
-                            void* buffer,
+                            void** buffer,
                             size_t dataLen)
 {
     Debug_ASSERT_SELF(cryptoCtx);
     return cryptoCtx->vtable->getRandomData(cryptoCtx,
-                                            flags,
-                                            saltBuffer,
-                                            saltLen,
                                             buffer,
                                             dataLen);
 }

@@ -132,10 +132,7 @@ SeosCrypto_deInit(SeosCryptoCtx* api)
 
 seos_err_t
 SeosCrypto_getRandomData(SeosCryptoCtx* api,
-                         unsigned int   flags,
-                         void const*    saltBuffer,
-                         size_t         saltLen,
-                         void*          buffer,
+                         void**         buffer,
                          size_t         bufferLen)
 {
     SeosCrypto* self = (SeosCrypto*) api;
@@ -143,33 +140,8 @@ SeosCrypto_getRandomData(SeosCryptoCtx* api,
 
     seos_err_t retval = SEOS_SUCCESS;
 
-    void const* seed   = (saltBuffer != NULL)
-                         ? saltBuffer : SeosCrypto_RANDOM_SEED_STR;
-    size_t seedLen      = (saltBuffer != NULL)
-                          ? saltLen : sizeof(SeosCrypto_RANDOM_SEED_STR) - 1;
+    // Todo: Extract random data
 
-    if (self->isRngInitialized && (saltBuffer != NULL))
-    {
-        seos_rng_free(&self->rng);
-        self->isRngInitialized = false;
-    }
-
-    if (!self->isRngInitialized
-        && seos_rng_init(&self->rng, seed, seedLen))
-    {
-        retval = SEOS_ERROR_ABORTED;
-    }
-    else
-    {
-        self->isRngInitialized = true;
-    }
-
-    if (self->isRngInitialized
-        && seos_rng_get_prng_bytes(&self->rng, buffer, bufferLen))
-    {
-        Debug_LOG_DEBUG("%s: aborted", __func__);
-        retval = SEOS_ERROR_ABORTED;
-    }
     return retval;
 }
 
@@ -337,11 +309,10 @@ SeosCrypto_keyGenerate(SeosCryptoCtx*           api,
         {
             char* keyBytes
                 = & (((char*) *pKeyHandle)[sizeof(SeosCryptoKey)]);
+            void *rnd = keyBytes;
 
             retval = SeosCrypto_getRandomData(api,
-                                              0,
-                                              NULL, 0,
-                                              keyBytes,
+                                              &rnd,
                                               sizeRawKey);
             if (retval != SEOS_SUCCESS)
             {

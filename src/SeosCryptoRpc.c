@@ -81,8 +81,6 @@ SeosCryptoRpc_deInit(SeosCryptoRpc* self)
 
 seos_err_t
 SeosCryptoRpc_getRandomData(SeosCryptoRpc* self,
-                            unsigned int flags,
-                            size_t saltLen,
                             size_t dataLen)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -91,17 +89,13 @@ SeosCryptoRpc_getRandomData(SeosCryptoRpc* self,
     {
         retval = SEOS_ERROR_INVALID_HANDLE;
     }
-    else if (dataLen > PAGE_SIZE || saltLen > PAGE_SIZE)
+    else if (dataLen > PAGE_SIZE)
     {
         retval = SEOS_ERROR_INVALID_PARAMETER;
     }
     else
     {
         retval = SeosCrypto_getRandomData(self->seosCryptoApi,
-                                          flags,
-                                          saltLen > 0
-                                          ? self->serverDataport : NULL,
-                                          saltLen,
                                           self->serverDataport,
                                           dataLen);
     }

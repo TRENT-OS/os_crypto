@@ -18,10 +18,7 @@ typedef struct SeosCryptoCtx SeosCryptoCtx;
 
 typedef seos_err_t
 (*SeosCryptoCtx_GetRandomDataT)(SeosCryptoCtx*  self,
-                                unsigned int    flags,
-                                void const*     saltBuffer,
-                                size_t          saltLen,
-                                void*           buffer,
+                                void**          buffer,
                                 size_t          dataLen);
 
 typedef seos_err_t

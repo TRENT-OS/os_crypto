@@ -65,8 +65,6 @@ SeosCryptoRpc_deInit(SeosCryptoRpc* self);
  */
 seos_err_t
 SeosCryptoRpc_getRandomData(SeosCryptoRpc* self,
-                            unsigned int flags,
-                            size_t saltLen,
                             size_t dataLen);
 /**
  * @brief rpc management of SeosCrypto_digestInit()

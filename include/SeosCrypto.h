@@ -103,10 +103,7 @@ SeosCrypto_deInit(SeosCryptoCtx* api);
  */
 seos_err_t
 SeosCrypto_getRandomData(SeosCryptoCtx* api,
-                         unsigned int   flags,
-                         void const*    saltBuffer,
-                         size_t         saltLen,
-                         void*          buffer,
+                         void**         buffer,
                          size_t         buffer_len);
 
 
