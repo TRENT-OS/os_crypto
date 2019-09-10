@@ -112,7 +112,7 @@ SeosCryptoRpc_keyInit(SeosCryptoRpc*                   self,
                       SeosCrypto_KeyHandle*            keyHandle,
                       unsigned int                     type,
                       SeosCryptoKey_Flag               flags,
-                      size_t                           secParam);
+                      size_t                           bits);
 
 /**
  * @brief rpc management of SeosCryptoRpc_keyGenerate()
@@ -138,7 +138,7 @@ SeosCryptoRpc_keyGeneratePair(SeosCryptoRpc*           self,
 seos_err_t
 SeosCryptoRpc_keyImport(SeosCryptoRpc*                 self,
                         SeosCrypto_KeyHandle           keyHandle,
-                        size_t                         keyLen);
+                        size_t                         keySize);
 
 /**
  * @brief rpc management of SeosCryptoRpc_keyExport()

@@ -29,7 +29,7 @@ SeosCryptoKey_init(SeosCrypto_MemIf*            memIf,
                    SeosCryptoKey*               self,
                    unsigned int                 type,
                    SeosCryptoKey_Flag           flags,
-                   size_t                       secParam);
+                   size_t                       bits);
 
 seos_err_t
 SeosCryptoKey_generate(SeosCryptoKey*           self);
@@ -41,12 +41,12 @@ SeosCryptoKey_generatePair(SeosCryptoKey*       prvKey,
 seos_err_t
 SeosCryptoKey_import(SeosCryptoKey*             self,
                      const void*                key,
-                     size_t                     keyLen);
+                     size_t                     keySize);
 
 seos_err_t
 SeosCryptoKey_export(SeosCryptoKey*             self,
                      void**                     key,
-                     size_t*                    keyLen);
+                     size_t*                    keySize);
 
 void
 SeosCryptoKey_deInit(SeosCrypto_MemIf*          memIf,

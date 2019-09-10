@@ -23,6 +23,7 @@ SeosCryptoKey_Flag;
 
 typedef enum
 {
+    SeosCryptoKey_Type_NONE,
     SeosCryptoKey_Type_AES,
     SeosCryptoKey_Type_RSA_PRIVATE,
     SeosCryptoKey_Type_RSA_PUBLIC,
@@ -35,6 +36,7 @@ SeosCryptoKey_Type;
 
 typedef enum
 {
+    SeosCryptoKey_PairType_NONE,
     SeosCryptoKey_PairType_RSA,
     SeosCryptoKey_PairType_DH,
     SeosCryptoKey_PairType_EC_SECP256R1,
@@ -43,10 +45,11 @@ SeosCryptoKey_PairType;
 
 typedef struct
 {
-    unsigned int        type;       ///< type of key, see above
-    unsigned int        security;   ///< the security parameter (e.g., key size)
-    void*               bytes;      ///< pointer to raw key material
-    size_t              len;        ///< amount of bytes stored
+    SeosCryptoKey_Flag  flags;      ///< flags, see above
+    SeosCryptoKey_Type  type;       ///< type of key, see above
+    unsigned int        bits;       ///< the security parameter (e.g., key size)
+    void*               raw;        ///< pointer to raw key material
+    size_t              rawSize;    ///< amount of bytes stored
 }
 SeosCryptoKey;
 

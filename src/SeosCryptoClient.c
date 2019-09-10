@@ -255,12 +255,12 @@ SeosCryptoClient_keyInit(SeosCryptoCtx*                   api,
                          SeosCrypto_KeyHandle*            keyHandle,
                          unsigned int                     type,
                          SeosCryptoKey_Flag               flags,
-                         size_t                           secParam)
+                         size_t                           bits)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
     Debug_ASSERT(self);
     Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
-    return SeosCryptoRpc_keyInit(self->rpcHandle, keyHandle, type, flags, secParam);
+    return SeosCryptoRpc_keyInit(self->rpcHandle, keyHandle, type, flags, bits);
 }
 
 seos_err_t
@@ -289,7 +289,7 @@ seos_err_t
 SeosCryptoClient_keyImport(SeosCryptoCtx*                 api,
                            SeosCrypto_KeyHandle           keyHandle,
                            const void*                    key,
-                           size_t                         keyLen)
+                           size_t                         keySize)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
     Debug_ASSERT_SELF(self);
@@ -297,14 +297,14 @@ SeosCryptoClient_keyImport(SeosCryptoCtx*                 api,
 
     seos_err_t retval   = SEOS_ERROR_GENERIC;
 
-    if (keyLen > PAGE_SIZE)
+    if (keySize > PAGE_SIZE)
     {
         retval = SEOS_ERROR_INVALID_PARAMETER;
     }
     else
     {
-        memcpy(self->clientDataport, key, keyLen);
-        retval = SeosCryptoRpc_keyImport(self->rpcHandle, keyHandle, keyLen);
+        memcpy(self->clientDataport, key, keySize);
+        retval = SeosCryptoRpc_keyImport(self->rpcHandle, keyHandle, keySize);
     }
     return retval;
 }

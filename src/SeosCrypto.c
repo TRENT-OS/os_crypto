@@ -303,7 +303,7 @@ SeosCrypto_keyInit(SeosCryptoCtx*                   api,
                    SeosCrypto_KeyHandle*            pKeyHandle,
                    unsigned int                     type,
                    SeosCryptoKey_Flag               flags,
-                   size_t                           secParam)
+                   size_t                           bits)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCrypto* self = (SeosCrypto*) api;
@@ -321,22 +321,20 @@ SeosCrypto_keyInit(SeosCryptoCtx*                   api,
     }
     else
     {
-        retval = SeosCryptoKey_init(&self->mem.memIf, *pKeyHandle, type, flags,
-                                    secParam);
+        retval = SeosCryptoKey_init(&self->mem.memIf, *pKeyHandle, type, flags, bits);
         if (retval != SEOS_SUCCESS)
         {
             goto err0;
         }
-        else if (!PointerVector_pushBack(&self->digestHandleVector, *pKeyHandle))
+        else if (!PointerVector_pushBack(&self->keyHandleVector, *pKeyHandle))
         {
             retval = SEOS_ERROR_INSUFFICIENT_SPACE;
             goto err1;
         }
-        else
-        {
-            goto exit;
-        }
     }
+
+    goto exit;
+
 err1:
     SeosCryptoKey_deInit(&self->mem.memIf, *pKeyHandle);
 err0:
@@ -366,10 +364,19 @@ seos_err_t
 SeosCrypto_keyImport(SeosCryptoCtx*                 api,
                      SeosCrypto_KeyHandle           keyHandle,
                      const void*                    key,
-                     size_t                         keyLen)
+                     size_t                         keySize)
 {
+    SeosCrypto* self = (SeosCrypto*) api;
+    size_t handlePos;
+
+    Debug_ASSERT_SELF(self);
+    Debug_ASSERT(self->parent.vtable == &SeosCrypto_vtable);
     Debug_PRINTF("\n%s\n", __func__);
-    return SEOS_ERROR_NOT_SUPPORTED;
+
+    handlePos = SeosCrypto_findHandle(&self->keyHandleVector, keyHandle);
+    return (handlePos != -1) ?
+           SeosCryptoKey_import(keyHandle, key, keySize) :
+           SEOS_ERROR_INVALID_HANDLE;
 }
 
 seos_err_t
@@ -378,8 +385,17 @@ SeosCrypto_keyExport(SeosCryptoCtx*                 api,
                      void**                         key,
                      size_t*                        keySize)
 {
+    SeosCrypto* self = (SeosCrypto*) api;
+    size_t handlePos;
+
+    Debug_ASSERT_SELF(self);
+    Debug_ASSERT(self->parent.vtable == &SeosCrypto_vtable);
     Debug_PRINTF("\n%s\n", __func__);
-    return SEOS_ERROR_NOT_SUPPORTED;
+
+    handlePos = SeosCrypto_findHandle(&self->keyHandleVector, keyHandle);
+    return (handlePos != -1) ?
+           SeosCryptoKey_export(keyHandle, key, keySize) :
+           SEOS_ERROR_INVALID_HANDLE;
 }
 
 seos_err_t

@@ -248,7 +248,7 @@ SeosCryptoRpc_keyInit(SeosCryptoRpc*                   self,
                       SeosCrypto_KeyHandle*            keyHandle,
                       unsigned int                     type,
                       SeosCryptoKey_Flag               flags,
-                      size_t                           secParam)
+                      size_t                           bits)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -260,8 +260,7 @@ SeosCryptoRpc_keyInit(SeosCryptoRpc*                   self,
     }
     else
     {
-        retval = SeosCrypto_keyInit(self->seosCryptoApi, keyHandle, type, flags,
-                                    secParam);
+        retval = SeosCrypto_keyInit(self->seosCryptoApi, keyHandle, type, flags, bits);
     }
     return retval;
 }

@@ -45,6 +45,36 @@
 //     return ( ret );
 // }
 
+/*
+ * This implementation should never be optimized out by the compiler
+ *
+ * This implementation for mbedtls_platform_zeroize() was inspired from
+ * Colin Percival's blog article at:
+ *
+ * http://www.daemonology.net/blog/2014-09-04-how-to-zero-a-buffer.html
+ *
+ * It uses a volatile function pointer to the standard memset(). Because the
+ * pointer is volatile the compiler expects it to change at
+ * any time and will not optimize out the call that could potentially perform
+ * other operations on the input buffer instead of just setting it to 0.
+ * Nevertheless, as pointed out by davidtgoldblatt on Hacker News
+ * (refer to http://www.daemonology.net/blog/2014-09-05-erratum.html for
+ * details), optimizations of the following form are still possible:
+ *
+ * if( memset_func != memset )
+ *     memset_func( buf, 0, len );
+ *
+ */
+static void* (* const volatile memset_func)( void*, int, size_t ) = memset;
+
+static void zeroize( void* buf, size_t len )
+{
+    if ( len > 0 )
+    {
+        memset_func( buf, 0, len );
+    }
+}
+
 // Public functions ------------------------------------------------------------
 
 seos_err_t
@@ -52,7 +82,7 @@ SeosCryptoKey_init(SeosCrypto_MemIf*            memIf,
                    SeosCryptoKey*               self,
                    unsigned int                 type,
                    SeosCryptoKey_Flag           flags,
-                   size_t                       secParam)
+                   size_t                       bits)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     size_t keySize;
@@ -60,23 +90,32 @@ SeosCryptoKey_init(SeosCrypto_MemIf*            memIf,
     Debug_ASSERT_SELF(self);
     Debug_PRINTF("\n%s\n", __func__);
 
+    if (NULL == memIf || NULL == self)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
     switch (type)
     {
     case SeosCryptoKey_Type_AES:
-        if (!(128 == secParam || 192 == secParam || 256 == secParam))
+        if (!(128 == bits || 192 == bits || 256 == bits))
         {
-            retval = SEOS_ERROR_INVALID_PARAMETER;
-            goto exit;
+            return SEOS_ERROR_INVALID_PARAMETER;
         }
-        else
-        {
-            keySize = sizeof(SeosCryptoKey_AES);
-        }
+        keySize = sizeof(SeosCryptoKey_AES);
         break;
     case SeosCryptoKey_Type_RSA_PRIVATE:
+        if (!(1024 == bits || 2048 == bits || 4096 == bits))
+        {
+            return SEOS_ERROR_INVALID_PARAMETER;
+        }
         keySize = sizeof(SeosCryptoKey_RSA_PRIVATE);
         break;
     case SeosCryptoKey_Type_RSA_PUBLIC:
+        if (!(1024 == bits || 2048 == bits || 4096 == bits))
+        {
+            return SEOS_ERROR_INVALID_PARAMETER;
+        }
         keySize = sizeof(SeosCryptoKey_RSA_PUBLIC);
         break;
     case SeosCryptoKey_Type_DH_PRIVATE:
@@ -87,9 +126,20 @@ SeosCryptoKey_init(SeosCrypto_MemIf*            memIf,
         retval = SEOS_ERROR_NOT_SUPPORTED;
     }
 
-    Debug_PRINTF("KeySize=%i\n", keySize);
+    if ((self->raw = memIf->malloc(keySize)) != NULL)
+    {
+        retval = SEOS_SUCCESS;
+        zeroize(self->raw, self->rawSize);
+        self->rawSize = keySize;
+        self->type = type;
+        self->bits = bits;
+        self->flags = flags;
+    }
+    else
+    {
+        retval = SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
 
-exit:
     return retval;
 }
 
@@ -114,21 +164,56 @@ SeosCryptoKey_generatePair(SeosCryptoKey*  prvKey,
 seos_err_t
 SeosCryptoKey_import(SeosCryptoKey*        self,
                      const void*           key,
-                     size_t                keyLen)
+                     size_t                keySize)
 {
     Debug_ASSERT_SELF(self);
     Debug_PRINTF("\n%s\n", __func__);
-    return SEOS_ERROR_NOT_SUPPORTED;
+
+    if (NULL == self || NULL == self->raw || 0 == self->rawSize || NULL == key
+        || 0 == keySize)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+    if (keySize > self->rawSize)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
+
+    memcpy(self->raw, key, keySize);
+
+    return SEOS_SUCCESS;
 }
 
 seos_err_t
 SeosCryptoKey_export(SeosCryptoKey*        self,
                      void**                key,
-                     size_t*               keyLen)
+                     size_t*               keySize)
 {
     Debug_ASSERT_SELF(self);
     Debug_PRINTF("\n%s\n", __func__);
-    return SEOS_ERROR_NOT_SUPPORTED;
+
+    if (NULL == self || NULL == self->raw || 0 == self->rawSize || NULL == key
+        || NULL == keySize || 0 == keySize)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    if (NULL == *key)
+    {
+        *key = self->raw;
+    }
+    else
+    {
+        if (*keySize < self->rawSize)
+        {
+            return SEOS_ERROR_BUFFER_TOO_SMALL;
+        }
+        memcpy(*key, self->raw, self->rawSize);
+    }
+
+    *keySize = self->rawSize;
+
+    return SEOS_SUCCESS;
 }
 
 void
@@ -137,24 +222,35 @@ SeosCryptoKey_deInit(SeosCrypto_MemIf*          memIf,
 {
     Debug_ASSERT_SELF(self);
     Debug_PRINTF("\n%s\n", __func__);
+
+    if (NULL != self->raw)
+    {
+        // We may have stored sensitive key data here, better make sure
+        // to remove it.
+        zeroize(self->raw, self->rawSize);
+        if (NULL != memIf)
+        {
+            memIf->free(self->raw);
+        }
+    }
 }
 
 SeosCryptoKey_RSA_PUBLIC*
 SeosCryptoKey_getRsaPublic(const SeosCryptoKey* key)
 {
-    return (SeosCryptoKey_RSA_PUBLIC*) key->bytes;
+    return (SeosCryptoKey_RSA_PUBLIC*) key->raw;
 }
 
 SeosCryptoKey_RSA_PRIVATE*
 SeosCryptoKey_getRsaPrivate(const SeosCryptoKey* key)
 {
-    return (SeosCryptoKey_RSA_PRIVATE*) key->bytes;
+    return (SeosCryptoKey_RSA_PRIVATE*) key->raw;
 }
 
 SeosCryptoKey_AES*
 SeosCryptoKey_getAES(const SeosCryptoKey* key)
 {
-    return (SeosCryptoKey_AES*) key->bytes;
+    return (SeosCryptoKey_AES*) key->raw;
 }
 
 // seos_err_t

@@ -128,7 +128,7 @@ SeosCrypto_keyInit(SeosCryptoCtx*                   api,
                    SeosCrypto_KeyHandle*            pKeyHandle,
                    unsigned int                     type,
                    unsigned int                     flags,
-                   size_t                           secParam);
+                   size_t                           bits);
 
 seos_err_t
 SeosCrypto_keyGenerate(SeosCryptoCtx*               api,
@@ -143,13 +143,13 @@ seos_err_t
 SeosCrypto_keyImport(SeosCryptoCtx*                 api,
                      SeosCrypto_KeyHandle           keyHandle,
                      const void*                    key,
-                     size_t                         keyLen);
+                     size_t                         keySize);
 
 seos_err_t
 SeosCrypto_keyExport(SeosCryptoCtx*                 api,
                      SeosCrypto_KeyHandle           keyHandle,
                      void**                         key,
-                     size_t*                        keyLen);
+                     size_t*                        keySize);
 
 seos_err_t
 SeosCrypto_keyDeInit(SeosCryptoCtx*                 api,

@@ -87,11 +87,11 @@ SeosCryptoApi_keyInit(SeosCryptoCtx*                   ctx,
                       SeosCrypto_KeyHandle*            keyHandle,
                       unsigned int                     type,
                       SeosCryptoKey_Flag               flags,
-                      size_t                           secParam)
+                      size_t                           bits)
 {
     Debug_ASSERT_SELF(ctx);
     Debug_PRINTF("\n%s\n", __func__);
-    return ctx->vtable->keyInit(ctx, keyHandle, type, flags, secParam);
+    return ctx->vtable->keyInit(ctx, keyHandle, type, flags, bits);
 }
 
 seos_err_t
