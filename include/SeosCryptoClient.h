@@ -58,21 +58,26 @@ SeosCryptoClient_init(SeosCryptoClient*     self,
 void
 SeosCryptoClient_deInit(SeosCryptoCtx* api);
 /**
- * @brief calls the remote seos crypto API. See SeosCryptoRpc_getRandomData()
- * and SeosCrypto_getRandomData()
+ * @brief calls the remote seos crypto API. See SeosCryptoRpc_rngGetBytes()
+ * and SeosCrypto_rngGetBytes()
  *
  * @param self (required) pointer to the seos crypto client object to be
  *  used
   * @param buffer pointer to the memory where the return data is
  * @param dataLen data length
  *
- * @return an error code. See SeosCrypto_getRandomData()
+ * @return an error code. See SeosCrypto_rngGetBytes()
  *
  */
 seos_err_t
-SeosCryptoClient_getRandomData(SeosCryptoCtx*       self,
-                               void**               buffer,
-                               size_t               dataLen);
+SeosCryptoClient_rngGetBytes(SeosCryptoCtx*       self,
+                             void**               buffer,
+                             size_t               dataLen);
+
+seos_err_t
+SeosCryptoClient_rngReSeed(SeosCryptoCtx*       self,
+                           const void*          seed,
+                           size_t               seedLen);
 
 /**
  * @brief implements SeosCryptoApi_digestInit() in a rpc connection

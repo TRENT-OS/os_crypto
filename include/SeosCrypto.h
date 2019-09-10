@@ -12,7 +12,7 @@
 #pragma once
 
 #include "seos_err.h"
-#include "seos_rng.h"
+
 #include "SeosCryptoRng.h"
 #include "SeosCryptoKey.h"
 #include "SeosCryptoDigest.h"
@@ -23,7 +23,6 @@
 #include "LibUtil/PointerVector.h"
 
 #define SeosCrypto_TO_SEOS_CRYPTO_CTX(self) (&(self)->parent)
-#define SeosCrypto_RANDOM_SEED_STR "SeosCryptoAPI"
 
 typedef struct SeosCrypto SeosCrypto;
 
@@ -53,8 +52,8 @@ struct SeosCrypto
         SeosCrypto_StaticBuf    staticBuf;
     }
     mem;
-    bool            isRngInitialized;
-    seos_rng_t      rng;
+
+    SeosCryptoRng cryptoRng;
 
     PointerVector keyHandleVector;
     PointerVector digestHandleVector;
@@ -63,18 +62,21 @@ struct SeosCrypto
 
 /**
  * @brief initializes a crypto API context. Usually, no crypto context is needed
- *  and most function accept NULL as context. The parameter malloc allows
+ *  and most function accept NULL as context. The parameter mallocFunc allows
  *  passing a custom function that will be called to allocate memory. The
- *  parameter func_free allows passing a custom function that will call to free
+ *  parameter freeFunc allows passing a custom function that will call to free
  *  memory. The parameter self will receive a context handle, that is used with
- *  further calls. It must be closed with crypto_api_close() eventually. The
- *  parameter buffer_self and len_buffer_self can be used to provide space for
- *  actual context. The space must be kept as long as self is used in calls to
- *  the library.
+ *  further calls. It must be closed with crypto_api_close() eventually. This
+ *  call will also initialize the internal RNG of the API.
  *
  * @param self (required) pointer to the seos_crypto context to initialize
- * @param malloc (required) provided malloc function
- * @param free (required) provided free function
+ * @param mallocFunc (required) provided malloc function
+ * @param freeFunc (required) provided free function
+ * @param entropyFunc (required) provided entropy function for feeding the
+ *  internal RNG
+ * @param entropyCtx (optional) context for entropy function
+ * @param seed (optional) seed for internal RNG
+ * @param seedLen (optional) lenght of seed
  *
  * @return an error code
  * @retval SEOS_SUCCESS if all right
@@ -83,9 +85,12 @@ struct SeosCrypto
  *
  */
 seos_err_t
-SeosCrypto_init(SeosCrypto* self,
-                SeosCrypto_MallocFunc malloc,
-                SeosCrypto_FreeFunc free);
+SeosCrypto_init(SeosCrypto*             self,
+                SeosCrypto_MallocFunc   mallocFunc,
+                SeosCrypto_FreeFunc     freeFunc,
+                SeosCrypto_EntropyFunc  entropyFunc,
+                void*                   entropyCtx);
+
 /**
  * @brief closes the initialized crypto context and releases all the allocated
  *  resources
@@ -97,14 +102,19 @@ void
 SeosCrypto_deInit(SeosCryptoCtx* api);
 
 /**
- * @brief implements SeosCryptoApi_getRandomData() in a local connection
+ * @brief implements SeosCryptoApi_rngGetBytes() in a local connection
  *  (function call, no rpc)
  *
  */
 seos_err_t
-SeosCrypto_getRandomData(SeosCryptoCtx* api,
-                         void**         buffer,
-                         size_t         buffer_len);
+SeosCrypto_rngGetBytes(SeosCryptoCtx*   api,
+                       void**           buffer,
+                       size_t           bufferLen);
+
+seos_err_t
+SeosCrypto_rngReSeed(SeosCryptoCtx*     api,
+                     const void*        seed,
+                     size_t             seedLen);
 
 
 // ------------------------------ Digest API -----------------------------------

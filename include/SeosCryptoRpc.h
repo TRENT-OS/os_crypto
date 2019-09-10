@@ -16,7 +16,6 @@
 #include "SeosCryptoDigest.h"
 #include "SeosCryptoCipher.h"
 #include "SeosCryptoKey.h"
-#include "seos_rng.h"
 
 typedef struct
 {
@@ -58,14 +57,19 @@ SeosCryptoRpc_init(SeosCryptoRpc* self,
 void
 SeosCryptoRpc_deInit(SeosCryptoRpc* self);
 /**
- * @brief rpc management of SeosCrypto_getRandomData()
+ * @brief rpc management of SeosCrypto_rngGetBytes()
  *
  * @retval SEOS_ERROR_INVALID_PARAMETER if dataLen > PAGE_SIZE
  *
  */
 seos_err_t
-SeosCryptoRpc_getRandomData(SeosCryptoRpc* self,
-                            size_t dataLen);
+SeosCryptoRpc_rngGetBytes(SeosCryptoRpc*    self,
+                          size_t            dataLen);
+
+seos_err_t
+SeosCryptoRpc_rngReSeed(SeosCryptoRpc*      self,
+                        size_t              seedLen);
+
 /**
  * @brief rpc management of SeosCrypto_digestInit()
  *

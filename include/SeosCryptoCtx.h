@@ -17,9 +17,14 @@
 typedef struct SeosCryptoCtx SeosCryptoCtx;
 
 typedef seos_err_t
-(*SeosCryptoCtx_GetRandomDataT)(SeosCryptoCtx*  self,
-                                void**          buffer,
-                                size_t          dataLen);
+(*SeosCryptoCtx_rngGetBytesT)(SeosCryptoCtx*  self,
+                             void**          buffer,
+                             size_t          dataLen);
+
+typedef seos_err_t
+(*SeosCryptoCtx_rngReSeedT)(SeosCryptoCtx*  self,
+                            const void*     seed,
+                            size_t          seedLen);
 
 typedef seos_err_t
 (*SeosCryptoCtx_digestInitT)(SeosCryptoCtx*                 self,
@@ -108,7 +113,8 @@ typedef void
 
 typedef struct
 {
-    SeosCryptoCtx_GetRandomDataT    getRandomData;
+    SeosCryptoCtx_rngGetBytesT      rngGetBytes;
+    SeosCryptoCtx_rngReSeedT        rngReSeed;
     SeosCryptoCtx_digestInitT       digestInit;
     SeosCryptoCtx_digestCloseT      digestClose;
     SeosCryptoCtx_digestUpdateT     digestUpdate;

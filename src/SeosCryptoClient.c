@@ -8,7 +8,8 @@
 
 static const SeosCryptoCtx_Vtable SeosCryptoClient_vtable =
 {
-    .getRandomData  = SeosCryptoClient_getRandomData,
+    .rngGetBytes     = SeosCryptoClient_rngGetBytes,
+    .rngReSeed       = SeosCryptoClient_rngReSeed,
     .digestInit      = SeosCryptoClient_digestInit,
     .digestClose     = SeosCryptoClient_digestClose,
     .digestUpdate    = SeosCryptoClient_digestUpdate,
@@ -57,9 +58,9 @@ SeosCryptoClient_deInit(SeosCryptoCtx* api)
 }
 
 seos_err_t
-SeosCryptoClient_getRandomData(SeosCryptoCtx*       api,
-                               void**               buffer,
-                               size_t               dataLen)
+SeosCryptoClient_rngGetBytes(SeosCryptoCtx*       api,
+                             void**               buffer,
+                             size_t               dataLen)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
     Debug_ASSERT_SELF(self);
@@ -73,8 +74,8 @@ SeosCryptoClient_getRandomData(SeosCryptoCtx*       api,
     }
     else
     {
-        retval = SeosCryptoRpc_getRandomData(self->rpcHandle,
-                                             dataLen);
+        retval = SeosCryptoRpc_rngGetBytes(self->rpcHandle,
+                                           dataLen);
 
         if (SEOS_SUCCESS == retval)
         {
@@ -84,11 +85,37 @@ SeosCryptoClient_getRandomData(SeosCryptoCtx*       api,
             }
             else
             {
-                *buffer = self->clientDataport;            
+                *buffer = self->clientDataport;
             }
         }
     }
 
+    return retval;
+}
+
+seos_err_t
+SeosCryptoClient_rngReSeed(SeosCryptoCtx*       api,
+                           const void*          seed,
+                           size_t               seedLen)
+{
+    SeosCryptoClient* self = (SeosCryptoClient*) api;
+    Debug_ASSERT_SELF(self);
+    Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
+
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    if (seedLen > PAGE_SIZE)
+    {
+        retval = SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else
+    {
+        if (seed != NULL)
+        {
+            memcpy(self->clientDataport, seed, seedLen);
+        }
+        retval = SeosCryptoRpc_rngReSeed(self->rpcHandle, seedLen);
+    }
     return retval;
 }
 

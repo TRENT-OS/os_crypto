@@ -48,7 +48,6 @@ if (SEOS_CRYPTO_IMPL_MBEDTLS)
     )
     target_sources(${PROJECT_NAME}
         PRIVATE
-        "src/seos_rng.c"
         "3rdParty/mbedtls/library/md5.c"
         "3rdParty/mbedtls/library/platform_util.c"
         "3rdParty/mbedtls/library/entropy.c"

@@ -80,10 +80,11 @@ SeosCryptoRpc_deInit(SeosCryptoRpc* self)
 }
 
 seos_err_t
-SeosCryptoRpc_getRandomData(SeosCryptoRpc* self,
-                            size_t dataLen)
+SeosCryptoRpc_rngGetBytes(SeosCryptoRpc* self,
+                          size_t dataLen)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
+    void*      rnd  = NULL;
 
     if (!isValidHandle(self))
     {
@@ -95,10 +96,32 @@ SeosCryptoRpc_getRandomData(SeosCryptoRpc* self,
     }
     else
     {
-        retval = SeosCrypto_getRandomData(self->seosCryptoApi,
-                                          self->serverDataport,
-                                          dataLen);
+        rnd = self->serverDataport;
+        retval = SeosCrypto_rngGetBytes(self->seosCryptoApi,
+                                        &rnd,
+                                        dataLen);
     }
+
+    return retval;
+}
+
+seos_err_t
+SeosCryptoRpc_rngReSeed(SeosCryptoRpc* self,
+                        size_t seedLen)
+{
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    if (!isValidHandle(self))
+    {
+        retval = SEOS_ERROR_INVALID_HANDLE;
+    }
+    else
+    {
+        retval = SeosCrypto_rngReSeed(self->seosCryptoApi,
+                                      self->serverDataport,
+                                      seedLen);
+    }
+
     return retval;
 }
 

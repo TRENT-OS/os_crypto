@@ -2,14 +2,14 @@
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 
-#include "SeosCryptoRng.h"
-
 #include <string.h>
 
+#include "SeosCryptoRng.h"
+
 seos_err_t
-SeosCryptoRng_init(SeosCryptoRng* self,
-                   void* impl,
-                   SeosCryptoRng_ImplRngFunc rngFunc)
+SeosCryptoRng_init(SeosCryptoRng*           self,
+                   SeosCrypto_EntropyFunc   entropyFunc,
+                   void*                    entropyCtx)
 {
     Debug_ASSERT_SELF(self);
 
@@ -17,32 +17,68 @@ SeosCryptoRng_init(SeosCryptoRng* self,
 
     memset(self, 0, sizeof(*self));
 
-    if (NULL == impl || NULL == rngFunc)
+    mbedtls_ctr_drbg_init(&self->drbg);
+    if (mbedtls_ctr_drbg_seed(&self->drbg, entropyFunc, entropyCtx, NULL, 0) != 0)
     {
-        retval = SEOS_ERROR_INVALID_PARAMETER;
+        retval = SEOS_ERROR_ABORTED;
+        goto err0;
     }
-    else
-    {
-        self->implCtx = impl;
-        self->rngFunc = rngFunc;
-    }
+
+    // Force mbedTLS to reseed drbg frequently (e.g., after every time we have
+    // obtained *some* amount of randomness from the DRBG)
+    mbedtls_ctr_drbg_set_prediction_resistance(&self->drbg, MBEDTLS_CTR_DRBG_PR_ON);
+
+    return SEOS_SUCCESS;
+
+err0:
+    mbedtls_ctr_drbg_free(&self->drbg);
     return retval;
 }
 
 seos_err_t
-SeosCryptoRng_nextBytes(SeosCryptoRng* self,
-                        void* destination,
-                        size_t destinationSize)
+SeosCryptoRng_getBytes(SeosCryptoRng*  self,
+                       void**          buf,
+                       size_t          bufSize)
 {
     Debug_ASSERT_SELF(self);
-    return self->rngFunc(self->implCtx, destination, destinationSize)
-           ? SEOS_ERROR_GENERIC : SEOS_SUCCESS;
+
+    if (NULL == buf)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    if (NULL == *buf)
+    {
+        if (bufSize > PAGE_SIZE)
+        {
+            return SEOS_ERROR_INVALID_PARAMETER;
+        }
+        *buf = self->rnd;
+    }
+
+    if (mbedtls_ctr_drbg_random(&self->drbg, *buf, bufSize) != 0)
+    {
+        return SEOS_ERROR_ABORTED;
+    }
+
+    return SEOS_SUCCESS;
+}
+
+seos_err_t
+SeosCryptoRng_reSeed(SeosCryptoRng*  self,
+                     const void*     seed,
+                     size_t          seedLen)
+{
+    return SEOS_SUCCESS;
 }
 
 void
 SeosCryptoRng_deInit(SeosCryptoRng* self)
 {
     Debug_ASSERT_SELF(self);
+
+    mbedtls_ctr_drbg_free(&self->drbg);
+
     return;
 }
 

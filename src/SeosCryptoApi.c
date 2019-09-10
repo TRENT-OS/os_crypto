@@ -7,14 +7,25 @@
 
 /***************************** Crypto functions *******************************/
 seos_err_t
-SeosCryptoApi_getRandomData(SeosCryptoCtx* cryptoCtx,
-                            void** buffer,
-                            size_t dataLen)
+SeosCryptoApi_rngGetBytes(SeosCryptoCtx*    cryptoCtx,
+                          void**            buffer,
+                          size_t            dataLen)
 {
     Debug_ASSERT_SELF(cryptoCtx);
-    return cryptoCtx->vtable->getRandomData(cryptoCtx,
-                                            buffer,
-                                            dataLen);
+    return cryptoCtx->vtable->rngGetBytes(cryptoCtx,
+                                          buffer,
+                                          dataLen);
+}
+
+seos_err_t
+SeosCryptoApi_rngReSeed(SeosCryptoCtx*      cryptoCtx,
+                        const void*         seed,
+                        size_t              seedLen)
+{
+    Debug_ASSERT_SELF(cryptoCtx);
+    return cryptoCtx->vtable->rngReSeed(cryptoCtx,
+                                        seed,
+                                        seedLen);
 }
 
 seos_err_t
