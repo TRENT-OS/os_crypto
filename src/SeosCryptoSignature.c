@@ -217,11 +217,12 @@ signHashImpl(SeosCryptoSignature* self,
 // Public Functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoSignature_init(SeosCryptoSignature* self,
-                         SeosCryptoSignature_Algorithm algorithm,
-                         SeosCryptoKey const* key,
-                         char* iv,
-                         size_t ivLen)
+SeosCryptoSignature_init(SeosCrypto_MemIf*              memIf,
+                         SeosCryptoSignature*           self,
+                         SeosCryptoSignature_Algorithm  algorithm,
+                         const SeosCryptoKey*           key,
+                         char*                          iv,
+                         size_t                         ivLen)
 {
     Debug_ASSERT_SELF(self);
 
@@ -262,7 +263,8 @@ exit:
 }
 
 void
-SeosCryptoSignature_deInit(SeosCryptoSignature* self)
+SeosCryptoSignature_deInit(SeosCrypto_MemIf*            memIf,
+                           SeosCryptoSignature*         self)
 {
     Debug_ASSERT_SELF(self);
 

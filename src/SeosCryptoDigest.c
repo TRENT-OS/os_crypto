@@ -76,7 +76,8 @@ update(SeosCryptoDigest* self,
 // Public Functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoDigest_init(SeosCryptoDigest*             self,
+SeosCryptoDigest_init(SeosCrypto_MemIf*             memIf,
+                      SeosCryptoDigest*             self,
                       SeosCryptoDigest_Algorithm    algorithm,
                       void*                         iv,
                       size_t                        ivLen)
@@ -106,7 +107,8 @@ SeosCryptoDigest_init(SeosCryptoDigest*             self,
 }
 
 void
-SeosCryptoDigest_deInit(SeosCryptoDigest* self)
+SeosCryptoDigest_deInit(SeosCrypto_MemIf*   memIf,
+                        SeosCryptoDigest*   self)
 {
     Debug_ASSERT_SELF(self);
 

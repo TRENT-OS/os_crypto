@@ -9,7 +9,8 @@
 #include <string.h>
 
 seos_err_t
-SeosCryptoAgreement_init(SeosCryptoAgreement*            self,
+SeosCryptoAgreement_init(SeosCrypto_MemIf*               memIf,
+                         SeosCryptoAgreement*            self,
                          SeosCryptoAgreement_Algorithm   algorithm,
                          SeosCryptoKey*                  privateKey)
 {
@@ -143,7 +144,8 @@ SeosCryptoAgreement_computeShared(SeosCryptoAgreement*  self,
 }
 
 void
-SeosCryptoAgreement_deInit(SeosCryptoAgreement* self)
+SeosCryptoAgreement_deInit(SeosCrypto_MemIf*        memIf,
+                           SeosCryptoAgreement*     self)
 {
     Debug_ASSERT_SELF(self);
 }

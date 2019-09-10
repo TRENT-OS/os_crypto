@@ -30,7 +30,8 @@
  *
  */
 seos_err_t
-SeosCryptoRng_init(SeosCryptoRng*           self,
+SeosCryptoRng_init(SeosCrypto_MemIf*        memIf,
+                   SeosCryptoRng*           self,
                    SeosCrypto_EntropyFunc   entropyFunc,
                    void*                    entropyCtx);
 
@@ -95,6 +96,7 @@ SeosCryptoRng_getBytesMbedtls(void*            self,
  *
  */
 void
-SeosCryptoRng_deInit(SeosCryptoRng* self);
+SeosCryptoRng_deInit(SeosCrypto_MemIf*           memIf,
+                     SeosCryptoRng*              self);
 
 /** @} */

@@ -37,11 +37,12 @@
  *
  */
 seos_err_t
-SeosCryptoSignature_init(SeosCryptoSignature* self,
-                         SeosCryptoSignature_Algorithm algorithm,
-                         SeosCryptoKey const* key,
-                         char* iv,
-                         size_t ivLen);
+SeosCryptoSignature_init(SeosCrypto_MemIf*              memIf,
+                         SeosCryptoSignature*           self,
+                         SeosCryptoSignature_Algorithm  algorithm,
+                         const SeosCryptoKey*           key,
+                         char*                          iv,
+                         size_t                         ivLen);
 /**
  * @brief closes a signature context.
  *
@@ -49,7 +50,8 @@ SeosCryptoSignature_init(SeosCryptoSignature* self,
  *
  */
 void
-SeosCryptoSignature_deInit(SeosCryptoSignature* self);
+SeosCryptoSignature_deInit(SeosCrypto_MemIf*            memIf,
+                           SeosCryptoSignature*         self);
 /**
  * @brief TBD
  *

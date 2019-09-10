@@ -48,8 +48,8 @@
 // Public functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoKey_init(SeosCryptoKey*               self,
-//                   const SeosCrypto_MemIf*      memIf,
+SeosCryptoKey_init(SeosCrypto_MemIf*            memIf,
+                   SeosCryptoKey*               self,
                    unsigned int                 type,
                    SeosCryptoKey_Flag           flags,
                    size_t                       secParam)
@@ -132,8 +132,8 @@ SeosCryptoKey_export(SeosCryptoKey*        self,
 }
 
 void
-SeosCryptoKey_deInit(SeosCryptoKey*             self)
-//                     const SeosCrypto_MemIf*    memIf)
+SeosCryptoKey_deInit(SeosCrypto_MemIf*          memIf,
+                     SeosCryptoKey*             self)
 {
     Debug_ASSERT_SELF(self);
     Debug_PRINTF("\n%s\n", __func__);

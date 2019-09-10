@@ -9,7 +9,8 @@
 #include <string.h>
 
 seos_err_t
-SeosCryptoRng_init(SeosCryptoRng*           self,
+SeosCryptoRng_init(SeosCrypto_MemIf*        memIf,
+                   SeosCryptoRng*           self,
                    SeosCrypto_EntropyFunc   entropyFunc,
                    void*                    entropyCtx)
 {
@@ -85,7 +86,8 @@ SeosCryptoRng_reSeed(SeosCryptoRng*  self,
 }
 
 void
-SeosCryptoRng_deInit(SeosCryptoRng* self)
+SeosCryptoRng_deInit(SeosCrypto_MemIf*              memIf,
+                     SeosCryptoRng*                 self)
 {
     Debug_ASSERT_SELF(self);
 

@@ -356,7 +356,8 @@ verifyTagImpl(SeosCryptoCipher* self,
 // Public functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoCipher_init(SeosCryptoCipher*             self,
+SeosCryptoCipher_init(SeosCrypto_MemIf*             memIf,
+                      SeosCryptoCipher*             self,
                       SeosCryptoCipher_Algorithm    algorithm,
                       SeosCryptoKey const*          key,
                       const void*                   iv,
@@ -403,7 +404,8 @@ exit:
 }
 
 void
-SeosCryptoCipher_deInit(SeosCryptoCipher* self)
+SeosCryptoCipher_deInit(SeosCrypto_MemIf*   memIf,
+                        SeosCryptoCipher*   self)
 {
     Debug_ASSERT_SELF(self);
 

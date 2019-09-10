@@ -19,12 +19,14 @@
 
 #include <stddef.h>
 
+
 /**
  * @brief initializes a SeosCryptoKey context
  *
  */
 seos_err_t
-SeosCryptoKey_init(SeosCryptoKey*               self,
+SeosCryptoKey_init(SeosCrypto_MemIf*            memIf,
+                   SeosCryptoKey*               self,
                    unsigned int                 type,
                    SeosCryptoKey_Flag           flags,
                    size_t                       secParam);
@@ -47,7 +49,8 @@ SeosCryptoKey_export(SeosCryptoKey*             self,
                      size_t*                    keyLen);
 
 void
-SeosCryptoKey_deInit(SeosCryptoKey*             self);
+SeosCryptoKey_deInit(SeosCrypto_MemIf*          memIf,
+                     SeosCryptoKey*             self);
 
 SeosCryptoKey_RSA_PUBLIC*
 SeosCryptoKey_getRsaPublic(const SeosCryptoKey* key);
