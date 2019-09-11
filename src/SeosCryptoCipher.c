@@ -3,6 +3,7 @@
  */
 
 #include "SeosCryptoCipher.h"
+#include "SeosCryptoKey.h"
 
 #include "LibDebug/Debug.h"
 
@@ -88,22 +89,43 @@ deInitImpl(SeosCryptoCipher* self)
 static seos_err_t
 setKeyImpl(SeosCryptoCipher* self)
 {
-    SeosCryptoKey_AES* key = (SeosCryptoKey_AES*)self->key;
+    SeosCryptoKey_AES* aesKey;
     seos_err_t retval = SEOS_SUCCESS;
 
     switch (self->algorithm)
     {
     case SeosCryptoCipher_Algorithm_AES_ECB_ENC:
     case SeosCryptoCipher_Algorithm_AES_CBC_ENC:
+    case SeosCryptoCipher_Algorithm_AES_ECB_DEC:
+    case SeosCryptoCipher_Algorithm_AES_CBC_DEC:
+    case SeosCryptoCipher_Algorithm_AES_GCM_ENC:
+    case SeosCryptoCipher_Algorithm_AES_GCM_DEC:
+        if (SeosCryptoKey_Type_AES == self->key->type)
+        {
+            aesKey = SeosCryptoKey_getAES(self->key);
+        }
+        else
+        {
+            return SEOS_ERROR_INVALID_PARAMETER;
+        }
+        break;
+    default:
+        return SEOS_ERROR_NOT_SUPPORTED;
+    }
+
+    switch (self->algorithm)
+    {
+    case SeosCryptoCipher_Algorithm_AES_ECB_ENC:
+    case SeosCryptoCipher_Algorithm_AES_CBC_ENC:
         retval = mbedtls_aes_setkey_enc(&self->algorithmCtx.aes,
-                                        key->bytes, key->len) ?
+                                        aesKey->bytes, self->key->bits) ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
 
     case SeosCryptoCipher_Algorithm_AES_ECB_DEC:
     case SeosCryptoCipher_Algorithm_AES_CBC_DEC:
         retval = mbedtls_aes_setkey_dec(&self->algorithmCtx.aes,
-                                        key->bytes, key->len) ?
+                                        aesKey->bytes, self->key->bits) ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
 
@@ -111,7 +133,7 @@ setKeyImpl(SeosCryptoCipher* self)
     case SeosCryptoCipher_Algorithm_AES_GCM_DEC:
         retval = mbedtls_gcm_setkey(&self->algorithmCtx.gcm,
                                     MBEDTLS_CIPHER_ID_AES,
-                                    key->bytes, key->len) ?
+                                    aesKey->bytes, self->key->bits) ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
 
