@@ -150,8 +150,8 @@ seos_err_t
 SeosCrypto_keyExport(SeosCryptoCtx*                 api,
                      SeosCrypto_KeyHandle           keyHandle,
                      SeosCrypto_KeyHandle           wrapKeyHandle,
-                     void**                         key,
-                     size_t*                        keySize);
+                     void**                         buf,
+                     size_t*                        bufSize);
 
 seos_err_t
 SeosCrypto_keyDeInit(SeosCryptoCtx*                 api,

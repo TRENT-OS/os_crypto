@@ -49,8 +49,8 @@ typedef struct
     SeosCryptoKey_Flag  flags;      ///< flags, see above
     SeosCryptoKey_Type  type;       ///< type of key, see above
     unsigned int        bits;       ///< the security parameter (e.g., key size)
-    void*               raw;        ///< pointer to raw key material
-    size_t              rawSize;    ///< amount of bytes stored
+    void*               keyBytes;   ///< pointer to raw key material
+    size_t              keySize;    ///< amount of bytes stored
 }
 SeosCryptoKey;
 
