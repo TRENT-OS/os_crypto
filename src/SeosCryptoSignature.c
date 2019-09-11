@@ -73,6 +73,7 @@ setKeyImpl(SeosCryptoSignature* self)
 static seos_err_t
 verifyHashImpl(SeosCryptoSignature* self,
                SeosCryptoDigest_Algorithm digestAlgo,
+               SeosCryptoRng* rng,
                const char* hash,
                size_t hashSize,
                const char* signature,
@@ -85,9 +86,9 @@ verifyHashImpl(SeosCryptoSignature* self,
     case SeosCryptoSignature_Algorithm_RSA_PKCS1:
     {
         mbedtls_rsa_context* rsa = (mbedtls_rsa_context*) self->key->algoKeyCtx;
-
+        void* rngFunc = (NULL != rng) ? SeosCryptoRng_getBytes_mbedtls : NULL;
         if (mbedtls_rsa_pkcs1_verify(rsa,
-                                     NULL, NULL,
+                                     rngFunc, rng,
                                      MBEDTLS_RSA_PUBLIC,
                                      TO_MBEDTL_MD_ALGO(digestAlgo),
                                      (unsigned int) hashSize,
@@ -113,6 +114,7 @@ verifyHashImpl(SeosCryptoSignature* self,
 static seos_err_t
 signHashImpl(SeosCryptoSignature* self,
              SeosCryptoDigest_Algorithm digestAlgo,
+             SeosCryptoRng* rng,
              const char* hash,
              size_t hashSize,
              char* signature,
@@ -133,8 +135,9 @@ signHashImpl(SeosCryptoSignature* self,
         }
         else
         {
+            void* rngFunc = (NULL != rng) ? SeosCryptoRng_getBytes_mbedtls : NULL;
             int err = mbedtls_rsa_pkcs1_sign(rsa,
-                                             NULL, NULL, 
+                                             rngFunc, rng,
                                              MBEDTLS_RSA_PRIVATE,
                                              TO_MBEDTL_MD_ALGO(digestAlgo),
                                              (unsigned int) hashSize,
@@ -240,6 +243,7 @@ SeosCryptoSignature_deInit(SeosCryptoSignature* self)
 seos_err_t
 SeosCryptoSignature_sign(SeosCryptoSignature* self,
                          SeosCryptoDigest_Algorithm digestAlgo,
+                         SeosCryptoRng* rng,
                          const char* hash,
                          size_t hashSize,
                          char* signature,
@@ -257,6 +261,7 @@ SeosCryptoSignature_sign(SeosCryptoSignature* self,
     {
         retval = signHashImpl(self,
                               digestAlgo,
+                              rng,
                               hash,
                               hashSize,
                               signature,
@@ -268,6 +273,7 @@ SeosCryptoSignature_sign(SeosCryptoSignature* self,
 seos_err_t
 SeosCryptoSignature_verify(SeosCryptoSignature* self,
                            SeosCryptoDigest_Algorithm digestAlgo,
+                           SeosCryptoRng* rng,
                            const char* hash,
                            size_t hashSize,
                            const char* signature,
@@ -285,6 +291,7 @@ SeosCryptoSignature_verify(SeosCryptoSignature* self,
     {
         retval = verifyHashImpl(self,
                                 digestAlgo,
+                                rng,
                                 hash,
                                 hashSize,
                                 signature,

@@ -19,8 +19,8 @@
 #include "seos_err.h"
 #include "compiler.h"
 
-typedef int   (SeosCrypto_EntropyFunc)(void* ctx, unsigned char* buf,
-                                       size_t len);
+typedef int (SeosCrypto_EntropyFunc)(void* ctx, unsigned char* buf, size_t len);
+
 
 typedef struct
 {
@@ -77,6 +77,22 @@ seos_err_t
 SeosCryptoRng_reSeed(SeosCryptoRng*  self,
                      const void*     seed,
                      size_t          seedLen);
+
+/**
+ * @brief get random bytes for mbedTLS wrapper
+ *
+ * @param self (required) pointer to context
+ * @param buf (required) pointer to the destination buffer
+ * @param bufSize size of the destination buffer
+ *
+ * @return an error code
+ * @retval 0 if all right
+ *
+ */
+int
+SeosCryptoRng_getBytes_mbedtls(SeosCryptoRng*  self,
+                               unsigned char*  buf,
+                               size_t          bufSize);
 
 /**
  * @brief deinitializes an rng context

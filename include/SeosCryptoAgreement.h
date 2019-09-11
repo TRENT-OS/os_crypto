@@ -12,6 +12,7 @@
 #pragma once
 
 #include "SeosCryptoKey.h"
+#include "SeosCryptoRng.h"
 
 #include "mbedtls/dhm.h"
 #include "mbedtls/ecdh.h"
@@ -63,6 +64,7 @@ SeosCryptoAgreement_init(SeosCryptoAgreement*              self,
  * @brief computes a shared secret
  *
  * @param self (required) pointer to context
+ * @param rng (optional) seos RNG for protection against side channel attacks
  * @param publicKey (required) their public key
  * @param buf (required) buffer for resulting shared key
  * @param bufSize size of buffer in bytes
@@ -78,6 +80,7 @@ SeosCryptoAgreement_init(SeosCryptoAgreement*              self,
  */
 seos_err_t
 SeosCryptoAgreement_computeShared(SeosCryptoAgreement*  self,
+                                  SeosCryptoRng*        rng,
                                   SeosCryptoKey*        publicKey,
                                   unsigned char*        buf,
                                   size_t                bufSize,

@@ -62,18 +62,22 @@ SeosCryptoAgreement_init(SeosCryptoAgreement*            self,
 
 seos_err_t
 SeosCryptoAgreement_computeShared(SeosCryptoAgreement*  self,
+                                  SeosCryptoRng*        rng,
                                   SeosCryptoKey*        publicKey,
                                   unsigned char*        buf,
                                   size_t                bufSize,
                                   size_t*               outLen)
 {
     seos_err_t retval;
+    void* rngFunc;
 
     if (NULL == self || NULL == publicKey || NULL == buf
         || publicKey->algorithm != self->algorithm)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
+
+    rngFunc = (NULL != rng) ? SeosCryptoRng_getBytes_mbedtls : NULL;
 
     retval = SEOS_SUCCESS;
     switch (self->algorithm)
@@ -100,7 +104,7 @@ SeosCryptoAgreement_computeShared(SeosCryptoAgreement*  self,
             || mbedtls_mpi_copy(&dh.G,  &priv->G) != 0
             || mbedtls_mpi_copy(&dh.GY, &pub->GY) != 0
             || mbedtls_mpi_copy(&dh.X,  &priv->X) != 0
-            || mbedtls_dhm_calc_secret(&dh, buf, bufSize, outLen, NULL, NULL) != 0)
+            || mbedtls_dhm_calc_secret(&dh, buf, bufSize, outLen, rngFunc, rng) != 0)
         {
             retval = SEOS_ERROR_ABORTED;
         }
@@ -126,7 +130,7 @@ SeosCryptoAgreement_computeShared(SeosCryptoAgreement*  self,
         if (mbedtls_ecp_group_copy(&ecdh.grp, &priv->grp) != 0
             || mbedtls_ecp_copy(&ecdh.Qp, &pub->Q) != 0
             || mbedtls_mpi_copy(&ecdh.d, &priv->d) != 0
-            || mbedtls_ecdh_calc_secret(&ecdh, outLen, buf, bufSize, NULL, NULL) != 0)
+            || mbedtls_ecdh_calc_secret(&ecdh, outLen, buf, bufSize, rngFunc, rng) != 0)
         {
             retval = SEOS_ERROR_ABORTED;
         }

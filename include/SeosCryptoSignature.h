@@ -12,6 +12,7 @@
 #pragma once
 
 #include "SeosCryptoDigest.h"
+#include "SeosCryptoRng.h"
 
 #include <limits.h>
 
@@ -78,11 +79,13 @@ SeosCryptoSignature_update(SeosCryptoSignature* self,
                            const char* input,
                            size_t inputSize);
 /**
- * @brief TBD
+ * @brief Sign a hash value
  *
  * @param self (required) pointer to context
- * @param input (required) input buffer
- * @param inputSize input buffer size
+ * @param digestAlgo (optional) algorithm ID of hash
+ * @param rng (optional) seos RNG for protection against side channel attacks
+ * @param hash (required) hash buffer
+ * @param hashSize hash buffer size
  * @param signature (required) input/output parameter cointaining the pointer to
  *  the output buffer. If content is == NULL, then it is set to a local (to the
  *  context) buffer and the content of \p outputSize is set to the correct value
@@ -107,26 +110,33 @@ SeosCryptoSignature_update(SeosCryptoSignature* self,
 seos_err_t
 SeosCryptoSignature_sign(SeosCryptoSignature* self,
                          SeosCryptoDigest_Algorithm digestAlgo, // can be none
+                         SeosCryptoRng* rng,
                          const char* hash,
                          size_t hashSize,
                          char* signature,
                          size_t* signatureSize);
 /**
- * @brief TBD
+ * @brief verify a hash value
  *
  * @param self (required) pointer to context
- * TBD
+ * @param digestAlgo (optional) algorithm ID of hash
+ * @param rng (optional) seos RNG for protection against side channel attacks
+ * @param hash (required) hash buffer
+ * @param hashSize hash buffer size
+ * @param signature (required) signature to be verified
+ * @param signatureSize (required) size of signature
  *
  * @return an error code
  * @retval SEOS_SUCCESS if all right
  * @retval SEOS_ERROR_INVALID_PARAMETER if any of the required parameters is
  *  missing or wrong
- * @retval SEOS_ERROR_GENERIC if it does not match
+ * @retval SEOS_ERROR_ABORTED if it does not match
  *
  */
 seos_err_t
 SeosCryptoSignature_verify(SeosCryptoSignature* self,
                            SeosCryptoDigest_Algorithm digestAlgo, // can be none
+                           SeosCryptoRng* rng,
                            const char* hash,
                            size_t hashSize,
                            const char* signature,

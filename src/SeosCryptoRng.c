@@ -46,7 +46,6 @@ SeosCryptoRng_getBytes(SeosCryptoRng*  self,
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-
     if (NULL == *buf)
     {
         if (bufSize > PAGE_SIZE)
@@ -64,11 +63,33 @@ SeosCryptoRng_getBytes(SeosCryptoRng*  self,
     return SEOS_SUCCESS;
 }
 
+int
+SeosCryptoRng_getBytes_mbedtls(SeosCryptoRng*  self,
+                               unsigned char*  buf,
+                               size_t          bufSize)
+{
+    // Simple wrapper for mbedTLS, to allow the buffered use of the getRandomData()
+    // function as is common, but also to directly pass a function to mbedTLS
+    void* p = buf;
+    return SeosCryptoRng_getBytes(self, &p, bufSize) == SEOS_SUCCESS ? 0 : 1;
+}
+
 seos_err_t
 SeosCryptoRng_reSeed(SeosCryptoRng*  self,
                      const void*     seed,
                      size_t          seedLen)
 {
+    if (NULL == seed || 0 == seedLen)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    // Update RNG state with additional seed data
+    if (mbedtls_ctr_drbg_update_ret(&self->drbg, seed, seedLen) != 0)
+    {
+        return SEOS_ERROR_ABORTED;
+    }
+
     return SEOS_SUCCESS;
 }
 
