@@ -3,11 +3,11 @@
  */
 
 #include "SeosCryptoSignature.h"
+#include "SeosCryptoKey.h"
+
 #include "LibDebug/Debug.h"
 
 #include <string.h>
-
-#include "mbedtls/rsa.h"
 
 #define TO_MBEDTL_MD_ALGO(x)    (x)
 

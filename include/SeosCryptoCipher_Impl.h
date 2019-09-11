@@ -11,13 +11,31 @@
 
 #pragma once
 
+#include "SeosCryptoKey_Impl.h"
+
 #include "mbedtls/rsa.h"
 #include "mbedtls/aes.h"
 #include "mbedtls/gcm.h"
 
-#include "SeosCryptoKey.h"
+#define SeosCryptoCipher_OUTPUT_BUFFER_SIZE     PAGE_SIZE
+#define SeosCryptoCipher_TAG_BUFFER_SIZE        16
+#define SeosCryptoCipher_AES_BLOCK_SIZE         16
 
-struct SeosCryptoCipher
+typedef enum
+{
+    SeosCryptoCipher_Algorithm_NONE,
+    SeosCryptoCipher_Algorithm_AES_ECB_ENC,
+    SeosCryptoCipher_Algorithm_AES_ECB_DEC,
+    SeosCryptoCipher_Algorithm_AES_CBC_ENC,
+    SeosCryptoCipher_Algorithm_AES_CBC_DEC,
+    SeosCryptoCipher_Algorithm_AES_GCM_ENC,
+    SeosCryptoCipher_Algorithm_AES_GCM_DEC,
+    SeosCryptoCipher_Algorithm_RSA_PKCS1_ENC,
+    SeosCryptoCipher_Algorithm_RSA_PKCS1_DEC
+}
+SeosCryptoCipher_Algorithm;
+
+typedef struct
 {
     union
     {
@@ -33,6 +51,7 @@ struct SeosCryptoCipher
     size_t                      ivLen;
     size_t                      inputLen;
     char                        outputBuf[SeosCryptoCipher_OUTPUT_BUFFER_SIZE];
-};
+}
+SeosCryptoCipher;
 
 /** @} */

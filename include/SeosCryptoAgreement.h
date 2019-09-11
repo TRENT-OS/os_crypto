@@ -11,34 +11,12 @@
  */
 #pragma once
 
-#include "SeosCryptoKey.h"
-#include "SeosCryptoRng.h"
+#include "SeosCrypto_Impl.h"
+#include "SeosCryptoRng_Impl.h"
+#include "SeosCryptoAgreement_Impl.h"
 
-#include "mbedtls/dhm.h"
-#include "mbedtls/ecdh.h"
-
+#include "compiler.h"
 #include "seos_err.h"
-
-typedef enum
-{
-    SeosCryptoAgreement_Algorithm_NONE,
-    SeosCryptoAgreement_Algorithm_DH,
-    SeosCryptoAgreement_Algorithm_ECDH
-}
-SeosCryptoAgreement_Algorithm;
-
-typedef struct
-{
-    SeosCryptoAgreement_Algorithm algorithm;
-    union
-    {
-        mbedtls_dhm_context     dh;
-        mbedtls_ecdh_context    ecdh;
-    }
-    algCtx;
-    SeosCryptoKey*              privateKey;
-}
-SeosCryptoAgreement;
 
 /**
  * @brief initializes a key agreement context

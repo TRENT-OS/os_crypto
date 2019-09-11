@@ -3,8 +3,8 @@
  */
 
 #include "SeosCryptoDigest.h"
+
 #include "LibDebug/Debug.h"
-#include "SeosCryptoCipher.h"
 
 #include <string.h>
 

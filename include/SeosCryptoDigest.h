@@ -11,36 +11,13 @@
  */
 #pragma once
 
+#include "SeosCrypto_Impl.h"
+#include "SeosCryptoDigest_Impl.h"
+
 #include "compiler.h"
 #include "seos_err.h"
 
 #include <string.h>
-
-#define SeosCryptoDigest_SIZE_MD5     16
-#define SeosCryptoDigest_SIZE_SHA256  32
-
-#define SeosCryptoDigest_MAX_DIGEST_SIZE SeosCryptoDigest_SIZE_SHA256
-
-typedef enum
-{
-    // be aware!! At the moment those enums are matching those of
-    // mbedtls_md_type_t for convenience reasons. Do not change values unless
-    // you know what you are doing.
-    SeosCryptoDigest_Algorithm_NONE,
-    SeosCryptoDigest_Algorithm_MD2,
-    SeosCryptoDigest_Algorithm_MD4,
-    SeosCryptoDigest_Algorithm_MD5,
-    SeosCryptoDigest_Algorithm_SHA1,
-    SeosCryptoDigest_Algorithm_SHA224,
-    SeosCryptoDigest_Algorithm_SHA256,
-    SeosCryptoDigest_Algorithm_SHA384,
-    SeosCryptoDigest_Algorithm_SHA512,
-    SeosCryptoDigest_Algorithm_RIPEMD160
-}
-SeosCryptoDigest_Algorithm;
-
-#include "SeosCryptoDigest_Impl.h"
-typedef struct SeosCryptoDigest SeosCryptoDigest;
 
 /**
  * @brief implements SeosCryptoApi_digestInit()

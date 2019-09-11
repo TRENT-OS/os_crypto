@@ -17,10 +17,30 @@
 #include "mbedtls/md5.h"
 #include "mbedtls/sha256.h"
 
-#include "SeosCryptoDigest.h"
-#include "SeosCryptoKey.h"
+#define SeosCryptoDigest_SIZE_MD5     16
+#define SeosCryptoDigest_SIZE_SHA256  32
 
-struct SeosCryptoDigest
+#define SeosCryptoDigest_MAX_DIGEST_SIZE SeosCryptoDigest_SIZE_SHA256
+
+typedef enum
+{
+    // be aware!! At the moment those enums are matching those of
+    // mbedtls_md_type_t for convenience reasons. Do not change values unless
+    // you know what you are doing.
+    SeosCryptoDigest_Algorithm_NONE,
+    SeosCryptoDigest_Algorithm_MD2,
+    SeosCryptoDigest_Algorithm_MD4,
+    SeosCryptoDigest_Algorithm_MD5,
+    SeosCryptoDigest_Algorithm_SHA1,
+    SeosCryptoDigest_Algorithm_SHA224,
+    SeosCryptoDigest_Algorithm_SHA256,
+    SeosCryptoDigest_Algorithm_SHA384,
+    SeosCryptoDigest_Algorithm_SHA512,
+    SeosCryptoDigest_Algorithm_RIPEMD160
+}
+SeosCryptoDigest_Algorithm;
+
+typedef struct
 {
     union
     {
@@ -31,7 +51,7 @@ struct SeosCryptoDigest
 
     SeosCryptoDigest_Algorithm algorithm;
     char digest[SeosCryptoDigest_MAX_DIGEST_SIZE];
-};
+} SeosCryptoDigest;
 
 Debug_STATIC_ASSERT(SeosCryptoDigest_Algorithm_NONE     ==
                     (int) MBEDTLS_MD_NONE);

@@ -3,6 +3,7 @@
  */
 
 #include "SeosCryptoCipher.h"
+
 #include "LibDebug/Debug.h"
 
 #include <string.h>

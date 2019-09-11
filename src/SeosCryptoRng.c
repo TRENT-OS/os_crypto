@@ -2,9 +2,11 @@
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 
-#include <string.h>
-
 #include "SeosCryptoRng.h"
+
+#include "LibDebug/Debug.h"
+
+#include <string.h>
 
 seos_err_t
 SeosCryptoRng_init(SeosCryptoRng*           self,

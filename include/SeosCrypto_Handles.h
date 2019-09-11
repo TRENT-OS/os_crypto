@@ -10,9 +10,9 @@
  *
  */
 
-#include "SeosCryptoKey.h"
-#include "SeosCryptoDigest.h"
-#include "SeosCryptoCipher.h"
+#include "SeosCryptoKey_Impl.h"
+#include "SeosCryptoDigest_Impl.h"
+#include "SeosCryptoCipher_Impl.h"
 
 typedef SeosCryptoKey*      SeosCrypto_KeyHandle;
 typedef SeosCryptoDigest*   SeosCrypto_DigestHandle;

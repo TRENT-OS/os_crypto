@@ -11,23 +11,11 @@
  */
 #pragma once
 
-#include "mbedtls/entropy.h"
-#include "mbedtls/ctr_drbg.h"
-
-#include "LibDebug/Debug.h"
+#include "SeosCrypto_Impl.h"
+#include "SeosCryptoRng_Impl.h"
 
 #include "seos_err.h"
 #include "compiler.h"
-
-typedef int (SeosCrypto_EntropyFunc)(void* ctx, unsigned char* buf, size_t len);
-
-
-typedef struct
-{
-    mbedtls_ctr_drbg_context    drbg;
-    unsigned char rnd[PAGE_SIZE];
-}
-SeosCryptoRng;
 
 /**
  * @brief initializes an rng context

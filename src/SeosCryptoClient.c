@@ -1,7 +1,9 @@
 /*
  *  Copyright (C) 2019, Hensoldt Cyber GmbH
  */
+
 #include "SeosCryptoClient.h"
+
 #include "LibDebug/Debug.h"
 
 #include <string.h>

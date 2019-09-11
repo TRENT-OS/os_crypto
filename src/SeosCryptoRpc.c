@@ -2,14 +2,13 @@
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 
-#include "SeosCryptoRpc.h"
 #include "SeosCrypto.h"
+#include "SeosCryptoRpc.h"
 
 #include "LibDebug/Debug.h"
 
 #include <string.h>
 #include <stdlib.h>
-
 
 // At the moment we manage one handle only.
 SeosCryptoRpc* handle = NULL;

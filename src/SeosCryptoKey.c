@@ -3,16 +3,8 @@
  */
 
 #include "SeosCryptoKey.h"
-#include "SeosCryptoCipher.h"
-#include "SeosCryptoSignature.h"
-#include "SeosCryptoAgreement.h"
 
 #include "LibDebug/Debug.h"
-
-#include "mbedtls/rsa.h"
-#include "mbedtls/dhm.h"
-#include "mbedtls/ecdh.h"
-#include "mbedtls/ecp.h"
 
 #include <string.h>
 

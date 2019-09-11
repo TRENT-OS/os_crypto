@@ -11,82 +11,13 @@
  */
 #pragma once
 
+#include "SeosCrypto_Impl.h"
+#include "SeosCryptoKey_Impl.h"
+
 #include "seos_err.h"
-
-#include <stdint.h>
-#include <stddef.h>
-#include <limits.h>
-
-#include "LibUtil/Bitmap.h"
-#include "LibDebug/Debug.h"
 #include "compiler.h"
 
-typedef enum
-{
-    SeosCryptoKey_Flags_IS_EXPORTABLE = (1 << 0)
-}
-SeosCryptoKey_Flag;
-
-typedef enum
-{
-    SeosCryptoKey_Type_AES,
-    SeosCryptoKey_Type_RSA_PRIVATE,
-    SeosCryptoKey_Type_RSA_PUBLIC,
-    SeosCryptoKey_Type_DH_PRIVATE,
-    SeosCryptoKey_Type_DH_PUBLIC,
-    SeosCryptoKey_Type_EC_SECP256R1_PRIVATE,
-    SeosCryptoKey_Type_EC_SECP256R1_PUBLIC
-}
-SeosCryptoKey_Type;
-
-typedef enum
-{
-    SeosCryptoKey_PairType_RSA,
-    SeosCryptoKey_PairType_DH,
-    SeosCryptoKey_PairType_EC_SECP256R1,
-}
-SeosCryptoKey_PairType;
-
-typedef struct
-{
-    unsigned int        type;       ///< type of key, see above
-    unsigned int        security;   ///< the security parameter (e.g., key size)
-    void*               bytes;      ///< pointer to raw key material
-    size_t              len;        ///< amount of bytes stored
-}
-SeosCryptoKey;
-
-#define MAX_KEYBUF_SIZE 64
-
-typedef struct __attribute__((__packed__))
-{
-    unsigned char   bytes[MAX_KEYBUF_SIZE];
-    size_t          len;
-}
-SeosCryptoKey_AES;
-
-typedef struct __attribute__((__packed__))
-{
-    unsigned char   nBytes[MAX_KEYBUF_SIZE];
-    size_t          nLen;
-    unsigned char   eBytes[MAX_KEYBUF_SIZE];
-    size_t          eLen;
-}
-SeosCryptoKey_RSA_PUBLIC;
-typedef struct __attribute__((__packed__))
-{
-    unsigned char   nBytes[MAX_KEYBUF_SIZE];
-    size_t          nLen;
-    unsigned char   eBytes[MAX_KEYBUF_SIZE];
-    size_t          eLen;
-    unsigned char   dBytes[MAX_KEYBUF_SIZE];
-    size_t          dLen;
-    unsigned char   pBytes[MAX_KEYBUF_SIZE];
-    size_t          pLen;
-    unsigned char   qBytes[MAX_KEYBUF_SIZE];
-    size_t          qLen;
-}
-SeosCryptoKey_RSA_PRIVATE;
+#include <stddef.h>
 
 /**
  * @brief initializes a SeosCryptoKey context
@@ -94,7 +25,6 @@ SeosCryptoKey_RSA_PRIVATE;
  */
 seos_err_t
 SeosCryptoKey_init(SeosCryptoKey*               self,
-//                   const SeosCrypto_MemIf*      memIf,
                    unsigned int                 type,
                    SeosCryptoKey_Flag           flags,
                    size_t                       secParam);
@@ -118,7 +48,6 @@ SeosCryptoKey_export(SeosCryptoKey*             self,
 
 void
 SeosCryptoKey_deInit(SeosCryptoKey*             self);
-//                     const SeosCrypto_MemIf*    memIf);
 
 SeosCryptoKey_RSA_PUBLIC*
 SeosCryptoKey_getRsaPublic(const SeosCryptoKey* key);

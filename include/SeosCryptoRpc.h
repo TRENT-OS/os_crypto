@@ -12,21 +12,15 @@
  */
 #pragma once
 
-#include "SeosCrypto.h"
-#include "SeosCryptoDigest.h"
-#include "SeosCryptoCipher.h"
-#include "SeosCryptoKey.h"
+#include "SeosCrypto_Impl.h"
+#include "SeosCryptoDigest_Impl.h"
+#include "SeosCryptoCipher_Impl.h"
+#include "SeosCryptoKey_Impl.h"
+#include "SeosCryptoRpc_Impl.h"
+#include "SeosCrypto_Handles.h"
 
-typedef struct
-{
-    SeosCryptoCtx*
-    seosCryptoApi;  ///< crypto context to be used by the RPC object
-    void*
-    serverDataport;     ///< the server's address of the dataport shared with the client
-}
-SeosCryptoRpc;
-
-typedef SeosCryptoRpc* SeosCryptoRpc_Handle;
+#include "seos_err.h"
+#include "compiler.h"
 
 /**
  * @brief constructor of a seos crypto RPC object

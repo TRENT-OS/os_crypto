@@ -11,54 +11,16 @@
  */
 #pragma once
 
-#include "seos_err.h"
+#include "SeosCryptoRng_Impl.h"
+#include "SeosCryptoKey_Impl.h"
+#include "SeosCryptoDigest_Impl.h"
+#include "SeosCryptoCipher_Impl.h"
+#include "SeosCrypto_Impl.h"
 
-#include "SeosCryptoRng.h"
-#include "SeosCryptoKey.h"
-#include "SeosCryptoDigest.h"
-#include "SeosCryptoCipher.h"
 #include "SeosCrypto_Handles.h"
-#include "SeosCryptoCtx.h"
 
-#include "LibUtil/PointerVector.h"
-
-#define SeosCrypto_TO_SEOS_CRYPTO_CTX(self) (&(self)->parent)
-
-typedef struct SeosCrypto SeosCrypto;
-
-typedef void* (SeosCrypto_MallocFunc)(size_t size);
-typedef void  (SeosCrypto_FreeFunc)(void* ptr);
-
-typedef struct
-{
-    SeosCrypto_MallocFunc*   malloc;
-    SeosCrypto_FreeFunc*     free;
-}
-SeosCrypto_MemIf;
-
-typedef struct
-{
-    void*   buf;
-    size_t  len;
-}
-SeosCrypto_StaticBuf;
-
-struct SeosCrypto
-{
-    SeosCryptoCtx   parent;
-    union
-    {
-        SeosCrypto_MemIf        memIf;
-        SeosCrypto_StaticBuf    staticBuf;
-    }
-    mem;
-
-    SeosCryptoRng cryptoRng;
-
-    PointerVector keyHandleVector;
-    PointerVector digestHandleVector;
-    PointerVector cipherHandleVector;
-};
+#include "compiler.h"
+#include "seos_err.h"
 
 /**
  * @brief initializes a crypto API context. Usually, no crypto context is needed
@@ -125,7 +87,7 @@ SeosCrypto_rngReSeed(SeosCryptoCtx*     api,
  */
 seos_err_t
 SeosCrypto_digestInit(SeosCryptoCtx*                api,
-                      SeosCrypto_DigestHandle*   pDigestHandle,
+                      SeosCrypto_DigestHandle*      pDigestHandle,
                       unsigned                      algorithm,
                       void*                         iv,
                       size_t                        ivLen);
@@ -136,7 +98,7 @@ SeosCrypto_digestInit(SeosCryptoCtx*                api,
  */
 seos_err_t
 SeosCrypto_digestClose(SeosCryptoCtx*               api,
-                       SeosCrypto_DigestHandle   digestHandle);
+                       SeosCrypto_DigestHandle      digestHandle);
 /**
  * @brief implements SeosCryptoApi_digestUpdate() in a local connection
  * (function call, no rpc)
@@ -144,7 +106,7 @@ SeosCrypto_digestClose(SeosCryptoCtx*               api,
  */
 seos_err_t
 SeosCrypto_digestUpdate(SeosCryptoCtx*              api,
-                        SeosCrypto_DigestHandle  digestHandle,
+                        SeosCrypto_DigestHandle     digestHandle,
                         const void*                 data,
                         size_t                      len);
 /**
@@ -154,7 +116,7 @@ SeosCrypto_digestUpdate(SeosCryptoCtx*              api,
  */
 seos_err_t
 SeosCrypto_digestFinalize(SeosCryptoCtx*                api,
-                          SeosCrypto_DigestHandle    digestHandle,
+                          SeosCrypto_DigestHandle       digestHandle,
                           const void*                   data,
                           size_t                        len,
                           void**                        digest,
@@ -163,7 +125,7 @@ SeosCrypto_digestFinalize(SeosCryptoCtx*                api,
 // -------------------------------- Key API ------------------------------------
 seos_err_t
 SeosCrypto_keyInit(SeosCryptoCtx*                   api,
-                   SeosCrypto_KeyHandle*            keyHandle,
+                   SeosCrypto_KeyHandle*            pKeyHandle,
                    unsigned int                     type,
                    unsigned int                     flags,
                    size_t                           secParam);

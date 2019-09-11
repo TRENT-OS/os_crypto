@@ -3,11 +3,8 @@
  */
 
 #include "SeosCryptoAgreement.h"
-#include "LibDebug/Debug.h"
 
-#include "mbedtls/dhm.h"
-#include "mbedtls/ecdh.h"
-#include "mbedtls/ecp.h"
+#include "LibDebug/Debug.h"
 
 #include <string.h>
 

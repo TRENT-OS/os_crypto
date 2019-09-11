@@ -14,6 +14,9 @@
 
 #include "SeosCrypto_Handles.h"
 
+#include "compiler.h"
+#include "seos_err.h"
+
 typedef struct SeosCryptoCtx SeosCryptoCtx;
 
 typedef seos_err_t

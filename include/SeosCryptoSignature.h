@@ -11,20 +11,13 @@
  */
 #pragma once
 
-#include "SeosCryptoDigest.h"
+#include "SeosCrypto_Impl.h"
+#include "SeosCryptoDigest_Impl.h"
+#include "SeosCryptoSignature_Impl.h"
 #include "SeosCryptoRng.h"
 
-#include <limits.h>
-
-typedef enum
-{
-    SeosCryptoSignature_Algorithm_NONE,
-    SeosCryptoSignature_Algorithm_RSA_PKCS1
-}
-SeosCryptoSignature_Algorithm;
-
-#include "SeosCryptoSignature_Impl.h"
-typedef struct SeosCryptoSignature SeosCryptoSignature;
+#include "seos_err.h"
+#include "compiler.h"
 
 /**
  * @brief initializes a signature context

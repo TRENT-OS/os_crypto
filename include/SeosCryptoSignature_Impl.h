@@ -11,9 +11,18 @@
 
 #pragma once
 
+#include "SeosCryptoKey_Impl.h"
+
 #include "mbedtls/rsa.h"
 
-struct SeosCryptoSignature
+typedef enum
+{
+    SeosCryptoSignature_Algorithm_NONE,
+    SeosCryptoSignature_Algorithm_RSA_PKCS1
+}
+SeosCryptoSignature_Algorithm;
+
+typedef struct
 {
     union
     {
@@ -23,4 +32,7 @@ struct SeosCryptoSignature
 
     SeosCryptoSignature_Algorithm   algorithm;
     SeosCryptoKey const*            key;
-};
+}
+SeosCryptoSignature;
+
+/** @} */

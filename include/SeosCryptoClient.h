@@ -14,21 +14,11 @@
  */
 #pragma once
 
-#include "seos_err.h"
+#include "SeosCryptoClient_Impl.h"
 #include "SeosCryptoRpc.h"
-#include "SeosCryptoCtx.h"
 
-#define SeosCryptoClient_TO_SEOS_CRYPTO_CTX(self) (&(self)->parent)
-
-typedef struct
-{
-    SeosCryptoCtx   parent;
-    SeosCryptoRpc_Handle
-    rpcHandle;      ///< pointer to be used in the rpc call, this pointer is not valid in our address space but will be used as a handle to tell the server which is the correct object in his address space
-    void*
-    clientDataport; ///< the client's address of the dataport shared with the server
-}
-SeosCryptoClient;
+#include "compiler.h"
+#include "seos_err.h"
 
 /**
  * @brief constructor of a seos crypto client

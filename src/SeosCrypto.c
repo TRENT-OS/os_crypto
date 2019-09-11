@@ -2,14 +2,13 @@
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 
+#include "SeosCryptoCipher.h"
+#include "SeosCryptoKey.h"
+#include "SeosCryptoRng.h"
+#include "SeosCryptoDigest.h"
 #include "SeosCrypto.h"
 
 #include "LibDebug/Debug.h"
-
-#include "SeosCryptoCipher.h"
-#include "SeosCryptoRng.h"
-#include "SeosCryptoDigest.h"
-#include "limits.h"
 
 static const SeosCryptoCtx_Vtable SeosCrypto_vtable =
 {
