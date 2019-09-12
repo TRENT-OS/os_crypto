@@ -250,38 +250,18 @@ SeosCryptoRpc_keyInit(SeosCryptoRpc*                   self,
                       SeosCryptoKey_Flag               flags,
                       size_t                           bits)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
-
-    Debug_PRINTF("\n%s\n", __func__);
-
-    if (!isValidHandle(self))
-    {
-        retval = SEOS_ERROR_INVALID_HANDLE;
-    }
-    else
-    {
-        retval = SeosCrypto_keyInit(self->seosCryptoApi, keyHandle, type, flags, bits);
-    }
-    return retval;
+    return !isValidHandle(self) ?
+           SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_keyInit(self->seosCryptoApi, keyHandle, type, flags, bits);
 }
 
 seos_err_t
 SeosCryptoRpc_keyGenerate(SeosCryptoRpc*               self,
                           SeosCrypto_KeyHandle         keyHandle)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
-
-    Debug_PRINTF("\n%s\n", __func__);
-
-    if (!isValidHandle(self))
-    {
-        retval = SEOS_ERROR_INVALID_HANDLE;
-    }
-    else
-    {
-        retval = SeosCrypto_keyGenerate(self->seosCryptoApi, keyHandle);
-    }
-    return retval;
+    return !isValidHandle(self) ?
+           SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_keyGenerate(self->seosCryptoApi, keyHandle);
 }
 
 seos_err_t
@@ -289,20 +269,9 @@ SeosCryptoRpc_keyGeneratePair(SeosCryptoRpc*           self,
                               SeosCrypto_KeyHandle     prvKeyHandle,
                               SeosCrypto_KeyHandle     pubKeyHandle)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
-
-    Debug_PRINTF("\n%s\n", __func__);
-
-    if (!isValidHandle(self))
-    {
-        retval = SEOS_ERROR_INVALID_HANDLE;
-    }
-    else
-    {
-        retval = SeosCrypto_keyGeneratePair(self->seosCryptoApi, prvKeyHandle,
-                                            pubKeyHandle);
-    }
-    return retval;
+    return !isValidHandle(self) ?
+           SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_keyGeneratePair(self->seosCryptoApi, prvKeyHandle, pubKeyHandle);
 }
 
 seos_err_t
@@ -311,28 +280,10 @@ SeosCryptoRpc_keyImport(SeosCryptoRpc*                 self,
                         SeosCrypto_KeyHandle           wrapKeyHandle,
                         size_t                         keyLen)
 {
-    seos_err_t  retval      = SEOS_ERROR_GENERIC;
-
-    Debug_PRINTF("\n%s\n", __func__);
-
-    if (!isValidHandle(self))
-    {
-        retval = SEOS_ERROR_INVALID_HANDLE;
-    }
-    else if (keyLen > PAGE_SIZE)
-    {
-        retval = SEOS_ERROR_INVALID_PARAMETER;
-    }
-    else
-    {
-        retval = SeosCrypto_keyImport(self->seosCryptoApi,
-                                      keyHandle,
-                                      wrapKeyHandle,
-                                      self->serverDataport,
-                                      keyLen);
-    }
-
-    return retval;
+    return !isValidHandle(self) ?
+           SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_keyImport(self->seosCryptoApi, keyHandle, wrapKeyHandle,
+                                self->serverDataport, keyLen);
 }
 
 seos_err_t
@@ -343,8 +294,6 @@ SeosCryptoRpc_keyExport(SeosCryptoRpc*                 self,
     seos_err_t  retval      = SEOS_ERROR_GENERIC;
     void*       output      = NULL;
     size_t      outputSize  = 0;
-
-    Debug_PRINTF("\n%s\n", __func__);
 
     if (!isValidHandle(self))
     {
@@ -372,19 +321,11 @@ seos_err_t
 SeosCryptoRpc_keyDeInit(SeosCryptoRpc*                  self,
                         SeosCrypto_KeyHandle            keyHandle)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
+    seos_err_t retval = !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
+                        SEOS_SUCCESS;
 
-    Debug_PRINTF("\n%s\n", __func__);
+    SeosCrypto_keyDeInit(self->seosCryptoApi, keyHandle);
 
-    if (!isValidHandle(self))
-    {
-        retval = SEOS_ERROR_INVALID_HANDLE;
-    }
-    else
-    {
-        SeosCrypto_keyDeInit(self->seosCryptoApi, keyHandle);
-        retval = SEOS_SUCCESS;
-    }
     return retval;
 }
 

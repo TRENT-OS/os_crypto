@@ -310,7 +310,6 @@ SeosCrypto_keyInit(SeosCryptoCtx*                   api,
 
     Debug_ASSERT_SELF(self);
     Debug_ASSERT(self->parent.vtable == &SeosCrypto_vtable);
-    Debug_PRINTF("\n%s\n", __func__);
 
     *pKeyHandle = self->mem.memIf.malloc(sizeof(SeosCryptoKey));
     if (NULL == *pKeyHandle)
@@ -369,7 +368,6 @@ SeosCrypto_keyImport(SeosCryptoCtx*                 api,
 
     Debug_ASSERT_SELF(self);
     Debug_ASSERT(self->parent.vtable == &SeosCrypto_vtable);
-    Debug_PRINTF("\n%s\n", __func__);
 
     if (NULL == wrapKeyHandle)
     {
@@ -397,7 +395,6 @@ SeosCrypto_keyExport(SeosCryptoCtx*                 api,
 
     Debug_ASSERT_SELF(self);
     Debug_ASSERT(self->parent.vtable == &SeosCrypto_vtable);
-    Debug_PRINTF("\n%s\n", __func__);
 
     if (NULL == wrapKeyHandle)
     {
@@ -422,7 +419,6 @@ SeosCrypto_keyDeInit(SeosCryptoCtx*                 api,
     SeosCrypto* self = (SeosCrypto*) api;
     size_t handlePos;
 
-    Debug_PRINTF("\n%s\n", __func__);
     Debug_ASSERT_SELF(self);
     Debug_ASSERT(self->parent.vtable == &SeosCrypto_vtable);
 

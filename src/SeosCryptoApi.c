@@ -90,7 +90,6 @@ SeosCryptoApi_keyInit(SeosCryptoCtx*                   ctx,
                       size_t                           bits)
 {
     Debug_ASSERT_SELF(ctx);
-    Debug_PRINTF("\n%s\n", __func__);
     return ctx->vtable->keyInit(ctx, keyHandle, type, flags, bits);
 }
 
@@ -99,7 +98,6 @@ SeosCryptoApi_keyGenerate(SeosCryptoCtx*               ctx,
                           SeosCrypto_KeyHandle         keyHandle)
 {
     Debug_ASSERT_SELF(ctx);
-    Debug_PRINTF("\n%s\n", __func__);
     return ctx->vtable->keyGenerate(ctx, keyHandle);
 }
 
@@ -109,7 +107,6 @@ SeosCryptoApi_keyGeneratePair(SeosCryptoCtx*           ctx,
                               SeosCrypto_KeyHandle     pubKeyHandle)
 {
     Debug_ASSERT_SELF(ctx);
-    Debug_PRINTF("\n%s\n", __func__);
     return ctx->vtable->keyGeneratePair(ctx, prvKeyHandle, pubKeyHandle);
 }
 
@@ -121,7 +118,6 @@ SeosCryptoApi_keyImport(SeosCryptoCtx*                 ctx,
                         size_t                         keyLen)
 {
     Debug_ASSERT_SELF(ctx);
-    Debug_PRINTF("\n%s\n", __func__);
     return ctx->vtable->keyImport(ctx, keyHandle, wrapKeyHandle, key, keyLen);
 }
 
@@ -133,7 +129,6 @@ SeosCryptoApi_keyExport(SeosCryptoCtx*                 ctx,
                         size_t*                        keySize)
 {
     Debug_ASSERT_SELF(ctx);
-    Debug_PRINTF("\n%s\n", __func__);
     return ctx->vtable->keyExport(ctx, keyHandle, wrapKeyHandle, key, keySize);
 }
 
@@ -142,7 +137,6 @@ SeosCryptoApi_keyDeInit(SeosCryptoCtx*                 ctx,
                         SeosCrypto_KeyHandle           keyHandle)
 {
     Debug_ASSERT_SELF(ctx);
-    Debug_PRINTF("\n%s\n", __func__);
     return ctx->vtable->keyDeInit(ctx, keyHandle);
 }
 
