@@ -107,7 +107,8 @@ SeosCryptoKey_init(SeosCrypto_MemIf*            memIf,
     seos_err_t retval = SEOS_ERROR_GENERIC;
     size_t keySize;
 
-    if (NULL == self || NULL == memIf || NULL == self)
+
+    if (NULL == memIf || NULL == self)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -115,7 +116,7 @@ SeosCryptoKey_init(SeosCrypto_MemIf*            memIf,
     switch (type)
     {
     case SeosCryptoKey_Type_AES:
-        if (!(128 == bits) || (192 == bits) || (256 == bits))
+        if (!((128 == bits) || (192 == bits) || (256 == bits)))
         {
             return SEOS_ERROR_INVALID_PARAMETER;
         }
