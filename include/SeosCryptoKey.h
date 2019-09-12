@@ -19,7 +19,6 @@
 
 #include <stddef.h>
 
-
 /**
  * @brief initializes a SeosCryptoKey context
  *
@@ -40,11 +39,13 @@ SeosCryptoKey_generatePair(SeosCryptoKey*       prvKey,
 
 seos_err_t
 SeosCryptoKey_import(SeosCryptoKey*             self,
-                     const void*                key,
+                     SeosCryptoKey*             wrapKey,
+                     const void*                keyBytes,
                      size_t                     keySize);
 
 seos_err_t
 SeosCryptoKey_export(SeosCryptoKey*             self,
+                     SeosCryptoKey*             wrapKey,
                      void**                     key,
                      size_t*                    keySize);
 

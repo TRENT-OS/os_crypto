@@ -116,23 +116,25 @@ SeosCryptoApi_keyGeneratePair(SeosCryptoCtx*           ctx,
 seos_err_t
 SeosCryptoApi_keyImport(SeosCryptoCtx*                 ctx,
                         SeosCrypto_KeyHandle           keyHandle,
+                        SeosCrypto_KeyHandle           wrapKeyHandle,
                         const void*                    key,
                         size_t                         keyLen)
 {
     Debug_ASSERT_SELF(ctx);
     Debug_PRINTF("\n%s\n", __func__);
-    return ctx->vtable->keyImport(ctx, keyHandle, key, keyLen);
+    return ctx->vtable->keyImport(ctx, keyHandle, wrapKeyHandle, key, keyLen);
 }
 
 seos_err_t
 SeosCryptoApi_keyExport(SeosCryptoCtx*                 ctx,
                         SeosCrypto_KeyHandle           keyHandle,
+                        SeosCrypto_KeyHandle           wrapKeyHandle,
                         void**                         key,
                         size_t*                        keySize)
 {
     Debug_ASSERT_SELF(ctx);
     Debug_PRINTF("\n%s\n", __func__);
-    return ctx->vtable->keyExport(ctx, keyHandle, key, keySize);
+    return ctx->vtable->keyExport(ctx, keyHandle, wrapKeyHandle, key, keySize);
 }
 
 seos_err_t

@@ -163,7 +163,8 @@ SeosCryptoKey_generatePair(SeosCryptoKey*  prvKey,
 
 seos_err_t
 SeosCryptoKey_import(SeosCryptoKey*        self,
-                     const void*           key,
+                     SeosCryptoKey*        wrapKey,
+                     const void*           keyBytes,
                      size_t                keySize)
 {
     Debug_ASSERT_SELF(self);
@@ -179,13 +180,20 @@ SeosCryptoKey_import(SeosCryptoKey*        self,
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    memcpy(self->raw, key, keySize);
+    if (NULL != wrapKey)
+    {
+        // Todo: Implement key unwrapping algorithm
+        return SEOS_ERROR_NOT_SUPPORTED;
+    }
+
+    memcpy(self->keyBytes, keyBytes, keySize);
 
     return SEOS_SUCCESS;
 }
 
 seos_err_t
 SeosCryptoKey_export(SeosCryptoKey*        self,
+                     SeosCryptoKey*        wrapKey,
                      void**                key,
                      size_t*               keySize)
 {
@@ -196,6 +204,18 @@ SeosCryptoKey_export(SeosCryptoKey*        self,
         || NULL == keySize || 0 == keySize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    // Can we export the key without wrapping?
+    if (NULL == wrapKey && !(self->flags & SeosCryptoKey_Flags_EXPORTABLE_RAW))
+    {
+        return SEOS_ERROR_ACCESS_DENIED;
+    }
+
+    if (NULL != wrapKey)
+    {
+        // Todo: Implement key wrapping algorithm
+        return SEOS_ERROR_NOT_SUPPORTED;
     }
 
     if (NULL == *key)

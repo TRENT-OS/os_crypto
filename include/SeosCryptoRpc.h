@@ -138,6 +138,7 @@ SeosCryptoRpc_keyGeneratePair(SeosCryptoRpc*           self,
 seos_err_t
 SeosCryptoRpc_keyImport(SeosCryptoRpc*                 self,
                         SeosCrypto_KeyHandle           keyHandle,
+                        SeosCrypto_KeyHandle           wrapkeyHandle,
                         size_t                         keySize);
 
 /**
@@ -146,7 +147,8 @@ SeosCryptoRpc_keyImport(SeosCryptoRpc*                 self,
  */
 seos_err_t
 SeosCryptoRpc_keyExport(SeosCryptoRpc*                 self,
-                        SeosCrypto_KeyHandle           keyHandle);
+                        SeosCrypto_KeyHandle           keyHandle,
+                        SeosCrypto_KeyHandle           wrapKeyHandle);
 
 /**
  * @brief rpc management of SeosCryptoRpc_keyDeInit()

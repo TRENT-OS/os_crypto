@@ -288,6 +288,7 @@ SeosCryptoClient_keyGeneratePair(SeosCryptoCtx*           api,
 seos_err_t
 SeosCryptoClient_keyImport(SeosCryptoCtx*                 api,
                            SeosCrypto_KeyHandle           keyHandle,
+                           SeosCrypto_KeyHandle           wrapKeyHandle,
                            const void*                    key,
                            size_t                         keySize)
 {
@@ -304,7 +305,8 @@ SeosCryptoClient_keyImport(SeosCryptoCtx*                 api,
     else
     {
         memcpy(self->clientDataport, key, keySize);
-        retval = SeosCryptoRpc_keyImport(self->rpcHandle, keyHandle, keySize);
+        retval = SeosCryptoRpc_keyImport(self->rpcHandle, keyHandle, wrapKeyHandle,
+                                         keySize);
     }
     return retval;
 }
@@ -312,6 +314,7 @@ SeosCryptoClient_keyImport(SeosCryptoCtx*                 api,
 seos_err_t
 SeosCryptoClient_keyExport(SeosCryptoCtx*                 api,
                            SeosCrypto_KeyHandle           keyHandle,
+                           SeosCrypto_KeyHandle           wrapKeyHandle,
                            void**                         key,
                            size_t*                        keySize)
 {
@@ -325,8 +328,8 @@ SeosCryptoClient_keyExport(SeosCryptoCtx*                 api,
     {
         retval = SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if ((retval = SeosCryptoRpc_keyExport(self->rpcHandle,
-                                               keyHandle)) == SEOS_SUCCESS)
+    else if ((retval = SeosCryptoRpc_keyExport(self->rpcHandle, keyHandle,
+                                               wrapKeyHandle)) == SEOS_SUCCESS)
     {
         size_t* outSize  = (size_t*) self->clientDataport;
         char*   out      = &(((char*) self->clientDataport)[sizeof(*keySize)]);

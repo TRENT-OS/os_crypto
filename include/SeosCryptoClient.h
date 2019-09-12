@@ -170,12 +170,14 @@ SeosCryptoClient_keyGeneratePair(SeosCryptoCtx*           ctx,
 seos_err_t
 SeosCryptoClient_keyImport(SeosCryptoCtx*                 ctx,
                            SeosCrypto_KeyHandle           keyHandle,
+                           SeosCrypto_KeyHandle           wrapKeyHandle,
                            const void*                    key,
                            size_t                         keyLen);
 
 seos_err_t
 SeosCryptoClient_keyExport(SeosCryptoCtx*                 ctx,
                            SeosCrypto_KeyHandle           keyHandle,
+                           SeosCrypto_KeyHandle           wrapKeyHandle,
                            void**                         key,
                            size_t*                        keySize);
 

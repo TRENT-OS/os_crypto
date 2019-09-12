@@ -308,6 +308,7 @@ SeosCryptoRpc_keyGeneratePair(SeosCryptoRpc*           self,
 seos_err_t
 SeosCryptoRpc_keyImport(SeosCryptoRpc*                 self,
                         SeosCrypto_KeyHandle           keyHandle,
+                        SeosCrypto_KeyHandle           wrapKeyHandle,
                         size_t                         keyLen)
 {
     seos_err_t  retval      = SEOS_ERROR_GENERIC;
@@ -326,6 +327,7 @@ SeosCryptoRpc_keyImport(SeosCryptoRpc*                 self,
     {
         retval = SeosCrypto_keyImport(self->seosCryptoApi,
                                       keyHandle,
+                                      wrapKeyHandle,
                                       self->serverDataport,
                                       keyLen);
     }
@@ -335,7 +337,8 @@ SeosCryptoRpc_keyImport(SeosCryptoRpc*                 self,
 
 seos_err_t
 SeosCryptoRpc_keyExport(SeosCryptoRpc*                 self,
-                        SeosCrypto_KeyHandle           keyHandle)
+                        SeosCrypto_KeyHandle           keyHandle,
+                        SeosCrypto_KeyHandle           wrapKeyHandle)
 {
     seos_err_t  retval      = SEOS_ERROR_GENERIC;
     void*       output      = NULL;
@@ -348,7 +351,7 @@ SeosCryptoRpc_keyExport(SeosCryptoRpc*                 self,
         retval = SEOS_ERROR_INVALID_HANDLE;
     }
     else if ((retval = SeosCrypto_keyExport(self->seosCryptoApi, keyHandle,
-                                            &output, &outputSize)) == SEOS_SUCCESS)
+                                            wrapKeyHandle, &output, &outputSize)) == SEOS_SUCCESS)
     {
         if (outputSize + sizeof(outputSize) > PAGE_SIZE)
         {

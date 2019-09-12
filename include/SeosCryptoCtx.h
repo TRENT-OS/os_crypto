@@ -73,12 +73,14 @@ typedef seos_err_t
 typedef seos_err_t
 (*SeosCryptoCtx_keyImportT)(SeosCryptoCtx*                 self,
                             SeosCrypto_KeyHandle           keyHandle,
+                            SeosCrypto_KeyHandle           wrapkeyHandle,
                             const void*                    key,
                             size_t                         keySize);
 
 typedef seos_err_t
 (*SeosCryptoCtx_keyExportT)(SeosCryptoCtx*                 self,
                             SeosCrypto_KeyHandle           keyHandle,
+                            SeosCrypto_KeyHandle           wrapKeyHandle,
                             void**                         key,
                             size_t*                        keySize);
 
