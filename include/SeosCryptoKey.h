@@ -49,7 +49,7 @@ SeosCryptoKey_export(SeosCryptoKey*             self,
                      void**                     buf,
                      size_t*                    bufSize);
 
-void
+seos_err_t
 SeosCryptoKey_deInit(SeosCrypto_MemIf*          memIf,
                      SeosCryptoKey*             self);
 

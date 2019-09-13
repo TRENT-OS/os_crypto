@@ -95,70 +95,58 @@ getEffectiveKeylength(unsigned int  type,
     }
 }
 
-// Public functions ------------------------------------------------------------
-
-seos_err_t
-SeosCryptoKey_init(SeosCrypto_MemIf*            memIf,
-                   SeosCryptoKey*               self,
-                   unsigned int                 type,
-                   SeosCryptoKey_Flag           flags,
-                   size_t                       bits)
+static seos_err_t
+initImpl(SeosCrypto_MemIf*            memIf,
+         SeosCryptoKey*               self)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
     size_t keySize;
 
-
-    if (NULL == memIf || NULL == self)
-    {
-        return SEOS_ERROR_INVALID_PARAMETER;
-    }
-
-    switch (type)
+    switch (self->type)
     {
     case SeosCryptoKey_Type_AES:
-        if (!((128 == bits) || (192 == bits) || (256 == bits)))
+        if (!((128 == self->bits) || (192 == self->bits) || (256 == self->bits)))
         {
             return SEOS_ERROR_INVALID_PARAMETER;
         }
         keySize = sizeof(SeosCryptoKey_AES);
         break;
     case SeosCryptoKey_Type_RSA_PRV:
-        if (bits > (SeosCryptoKey_Size_RSA_PRV * 8))
+        if (self->bits > (SeosCryptoKey_Size_RSA_PRV * 8) || self->bits < 128)
         {
             return SEOS_ERROR_INVALID_PARAMETER;
         }
         keySize = sizeof(SeosCryptoKey_RSAPrv);
         break;
     case SeosCryptoKey_Type_RSA_PUB:
-        if (bits > (SeosCryptoKey_Size_RSA_PUB * 8))
+        if (self->bits > (SeosCryptoKey_Size_RSA_PUB * 8) || self->bits < 128)
         {
             return SEOS_ERROR_INVALID_PARAMETER;
         }
         keySize = sizeof(SeosCryptoKey_RSAPub);
         break;
     case SeosCryptoKey_Type_DH_PRV:
-        if (bits > (SeosCryptoKey_Size_DH_PRV * 8))
+        if (self->bits > (SeosCryptoKey_Size_DH_PRV * 8))
         {
             return SEOS_ERROR_INVALID_PARAMETER;
         }
         keySize = sizeof(SeosCryptoKey_DHPrv);
         break;
     case SeosCryptoKey_Type_DH_PUB:
-        if (bits > (SeosCryptoKey_Size_DH_PUB * 8))
+        if (self->bits > (SeosCryptoKey_Size_DH_PUB * 8))
         {
             return SEOS_ERROR_INVALID_PARAMETER;
         }
         keySize = sizeof(SeosCryptoKey_DHPub);
         break;
     case SeosCryptoKey_Type_SECP256R1_PRV:
-        if (bits != (SeosCryptoKey_Size_SECP256R1_PRV * 8))
+        if (self->bits != (SeosCryptoKey_Size_SECP256R1_PRV * 8))
         {
             return SEOS_ERROR_INVALID_PARAMETER;
         }
         keySize = sizeof(SeosCryptoKey_SECP256r1Prv);
         break;
     case SeosCryptoKey_Type_SECP256R1_PUB:
-        if (bits != (SeosCryptoKey_Size_SECP256R1_PUB * 8))
+        if (self->bits != (SeosCryptoKey_Size_SECP256R1_PUB * 8))
         {
             return SEOS_ERROR_INVALID_PARAMETER;
         }
@@ -168,39 +156,131 @@ SeosCryptoKey_init(SeosCrypto_MemIf*            memIf,
         return SEOS_ERROR_NOT_SUPPORTED;
     }
 
-    if ((self->keyBytes = memIf->malloc(keySize)) != NULL)
+    self->keySize = keySize;
+    return (self->keyBytes = memIf->malloc(self->keySize)) != NULL ?
+           SEOS_SUCCESS : SEOS_ERROR_INSUFFICIENT_SPACE;
+}
+
+static seos_err_t
+deInitImpl(SeosCrypto_MemIf*            memIf,
+           SeosCryptoKey*               self)
+{
+    // We may have stored sensitive key data here, better make sure to remove it.
+    if (!self->empty)
     {
-        retval        = SEOS_SUCCESS;
-        self->keySize = keySize;
-        self->type    = type;
-        self->bits    = bits;
-        self->flags   = flags;
-        self->empty   = true;
+        zeroize(self->keyBytes, self->keySize);
+    }
+    memIf->free(self->keyBytes);
+
+    return SEOS_SUCCESS;
+}
+
+static seos_err_t
+genImpl(SeosCryptoKey*      self)
+{
+    return SEOS_ERROR_NOT_SUPPORTED;
+}
+
+static seos_err_t
+genPairImpl(SeosCryptoKey*  prvKey,
+            SeosCryptoKey*  pubKey)
+{
+    return SEOS_ERROR_NOT_SUPPORTED;
+}
+
+static seos_err_t
+importImpl(SeosCryptoKey*        self,
+           SeosCryptoKey*        wrapKey,
+           const void*           keyBytes,
+           size_t                keySize)
+{
+    if (NULL != wrapKey)
+    {
+        // Todo: Implement key unwrapping algorithm
+        return SEOS_ERROR_NOT_SUPPORTED;
+    }
+
+    memcpy(self->keyBytes, keyBytes, keySize);
+    self->empty = false;
+
+    return SEOS_SUCCESS;
+}
+
+static seos_err_t
+exportImpl(SeosCryptoKey*        self,
+           SeosCryptoKey*        wrapKey,
+           void**                buf,
+           size_t*               bufSize)
+{
+    if (NULL != wrapKey)
+    {
+        // Todo: Implement key wrapping algorithm
+        return SEOS_ERROR_NOT_SUPPORTED;
+    }
+
+    if (NULL == *buf)
+    {
+        *buf = self->keyBytes;
     }
     else
     {
-        retval = SEOS_ERROR_INSUFFICIENT_SPACE;
+        if (*bufSize < self->keySize)
+        {
+            return SEOS_ERROR_BUFFER_TOO_SMALL;
+        }
+        memcpy(*buf, self->keyBytes, self->keySize);
     }
 
-    return retval;
+    *bufSize = self->keySize;
+
+    return SEOS_SUCCESS;
+}
+
+// Public functions ------------------------------------------------------------
+
+seos_err_t
+SeosCryptoKey_init(SeosCrypto_MemIf*            memIf,
+                   SeosCryptoKey*               self,
+                   unsigned int                 type,
+                   SeosCryptoKey_Flag           flags,
+                   size_t                       bits)
+{
+    if (NULL == memIf || NULL == self)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    memset(self, 0, sizeof(*self));
+
+    self->type    = type;
+    self->bits    = bits;
+    self->flags   = flags;
+    self->empty   = true;
+
+    return initImpl(memIf, self);
 }
 
 seos_err_t
 SeosCryptoKey_generate(SeosCryptoKey*      self)
 {
-    Debug_ASSERT_SELF(self);
-    Debug_PRINTF("\n%s\n", __func__);
-    return SEOS_ERROR_NOT_SUPPORTED;
+    if (NULL == self)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    return genImpl(self);
 }
 
 seos_err_t
 SeosCryptoKey_generatePair(SeosCryptoKey*  prvKey,
                            SeosCryptoKey*  pubKey)
 {
-    Debug_ASSERT_SELF(prvKey);
-    Debug_ASSERT_SELF(pubKey);
-    Debug_PRINTF("\n%s\n", __func__);
-    return SEOS_ERROR_NOT_SUPPORTED;
+    if (NULL == prvKey || NULL == pubKey)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    return genPairImpl(prvKey, pubKey);
 }
 
 seos_err_t
@@ -227,16 +307,7 @@ SeosCryptoKey_import(SeosCryptoKey*        self,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if (NULL != wrapKey)
-    {
-        // Todo: Implement key unwrapping algorithm
-        return SEOS_ERROR_NOT_SUPPORTED;
-    }
-
-    memcpy(self->keyBytes, keyBytes, keySize);
-    self->empty = false;
-
-    return SEOS_SUCCESS;
+    return importImpl(self, wrapKey, keyBytes, keySize);
 }
 
 seos_err_t
@@ -261,45 +332,17 @@ SeosCryptoKey_export(SeosCryptoKey*        self,
         return SEOS_ERROR_ACCESS_DENIED;
     }
 
-    if (NULL != wrapKey)
-    {
-        // Todo: Implement key wrapping algorithm
-        return SEOS_ERROR_NOT_SUPPORTED;
-    }
-
-    if (NULL == *buf)
-    {
-        *buf = self->keyBytes;
-    }
-    else
-    {
-        if (*bufSize < self->keySize)
-        {
-            return SEOS_ERROR_BUFFER_TOO_SMALL;
-        }
-        memcpy(*buf, self->keyBytes, self->keySize);
-    }
-
-    *bufSize = self->keySize;
-
-    return SEOS_SUCCESS;
+    return exportImpl(self, wrapKey, buf, bufSize);
 }
 
-void
+seos_err_t
 SeosCryptoKey_deInit(SeosCrypto_MemIf*          memIf,
                      SeosCryptoKey*             self)
 {
-    if (NULL != self && NULL != self->keyBytes)
+    if (NULL == memIf || NULL == self || NULL == self->keyBytes)
     {
-        // We may have stored sensitive key data here, better make sure
-        // to remove it.
-        if (!self->empty)
-        {
-            zeroize(self->keyBytes, self->keySize);
-        }
-        if (NULL != memIf)
-        {
-            memIf->free(self->keyBytes);
-        }
+        return SEOS_ERROR_INVALID_PARAMETER;
     }
+
+    return deInitImpl(memIf, self);
 }

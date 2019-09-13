@@ -425,10 +425,12 @@ SeosCrypto_keyDeInit(SeosCryptoCtx*                 api,
     handlePos = SeosCrypto_findHandle(&self->keyHandleVector, keyHandle);
     if (-1 != handlePos)
     {
-        SeosCryptoKey_deInit(&self->mem.memIf, keyHandle);
-        SeosCrypto_removeHandle(&self->keyHandleVector, handlePos);
-        self->mem.memIf.free(keyHandle);
-        retval = SEOS_SUCCESS;
+        retval = SeosCryptoKey_deInit(&self->mem.memIf, keyHandle);
+        if (SEOS_SUCCESS == retval)
+        {
+            SeosCrypto_removeHandle(&self->keyHandleVector, handlePos);
+            self->mem.memIf.free(keyHandle);
+        }
     }
     else
     {
