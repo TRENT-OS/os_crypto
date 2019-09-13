@@ -14,6 +14,14 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+#define SeosCryptoKey_Size_AES              32      ///< max 256 bit
+#define SeosCryptoKey_Size_RSA_PRV          512     ///< max 4096 bit
+#define SeosCryptoKey_Size_RSA_PUB          512     ///< max 4096 bit
+#define SeosCryptoKey_Size_DH_PRV           512     ///< max 4096 bit
+#define SeosCryptoKey_Size_DH_PUB           512     ///< max 4096 bit
+#define SeosCryptoKey_Size_SECP256R1_PRV    32      ///< always 256 bit
+#define SeosCryptoKey_Size_SECP256R1_PUB    32      ///< always 256 bit
+
 typedef enum
 {
     SeosCryptoKey_Flags_EXPORTABLE_RAW      = (1 << 0),
@@ -25,12 +33,12 @@ typedef enum
 {
     SeosCryptoKey_Type_NONE,
     SeosCryptoKey_Type_AES,
-    SeosCryptoKey_Type_RSA_PRIVATE,
-    SeosCryptoKey_Type_RSA_PUBLIC,
-    SeosCryptoKey_Type_DH_PRIVATE,
-    SeosCryptoKey_Type_DH_PUBLIC,
-    SeosCryptoKey_Type_EC_SECP256R1_PRIVATE,
-    SeosCryptoKey_Type_EC_SECP256R1_PUBLIC
+    SeosCryptoKey_Type_RSA_PRV,
+    SeosCryptoKey_Type_RSA_PUB,
+    SeosCryptoKey_Type_DH_PRV,
+    SeosCryptoKey_Type_DH_PUB,
+    SeosCryptoKey_Type_SECP256R1_PRV,
+    SeosCryptoKey_Type_SECP256R1_PUB
 }
 SeosCryptoKey_Type;
 
@@ -39,7 +47,7 @@ typedef enum
     SeosCryptoKey_PairType_NONE,
     SeosCryptoKey_PairType_RSA,
     SeosCryptoKey_PairType_DH,
-    SeosCryptoKey_PairType_EC_SECP256R1,
+    SeosCryptoKey_PairType_SECP256R1,
 }
 SeosCryptoKey_PairType;
 
@@ -56,67 +64,67 @@ SeosCryptoKey;
 
 typedef struct __attribute__((__packed__))
 {
-    unsigned char   bytes[32]; ///< raw bytes (max: 256 bits)
+    unsigned char   bytes[SeosCryptoKey_Size_AES];
     size_t          len;
 }
 SeosCryptoKey_AES;
 
 typedef struct __attribute__((__packed__))
 {
-    unsigned char   nBytes[1024]; ///< public modulus (max: 8192 bits)
+    unsigned char   nBytes[SeosCryptoKey_Size_RSA_PUB]; ///< public modulus
     size_t          nLen;
-    unsigned char   eBytes[1024]; ///< public exponent (max: 8192 bits)
+    unsigned char   eBytes[SeosCryptoKey_Size_RSA_PUB]; ///< public exponent
     size_t          eLen;
 }
-SeosCryptoKey_RSA_PUBLIC;
+SeosCryptoKey_RSAPub;
 typedef struct __attribute__((__packed__))
 {
-    unsigned char   nBytes[1024]; ///< public modulus n=p*q (max: 8192 bits)
+    unsigned char   nBytes[SeosCryptoKey_Size_RSA_PRV]; ///< public modulus n=p*q
     size_t          nLen;
-    unsigned char   dBytes[1024]; ///< private exponent d=e^-1 (max: 8192 bits)
+    unsigned char   dBytes[SeosCryptoKey_Size_RSA_PRV]; ///< exponent d=e^-1
     size_t          dLen;
-    unsigned char   pBytes[512]; ///< private prime factor (max: 4096 bits)
+    unsigned char   pBytes[SeosCryptoKey_Size_RSA_PRV / 2]; ///< prime factor
     size_t          pLen;
-    unsigned char   qBytes[512]; ///< private prime factor (max: 4096 bits)
+    unsigned char   qBytes[SeosCryptoKey_Size_RSA_PRV / 2]; ///< prime factor
     size_t          qLen;
 }
-SeosCryptoKey_RSA_PRIVATE;
+SeosCryptoKey_RSAPrv;
 
 typedef struct __attribute__((__packed__))
 {
-    unsigned char   qxBytes[64]; ///< x coord of public point Q=P*d (max: 512 bits)
+    unsigned char   qxBytes[SeosCryptoKey_Size_SECP256R1_PUB]; ///< x of point Q=P*d
     size_t          qxLen;
-    unsigned char   qyBytes[64]; ///< y coord of public point Q=P*d (max: 512 bits)
+    unsigned char   qyBytes[SeosCryptoKey_Size_SECP256R1_PUB]; ///< y of point Q=P*d
     size_t          qyLen;
 }
-SeosCryptoKey_EC_SECP256R1_PUBLIC;
+SeosCryptoKey_SECP256r1Pub;
 typedef struct __attribute__((__packed__))
 {
-    unsigned char   dBytes[64]; ///<  private scalar (max: 512 bits)
+    unsigned char   dBytes[SeosCryptoKey_Size_SECP256R1_PRV]; ///<  private scalar
     size_t          dLen;
 }
-SeosCryptoKey_EC_SECP256R1_PRIVATE;
+SeosCryptoKey_SECP256r1Prv;
 
 typedef struct __attribute__((__packed__))
 {
-    unsigned char   pBytes[1024]; ///< shared prime (max: 8192 bits)
+    unsigned char   pBytes[SeosCryptoKey_Size_DH_PUB]; ///< shared prime
     size_t          pLen;
-    unsigned char   gBytes[1024]; ///< shared generator (max: 8192 bits)
+    unsigned char   gBytes[SeosCryptoKey_Size_DH_PUB]; ///< shared generator
     size_t          gLen;
-    unsigned char   yBytes[1024]; ///< public key y=g^x mod p (max: 8192 bits)
+    unsigned char   yBytes[SeosCryptoKey_Size_DH_PUB]; ///< public key y=g^x mod p
     size_t          yLen;
 }
-SeosCryptoKey_DH_PUBLIC;
+SeosCryptoKey_DHPub;
 
 typedef struct __attribute__((__packed__))
 {
-    unsigned char   pBytes[1024]; ///< shared prime (max: 8192 bits)
+    unsigned char   pBytes[SeosCryptoKey_Size_DH_PRV]; ///< shared prime
     size_t          pLen;
-    unsigned char   gBytes[1024]; ///< shared generator (max: 8192 bits)
+    unsigned char   gBytes[SeosCryptoKey_Size_DH_PRV]; ///< shared generator
     size_t          gLen;
-    unsigned char   xBytes[1024]; ///< private exponent (max: 8192 bits)
+    unsigned char   xBytes[SeosCryptoKey_Size_DH_PRV]; ///< private exponent
     size_t          xLen;
 }
-SeosCryptoKey_DH_PRIVATE;
+SeosCryptoKey_DHPrv;
 
 /** @} */

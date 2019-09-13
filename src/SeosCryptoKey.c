@@ -61,28 +61,28 @@ getEffectiveKeylength(unsigned int  type,
 {
     switch (type)
     {
-    case SeosCryptoKey_Type_RSA_PUBLIC:
+    case SeosCryptoKey_Type_RSA_PUB:
     {
-        SeosCryptoKey_RSA_PUBLIC* key = (SeosCryptoKey_RSA_PUBLIC*) keyBytes;
+        SeosCryptoKey_RSAPub* key = (SeosCryptoKey_RSAPub*) keyBytes;
         return getMpiLen(key->nBytes, key->nLen);
     }
-    case SeosCryptoKey_Type_RSA_PRIVATE:
+    case SeosCryptoKey_Type_RSA_PRV:
     {
-        SeosCryptoKey_RSA_PRIVATE* key = (SeosCryptoKey_RSA_PRIVATE*) keyBytes;
+        SeosCryptoKey_RSAPrv* key = (SeosCryptoKey_RSAPrv*) keyBytes;
         return getMpiLen(key->nBytes, key->nLen);
     }
-    case SeosCryptoKey_Type_EC_SECP256R1_PUBLIC:
-    case SeosCryptoKey_Type_EC_SECP256R1_PRIVATE:
+    case SeosCryptoKey_Type_SECP256R1_PUB:
+    case SeosCryptoKey_Type_SECP256R1_PRV:
         // Effective keylength is already determined by the curve
         return 256;
-    case SeosCryptoKey_Type_DH_PUBLIC:
+    case SeosCryptoKey_Type_DH_PUB:
     {
-        SeosCryptoKey_DH_PUBLIC* key = (SeosCryptoKey_DH_PUBLIC*) keyBytes;
+        SeosCryptoKey_DHPub* key = (SeosCryptoKey_DHPub*) keyBytes;
         return getMpiLen(key->pBytes, key->pLen);
     }
-    case SeosCryptoKey_Type_DH_PRIVATE:
+    case SeosCryptoKey_Type_DH_PRV:
     {
-        SeosCryptoKey_DH_PRIVATE* key = (SeosCryptoKey_DH_PRIVATE*) keyBytes;
+        SeosCryptoKey_DHPrv* key = (SeosCryptoKey_DHPrv*) keyBytes;
         return getMpiLen(key->pBytes, key->pLen);
     }
     case SeosCryptoKey_Type_AES:
@@ -122,47 +122,47 @@ SeosCryptoKey_init(SeosCrypto_MemIf*            memIf,
         }
         keySize = sizeof(SeosCryptoKey_AES);
         break;
-    case SeosCryptoKey_Type_RSA_PRIVATE:
-        if (bits > MBEDTLS_MPI_MAX_BITS)
+    case SeosCryptoKey_Type_RSA_PRV:
+        if (bits > (SeosCryptoKey_Size_RSA_PRV * 8))
         {
             return SEOS_ERROR_INVALID_PARAMETER;
         }
-        keySize = sizeof(SeosCryptoKey_RSA_PRIVATE);
+        keySize = sizeof(SeosCryptoKey_RSAPrv);
         break;
-    case SeosCryptoKey_Type_RSA_PUBLIC:
-        if (bits > MBEDTLS_MPI_MAX_BITS)
+    case SeosCryptoKey_Type_RSA_PUB:
+        if (bits > (SeosCryptoKey_Size_RSA_PUB * 8))
         {
             return SEOS_ERROR_INVALID_PARAMETER;
         }
-        keySize = sizeof(SeosCryptoKey_RSA_PUBLIC);
+        keySize = sizeof(SeosCryptoKey_RSAPub);
         break;
-    case SeosCryptoKey_Type_DH_PRIVATE:
-        if (bits > MBEDTLS_MPI_MAX_BITS)
+    case SeosCryptoKey_Type_DH_PRV:
+        if (bits > (SeosCryptoKey_Size_DH_PRV * 8))
         {
             return SEOS_ERROR_INVALID_PARAMETER;
         }
-        keySize = sizeof(SeosCryptoKey_DH_PRIVATE);
+        keySize = sizeof(SeosCryptoKey_DHPrv);
         break;
-    case SeosCryptoKey_Type_DH_PUBLIC:
-        if (bits > MBEDTLS_MPI_MAX_BITS)
+    case SeosCryptoKey_Type_DH_PUB:
+        if (bits > (SeosCryptoKey_Size_DH_PUB * 8))
         {
             return SEOS_ERROR_INVALID_PARAMETER;
         }
-        keySize = sizeof(SeosCryptoKey_DH_PUBLIC);
+        keySize = sizeof(SeosCryptoKey_DHPub);
         break;
-    case SeosCryptoKey_Type_EC_SECP256R1_PRIVATE:
-        if (bits != 256)
+    case SeosCryptoKey_Type_SECP256R1_PRV:
+        if (bits != (SeosCryptoKey_Size_SECP256R1_PRV * 8))
         {
             return SEOS_ERROR_INVALID_PARAMETER;
         }
-        keySize = sizeof(SeosCryptoKey_EC_SECP256R1_PRIVATE);
+        keySize = sizeof(SeosCryptoKey_SECP256r1Prv);
         break;
-    case SeosCryptoKey_Type_EC_SECP256R1_PUBLIC:
-        if (bits != 256)
+    case SeosCryptoKey_Type_SECP256R1_PUB:
+        if (bits != (SeosCryptoKey_Size_SECP256R1_PUB * 8))
         {
             return SEOS_ERROR_INVALID_PARAMETER;
         }
-        keySize = sizeof(SeosCryptoKey_EC_SECP256R1_PUBLIC);
+        keySize = sizeof(SeosCryptoKey_SECP256r1Pub);
         break;
     default:
         return SEOS_ERROR_NOT_SUPPORTED;

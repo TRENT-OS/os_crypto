@@ -57,11 +57,11 @@ setKeyImpl(SeosCryptoSignature*     self)
     {
         switch (self->pubKey->type)
         {
-        case SeosCryptoKey_Type_RSA_PUBLIC:
+        case SeosCryptoKey_Type_RSA_PUB:
         {
-            SeosCryptoKey_RSA_PUBLIC* pubKey;
+            SeosCryptoKey_RSAPub* pubKey;
             retval = (self->algorithm != SeosCryptoSignature_Algorithm_RSA_PKCS1)
-                     || (pubKey = SeosCryptoKey_getRsaPublic(self->pubKey)) == NULL
+                     || (pubKey = SeosCryptoKey_getRSAPub(self->pubKey)) == NULL
                      || (mbedtls_rsa_import_raw(&self->mbedtls.rsa,
                                                 pubKey->nBytes, pubKey->nLen,
                                                 NULL, 0, NULL, 0, NULL, 0,
@@ -85,11 +85,11 @@ setKeyImpl(SeosCryptoSignature*     self)
     {
         switch (self->prvKey->type)
         {
-        case SeosCryptoKey_Type_RSA_PRIVATE:
+        case SeosCryptoKey_Type_RSA_PRV:
         {
-            SeosCryptoKey_RSA_PRIVATE* prvKey;
+            SeosCryptoKey_RSAPrv* prvKey;
             retval = (self->algorithm != SeosCryptoSignature_Algorithm_RSA_PKCS1)
-                     || (prvKey = SeosCryptoKey_getRsaPrivate(self->prvKey)) == NULL
+                     || (prvKey = SeosCryptoKey_getRSAPrv(self->prvKey)) == NULL
                      || (mbedtls_rsa_import_raw(&self->mbedtls.rsa,
                                                 prvKey->nBytes, prvKey->nLen,
                                                 prvKey->pBytes, prvKey->pLen,
@@ -131,7 +131,7 @@ verifyHashImpl(SeosCryptoSignature*         self,
         }
         else
         {
-            retval = (self->pubKey->type != SeosCryptoKey_Type_RSA_PUBLIC)
+            retval = (self->pubKey->type != SeosCryptoKey_Type_RSA_PUB)
                      || mbedtls_rsa_pkcs1_verify(&self->mbedtls.rsa, rngFunc, rng,
                                                  MBEDTLS_RSA_PUBLIC, MBEDTLS_MD_NONE, hashSize,
                                                  hash, signature) != 0 ?
@@ -165,7 +165,7 @@ signHashImpl(SeosCryptoSignature*       self,
         }
         else
         {
-            retval = (self->pubKey->type != SeosCryptoKey_Type_RSA_PUBLIC)
+            retval = (self->pubKey->type != SeosCryptoKey_Type_RSA_PUB)
                      ||  mbedtls_rsa_pkcs1_sign(&self->mbedtls.rsa, rngFunc, rng,
                                                 MBEDTLS_RSA_PRIVATE, MBEDTLS_MD_NONE, hashSize,
                                                 hash, signature) != 0 ?

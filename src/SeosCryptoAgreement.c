@@ -98,12 +98,12 @@ setKeyImpl(SeosCryptoAgreement*            self)
 
     switch (self->prvKey->type)
     {
-    case SeosCryptoKey_Type_DH_PRIVATE:
+    case SeosCryptoKey_Type_DH_PRV:
     {
         mbedtls_dhm_context* dh = &self->mbedtls.dh;
-        SeosCryptoKey_DH_PRIVATE* dhKey;
+        SeosCryptoKey_DHPrv* dhKey;
         retval = (self->algorithm != SeosCryptoAgreement_Algorithm_DH)
-                 || (dhKey = SeosCryptoKey_getDhPrivate(self->prvKey)) == NULL
+                 || (dhKey = SeosCryptoKey_getDHPrv(self->prvKey)) == NULL
                  || mbedtls_mpi_read_binary(&dh->P, dhKey->pBytes, dhKey->pLen) != 0
                  || mbedtls_mpi_read_binary(&dh->G, dhKey->gBytes, dhKey->gLen) != 0
                  || mbedtls_mpi_read_binary(&dh->X, dhKey->xBytes, dhKey->xLen) != 0
@@ -111,12 +111,12 @@ setKeyImpl(SeosCryptoAgreement*            self)
                  SEOS_ERROR_INVALID_PARAMETER : SEOS_SUCCESS;
         break;
     }
-    case SeosCryptoKey_Type_EC_SECP256R1_PRIVATE:
+    case SeosCryptoKey_Type_SECP256R1_PRV:
     {
         mbedtls_ecdh_context* ecdh = &self->mbedtls.ecdh;
-        SeosCryptoKey_EC_SECP256R1_PRIVATE* ecKey;
+        SeosCryptoKey_SECP256r1Prv* ecKey;
         retval = (self->algorithm != SeosCryptoAgreement_Algorithm_ECDH)
-                 || (ecKey = SeosCryptoKey_getEcSecp256r1Private(self->prvKey)) == NULL
+                 || (ecKey = SeosCryptoKey_getSECP256r1Prv(self->prvKey)) == NULL
                  || mbedtls_ecp_group_load(&ecdh->grp, MBEDTLS_ECP_DP_SECP256R1) != 0
                  || mbedtls_mpi_read_binary(&ecdh->d, ecKey->dBytes, ecKey->dLen) != 0 ?
                  SEOS_ERROR_INVALID_PARAMETER : SEOS_SUCCESS;
@@ -142,24 +142,24 @@ computeImpl(SeosCryptoAgreement*            self,
 
     switch (pubKey->type)
     {
-    case SeosCryptoKey_Type_DH_PUBLIC:
+    case SeosCryptoKey_Type_DH_PUB:
     {
         mbedtls_dhm_context* dh = &self->mbedtls.dh;
-        SeosCryptoKey_DH_PUBLIC* dhKey;
+        SeosCryptoKey_DHPub* dhKey;
         retval = (self->algorithm != SeosCryptoAgreement_Algorithm_DH)
-                 || (dhKey = SeosCryptoKey_getDhPublic(pubKey)) == NULL
+                 || (dhKey = SeosCryptoKey_getDHPub(pubKey)) == NULL
                  || mbedtls_mpi_read_binary(&dh->GY, dhKey->yBytes, dhKey->yLen) != 0
                  || dhm_check_range(&dh->GY, &dh->P) != 0
                  || mbedtls_dhm_calc_secret(dh, buf, *bufSize, &outLen, rngFunc, rng) != 0 ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
     }
-    case SeosCryptoKey_Type_EC_SECP256R1_PUBLIC:
+    case SeosCryptoKey_Type_SECP256R1_PUB:
     {
         mbedtls_ecdh_context* ecdh = &self->mbedtls.ecdh;
-        SeosCryptoKey_EC_SECP256R1_PUBLIC* ecKey;
+        SeosCryptoKey_SECP256r1Pub* ecKey;
         retval = (self->algorithm != SeosCryptoAgreement_Algorithm_ECDH)
-                 || (ecKey = SeosCryptoKey_getEcSecp256r1Public(pubKey)) == NULL
+                 || (ecKey = SeosCryptoKey_getSECP256r1Pub(pubKey)) == NULL
                  || mbedtls_mpi_read_binary(&ecdh->Qp.X, ecKey->qxBytes, ecKey->qxLen) != 0
                  || mbedtls_mpi_read_binary(&ecdh->Qp.Y, ecKey->qyBytes, ecKey->qyLen) != 0
                  || mbedtls_mpi_lset(&ecdh->Qp.Z, 1) != 0

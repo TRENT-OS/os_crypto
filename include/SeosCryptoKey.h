@@ -53,40 +53,40 @@ void
 SeosCryptoKey_deInit(SeosCrypto_MemIf*          memIf,
                      SeosCryptoKey*             self);
 
-INLINE SeosCryptoKey_RSA_PUBLIC*
-SeosCryptoKey_getRsaPublic(const SeosCryptoKey* key)
+INLINE SeosCryptoKey_RSAPub*
+SeosCryptoKey_getRSAPub(const SeosCryptoKey* key)
 {
-    return key->empty ? NULL : (SeosCryptoKey_RSA_PUBLIC*) key->keyBytes;
+    return key->empty ? NULL : (SeosCryptoKey_RSAPub*) key->keyBytes;
 }
 
-INLINE SeosCryptoKey_RSA_PRIVATE*
-SeosCryptoKey_getRsaPrivate(const SeosCryptoKey* key)
+INLINE SeosCryptoKey_RSAPrv*
+SeosCryptoKey_getRSAPrv(const SeosCryptoKey* key)
 {
-    return key->empty ? NULL : (SeosCryptoKey_RSA_PRIVATE*) key->keyBytes;
+    return key->empty ? NULL : (SeosCryptoKey_RSAPrv*) key->keyBytes;
 }
 
-INLINE SeosCryptoKey_EC_SECP256R1_PUBLIC*
-SeosCryptoKey_getEcSecp256r1Public(const SeosCryptoKey* key)
+INLINE SeosCryptoKey_SECP256r1Pub*
+SeosCryptoKey_getSECP256r1Pub(const SeosCryptoKey* key)
 {
-    return key->empty ? NULL : (SeosCryptoKey_EC_SECP256R1_PUBLIC*) key->keyBytes;
+    return key->empty ? NULL : (SeosCryptoKey_SECP256r1Pub*) key->keyBytes;
 }
 
-INLINE SeosCryptoKey_EC_SECP256R1_PRIVATE*
-SeosCryptoKey_getEcSecp256r1Private(const SeosCryptoKey* key)
+INLINE SeosCryptoKey_SECP256r1Prv*
+SeosCryptoKey_getSECP256r1Prv(const SeosCryptoKey* key)
 {
-    return key->empty ? NULL : (SeosCryptoKey_EC_SECP256R1_PRIVATE*) key->keyBytes;
+    return key->empty ? NULL : (SeosCryptoKey_SECP256r1Prv*) key->keyBytes;
 }
 
-INLINE SeosCryptoKey_DH_PUBLIC*
-SeosCryptoKey_getDhPublic(const SeosCryptoKey* key)
+INLINE SeosCryptoKey_DHPub*
+SeosCryptoKey_getDHPub(const SeosCryptoKey* key)
 {
-    return key->empty ? NULL : (SeosCryptoKey_DH_PUBLIC*) key->keyBytes;
+    return key->empty ? NULL : (SeosCryptoKey_DHPub*) key->keyBytes;
 }
 
-INLINE SeosCryptoKey_DH_PRIVATE*
-SeosCryptoKey_getDhPrivate(const SeosCryptoKey* key)
+INLINE SeosCryptoKey_DHPrv*
+SeosCryptoKey_getDHPrv(const SeosCryptoKey* key)
 {
-    return key->empty ? NULL : (SeosCryptoKey_DH_PRIVATE*) key->keyBytes;
+    return key->empty ? NULL : (SeosCryptoKey_DHPrv*) key->keyBytes;
 }
 
 INLINE SeosCryptoKey_AES*
