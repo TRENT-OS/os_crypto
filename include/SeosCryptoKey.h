@@ -31,11 +31,13 @@ SeosCryptoKey_init(SeosCrypto_MemIf*            memIf,
                    size_t                       bits);
 
 seos_err_t
-SeosCryptoKey_generate(SeosCryptoKey*           self);
+SeosCryptoKey_generate(SeosCryptoKey*           self,
+                       SeosCryptoRng*           rng);
 
 seos_err_t
 SeosCryptoKey_generatePair(SeosCryptoKey*       prvKey,
-                           SeosCryptoKey*       pubKey);
+                           SeosCryptoKey*       pubKey,
+                           SeosCryptoRng*       rng);
 
 seos_err_t
 SeosCryptoKey_import(SeosCryptoKey*             self,

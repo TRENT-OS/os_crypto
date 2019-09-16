@@ -24,6 +24,7 @@
 
 typedef enum
 {
+    SeosCryptoKey_Flags_NONE                = 0,
     SeosCryptoKey_Flags_EXPORTABLE_RAW      = (1 << 0),
     SeosCryptoKey_Flags_EXPORTABLE_WRAPPED  = (1 << 1)
 }

@@ -3,6 +3,7 @@
  */
 
 #include "SeosCryptoKey.h"
+#include "SeosCryptoRng.h"
 
 #include "LibDebug/Debug.h"
 
@@ -176,16 +177,47 @@ deInitImpl(SeosCrypto_MemIf*            memIf,
 }
 
 static seos_err_t
-genImpl(SeosCryptoKey*      self)
+genImpl(SeosCryptoKey*      self,
+        SeosCryptoRng*      rng)
 {
-    return SEOS_ERROR_NOT_SUPPORTED;
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+    void* ptr;
+
+    ptr = self->keyBytes;
+    self->keySize = self->bits >> 3;
+
+    switch (self->type)
+    {
+    case SeosCryptoKey_Type_AES:
+    {
+        retval = SeosCryptoRng_getBytes(rng, &ptr, self->keySize);
+        break;
+    }
+    default:
+        retval = SEOS_ERROR_NOT_SUPPORTED;
+    }
+
+    return retval;
 }
 
 static seos_err_t
 genPairImpl(SeosCryptoKey*  prvKey,
-            SeosCryptoKey*  pubKey)
+            SeosCryptoKey*  pubKey,
+            SeosCryptoRng*  rng)
 {
-    return SEOS_ERROR_NOT_SUPPORTED;
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    switch (prvKey->type)
+    {
+    case SeosCryptoKey_Type_RSA_PRV:
+    case SeosCryptoKey_Type_DH_PRV:
+    case SeosCryptoKey_Type_SECP256R1_PRV:
+
+    default:
+        retval = SEOS_ERROR_NOT_SUPPORTED;
+    }
+
+    return retval;
 }
 
 static seos_err_t
@@ -261,26 +293,28 @@ SeosCryptoKey_init(SeosCrypto_MemIf*            memIf,
 }
 
 seos_err_t
-SeosCryptoKey_generate(SeosCryptoKey*      self)
+SeosCryptoKey_generate(SeosCryptoKey*      self,
+                       SeosCryptoRng*      rng)
 {
-    if (NULL == self)
+    if (NULL == self || NULL == rng)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return genImpl(self);
+    return genImpl(self, rng);
 }
 
 seos_err_t
 SeosCryptoKey_generatePair(SeosCryptoKey*  prvKey,
-                           SeosCryptoKey*  pubKey)
+                           SeosCryptoKey*  pubKey,
+                           SeosCryptoRng*  rng)
 {
-    if (NULL == prvKey || NULL == pubKey)
+    if (NULL == prvKey || NULL == pubKey || NULL == rng)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return genPairImpl(prvKey, pubKey);
+    return genPairImpl(prvKey, pubKey, rng);
 }
 
 seos_err_t
