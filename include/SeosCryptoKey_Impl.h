@@ -14,6 +14,9 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+#define SeosCryptoKey_DH_GENERATOR          2       ///< Generator for DH
+#define SeosCryptoKey_RSA_EXPONENT          65537   ///< Public exp. 2^16+1
+
 #define SeosCryptoKey_Size_AES              32      ///< max 256 bit
 #define SeosCryptoKey_Size_RSA_PRV          512     ///< max 4096 bit
 #define SeosCryptoKey_Size_RSA_PUB          512     ///< max 4096 bit
@@ -42,15 +45,6 @@ typedef enum
     SeosCryptoKey_Type_SECP256R1_PUB
 }
 SeosCryptoKey_Type;
-
-typedef enum
-{
-    SeosCryptoKey_PairType_NONE,
-    SeosCryptoKey_PairType_RSA,
-    SeosCryptoKey_PairType_DH,
-    SeosCryptoKey_PairType_SECP256R1,
-}
-SeosCryptoKey_PairType;
 
 typedef struct
 {

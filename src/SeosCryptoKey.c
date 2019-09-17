@@ -7,6 +7,10 @@
 
 #include "LibDebug/Debug.h"
 
+#include "mbedtls/rsa.h"
+#include "mbedtls/ecp.h"
+#include "mbedtls/dhm.h"
+
 #include <string.h>
 
 // Private static functions ----------------------------------------------------
@@ -39,6 +43,41 @@ zeroize( void* buf, size_t len )
     {
         memset_func( buf, 0, len );
     }
+}
+
+/*
+ * Verify sanity of parameter with regards to P
+ *
+ * Parameter should be: 2 <= public_param <= P - 2
+ *
+ * This means that we need to return an error if
+ *              public_param < 2 or public_param > P-2
+ *
+ * For more information on the attack, see:
+ *  http://www.cl.cam.ac.uk/~rja14/Papers/psandqs.pdf
+ *  http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2005-2643
+ */
+static int dhm_check_range(const mbedtls_mpi* param, const mbedtls_mpi* P)
+{
+    mbedtls_mpi L, U;
+    int ret = 0;
+
+    mbedtls_mpi_init( &L );
+    mbedtls_mpi_init( &U );
+
+    MBEDTLS_MPI_CHK( mbedtls_mpi_lset( &L, 2 ) );
+    MBEDTLS_MPI_CHK( mbedtls_mpi_sub_int( &U, P, 2 ) );
+
+    if ( mbedtls_mpi_cmp_mpi( param, &L ) < 0 ||
+         mbedtls_mpi_cmp_mpi( param, &U ) > 0 )
+    {
+        ret = MBEDTLS_ERR_DHM_BAD_INPUT_DATA;
+    }
+
+cleanup:
+    mbedtls_mpi_free( &L );
+    mbedtls_mpi_free( &U );
+    return ( ret );
 }
 
 static size_t
@@ -201,6 +240,182 @@ genImpl(SeosCryptoKey*      self,
 }
 
 static seos_err_t
+genRSAPairImpl(SeosCryptoKey*  prvKey,
+               SeosCryptoKey*  pubKey,
+               SeosCryptoRng*  rng)
+{
+    seos_err_t retval;
+    SeosCryptoKey_RSAPrv* prvRsa = (SeosCryptoKey_RSAPrv*) prvKey->keyBytes;
+    SeosCryptoKey_RSAPub* pubRsa = (SeosCryptoKey_RSAPub*) pubKey->keyBytes;
+    mbedtls_rsa_context rsa;
+
+    mbedtls_rsa_init(&rsa, MBEDTLS_RSA_PKCS_V15, MBEDTLS_MD_NONE);
+
+    if (mbedtls_rsa_gen_key(&rsa, SeosCryptoRng_getBytesMbedtls, rng, prvKey->bits,
+                            SeosCryptoKey_RSA_EXPONENT) != 0)
+    {
+        retval = SEOS_ERROR_ABORTED;
+    }
+    else
+    {
+        pubRsa->nLen = mbedtls_mpi_size(&rsa.N);
+        pubRsa->eLen = mbedtls_mpi_size(&rsa.E);
+        prvRsa->nLen = mbedtls_mpi_size(&rsa.N);
+        prvRsa->qLen = mbedtls_mpi_size(&rsa.Q);
+        prvRsa->pLen = mbedtls_mpi_size(&rsa.P);
+        prvRsa->dLen = mbedtls_mpi_size(&rsa.D);
+        retval = mbedtls_mpi_write_binary(&rsa.N, pubRsa->nBytes, pubRsa->nLen) ||
+                 mbedtls_mpi_write_binary(&rsa.E, pubRsa->eBytes, pubRsa->eLen) ||
+                 mbedtls_mpi_write_binary(&rsa.N, prvRsa->nBytes, prvRsa->nLen) ||
+                 mbedtls_mpi_write_binary(&rsa.P, prvRsa->pBytes, prvRsa->pLen) ||
+                 mbedtls_mpi_write_binary(&rsa.Q, prvRsa->qBytes, prvRsa->qLen) ||
+                 mbedtls_mpi_write_binary(&rsa.D, prvRsa->dBytes, prvRsa->dLen) ?
+                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+    }
+
+    mbedtls_rsa_free(&rsa);
+
+    return retval;
+}
+
+static seos_err_t
+genDHPairImpl(SeosCryptoKey*  prvKey,
+              SeosCryptoKey*  pubKey,
+              SeosCryptoRng*  rng)
+{
+    seos_err_t retval;
+    SeosCryptoKey_DHPrv* prvDh = (SeosCryptoKey_DHPrv*) prvKey->keyBytes;
+    SeosCryptoKey_DHPub* pubDh = (SeosCryptoKey_DHPub*) pubKey->keyBytes;
+    mbedtls_dhm_context dh;
+    mbedtls_mpi Q, X, GX;
+    void* rngFunc = SeosCryptoRng_getBytesMbedtls;
+    size_t retries;
+
+    mbedtls_dhm_init(&dh);
+    mbedtls_mpi_init(&Q);
+    mbedtls_mpi_init(&X);
+    mbedtls_mpi_init(&GX);
+
+    // Generate a "safe prime" P such that Q=(P-1)/2 is also prime
+    retval = SEOS_ERROR_ABORTED;
+    retries = 10;
+    while (retries > 0)
+    {
+        if (mbedtls_mpi_gen_prime(&dh.P, prvKey->bits, 1, rngFunc, rng) != 0 ||
+            mbedtls_mpi_sub_int(&Q, &dh.P, 1) != 0 ||
+            mbedtls_mpi_div_int(&Q, NULL, &Q, 2) != 0)
+        {
+            break;
+        }
+        // The prime test is iterated; a general recommendation is to set the amount
+        // of iterations to half of the security parameter, e.g., the numbe of
+        // bits of prime.
+        else if (mbedtls_mpi_is_prime_ext(&Q, prvKey->bits / 2, rngFunc, rng) == 0)
+        {
+            retval = SEOS_SUCCESS;
+            break;
+        }
+        retries--;
+        Debug_LOG_WARNING("Could not generate prime P for DH, retrying..");
+    }
+
+    if (SEOS_SUCCESS == retval)
+    {
+        // Generate an X as large as possible
+        retval = SEOS_ERROR_ABORTED;
+        retries = 10;
+        while (retries > 0)
+        {
+            if (mbedtls_mpi_fill_random(&X, mbedtls_mpi_size(&dh.P), rngFunc, rng) != 0)
+            {
+                break;
+            }
+
+            while (mbedtls_mpi_cmp_mpi(&X, &dh.P) >= 0)
+            {
+                mbedtls_mpi_shift_r(&X, 1);
+            }
+
+            if (dhm_check_range(&X, &dh.P) == 0)
+            {
+                retval = SEOS_SUCCESS;
+                break;
+            }
+            retries--;
+        }
+
+        // Generate GX = G^X mod P and store it all
+        if (SEOS_SUCCESS == retval
+            && mbedtls_mpi_lset(&dh.G, SeosCryptoKey_DH_GENERATOR) == 0
+            && mbedtls_mpi_exp_mod(&GX, &dh.G, &X, &dh.P, &dh.RP) == 0
+            && dhm_check_range(&GX, &dh.P) == 0)
+        {
+            prvDh->pLen = mbedtls_mpi_size(&dh.P);
+            prvDh->gLen = mbedtls_mpi_size(&dh.G);
+            prvDh->xLen = mbedtls_mpi_size(&X);
+            pubDh->pLen = mbedtls_mpi_size(&dh.P);
+            pubDh->gLen = mbedtls_mpi_size(&dh.G);
+            pubDh->yLen = mbedtls_mpi_size(&GX);
+            retval = mbedtls_mpi_write_binary(&X,    prvDh->xBytes, prvDh->xLen) != 0 ||
+                     mbedtls_mpi_write_binary(&GX,   pubDh->yBytes, pubDh->yLen) != 0 ||
+                     mbedtls_mpi_write_binary(&dh.P, prvDh->pBytes, prvDh->pLen) != 0 ||
+                     mbedtls_mpi_write_binary(&dh.G, prvDh->gBytes, prvDh->gLen) != 0 ||
+                     mbedtls_mpi_write_binary(&dh.G, pubDh->gBytes, pubDh->gLen) != 0 ||
+                     mbedtls_mpi_write_binary(&dh.P, pubDh->pBytes, pubDh->pLen) != 0 ?
+                     SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+        }
+    }
+
+    mbedtls_mpi_free(&GX);
+    mbedtls_mpi_free(&X);
+    mbedtls_mpi_free(&Q);
+    mbedtls_dhm_free(&dh);
+
+    return retval;
+}
+
+static seos_err_t
+genSECP256r1PairImpl(SeosCryptoKey*  prvKey,
+                     SeosCryptoKey*  pubKey,
+                     SeosCryptoRng*  rng)
+{
+    seos_err_t retval;
+    SeosCryptoKey_SECP256r1Prv* prvEc = (SeosCryptoKey_SECP256r1Prv*)
+                                        prvKey->keyBytes;
+    SeosCryptoKey_SECP256r1Pub* pubEc = (SeosCryptoKey_SECP256r1Pub*)
+                                        pubKey->keyBytes;
+    mbedtls_ecp_group grp;
+    mbedtls_mpi d;
+    mbedtls_ecp_point Q;
+
+    mbedtls_ecp_group_init(&grp);
+    mbedtls_ecp_point_init(&Q);
+    mbedtls_mpi_init(&d);
+
+    if (mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1) != 0 ||
+        mbedtls_ecp_gen_keypair(&grp, &d, &Q, SeosCryptoRng_getBytesMbedtls, rng) != 0)
+    {
+        retval = SEOS_ERROR_ABORTED;
+    }
+    else
+    {
+        pubEc->qxLen = mbedtls_mpi_size(&Q.X);
+        pubEc->qyLen = mbedtls_mpi_size(&Q.Y);
+        prvEc->dLen = mbedtls_mpi_size(&d);
+        retval = mbedtls_mpi_write_binary(&Q.X, pubEc->qxBytes, pubEc->qxLen) != 0 ||
+                 mbedtls_mpi_write_binary(&Q.Y, pubEc->qyBytes, pubEc->qyLen) != 0 ||
+                 mbedtls_mpi_write_binary(&d, prvEc->dBytes, prvEc->dLen) ?
+                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+    }
+
+    mbedtls_ecp_group_free(&grp);
+    mbedtls_ecp_point_free(&Q);
+    mbedtls_mpi_free(&d);
+
+    return retval;
+}
+
+static seos_err_t
 genPairImpl(SeosCryptoKey*  prvKey,
             SeosCryptoKey*  pubKey,
             SeosCryptoRng*  rng)
@@ -210,9 +425,17 @@ genPairImpl(SeosCryptoKey*  prvKey,
     switch (prvKey->type)
     {
     case SeosCryptoKey_Type_RSA_PRV:
-    case SeosCryptoKey_Type_DH_PRV:
+        retval = (pubKey->type != SeosCryptoKey_Type_RSA_PUB) ?
+                 SEOS_ERROR_INVALID_PARAMETER : genRSAPairImpl(prvKey, pubKey, rng);
+        break;
     case SeosCryptoKey_Type_SECP256R1_PRV:
-
+        retval = (pubKey->type != SeosCryptoKey_Type_SECP256R1_PUB) ?
+                 SEOS_ERROR_INVALID_PARAMETER : genSECP256r1PairImpl(prvKey, pubKey, rng);
+        break;
+    case SeosCryptoKey_Type_DH_PRV:
+        retval = (pubKey->type != SeosCryptoKey_Type_DH_PUB) ?
+                 SEOS_ERROR_INVALID_PARAMETER : genDHPairImpl(prvKey, pubKey, rng);
+        break;
     default:
         retval = SEOS_ERROR_NOT_SUPPORTED;
     }
@@ -301,6 +524,11 @@ SeosCryptoKey_generate(SeosCryptoKey*      self,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
+    if (!self->empty)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
+
     return genImpl(self, rng);
 }
 
@@ -309,9 +537,15 @@ SeosCryptoKey_generatePair(SeosCryptoKey*  prvKey,
                            SeosCryptoKey*  pubKey,
                            SeosCryptoRng*  rng)
 {
-    if (NULL == prvKey || NULL == pubKey || NULL == rng)
+    if (NULL == prvKey || NULL == pubKey || NULL == rng
+        || prvKey->bits != pubKey->bits)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    if (!prvKey->empty || !pubKey->empty)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
     return genPairImpl(prvKey, pubKey, rng);

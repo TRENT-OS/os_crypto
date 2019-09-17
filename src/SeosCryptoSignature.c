@@ -22,7 +22,7 @@ initImpl(SeosCrypto_MemIf*      memIf,
     switch (self->algorithm)
     {
     case SeosCryptoSignature_Algorithm_RSA_PKCS1:
-        mbedtls_rsa_init(&self->mbedtls.rsa, MBEDTLS_RSA_PKCS_V15, MBEDTLS_MD_SHA256);
+        mbedtls_rsa_init(&self->mbedtls.rsa, MBEDTLS_RSA_PKCS_V15, MBEDTLS_MD_NONE);
         retval = SEOS_SUCCESS;
         break;
     default:
