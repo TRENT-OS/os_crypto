@@ -49,45 +49,37 @@ setKeyImpl(SeosCryptoSignature* self)
 {
     seos_err_t retval = SEOS_SUCCESS;
 
-    switch (self->algorithm)
+    switch (self->key->type)
     {
-    case SeosCryptoSignature_Algorithm_RSA_PKCS1:
+    case SeosCryptoKey_Type_RSA_PUBLIC:
     {
-        switch (self->key->type)
-        {
-        case SeosCryptoKey_Type_RSA_PUBLIC:
-        {
+        SeosCryptoKey_RSA_PUBLIC* pubKey;
+        retval = (self->algorithm != SeosCryptoSignature_Algorithm_RSA_PKCS1)
+                 || (pubKey = SeosCryptoKey_getRsaPublic(self->key)) == NULL
+                 || (mbedtls_rsa_import_raw(&self->mbedtls.rsa,
+                                            pubKey->nBytes, pubKey->nLen,
+                                            NULL, 0, NULL, 0, NULL, 0,
+                                            pubKey->eBytes, pubKey->eLen) != 0)
+                 || (mbedtls_rsa_complete(&self->mbedtls.rsa) != 0)
+                 || (mbedtls_rsa_check_pubkey(&self->mbedtls.rsa) != 0) ?
+                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+        break;
+    }
+    case SeosCryptoKey_Type_RSA_PRIVATE:
+    {
+        SeosCryptoKey_RSA_PRIVATE* prvKey;
+        retval = (self->algorithm != SeosCryptoSignature_Algorithm_RSA_PKCS1)
+                 || (prvKey = SeosCryptoKey_getRsaPrivate(self->key)) == NULL
+                 || (mbedtls_rsa_import_raw(&self->mbedtls.rsa,
+                                            prvKey->nBytes, prvKey->nLen,
+                                            prvKey->pBytes, prvKey->pLen,
+                                            prvKey->qBytes, prvKey->qLen,
+                                            prvKey->dBytes, prvKey->dLen,
+                                            NULL, 0) != 0)
+                 || (mbedtls_rsa_complete(&self->mbedtls.rsa) != 0)
+                 || (mbedtls_rsa_check_privkey(&self->mbedtls.rsa) != 0) ?
+                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
 
-            const SeosCryptoKey_RSA_PUBLIC* pubKey = SeosCryptoKey_getRsaPublic(self->key);
-            retval = (mbedtls_rsa_import_raw(&self->mbedtls.rsa,
-                                             pubKey->nBytes, pubKey->nLen,
-                                             NULL, 0,
-                                             NULL, 0,
-                                             NULL, 0,
-                                             pubKey->eBytes, pubKey->eLen) != 0)
-                     || (mbedtls_rsa_complete(&self->mbedtls.rsa) != 0)
-                     || (mbedtls_rsa_check_pubkey(&self->mbedtls.rsa) != 0) ?
-                     SEOS_ERROR_ABORTED : SEOS_SUCCESS;
-            break;
-        }
-        case SeosCryptoKey_Type_RSA_PRIVATE:
-        {
-            const SeosCryptoKey_RSA_PRIVATE* prvKey = SeosCryptoKey_getRsaPrivate(
-                                                          self->key);
-            retval = (mbedtls_rsa_import_raw(&self->mbedtls.rsa,
-                                             prvKey->nBytes, prvKey->nLen,
-                                             prvKey->pBytes, prvKey->pLen,
-                                             prvKey->qBytes, prvKey->qLen,
-                                             prvKey->dBytes, prvKey->dLen,
-                                             NULL, 0) != 0)
-                     || (mbedtls_rsa_complete(&self->mbedtls.rsa) != 0)
-                     || (mbedtls_rsa_check_privkey(&self->mbedtls.rsa) != 0) ?
-                     SEOS_ERROR_ABORTED : SEOS_SUCCESS;
-            break;
-        }
-        default:
-            retval = SEOS_ERROR_NOT_SUPPORTED;
-        }
         break;
     }
     default:

@@ -53,77 +53,46 @@ void
 SeosCryptoKey_deInit(SeosCrypto_MemIf*          memIf,
                      SeosCryptoKey*             self);
 
-SeosCryptoKey_RSA_PUBLIC*
-SeosCryptoKey_getRsaPublic(const SeosCryptoKey* key);
+INLINE SeosCryptoKey_RSA_PUBLIC*
+SeosCryptoKey_getRsaPublic(const SeosCryptoKey* key)
+{
+    return key->empty ? NULL : (SeosCryptoKey_RSA_PUBLIC*) key->keyBytes;
+}
 
-SeosCryptoKey_RSA_PRIVATE*
-SeosCryptoKey_getRsaPrivate(const SeosCryptoKey* key);
+INLINE SeosCryptoKey_RSA_PRIVATE*
+SeosCryptoKey_getRsaPrivate(const SeosCryptoKey* key)
+{
+    return key->empty ? NULL : (SeosCryptoKey_RSA_PRIVATE*) key->keyBytes;
+}
 
-SeosCryptoKey_AES*
-SeosCryptoKey_getAES(const SeosCryptoKey* key);
+INLINE SeosCryptoKey_EC_SECP256R1_PUBLIC*
+SeosCryptoKey_getEcSecp256r1Public(const SeosCryptoKey* key)
+{
+    return key->empty ? NULL : (SeosCryptoKey_EC_SECP256R1_PUBLIC*) key->keyBytes;
+}
 
-// seos_err_t
-// SeosCryptoKey_initRsaPublic(SeosCryptoKey*  self,
-//                             void*           algoKeyCtx,
-//                             const void*     n,
-//                             size_t          lenN,
-//                             const void*     e,
-//                             size_t          lenE);
-// seos_err_t
-// SeosCryptoKey_initRsaPrivate(SeosCryptoKey* self,
-//                              void*          algoKeyCtx,
-//                              const void*    n,
-//                              size_t         lenN,
-//                              const void*    e,
-//                              size_t         lenE,
-//                              const void*    d,
-//                              size_t         lenD,
-//                              const void*    p,
-//                              size_t         lenP,
-//                              const void*    q,
-//                              size_t         lenQ);
+INLINE SeosCryptoKey_EC_SECP256R1_PRIVATE*
+SeosCryptoKey_getEcSecp256r1Private(const SeosCryptoKey* key)
+{
+    return key->empty ? NULL : (SeosCryptoKey_EC_SECP256R1_PRIVATE*) key->keyBytes;
+}
 
-// seos_err_t
-// SeosCryptoKey_initDhPublic(SeosCryptoKey*     self,
-//                            void*              algoKeyCtx,
-//                            const void*        p,
-//                            size_t             lenP,
-//                            const void*        g,
-//                            size_t             lenG,
-//                            const void*        gy,
-//                            size_t             lenGY);
+INLINE SeosCryptoKey_DH_PUBLIC*
+SeosCryptoKey_getDhPublic(const SeosCryptoKey* key)
+{
+    return key->empty ? NULL : (SeosCryptoKey_DH_PUBLIC*) key->keyBytes;
+}
 
-// seos_err_t
-// SeosCryptoKey_initDhPrivate(SeosCryptoKey*    self,
-//                             void*             algoKeyCtx,
-//                             const void*       p,
-//                             size_t            lenP,
-//                             const void*       g,
-//                             size_t            lenG,
-//                             const void*       x,
-//                             size_t            lenX);
+INLINE SeosCryptoKey_DH_PRIVATE*
+SeosCryptoKey_getDhPrivate(const SeosCryptoKey* key)
+{
+    return key->empty ? NULL : (SeosCryptoKey_DH_PRIVATE*) key->keyBytes;
+}
 
-// seos_err_t
-// SeosCryptoKey_initEcdhPublic(SeosCryptoKey*   self,
-//                              void*            algoKeyCtx,
-//                              unsigned int     curveId,
-//                              const void*      qX,
-//                              size_t           lenQX,
-//                              const void*      qY,
-//                              size_t           lenQY);
-
-// seos_err_t
-// SeosCryptoKey_initEcdhPrivate(SeosCryptoKey*  self,
-//                               void*           algoKeyCtx,
-//                               unsigned int    curveId,
-//                               const void*     d,
-//                               size_t          lenD);
-
-// INLINE size_t
-// SeosCryptoKey_getSize(SeosCryptoKey* self)
-// {
-//     return self->lenBits / CHAR_BIT
-//            + ((self->lenBits % CHAR_BIT) ? 1 : 0);
-// }
+INLINE SeosCryptoKey_AES*
+SeosCryptoKey_getAES(const SeosCryptoKey* key)
+{
+    return key->empty ? NULL : (SeosCryptoKey_AES*) key->keyBytes;
+}
 
 ///@}

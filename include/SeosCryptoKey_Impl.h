@@ -12,8 +12,7 @@
 #pragma once
 
 #include <stddef.h>
-
-#define MAX_KEYBUF_SIZE 64
+#include <stdbool.h>
 
 typedef enum
 {
@@ -50,38 +49,74 @@ typedef struct
     SeosCryptoKey_Type  type;       ///< type of key, see above
     unsigned int        bits;       ///< the security parameter (e.g., key size)
     void*               keyBytes;   ///< pointer to raw key material
+    bool                empty;      ///< indicate if key material is there
     size_t              keySize;    ///< amount of bytes stored
 }
 SeosCryptoKey;
 
 typedef struct __attribute__((__packed__))
 {
-    unsigned char   bytes[MAX_KEYBUF_SIZE];
+    unsigned char   bytes[32]; ///< raw bytes (max: 256 bits)
     size_t          len;
 }
 SeosCryptoKey_AES;
 
 typedef struct __attribute__((__packed__))
 {
-    unsigned char   nBytes[MAX_KEYBUF_SIZE];
+    unsigned char   nBytes[1024]; ///< public modulus (max: 8192 bits)
     size_t          nLen;
-    unsigned char   eBytes[MAX_KEYBUF_SIZE];
+    unsigned char   eBytes[1024]; ///< public exponent (max: 8192 bits)
     size_t          eLen;
 }
 SeosCryptoKey_RSA_PUBLIC;
 typedef struct __attribute__((__packed__))
 {
-    unsigned char   nBytes[MAX_KEYBUF_SIZE];
+    unsigned char   nBytes[1024]; ///< public modulus n=p*q (max: 8192 bits)
     size_t          nLen;
-    unsigned char   eBytes[MAX_KEYBUF_SIZE];
-    size_t          eLen;
-    unsigned char   dBytes[MAX_KEYBUF_SIZE];
+    unsigned char   dBytes[1024]; ///< private exponent d=e^-1 (max: 8192 bits)
     size_t          dLen;
-    unsigned char   pBytes[MAX_KEYBUF_SIZE];
+    unsigned char   pBytes[512]; ///< private prime factor (max: 4096 bits)
     size_t          pLen;
-    unsigned char   qBytes[MAX_KEYBUF_SIZE];
+    unsigned char   qBytes[512]; ///< private prime factor (max: 4096 bits)
     size_t          qLen;
 }
 SeosCryptoKey_RSA_PRIVATE;
+
+typedef struct __attribute__((__packed__))
+{
+    unsigned char   qxBytes[64]; ///< x coord of public point Q=P*d (max: 512 bits)
+    size_t          qxLen;
+    unsigned char   qyBytes[64]; ///< y coord of public point Q=P*d (max: 512 bits)
+    size_t          qyLen;
+}
+SeosCryptoKey_EC_SECP256R1_PUBLIC;
+typedef struct __attribute__((__packed__))
+{
+    unsigned char   dBytes[64]; ///<  private scalar (max: 512 bits)
+    size_t          dLen;
+}
+SeosCryptoKey_EC_SECP256R1_PRIVATE;
+
+typedef struct __attribute__((__packed__))
+{
+    unsigned char   pBytes[1024]; ///< shared prime (max: 8192 bits)
+    size_t          pLen;
+    unsigned char   gBytes[1024]; ///< shared generator (max: 8192 bits)
+    size_t          gLen;
+    unsigned char   yBytes[1024]; ///< public key y=g^x mod p (max: 8192 bits)
+    size_t          yLen;
+}
+SeosCryptoKey_DH_PUBLIC;
+
+typedef struct __attribute__((__packed__))
+{
+    unsigned char   pBytes[1024]; ///< shared prime (max: 8192 bits)
+    size_t          pLen;
+    unsigned char   gBytes[1024]; ///< shared generator (max: 8192 bits)
+    size_t          gLen;
+    unsigned char   xBytes[1024]; ///< private exponent (max: 8192 bits)
+    size_t          xLen;
+}
+SeosCryptoKey_DH_PRIVATE;
 
 /** @} */

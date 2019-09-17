@@ -313,7 +313,6 @@ SeosCrypto_keyInit(SeosCryptoCtx*                   api,
     Debug_PRINTF("\n%s\n", __func__);
 
     *pKeyHandle = self->mem.memIf.malloc(sizeof(SeosCryptoKey));
-
     if (NULL == *pKeyHandle)
     {
         retval = SEOS_ERROR_INSUFFICIENT_SPACE;
@@ -332,7 +331,6 @@ SeosCrypto_keyInit(SeosCryptoCtx*                   api,
             goto err1;
         }
     }
-
     goto exit;
 
 err1:

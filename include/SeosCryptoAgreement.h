@@ -46,9 +46,8 @@ SeosCryptoAgreement_init(SeosCrypto_MemIf*                 memIf,
  * @param rng (optional) seos RNG for protection against side channel attacks
  * @param publicKey (required) their public key
  * @param buf (required) buffer for resulting shared key
- * @param bufSize size of buffer in bytes
- * @param outLen length of shared key in bytes
- *
+ * @param bufSize size of buffer in bytes, will be set to actual length
+  *
  * @return an error code
  * @retval SEOS_SUCCESS if all right
  * @retval SEOS_ERROR_INVALID_PARAMETER if any of the required parameters is
@@ -62,8 +61,7 @@ SeosCryptoAgreement_computeShared(SeosCryptoAgreement*  self,
                                   SeosCryptoRng*        rng,
                                   SeosCryptoKey*        publicKey,
                                   unsigned char*        buf,
-                                  size_t                bufSize,
-                                  size_t*               outLen);
+                                  size_t*               bufSize);
 
 /**
  * @brief closes a key agreement context.

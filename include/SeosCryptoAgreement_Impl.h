@@ -32,8 +32,9 @@ typedef struct
         mbedtls_dhm_context     dh;
         mbedtls_ecdh_context    ecdh;
     }
-    algCtx;
-    SeosCryptoKey*              privateKey;
+    mbedtls;
+
+    const SeosCryptoKey*        prvKey;
 }
 SeosCryptoAgreement;
 

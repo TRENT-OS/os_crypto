@@ -100,11 +100,8 @@ setKeyImpl(SeosCryptoCipher* self)
     case SeosCryptoCipher_Algorithm_AES_CBC_DEC:
     case SeosCryptoCipher_Algorithm_AES_GCM_ENC:
     case SeosCryptoCipher_Algorithm_AES_GCM_DEC:
-        if (SeosCryptoKey_Type_AES == self->key->type)
-        {
-            aesKey = SeosCryptoKey_getAES(self->key);
-        }
-        else
+        if ((SeosCryptoKey_Type_AES != self->key->type)
+            || (aesKey = SeosCryptoKey_getAES(self->key)) == NULL)
         {
             return SEOS_ERROR_INVALID_PARAMETER;
         }
