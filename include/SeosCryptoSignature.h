@@ -12,9 +12,8 @@
 #pragma once
 
 #include "SeosCrypto_Impl.h"
-#include "SeosCryptoDigest_Impl.h"
 #include "SeosCryptoSignature_Impl.h"
-#include "SeosCryptoRng.h"
+#include "SeosCryptoRng_Impl.h"
 
 #include "seos_err.h"
 #include "compiler.h"
@@ -40,9 +39,9 @@ seos_err_t
 SeosCryptoSignature_init(SeosCrypto_MemIf*              memIf,
                          SeosCryptoSignature*           self,
                          SeosCryptoSignature_Algorithm  algorithm,
-                         const SeosCryptoKey*           key,
-                         char*                          iv,
-                         size_t                         ivLen);
+                         SeosCryptoKey*                 prvKey,
+                         SeosCryptoKey*                 pubKey);
+
 /**
  * @brief closes a signature context.
  *
@@ -52,32 +51,11 @@ SeosCryptoSignature_init(SeosCrypto_MemIf*              memIf,
 void
 SeosCryptoSignature_deInit(SeosCrypto_MemIf*            memIf,
                            SeosCryptoSignature*         self);
-/**
- * @brief TBD
- *
- * @param self (required) pointer to context
- * @param input (required) input buffer
- * @param inputSize input buffer size
- *
- * @return an error code
- * @retval SEOS_SUCCESS if all right
- * @retval SEOS_ERROR_INVALID_PARAMETER if any of the required parameters is
- *  missing or wrong
- * @retval SEOS_ERROR_NOT_SUPPORTED if there is no implementation for the given
- *  algorithm
- * @retval SEOS_ERROR_ABORTED if the underlying implementation of the algorithm
- *  fails for any reason or the output buffer is not big enough
- *
- */
-seos_err_t
-SeosCryptoSignature_update(SeosCryptoSignature* self,
-                           const char* input,
-                           size_t inputSize);
+
 /**
  * @brief Sign a hash value
  *
  * @param self (required) pointer to context
- * @param digestAlgo (optional) algorithm ID of hash
  * @param rng (optional) seos RNG for protection against side channel attacks
  * @param hash (required) hash buffer
  * @param hashSize hash buffer size
@@ -103,18 +81,17 @@ SeosCryptoSignature_update(SeosCryptoSignature* self,
  *
  */
 seos_err_t
-SeosCryptoSignature_sign(SeosCryptoSignature* self,
-                         SeosCryptoDigest_Algorithm digestAlgo, // can be none
-                         SeosCryptoRng* rng,
-                         const char* hash,
-                         size_t hashSize,
-                         char* signature,
-                         size_t* signatureSize);
+SeosCryptoSignature_sign(SeosCryptoSignature*       self,
+                         SeosCryptoRng*             rng,
+                         const void*                hash,
+                         size_t                     hashSize,
+                         void*                      signature,
+                         size_t*                    signatureSize);
+
 /**
  * @brief verify a hash value
  *
  * @param self (required) pointer to context
- * @param digestAlgo (optional) algorithm ID of hash
  * @param rng (optional) seos RNG for protection against side channel attacks
  * @param hash (required) hash buffer
  * @param hashSize hash buffer size
@@ -129,12 +106,11 @@ SeosCryptoSignature_sign(SeosCryptoSignature* self,
  *
  */
 seos_err_t
-SeosCryptoSignature_verify(SeosCryptoSignature* self,
-                           SeosCryptoDigest_Algorithm digestAlgo, // can be none
-                           SeosCryptoRng* rng,
-                           const char* hash,
-                           size_t hashSize,
-                           const char* signature,
-                           size_t signatureSize);
+SeosCryptoSignature_verify(SeosCryptoSignature*         self,
+                           SeosCryptoRng*               rng,
+                           const void*                  hash,
+                           size_t                       hashSize,
+                           const void*                  signature,
+                           size_t                       signatureSize);
 
 ///@}

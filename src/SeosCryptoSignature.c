@@ -4,18 +4,19 @@
 
 #include "SeosCryptoSignature.h"
 #include "SeosCryptoKey.h"
+#include "SeosCryptoRng.h"
 
 #include "LibDebug/Debug.h"
 
 #include <string.h>
 
-#define TO_MBEDTL_MD_ALGO(x)    (x)
-
 // Private Functions -----------------------------------------------------------
 
 static seos_err_t
-initImpl(SeosCryptoSignature* self)
+initImpl(SeosCrypto_MemIf*      memIf,
+         SeosCryptoSignature*   self)
 {
+    UNUSED_VAR(memIf);
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
@@ -32,8 +33,11 @@ initImpl(SeosCryptoSignature* self)
 }
 
 static void
-deInitImpl(SeosCryptoSignature* self)
+deInitImpl(SeosCrypto_MemIf*        memIf,
+           SeosCryptoSignature*     self)
 {
+    UNUSED_VAR(memIf);
+
     switch (self->algorithm)
     {
     case SeosCryptoSignature_Algorithm_RSA_PKCS1:
@@ -45,74 +49,75 @@ deInitImpl(SeosCryptoSignature* self)
 }
 
 static seos_err_t
-setKeyImpl(SeosCryptoSignature* self)
+setKeyImpl(SeosCryptoSignature*     self)
 {
     seos_err_t retval = SEOS_SUCCESS;
 
-    switch (self->key->type)
+    if (self->pubKey != NULL)
     {
-    case SeosCryptoKey_Type_RSA_PUBLIC:
-    {
-        SeosCryptoKey_RSA_PUBLIC* pubKey;
-        retval = (self->algorithm != SeosCryptoSignature_Algorithm_RSA_PKCS1)
-                 || (pubKey = SeosCryptoKey_getRsaPublic(self->key)) == NULL
-                 || (mbedtls_rsa_import_raw(&self->mbedtls.rsa,
-                                            pubKey->nBytes, pubKey->nLen,
-                                            NULL, 0, NULL, 0, NULL, 0,
-                                            pubKey->eBytes, pubKey->eLen) != 0)
-                 || (mbedtls_rsa_complete(&self->mbedtls.rsa) != 0)
-                 || (mbedtls_rsa_check_pubkey(&self->mbedtls.rsa) != 0) ?
-                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
-        break;
-    }
-    case SeosCryptoKey_Type_RSA_PRIVATE:
-    {
-        SeosCryptoKey_RSA_PRIVATE* prvKey;
-        retval = (self->algorithm != SeosCryptoSignature_Algorithm_RSA_PKCS1)
-                 || (prvKey = SeosCryptoKey_getRsaPrivate(self->key)) == NULL
-                 || (mbedtls_rsa_import_raw(&self->mbedtls.rsa,
-                                            prvKey->nBytes, prvKey->nLen,
-                                            prvKey->pBytes, prvKey->pLen,
-                                            prvKey->qBytes, prvKey->qLen,
-                                            prvKey->dBytes, prvKey->dLen,
-                                            NULL, 0) != 0)
-                 || (mbedtls_rsa_complete(&self->mbedtls.rsa) != 0)
-                 || (mbedtls_rsa_check_privkey(&self->mbedtls.rsa) != 0) ?
-                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
-
-        break;
-    }
-    default:
-        retval = SEOS_ERROR_NOT_SUPPORTED;
+        switch (self->pubKey->type)
+        {
+        case SeosCryptoKey_Type_RSA_PUBLIC:
+        {
+            SeosCryptoKey_RSA_PUBLIC* pubKey;
+            retval = (self->algorithm != SeosCryptoSignature_Algorithm_RSA_PKCS1)
+                     || (pubKey = SeosCryptoKey_getRsaPublic(self->pubKey)) == NULL
+                     || (mbedtls_rsa_import_raw(&self->mbedtls.rsa,
+                                                pubKey->nBytes, pubKey->nLen,
+                                                NULL, 0, NULL, 0, NULL, 0,
+                                                pubKey->eBytes, pubKey->eLen) != 0)
+                     || (mbedtls_rsa_complete(&self->mbedtls.rsa) != 0)
+                     || (mbedtls_rsa_check_pubkey(&self->mbedtls.rsa) != 0) ?
+                     SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+            break;
+        }
+        default:
+            retval = SEOS_ERROR_NOT_SUPPORTED;
+        }
     }
 
+    if (retval != SEOS_SUCCESS)
+    {
+        goto exit;
+    }
+
+    if (self->prvKey != NULL)
+    {
+        switch (self->prvKey->type)
+        {
+        case SeosCryptoKey_Type_RSA_PRIVATE:
+        {
+            SeosCryptoKey_RSA_PRIVATE* prvKey;
+            retval = (self->algorithm != SeosCryptoSignature_Algorithm_RSA_PKCS1)
+                     || (prvKey = SeosCryptoKey_getRsaPrivate(self->prvKey)) == NULL
+                     || (mbedtls_rsa_import_raw(&self->mbedtls.rsa,
+                                                prvKey->nBytes, prvKey->nLen,
+                                                prvKey->pBytes, prvKey->pLen,
+                                                prvKey->qBytes, prvKey->qLen,
+                                                prvKey->dBytes, prvKey->dLen,
+                                                NULL, 0) != 0)
+                     || (mbedtls_rsa_complete(&self->mbedtls.rsa) != 0)
+                     || (mbedtls_rsa_check_privkey(&self->mbedtls.rsa) != 0) ?
+                     SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+
+            break;
+        }
+        default:
+            retval = SEOS_ERROR_NOT_SUPPORTED;
+        }
+    }
+
+exit:
     return retval;
 }
 
-//static seos_err_t
-//updateImpl(SeosCryptoSignature* self,
-//           const char* input,
-//           size_t inputSize)
-//{
-//    seos_err_t retval = SEOS_ERROR_GENERIC;
-//
-//    switch (self->algorithm)
-//    {
-//    default:
-//        retval = SEOS_ERROR_NOT_SUPPORTED;
-//        break;
-//    }
-//    return retval;
-//}
-
 static seos_err_t
-verifyHashImpl(SeosCryptoSignature* self,
-               SeosCryptoDigest_Algorithm digestAlgo,
-               SeosCryptoRng* rng,
-               const char* hash,
-               size_t hashSize,
-               const char* signature,
-               size_t signatureSize)
+verifyHashImpl(SeosCryptoSignature*         self,
+               SeosCryptoRng*               rng,
+               const void*                  hash,
+               size_t                       hashSize,
+               const void*                  signature,
+               size_t                       signatureSize)
 {
     void* rngFunc = (NULL != rng) ? SeosCryptoRng_getBytesMbedtls : NULL;
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -120,31 +125,19 @@ verifyHashImpl(SeosCryptoSignature* self,
     switch (self->algorithm)
     {
     case SeosCryptoSignature_Algorithm_RSA_PKCS1:
-    {
-        if (self->key->type != SeosCryptoKey_Type_RSA_PUBLIC)
+        if (self->mbedtls.rsa.len != signatureSize)
         {
-            retval = SEOS_ERROR_ABORTED;
+            retval = SEOS_ERROR_INVALID_PARAMETER;
         }
         else
         {
-            if (mbedtls_rsa_pkcs1_verify(&self->mbedtls.rsa,
-                                         rngFunc, rng,
-                                         MBEDTLS_RSA_PUBLIC,
-                                         TO_MBEDTL_MD_ALGO(digestAlgo),
-                                         (unsigned int) hashSize,
-                                         (const unsigned char*) hash,
-                                         (const unsigned char*) signature) != 0)
-            {
-                retval = SEOS_ERROR_ABORTED;
-            }
-            else
-            {
-                retval = SEOS_SUCCESS;
-            }
+            retval = (self->pubKey->type != SeosCryptoKey_Type_RSA_PUBLIC)
+                     || mbedtls_rsa_pkcs1_verify(&self->mbedtls.rsa, rngFunc, rng,
+                                                 MBEDTLS_RSA_PUBLIC, MBEDTLS_MD_NONE, hashSize,
+                                                 hash, signature) != 0 ?
+                     SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         }
-    }
-    break;
-
+        break;
     default:
         retval = SEOS_ERROR_NOT_SUPPORTED;
         break;
@@ -153,56 +146,41 @@ verifyHashImpl(SeosCryptoSignature* self,
 }
 
 static seos_err_t
-signHashImpl(SeosCryptoSignature* self,
-             SeosCryptoDigest_Algorithm digestAlgo,
-             SeosCryptoRng* rng,
-             const char* hash,
-             size_t hashSize,
-             char* signature,
-             size_t* signatureSize)
+signHashImpl(SeosCryptoSignature*       self,
+             SeosCryptoRng*             rng,
+             const void*                hash,
+             size_t                     hashSize,
+             void*                      signature,
+             size_t*                    signatureSize)
 {
     void* rngFunc = (NULL != rng) ? SeosCryptoRng_getBytesMbedtls : NULL;
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
-    UNUSED_VAR(signatureSize);
-
     switch (self->algorithm)
     {
     case SeosCryptoSignature_Algorithm_RSA_PKCS1:
-    {
-        if (self->key->type != SeosCryptoKey_Type_RSA_PRIVATE)
-        {
-            retval = SEOS_ERROR_ABORTED;
-        }
-        else if (self->mbedtls.rsa.len > *signatureSize)
+        if (self->mbedtls.rsa.len > *signatureSize)
         {
             retval = SEOS_ERROR_BUFFER_TOO_SMALL;
         }
         else
         {
-            if (mbedtls_rsa_pkcs1_sign(&self->mbedtls.rsa,
-                                       rngFunc, rng,
-                                       MBEDTLS_RSA_PRIVATE,
-                                       TO_MBEDTL_MD_ALGO(digestAlgo),
-                                       (unsigned int) hashSize,
-                                       (const unsigned char*) hash,
-                                       (unsigned char*) signature) != 0)
-            {
-                retval = SEOS_ERROR_ABORTED;
-            }
-            else
+            retval = (self->pubKey->type != SeosCryptoKey_Type_RSA_PUBLIC)
+                     ||  mbedtls_rsa_pkcs1_sign(&self->mbedtls.rsa, rngFunc, rng,
+                                                MBEDTLS_RSA_PRIVATE, MBEDTLS_MD_NONE, hashSize,
+                                                hash, signature) != 0 ?
+                     SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+            if (retval == SEOS_SUCCESS)
             {
                 *signatureSize = self->mbedtls.rsa.len;
-                retval = SEOS_SUCCESS;
             }
         }
-    }
-    break;
-
+        break;
     default:
         retval = SEOS_ERROR_NOT_SUPPORTED;
         break;
     }
+
     return retval;
 }
 
@@ -212,15 +190,13 @@ seos_err_t
 SeosCryptoSignature_init(SeosCrypto_MemIf*              memIf,
                          SeosCryptoSignature*           self,
                          SeosCryptoSignature_Algorithm  algorithm,
-                         const SeosCryptoKey*           key,
-                         char*                          iv,
-                         size_t                         ivLen)
+                         SeosCryptoKey*                 prvKey,
+                         SeosCryptoKey*                 pubKey)
 {
-    Debug_ASSERT_SELF(self);
-
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
-    if (NULL == key)
+    // We can have one of those keys be empty, but not both
+    if (NULL == memIf || NULL == self || ( NULL == prvKey && NULL == pubKey))
     {
         retval = SEOS_ERROR_INVALID_PARAMETER;
         goto exit;
@@ -229,9 +205,10 @@ SeosCryptoSignature_init(SeosCrypto_MemIf*              memIf,
     memset(self, 0, sizeof(*self));
 
     self->algorithm  = algorithm;
-    self->key        = key;
+    self->prvKey     = prvKey;
+    self->pubKey     = pubKey;
 
-    retval = initImpl(self);
+    retval = initImpl(memIf, self);
     if (retval != SEOS_SUCCESS)
     {
         goto exit;
@@ -245,12 +222,8 @@ SeosCryptoSignature_init(SeosCrypto_MemIf*              memIf,
 
     goto exit;
 err0:
-    deInitImpl(self);
+    deInitImpl(memIf, self);
 exit:
-    if (retval != SEOS_SUCCESS)
-    {
-        Debug_LOG_ERROR("%s: failed with err %d", __func__, retval);
-    }
     return retval;
 }
 
@@ -258,88 +231,57 @@ void
 SeosCryptoSignature_deInit(SeosCrypto_MemIf*            memIf,
                            SeosCryptoSignature*         self)
 {
-    Debug_ASSERT_SELF(self);
-
-    deInitImpl(self);
+    if (NULL != memIf && NULL != self)
+    {
+        deInitImpl(memIf, self);
+    }
 }
 
-//seos_err_t
-//SeosCryptoSignature_update(SeosCryptoSignature* self,
-//                           const char* data,
-//                           size_t len)
-//{
-//    Debug_ASSERT_SELF(self);
-//
-//    seos_err_t retval = SEOS_ERROR_GENERIC;
-//
-//    if (NULL == data || 0 == len)
-//    {
-//        retval = SEOS_ERROR_INVALID_PARAMETER;
-//    }
-//    else
-//    {
-//        retval = updateImpl(self, data, len);
-//    }
-//    return retval;
-//}
-
 seos_err_t
-SeosCryptoSignature_sign(SeosCryptoSignature* self,
-                         SeosCryptoDigest_Algorithm digestAlgo,
-                         SeosCryptoRng* rng,
-                         const char* hash,
-                         size_t hashSize,
-                         char* signature,
-                         size_t* signatureSize)
+SeosCryptoSignature_sign(SeosCryptoSignature*       self,
+                         SeosCryptoRng*             rng,
+                         const void*                hash,
+                         size_t                     hashSize,
+                         void*                      signature,
+                         size_t*                    signatureSize)
 {
-    Debug_ASSERT_SELF(self);
-
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
-    if (NULL == signature || NULL == signatureSize)
+    if (NULL == self || NULL == hash || 0 == hashSize || NULL == signature
+        || NULL == signatureSize)
     {
         retval = SEOS_ERROR_INVALID_PARAMETER;
     }
     else
     {
-        retval = signHashImpl(self,
-                              digestAlgo,
-                              rng,
-                              hash,
-                              hashSize,
-                              signature,
-                              signatureSize);
+        retval = (self->prvKey != NULL) ?
+                 signHashImpl(self, rng, hash, hashSize, signature, signatureSize) :
+                 SEOS_ERROR_ABORTED;
     }
+
     return retval;
 }
 
 seos_err_t
-SeosCryptoSignature_verify(SeosCryptoSignature* self,
-                           SeosCryptoDigest_Algorithm digestAlgo,
-                           SeosCryptoRng* rng,
-                           const char* hash,
-                           size_t hashSize,
-                           const char* signature,
-                           size_t signatureSize)
+SeosCryptoSignature_verify(SeosCryptoSignature*         self,
+                           SeosCryptoRng*               rng,
+                           const void*                  hash,
+                           size_t                       hashSize,
+                           const void*                  signature,
+                           size_t                       signatureSize)
 {
-    Debug_ASSERT_SELF(self);
-
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
-    if (NULL == hash || !hashSize)
+    if (NULL == self || NULL == hash || 0 == hashSize)
     {
         retval = SEOS_ERROR_INVALID_PARAMETER;
     }
     else
     {
-        retval = verifyHashImpl(self,
-                                digestAlgo,
-                                rng,
-                                hash,
-                                hashSize,
-                                signature,
-                                signatureSize);
+        retval = (self->pubKey != NULL) ?
+                 verifyHashImpl(self, rng, hash, hashSize, signature, signatureSize) :
+                 SEOS_ERROR_ABORTED ;
     }
-    Debug_LOG_TRACE("%s: returns %d", __func__, retval);
+
     return retval;
 }
