@@ -134,9 +134,9 @@ SeosCrypto_deInit(SeosCryptoCtx* api)
     SeosCrypto* self = (SeosCrypto*) api;
     Debug_ASSERT_SELF(self);
 
-    PointerVector_dtor(&self->cipherHandleVector);
-    PointerVector_dtor(&self->keyHandleVector);
     PointerVector_dtor(&self->digestHandleVector);
+    PointerVector_dtor(&self->keyHandleVector);
+    PointerVector_dtor(&self->cipherHandleVector);
 
     SeosCryptoRng_deInit(&self->cryptoRng);
 }
