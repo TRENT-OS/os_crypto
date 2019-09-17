@@ -68,16 +68,14 @@ SeosCryptoAgreement_computeShared(SeosCryptoAgreement*  self,
                                   size_t                bufSize,
                                   size_t*               outLen)
 {
+    void* rngFunc = (NULL != rng) ? SeosCryptoRng_getBytesMbedtls : NULL;
     seos_err_t retval;
-    void* rngFunc;
 
     if (NULL == self || NULL == publicKey || NULL == buf
         || publicKey->algorithm != self->algorithm)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-
-    rngFunc = (NULL != rng) ? SeosCryptoRng_getBytes_mbedtls : NULL;
 
     retval = SEOS_SUCCESS;
     switch (self->algorithm)

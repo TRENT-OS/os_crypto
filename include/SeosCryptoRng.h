@@ -89,10 +89,16 @@ SeosCryptoRng_reSeed(SeosCryptoRng*  self,
  * @retval 0 if all right
  *
  */
-int
-SeosCryptoRng_getBytes_mbedtls(SeosCryptoRng*  self,
-                               unsigned char*  buf,
-                               size_t          bufSize);
+INLINE int
+SeosCryptoRng_getBytesMbedtls(void*            self,
+                              unsigned char*   buf,
+                              size_t           bufSize)
+{
+    // Simple wrapper for mbedTLS, to allow the buffered use of the getRandomData()
+    // function as is common, but also to directly pass a function to mbedTLS
+    void* p = buf;
+    return SeosCryptoRng_getBytes(self, &p, bufSize) == SEOS_SUCCESS ? 0 : 1;
+}
 
 /**
  * @brief deinitializes an rng context

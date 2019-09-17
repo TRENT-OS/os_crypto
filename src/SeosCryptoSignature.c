@@ -79,6 +79,7 @@ verifyHashImpl(SeosCryptoSignature* self,
                const char* signature,
                size_t signatureSize)
 {
+    void* rngFunc = (NULL != rng) ? SeosCryptoRng_getBytesMbedtls : NULL;
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
@@ -86,7 +87,6 @@ verifyHashImpl(SeosCryptoSignature* self,
     case SeosCryptoSignature_Algorithm_RSA_PKCS1:
     {
         mbedtls_rsa_context* rsa = (mbedtls_rsa_context*) self->key->algoKeyCtx;
-        void* rngFunc = (NULL != rng) ? SeosCryptoRng_getBytes_mbedtls : NULL;
         if (mbedtls_rsa_pkcs1_verify(rsa,
                                      rngFunc, rng,
                                      MBEDTLS_RSA_PUBLIC,
@@ -120,6 +120,7 @@ signHashImpl(SeosCryptoSignature* self,
              char* signature,
              size_t* signatureSize)
 {
+    void* rngFunc = (NULL != rng) ? SeosCryptoRng_getBytesMbedtls : NULL;
     seos_err_t retval = SEOS_ERROR_GENERIC;
     UNUSED_VAR(signatureSize);
 
@@ -135,7 +136,6 @@ signHashImpl(SeosCryptoSignature* self,
         }
         else
         {
-            void* rngFunc = (NULL != rng) ? SeosCryptoRng_getBytes_mbedtls : NULL;
             int err = mbedtls_rsa_pkcs1_sign(rsa,
                                              rngFunc, rng,
                                              MBEDTLS_RSA_PRIVATE,
