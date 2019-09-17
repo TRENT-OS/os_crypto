@@ -19,9 +19,12 @@ static const SeosCryptoCtx_Vtable SeosCrypto_vtable =
     .digestClose     = SeosCrypto_digestClose,
     .digestUpdate    = SeosCrypto_digestUpdate,
     .digestFinalize  = SeosCrypto_digestFinalize,
+    .keyInit         = SeosCrypto_keyInit,
     .keyGenerate     = SeosCrypto_keyGenerate,
+    .keyGeneratePair = SeosCrypto_keyGeneratePair,
     .keyImport       = SeosCrypto_keyImport,
-    .keyClose        = SeosCrypto_keyClose,
+    .keyExport       = SeosCrypto_keyExport,
+    .keyDeInit       = SeosCrypto_keyDeInit,
     .cipherInit      = SeosCrypto_cipherInit,
     .cipherClose     = SeosCrypto_cipherClose,
     .cipherUpdate    = SeosCrypto_cipherUpdate,
@@ -295,66 +298,41 @@ SeosCrypto_digestFinalize(SeosCryptoCtx*          api,
 }
 
 seos_err_t
-SeosCrypto_keyGenerate(SeosCryptoCtx*           api,
-                       SeosCrypto_KeyHandle*    pKeyHandle,
-                       unsigned int             algorithm,
-                       unsigned int             flags,
-                       size_t                   lenBits)
+SeosCrypto_keyInit(SeosCryptoCtx*                   api,
+                   SeosCrypto_KeyHandle*            pKeyHandle,
+                   unsigned int                     type,
+                   SeosCryptoKey_Flag               flags,
+                   size_t                           secParam)
 {
+    seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCrypto* self = (SeosCrypto*) api;
+
     Debug_ASSERT_SELF(self);
     Debug_ASSERT(self->parent.vtable == &SeosCrypto_vtable);
+    Debug_PRINTF("\n%s\n", __func__);
 
-    seos_err_t retval = SEOS_ERROR_GENERIC;
+    *pKeyHandle = self->mem.memIf.malloc(sizeof(SeosCryptoKey));
 
-    if (NULL == pKeyHandle || !lenBits)
+    if (NULL == *pKeyHandle)
     {
-        retval = SEOS_ERROR_INVALID_PARAMETER;
+        retval = SEOS_ERROR_INSUFFICIENT_SPACE;
         goto exit;
     }
     else
     {
-        size_t sizeRawKey   = lenBits / CHAR_BIT + ((lenBits % CHAR_BIT) ? 1 : 0);
-        size_t sizeObjBytes = sizeof(SeosCryptoKey) + sizeRawKey;
-
-        *pKeyHandle = self->mem.memIf.malloc(sizeObjBytes);
-        if (NULL == *pKeyHandle)
+        retval = SeosCryptoKey_init(*pKeyHandle, type, flags, secParam);
+        if (retval != SEOS_SUCCESS)
+        {
+            goto err0;
+        }
+        else if (!PointerVector_pushBack(&self->digestHandleVector, *pKeyHandle))
         {
             retval = SEOS_ERROR_INSUFFICIENT_SPACE;
-            goto exit;
+            goto err1;
         }
         else
         {
-            char* keyBytes = & (((char*) *pKeyHandle)[sizeof(SeosCryptoKey)]);
-            void* rnd = keyBytes;
-
-            retval = SeosCrypto_rngGetBytes(api,
-                                            &rnd,
-                                            sizeRawKey);
-            if (retval != SEOS_SUCCESS)
-            {
-                goto err0;
-            }
-            retval = SeosCryptoKey_init(*pKeyHandle,
-                                        NULL,
-                                        algorithm,
-                                        flags,
-                                        keyBytes,
-                                        lenBits);
-            if (retval != SEOS_SUCCESS)
-            {
-                goto err0;
-            }
-            else if (!PointerVector_pushBack(&self->keyHandleVector,
-                                             *pKeyHandle))
-            {
-                retval = SEOS_ERROR_INSUFFICIENT_SPACE;
-                goto err1;
-            }
-            else
-            {
-                goto exit;
-            }
+            goto exit;
         }
     }
 err1:
@@ -366,104 +344,67 @@ exit:
 }
 
 seos_err_t
-SeosCrypto_keyImport(SeosCryptoCtx*         api,
-                     SeosCrypto_KeyHandle*  pKeyHandle,
-                     unsigned int           algorithm,
-                     unsigned int           flags,
-                     void const*            keyImportBuffer,
-                     size_t                 keyImportLenBits)
+SeosCrypto_keyGenerate(SeosCryptoCtx*               api,
+                       SeosCrypto_KeyHandle         keyHandle)
 {
-    SeosCrypto* self = (SeosCrypto*) api;
-    Debug_ASSERT_SELF(self);
-    Debug_ASSERT(self->parent.vtable == &SeosCrypto_vtable);
-
-    seos_err_t retval = SEOS_ERROR_GENERIC;
-
-    if (NULL == keyImportBuffer)
-    {
-        retval = SEOS_ERROR_INVALID_PARAMETER;
-    }
-    else
-    {
-        retval = SeosCrypto_keyGenerate(api,
-                                        pKeyHandle,
-                                        algorithm,
-                                        flags,
-                                        keyImportLenBits);
-        if (retval == SEOS_SUCCESS)
-        {
-            SeosCryptoKey* pKey = *pKeyHandle;
-            memcpy(pKey->bytes, keyImportBuffer, SeosCryptoKey_getSize(pKey));
-        }
-    }
-    return retval;
+    Debug_PRINTF("\n%s\n", __func__);
+    return SEOS_ERROR_NOT_SUPPORTED;
 }
 
 seos_err_t
-SeosCrypto_keyExport(SeosCryptoCtx*         api,
-                     SeosCrypto_KeyHandle   keyHandle,
-                     void*                  buffer,
-                     size_t                 bufferLen)
+SeosCrypto_keyGeneratePair(SeosCryptoCtx*           api,
+                           SeosCrypto_KeyHandle     prvKeyHandle,
+                           SeosCrypto_KeyHandle     pubKeyHandle)
 {
-    SeosCrypto* self = (SeosCrypto*) api;
-    Debug_ASSERT_SELF(self);
-    Debug_ASSERT(self->parent.vtable == &SeosCrypto_vtable);
-
-    seos_err_t retval = SEOS_SUCCESS;
-
-    size_t handlePos = SeosCrypto_findHandle(&self->keyHandleVector,
-                                             keyHandle);
-    if (handlePos != -1)
-    {
-        SeosCryptoKey* pKey = keyHandle;
-
-        if (SeosCryptoKey_getSize(keyHandle) > bufferLen)
-        {
-            retval = SEOS_ERROR_BUFFER_TOO_SMALL;
-        }
-        else
-        {
-            switch (pKey->algorithm)
-            {
-//              export only exportable things
-//            case ...:
-//                memcpy(buffer, pKey->bytes, sizeRawKey);
-//                break;
-
-            default:
-                retval = SEOS_ERROR_ABORTED;
-            }
-        }
-    }
-    else
-    {
-        retval = SEOS_ERROR_INVALID_HANDLE;
-    }
-    return retval;
+    Debug_PRINTF("\n%s\n", __func__);
+    return SEOS_ERROR_NOT_SUPPORTED;
 }
 
 seos_err_t
-SeosCrypto_keyClose(SeosCryptoCtx*          api,
-                    SeosCrypto_KeyHandle    keyHandle)
+SeosCrypto_keyImport(SeosCryptoCtx*                 api,
+                     SeosCrypto_KeyHandle           keyHandle,
+                     const void*                    key,
+                     size_t                         keyLen)
 {
+    Debug_PRINTF("\n%s\n", __func__);
+    return SEOS_ERROR_NOT_SUPPORTED;
+}
+
+seos_err_t
+SeosCrypto_keyExport(SeosCryptoCtx*                 api,
+                     SeosCrypto_KeyHandle           keyHandle,
+                     void**                         key,
+                     size_t*                        keySize)
+{
+    Debug_PRINTF("\n%s\n", __func__);
+    return SEOS_ERROR_NOT_SUPPORTED;
+}
+
+seos_err_t
+SeosCrypto_keyDeInit(SeosCryptoCtx*                 api,
+                     SeosCrypto_KeyHandle           keyHandle)
+{
+    seos_err_t retval = SEOS_SUCCESS;
     SeosCrypto* self = (SeosCrypto*) api;
+    size_t handlePos;
+
+    Debug_PRINTF("\n%s\n", __func__);
     Debug_ASSERT_SELF(self);
     Debug_ASSERT(self->parent.vtable == &SeosCrypto_vtable);
 
-    seos_err_t retval = SEOS_SUCCESS;
-
-    size_t handlePos = SeosCrypto_findHandle(&self->keyHandleVector,
-                                             keyHandle);
-    if (handlePos != -1)
+    handlePos = SeosCrypto_findHandle(&self->keyHandleVector, keyHandle);
+    if (-1 != handlePos)
     {
         SeosCryptoKey_deInit(keyHandle);
         SeosCrypto_removeHandle(&self->keyHandleVector, handlePos);
         self->mem.memIf.free(keyHandle);
+        retval = SEOS_SUCCESS;
     }
     else
     {
         retval = SEOS_ERROR_INVALID_HANDLE;
     }
+
     return retval;
 }
 

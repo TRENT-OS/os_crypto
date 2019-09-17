@@ -161,66 +161,37 @@ SeosCrypto_digestFinalize(SeosCryptoCtx*                api,
                           size_t*                       digestSize);
 
 // -------------------------------- Key API ------------------------------------
-/**
- * @brief implements SeosCryptoApi_keyGenerate() in a local connection
- * (function call, no rpc)
- *
- */
 seos_err_t
-SeosCrypto_keyGenerate(SeosCryptoCtx*           api,
-                       SeosCrypto_KeyHandle* pKeyHandle,
-                       unsigned int             algorithm,
-                       unsigned int             flags,
-                       size_t                   lenBits);
-/**
- * @brief implements SeosCryptoApi_keyImport() in a local connection
- * (function call, no rpc)
- *
- */
+SeosCrypto_keyInit(SeosCryptoCtx*                   api,
+                   SeosCrypto_KeyHandle*            keyHandle,
+                   unsigned int                     type,
+                   unsigned int                     flags,
+                   size_t                           secParam);
+
 seos_err_t
-SeosCrypto_keyImport(SeosCryptoCtx*             api,
-                     SeosCrypto_KeyHandle*   pKeyHandle,
-                     unsigned int               algorithm,
-                     unsigned int               flags,
-                     void const*                keyImportBuffer,
-                     size_t                     keyImportLenBits);
-/**
- * @brief export the key material. Export of certain keys may not be allowed.
- *  The public part of an asymmetric key is usually exportable
- *
- * @param api (optional) pointer to the seos_crypto context
- * @param flags contains key specific setting about what to export and which
- *  format is used the format of the key material is specific to the key type
- * @param hKey ///TODO: NOT DOCUMENTED in Wiki
- * @param buffer (optional) if NULL, then the parameter len_buffer contains the
- *  buffer size that is needed on output
- * @param buffer_len (optional) if the parameter buffer is not NULL, the
- *  parameter len_buffer must contain the buffer size on input and will contain
- *  the length used on return
- *
- * @return an error code
- * @retval SEOS_SUCCESS if all right
- * @retval SEOS_ERROR_INVALID_PARAMETER if any of the required parameters is
- *  missing or if any parameter is invalid
- * @retval SEOS_ERROR_INVALID_HANDLE invalid key store handle
- * @retval SEOS_ERROR_BUFFER_TOO_SMALL len_keyBlobBuffer contains the size
- *  that would be needed for the key blob
- * @retval SEOS_ERROR_ACCESS_DENIED export denied
- *
- */
+SeosCrypto_keyGenerate(SeosCryptoCtx*               api,
+                       SeosCrypto_KeyHandle         keyHandle);
+
 seos_err_t
-SeosCrypto_keyExport(SeosCryptoCtx*             api,
-                     SeosCrypto_KeyHandle    keyHandle,
-                     void*                      buffer,
-                     size_t                     bufferLen);
-/**
- * @brief implements SeosCryptoApi_digestInit() in a local connection
- * (function call, no rpc)
- *
- */
+SeosCrypto_keyGeneratePair(SeosCryptoCtx*           api,
+                           SeosCrypto_KeyHandle     prvKeyHandle,
+                           SeosCrypto_KeyHandle     pubKeyHandle);
+
 seos_err_t
-SeosCrypto_keyClose(SeosCryptoCtx*          api,
-                    SeosCrypto_KeyHandle keyHandle);
+SeosCrypto_keyImport(SeosCryptoCtx*                 api,
+                     SeosCrypto_KeyHandle           keyHandle,
+                     const void*                    key,
+                     size_t                         keyLen);
+
+seos_err_t
+SeosCrypto_keyExport(SeosCryptoCtx*                 api,
+                     SeosCrypto_KeyHandle           keyHandle,
+                     void**                         key,
+                     size_t*                        keyLen);
+
+seos_err_t
+SeosCrypto_keyDeInit(SeosCryptoCtx*                 api,
+                     SeosCrypto_KeyHandle           keyHandle);
 
 
 // ----------------------------- Key Derivation --------------------------------

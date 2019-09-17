@@ -52,22 +52,36 @@ typedef seos_err_t
                                  size_t*                    digestSize);
 
 typedef seos_err_t
-(*SeosCryptoCtx_keyGenerateT)(SeosCryptoCtx*            self,
-                              SeosCrypto_KeyHandle*     pKeyHandle,
-                              unsigned int              algorithm,
-                              unsigned int              flags,
-                              size_t                    lenBits);
-typedef seos_err_t
-(*SeosCryptoCtx_keyImportT)(SeosCryptoCtx*              self,
-                            SeosCrypto_KeyHandle*       pKeyHandle,
-                            unsigned int                algorithm,
-                            unsigned int                flags,
-                            void const*                 keyImportBuffer,
-                            size_t                      keyImportLenBits);
+(*SeosCryptoCtx_keyInitT)(SeosCryptoCtx*                   self,
+                          SeosCrypto_KeyHandle*            keyHandle,
+                          unsigned int                     type,
+                          unsigned int                     flags,
+                          size_t                           secParam);
 
 typedef seos_err_t
-(*SeosCryptoCtx_keyCloseT)(SeosCryptoCtx*           self,
-                           SeosCrypto_KeyHandle     keyHandle);
+(*SeosCryptoCtx_keyGenerateT)(SeosCryptoCtx*               self,
+                              SeosCrypto_KeyHandle         keyHandle);
+
+typedef seos_err_t
+(*SeosCryptoCtx_keyGeneratePairT)(SeosCryptoCtx*           self,
+                                  SeosCrypto_KeyHandle     prvKeyHandle,
+                                  SeosCrypto_KeyHandle     pubKeyHandle);
+
+typedef seos_err_t
+(*SeosCryptoCtx_keyImportT)(SeosCryptoCtx*                 self,
+                            SeosCrypto_KeyHandle           keyHandle,
+                            const void*                    key,
+                            size_t                         keyLen);
+
+typedef seos_err_t
+(*SeosCryptoCtx_keyExportT)(SeosCryptoCtx*                 self,
+                            SeosCrypto_KeyHandle           keyHandle,
+                            void**                         key,
+                            size_t*                        keyLen);
+
+typedef seos_err_t
+(*SeosCryptoCtx_keyDeInitT)(SeosCryptoCtx*                 self,
+                            SeosCrypto_KeyHandle           keyHandle);
 
 typedef seos_err_t
 (*SeosCryptoCtx_cipherInitT)(SeosCryptoCtx*                 self,
@@ -119,9 +133,12 @@ typedef struct
     SeosCryptoCtx_digestCloseT      digestClose;
     SeosCryptoCtx_digestUpdateT     digestUpdate;
     SeosCryptoCtx_digestFinalizeT   digestFinalize;
+    SeosCryptoCtx_keyInitT          keyInit;
     SeosCryptoCtx_keyGenerateT      keyGenerate;
+    SeosCryptoCtx_keyGeneratePairT  keyGeneratePair;
     SeosCryptoCtx_keyImportT        keyImport;
-    SeosCryptoCtx_keyCloseT         keyClose;
+    SeosCryptoCtx_keyExportT        keyExport;
+    SeosCryptoCtx_keyDeInitT        keyDeInit;
     SeosCryptoCtx_cipherInitT       cipherInit;
     SeosCryptoCtx_cipherCloseT      cipherClose;
     SeosCryptoCtx_cipherUpdateT     cipherUpdate;

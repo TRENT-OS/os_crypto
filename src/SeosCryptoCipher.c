@@ -87,6 +87,7 @@ deInitImpl(SeosCryptoCipher* self)
 static seos_err_t
 setKeyImpl(SeosCryptoCipher* self)
 {
+    SeosCryptoKey_AES* key = (SeosCryptoKey_AES*)self->key;
     seos_err_t retval = SEOS_SUCCESS;
 
     switch (self->algorithm)
@@ -94,16 +95,14 @@ setKeyImpl(SeosCryptoCipher* self)
     case SeosCryptoCipher_Algorithm_AES_ECB_ENC:
     case SeosCryptoCipher_Algorithm_AES_CBC_ENC:
         retval = mbedtls_aes_setkey_enc(&self->algorithmCtx.aes,
-                                        (const unsigned char*) self->key->bytes,
-                                        self->key->lenBits) ?
+                                        key->bytes, key->len) ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
 
     case SeosCryptoCipher_Algorithm_AES_ECB_DEC:
     case SeosCryptoCipher_Algorithm_AES_CBC_DEC:
         retval = mbedtls_aes_setkey_dec(&self->algorithmCtx.aes,
-                                        (const unsigned char*) self->key->bytes,
-                                        self->key->lenBits) ?
+                                        key->bytes, key->len) ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
 
@@ -111,8 +110,7 @@ setKeyImpl(SeosCryptoCipher* self)
     case SeosCryptoCipher_Algorithm_AES_GCM_DEC:
         retval = mbedtls_gcm_setkey(&self->algorithmCtx.gcm,
                                     MBEDTLS_CIPHER_ID_AES,
-                                    (const unsigned char*) self->key->bytes,
-                                    self->key->lenBits) ?
+                                    key->bytes, key->len) ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
 

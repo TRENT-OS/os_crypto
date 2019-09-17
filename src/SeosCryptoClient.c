@@ -14,9 +14,12 @@ static const SeosCryptoCtx_Vtable SeosCryptoClient_vtable =
     .digestClose     = SeosCryptoClient_digestClose,
     .digestUpdate    = SeosCryptoClient_digestUpdate,
     .digestFinalize  = SeosCryptoClient_digestFinalize,
+    .keyInit         = SeosCryptoClient_keyInit,
     .keyGenerate     = SeosCryptoClient_keyGenerate,
+    .keyGeneratePair = SeosCryptoClient_keyGeneratePair,
     .keyImport       = SeosCryptoClient_keyImport,
-    .keyClose        = SeosCryptoClient_keyClose,
+    .keyExport       = SeosCryptoClient_keyExport,
+    .keyDeInit       = SeosCryptoClient_keyDeInit,
     .cipherInit      = SeosCryptoClient_cipherInit,
     .cipherClose     = SeosCryptoClient_cipherClose,
     .cipherUpdate    = SeosCryptoClient_cipherUpdate,
@@ -246,63 +249,118 @@ SeosCryptoClient_digestFinalize(SeosCryptoCtx*              api,
 }
 
 seos_err_t
-SeosCryptoClient_keyGenerate(SeosCryptoCtx*             api,
-                             SeosCrypto_KeyHandle*      pKeyHandle,
-                             unsigned int               algorithm,
-                             unsigned int               flags,
-                             size_t                     lenBits)
+SeosCryptoClient_keyInit(SeosCryptoCtx*                   api,
+                         SeosCrypto_KeyHandle*            keyHandle,
+                         unsigned int                     type,
+                         SeosCryptoKey_Flag               flags,
+                         size_t                           secParam)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
-    Debug_ASSERT_SELF(self);
+    Debug_ASSERT(self);
     Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
-
-    return SeosCryptoRpc_keyGenerate(self->rpcHandle,
-                                     pKeyHandle,
-                                     algorithm,
-                                     flags,
-                                     lenBits);
+    return SeosCryptoRpc_keyInit(self->rpcHandle, keyHandle, type, flags, secParam);
 }
 
 seos_err_t
-SeosCryptoClient_keyImport(SeosCryptoCtx*           api,
-                           SeosCrypto_KeyHandle*    pKeyHandle,
-                           unsigned int             algorithm,
-                           unsigned int             flags,
-                           void const*              keyImportBuffer,
-                           size_t                   keyImportLenBits)
+SeosCryptoClient_keyGenerate(SeosCryptoCtx*               api,
+                             SeosCrypto_KeyHandle         keyHandle)
+{
+    SeosCryptoClient* self = (SeosCryptoClient*) api;
+    Debug_ASSERT(self);
+    Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
+    return SeosCryptoRpc_keyGenerate(self->rpcHandle, keyHandle);
+}
+
+seos_err_t
+SeosCryptoClient_keyGeneratePair(SeosCryptoCtx*           api,
+                                 SeosCrypto_KeyHandle     prvKeyHandle,
+                                 SeosCrypto_KeyHandle     pubKeyHandle)
+{
+    SeosCryptoClient* self = (SeosCryptoClient*) api;
+    Debug_ASSERT(self);
+    Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
+    return SeosCryptoRpc_keyGeneratePair(self->rpcHandle, prvKeyHandle,
+                                         pubKeyHandle);
+}
+
+seos_err_t
+SeosCryptoClient_keyImport(SeosCryptoCtx*                 api,
+                           SeosCrypto_KeyHandle           keyHandle,
+                           const void*                    key,
+                           size_t                         keyLen)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
     Debug_ASSERT_SELF(self);
     Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
 
     seos_err_t retval   = SEOS_ERROR_GENERIC;
-    size_t sizeRawKey   = keyImportLenBits / CHAR_BIT
-                          + ((keyImportLenBits % CHAR_BIT) ? 1 : 0);
 
-    if (sizeRawKey > PAGE_SIZE)
+    if (keyLen > PAGE_SIZE)
     {
         retval = SEOS_ERROR_INVALID_PARAMETER;
     }
     else
     {
-        memcpy(self->clientDataport, keyImportBuffer, sizeRawKey);
-        retval = SeosCryptoRpc_keyImport(self->rpcHandle,
-                                         pKeyHandle,
-                                         algorithm,
-                                         flags,
-                                         keyImportLenBits);
+        memcpy(self->clientDataport, key, keyLen);
+        retval = SeosCryptoRpc_keyImport(self->rpcHandle, keyHandle, keyLen);
     }
     return retval;
 }
 
 seos_err_t
-SeosCryptoClient_keyClose(SeosCryptoCtx*        api,
-                          SeosCrypto_KeyHandle  keyHandle)
+SeosCryptoClient_keyExport(SeosCryptoCtx*                 api,
+                           SeosCrypto_KeyHandle           keyHandle,
+                           void**                         key,
+                           size_t*                        keySize)
+{
+    SeosCryptoClient* self = (SeosCryptoClient*) api;
+    Debug_ASSERT_SELF(self);
+    Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
+
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    if (NULL == key || NULL == keySize)
+    {
+        retval = SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else if ((retval = SeosCryptoRpc_keyExport(self->rpcHandle,
+                                               keyHandle)) == SEOS_SUCCESS)
+    {
+        size_t* outSize  = (size_t*) self->clientDataport;
+        char*   out      = &(((char*) self->clientDataport)[sizeof(*keySize)]);
+
+        if (*key != NULL)
+        {
+            if (*keySize < *outSize)
+            {
+                retval = SEOS_ERROR_BUFFER_TOO_SMALL;
+            }
+            else
+            {
+                *keySize = *outSize;
+                memcpy(*key, out, *keySize);
+                retval = SEOS_SUCCESS;
+            }
+        }
+        else
+        {
+            *keySize = *outSize;
+            *key     = out;
+            retval   = SEOS_SUCCESS;
+        }
+    }
+
+    return retval;
+}
+
+seos_err_t
+SeosCryptoClient_keyDeInit(SeosCryptoCtx*                 api,
+                           SeosCrypto_KeyHandle           keyHandle)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
     Debug_ASSERT(self);
     Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
-    return SeosCryptoRpc_keyClose(self->rpcHandle, keyHandle);
+    return SeosCryptoRpc_keyDeInit(self->rpcHandle, keyHandle);
 }
 
 seos_err_t
@@ -377,27 +435,26 @@ SeosCryptoClient_cipherUpdate(SeosCryptoCtx*                api,
 
         if (SEOS_SUCCESS == retval)
         {
-            size_t* obtainedOutputSize  = (size_t*) self->clientDataport;
-            char*   obtainedOutput      = &(((char*) self->clientDataport)
-                                            [sizeof(*outputSize)]);
+            size_t* outSize = (size_t*) self->clientDataport;
+            char*   out     = &(((char*) self->clientDataport)[sizeof(*outputSize)]);
 
             if (*output != NULL)
             {
-                if (*outputSize < *obtainedOutputSize)
+                if (*outputSize < *outSize)
                 {
                     retval = SEOS_ERROR_BUFFER_TOO_SMALL;
                 }
                 else
                 {
-                    *outputSize = *obtainedOutputSize;
-                    memcpy(*output, obtainedOutput, *outputSize);
+                    *outputSize = *outSize;
+                    memcpy(*output, out, *outputSize);
                     retval = SEOS_SUCCESS;
                 }
             }
             else
             {
-                *outputSize = *obtainedOutputSize;
-                *output     = obtainedOutput;
+                *outputSize = *outSize;
+                *output     = out;
                 retval      = SEOS_SUCCESS;
             }
         }
@@ -452,27 +509,26 @@ SeosCryptoClient_cipherFinalize(SeosCryptoCtx*              api,
         retval = SeosCryptoRpc_cipherFinalize(self->rpcHandle, cipherHandle);
         if (SEOS_SUCCESS == retval)
         {
-            size_t* obtainedOutputSize  = (size_t*) self->clientDataport;
-            char*   obtainedOutput      = &(((char*) self->clientDataport)
-                                            [sizeof(*outputSize)]);
+            size_t* outSize  = (size_t*) self->clientDataport;
+            char*   out      = &(((char*) self->clientDataport)[sizeof(*outputSize)]);
 
             if (*output != NULL)
             {
-                if (*outputSize < *obtainedOutputSize)
+                if (*outputSize < *outSize)
                 {
                     retval = SEOS_ERROR_BUFFER_TOO_SMALL;
                 }
                 else
                 {
-                    *outputSize = *obtainedOutputSize;
-                    memcpy(*output, obtainedOutput, *outputSize);
+                    *outputSize = *outSize;
+                    memcpy(*output, out, *outputSize);
                     retval = SEOS_SUCCESS;
                 }
             }
             else
             {
-                *outputSize = *obtainedOutputSize;
-                *output     = obtainedOutput;
+                *outputSize = *outSize;
+                *output     = out;
                 retval      = SEOS_SUCCESS;
             }
         }

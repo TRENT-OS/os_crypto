@@ -160,34 +160,39 @@ SeosCryptoClient_digestFinalizeNoData2(SeosCryptoClient*        self,
                                                  &pDigest,
                                                  &digestSize);
 }
-/**
- * @brief implements SeosCryptoApi_keyGenerate() in a rpc connection
- *
- */
+
 seos_err_t
-SeosCryptoClient_keyGenerate(SeosCryptoCtx*             api,
-                             SeosCrypto_KeyHandle*      pKeyHandle,
-                             unsigned int               algorithm,
-                             unsigned int               flags,
-                             size_t                     lenBits);
-/**
- * @brief implements SeosCryptoApi_keyImport() in a rpc connection
- *
- */
+SeosCryptoClient_keyInit(SeosCryptoCtx*                   ctx,
+                         SeosCrypto_KeyHandle*            keyHandle,
+                         unsigned int                     type,
+                         unsigned int                     flags,
+                         size_t                           keySize);
+
 seos_err_t
-SeosCryptoClient_keyImport(SeosCryptoCtx*               api,
-                           SeosCrypto_KeyHandle*        pKeyHandle,
-                           unsigned int                 algorithm,
-                           unsigned int                 flags,
-                           void const*                  keyImportBuffer,
-                           size_t                       keyImportLenBits);
-/**
- * @brief implements SeosCryptoApi_keyClose() in a rpc connection
- *
- */
+SeosCryptoClient_keyGenerate(SeosCryptoCtx*               ctx,
+                             SeosCrypto_KeyHandle         keyHandle);
+
 seos_err_t
-SeosCryptoClient_keyClose(SeosCryptoCtx*            api,
-                          SeosCrypto_KeyHandle      keyHandle);
+SeosCryptoClient_keyGeneratePair(SeosCryptoCtx*           ctx,
+                                 SeosCrypto_KeyHandle     prvKeyHandle,
+                                 SeosCrypto_KeyHandle     pubKeyHandle);
+
+seos_err_t
+SeosCryptoClient_keyImport(SeosCryptoCtx*                 ctx,
+                           SeosCrypto_KeyHandle           keyHandle,
+                           const void*                    key,
+                           size_t                         keyLen);
+
+seos_err_t
+SeosCryptoClient_keyExport(SeosCryptoCtx*                 ctx,
+                           SeosCrypto_KeyHandle           keyHandle,
+                           void**                         key,
+                           size_t*                        keySize);
+
+seos_err_t
+SeosCryptoClient_keyDeInit(SeosCryptoCtx*                 ctx,
+                           SeosCrypto_KeyHandle           keyHandle);
+
 /**
  * @brief implements SeosCryptoApi_cipherInit() in a rpc connection
  *

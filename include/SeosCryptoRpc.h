@@ -108,33 +108,59 @@ seos_err_t
 SeosCryptoRpc_digestFinalize(SeosCryptoRpc*             self,
                              SeosCrypto_DigestHandle    digestHandle,
                              size_t                     len);
+
 /**
- * @brief rpc management of SeosCrypto_keyGenerate()
+ * @brief rpc management of SeosCryptoRpc_keyInit()
  *
  */
 seos_err_t
-SeosCryptoRpc_keyGenerate(SeosCryptoRpc*            self,
-                          SeosCrypto_KeyHandle*     pKeyHandle,
-                          unsigned int              algorithm,
-                          unsigned int              flags,
-                          size_t                    lenBits);
+SeosCryptoRpc_keyInit(SeosCryptoRpc*                   self,
+                      SeosCrypto_KeyHandle*            keyHandle,
+                      unsigned int                     type,
+                      SeosCryptoKey_Flag               flags,
+                      size_t                           secParam);
+
 /**
- * @brief rpc management of SeosCrypto_keyImport()
+ * @brief rpc management of SeosCryptoRpc_keyGenerate()
  *
  */
 seos_err_t
-SeosCryptoRpc_keyImport(SeosCryptoRpc*          self,
-                        SeosCrypto_KeyHandle*   pKeyHandle,
-                        unsigned int            algorithm,
-                        unsigned int            flags,
-                        size_t                  keyImportLenBits);
+SeosCryptoRpc_keyGenerate(SeosCryptoRpc*               self,
+                          SeosCrypto_KeyHandle         keyHandle);
+
 /**
- * @brief rpc management of SeosCrypto_keyClose()
+ * @brief rpc management of SeosCryptoRpc_keyGeneratePair()
  *
  */
 seos_err_t
-SeosCryptoRpc_keyClose(SeosCryptoRpc*          self,
-                       SeosCrypto_KeyHandle    keyHandle);
+SeosCryptoRpc_keyGeneratePair(SeosCryptoRpc*           self,
+                              SeosCrypto_KeyHandle     prvKeyHandle,
+                              SeosCrypto_KeyHandle     pubKeyHandle);
+
+/**
+ * @brief rpc management of SeosCryptoRpc_keyImport()
+ *
+ */
+seos_err_t
+SeosCryptoRpc_keyImport(SeosCryptoRpc*                 self,
+                        SeosCrypto_KeyHandle           keyHandle,
+                        size_t                         keyLen);
+
+/**
+ * @brief rpc management of SeosCryptoRpc_keyExport()
+ *
+ */
+seos_err_t
+SeosCryptoRpc_keyExport(SeosCryptoRpc*                 self,
+                        SeosCrypto_KeyHandle           keyHandle);
+
+/**
+ * @brief rpc management of SeosCryptoRpc_keyDeInit()
+ *
+ */
+seos_err_t
+SeosCryptoRpc_keyDeInit(SeosCryptoRpc*                 self,
+                        SeosCrypto_KeyHandle           keyHandle);
 
 /**
  * @brief rpc management of SeosCrypto_cipherInit()

@@ -19,7 +19,7 @@ struct SeosCryptoSignature
     {
         mbedtls_rsa_context     rsa;
     }
-    agorithmCtx;
+    mbedtls;
 
     SeosCryptoSignature_Algorithm   algorithm;
     SeosCryptoKey const*            key;
