@@ -7,9 +7,7 @@
 
 #include "LibDebug/Debug.h"
 
-#include "mbedtls/rsa.h"
 #include "mbedtls/ecp.h"
-#include "mbedtls/dhm.h"
 
 #include <string.h>
 
@@ -613,4 +611,84 @@ SeosCryptoKey_deInit(SeosCrypto_MemIf*          memIf,
     }
 
     return deInitImpl(memIf, self);
+}
+
+seos_err_t
+SeosCryptoKey_writeRSAPub(const SeosCryptoKey* key,
+                          mbedtls_rsa_context* rsa)
+{
+    SeosCryptoKey_RSAPub* pubKey;
+    return (pubKey = SeosCryptoKey_getRSAPub(key)) == NULL
+           || (mbedtls_rsa_import_raw(rsa,
+                                      pubKey->nBytes, pubKey->nLen,
+                                      NULL, 0, NULL, 0, NULL, 0,
+                                      pubKey->eBytes, pubKey->eLen) != 0)
+           || (mbedtls_rsa_complete(rsa) != 0)
+           || (mbedtls_rsa_check_pubkey(rsa) != 0) ?
+           SEOS_ERROR_INVALID_PARAMETER : SEOS_SUCCESS;
+}
+
+seos_err_t
+SeosCryptoKey_writeRSAPrv(const SeosCryptoKey* key,
+                          mbedtls_rsa_context* rsa)
+{
+    SeosCryptoKey_RSAPrv* prvKey;
+    return (prvKey = SeosCryptoKey_getRSAPrv(key)) == NULL
+           || (mbedtls_rsa_import_raw(rsa,
+                                      prvKey->nBytes, prvKey->nLen,
+                                      prvKey->pBytes, prvKey->pLen,
+                                      prvKey->qBytes, prvKey->qLen,
+                                      prvKey->dBytes, prvKey->dLen,
+                                      NULL, 0) != 0)
+           || (mbedtls_rsa_complete(rsa) != 0)
+           || (mbedtls_rsa_check_privkey(rsa) != 0) ?
+           SEOS_ERROR_INVALID_PARAMETER : SEOS_SUCCESS;
+}
+
+seos_err_t
+SeosCryptoKey_writeDHPub(const SeosCryptoKey* key,
+                         mbedtls_dhm_context* dh)
+{
+    SeosCryptoKey_DHPub* dhKey;
+    return (dhKey = SeosCryptoKey_getDHPub(key)) == NULL
+           || mbedtls_mpi_read_binary(&dh->GY, dhKey->yBytes, dhKey->yLen) != 0
+           || dhm_check_range(&dh->GY, &dh->P) != 0 ?
+           SEOS_ERROR_INVALID_PARAMETER : SEOS_SUCCESS;
+}
+
+seos_err_t
+SeosCryptoKey_writeDHPrv(const SeosCryptoKey* key,
+                         mbedtls_dhm_context* dh)
+{
+    SeosCryptoKey_DHPrv* dhKey;
+    return (dhKey = SeosCryptoKey_getDHPrv(key)) == NULL
+           || mbedtls_mpi_read_binary(&dh->P, dhKey->pBytes, dhKey->pLen) != 0
+           || mbedtls_mpi_read_binary(&dh->G, dhKey->gBytes, dhKey->gLen) != 0
+           || mbedtls_mpi_read_binary(&dh->X, dhKey->xBytes, dhKey->xLen) != 0
+           || dhm_check_range(&dh->X, &dh->P) != 0 ?
+           SEOS_ERROR_INVALID_PARAMETER : SEOS_SUCCESS;
+}
+
+seos_err_t
+SeosCryptoKey_writeSECP256r1Pub(const SeosCryptoKey*  key,
+                                mbedtls_ecdh_context* ecdh)
+{
+    SeosCryptoKey_SECP256r1Pub* ecKey;
+    return  (ecKey = SeosCryptoKey_getSECP256r1Pub(key)) == NULL
+            || mbedtls_mpi_read_binary(&ecdh->Qp.X, ecKey->qxBytes, ecKey->qxLen) != 0
+            || mbedtls_mpi_read_binary(&ecdh->Qp.Y, ecKey->qyBytes, ecKey->qyLen) != 0
+            || mbedtls_mpi_lset(&ecdh->Qp.Z, 1) != 0
+            || mbedtls_ecp_check_pubkey(&ecdh->grp, &ecdh->Qp) != 0 ?
+            SEOS_ERROR_INVALID_PARAMETER : SEOS_SUCCESS;
+}
+
+seos_err_t
+SeosCryptoKey_writeSECP256r1Prv(const SeosCryptoKey*  key,
+                                mbedtls_ecdh_context* ecdh)
+{
+    SeosCryptoKey_SECP256r1Prv* ecKey;
+    return (ecKey = SeosCryptoKey_getSECP256r1Prv(key)) == NULL
+           || mbedtls_ecp_group_load(&ecdh->grp, MBEDTLS_ECP_DP_SECP256R1) != 0
+           || mbedtls_mpi_read_binary(&ecdh->d, ecKey->dBytes, ecKey->dLen) != 0 ?
+           SEOS_ERROR_INVALID_PARAMETER : SEOS_SUCCESS;
 }

@@ -58,56 +58,29 @@ setKeyImpl(SeosCryptoSignature*     self)
         switch (self->pubKey->type)
         {
         case SeosCryptoKey_Type_RSA_PUB:
-        {
-            SeosCryptoKey_RSAPub* pubKey;
-            retval = (self->algorithm != SeosCryptoSignature_Algorithm_RSA_PKCS1)
-                     || (pubKey = SeosCryptoKey_getRSAPub(self->pubKey)) == NULL
-                     || (mbedtls_rsa_import_raw(&self->mbedtls.rsa,
-                                                pubKey->nBytes, pubKey->nLen,
-                                                NULL, 0, NULL, 0, NULL, 0,
-                                                pubKey->eBytes, pubKey->eLen) != 0)
-                     || (mbedtls_rsa_complete(&self->mbedtls.rsa) != 0)
-                     || (mbedtls_rsa_check_pubkey(&self->mbedtls.rsa) != 0) ?
-                     SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+            retval = (self->algorithm == SeosCryptoSignature_Algorithm_RSA_PKCS1) ?
+                     SeosCryptoKey_writeRSAPub(self->pubKey,
+                                               &self->mbedtls.rsa) : SEOS_ERROR_ABORTED;
             break;
-        }
         default:
             retval = SEOS_ERROR_NOT_SUPPORTED;
         }
     }
 
-    if (retval != SEOS_SUCCESS)
-    {
-        goto exit;
-    }
-
-    if (self->prvKey != NULL)
+    if (SEOS_SUCCESS == retval && NULL != self->prvKey)
     {
         switch (self->prvKey->type)
         {
         case SeosCryptoKey_Type_RSA_PRV:
-        {
-            SeosCryptoKey_RSAPrv* prvKey;
-            retval = (self->algorithm != SeosCryptoSignature_Algorithm_RSA_PKCS1)
-                     || (prvKey = SeosCryptoKey_getRSAPrv(self->prvKey)) == NULL
-                     || (mbedtls_rsa_import_raw(&self->mbedtls.rsa,
-                                                prvKey->nBytes, prvKey->nLen,
-                                                prvKey->pBytes, prvKey->pLen,
-                                                prvKey->qBytes, prvKey->qLen,
-                                                prvKey->dBytes, prvKey->dLen,
-                                                NULL, 0) != 0)
-                     || (mbedtls_rsa_complete(&self->mbedtls.rsa) != 0)
-                     || (mbedtls_rsa_check_privkey(&self->mbedtls.rsa) != 0) ?
-                     SEOS_ERROR_ABORTED : SEOS_SUCCESS;
-
+            retval = (self->algorithm == SeosCryptoSignature_Algorithm_RSA_PKCS1) ?
+                     SeosCryptoKey_writeRSAPrv(self->prvKey,
+                                               &self->mbedtls.rsa) : SEOS_ERROR_ABORTED;
             break;
-        }
         default:
             retval = SEOS_ERROR_NOT_SUPPORTED;
         }
     }
 
-exit:
     return retval;
 }
 

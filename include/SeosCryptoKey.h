@@ -17,6 +17,10 @@
 #include "seos_err.h"
 #include "compiler.h"
 
+#include "mbedtls/rsa.h"
+#include "mbedtls/ecdh.h"
+#include "mbedtls/dhm.h"
+
 #include <stddef.h>
 
 /**
@@ -96,5 +100,29 @@ SeosCryptoKey_getAES(const SeosCryptoKey* key)
 {
     return key->empty ? NULL : (SeosCryptoKey_AES*) key->keyBytes;
 }
+
+seos_err_t
+SeosCryptoKey_writeRSAPub(const SeosCryptoKey*        key,
+                          mbedtls_rsa_context*        rsa);
+
+seos_err_t
+SeosCryptoKey_writeRSAPrv(const SeosCryptoKey*        key,
+                          mbedtls_rsa_context*        rsa);
+
+seos_err_t
+SeosCryptoKey_writeDHPub(const SeosCryptoKey*         key,
+                         mbedtls_dhm_context*         dh);
+
+seos_err_t
+SeosCryptoKey_writeDHPrv(const SeosCryptoKey*         key,
+                         mbedtls_dhm_context*         dh);
+
+seos_err_t
+SeosCryptoKey_writeSECP256r1Pub(const SeosCryptoKey*  key,
+                                mbedtls_ecdh_context* ecdh);
+
+seos_err_t
+SeosCryptoKey_writeSECP256r1Prv(const SeosCryptoKey*  key,
+                                mbedtls_ecdh_context* ecdh);
 
 ///@}
