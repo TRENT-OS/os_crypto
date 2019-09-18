@@ -16,7 +16,7 @@
 /*
  * This implementation should never be optimized out by the compiler
  *
- * This implementation for mbedtls_platform_zeroize() was inspired from
+ * This implementation for mbedtls_platform_zeroizeMemory() was inspired from
  * Colin Percival's blog article at:
  *
  * http://www.daemonology.net/blog/2014-09-04-how-to-zero-a-buffer.html
@@ -34,8 +34,10 @@
  *
  */
 static void* (* const volatile memset_func)( void*, int, size_t ) = memset;
+
 static void
-zeroize( void* buf, size_t len )
+zeroizeMemory(void*   buf,
+              size_t  len)
 {
     if ( len > 0 )
     {
@@ -55,39 +57,46 @@ zeroize( void* buf, size_t len )
  *  http://www.cl.cam.ac.uk/~rja14/Papers/psandqs.pdf
  *  http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2005-2643
  */
-static int dhm_check_range(const mbedtls_mpi* param, const mbedtls_mpi* P)
+static int
+checkDhRange(const mbedtls_mpi*     param,
+             const mbedtls_mpi*     P)
 {
     mbedtls_mpi L, U;
     int ret = 0;
 
-    mbedtls_mpi_init( &L );
-    mbedtls_mpi_init( &U );
+    mbedtls_mpi_init(&L);
+    mbedtls_mpi_init(&U);
 
-    MBEDTLS_MPI_CHK( mbedtls_mpi_lset( &L, 2 ) );
-    MBEDTLS_MPI_CHK( mbedtls_mpi_sub_int( &U, P, 2 ) );
-
-    if ( mbedtls_mpi_cmp_mpi( param, &L ) < 0 ||
-         mbedtls_mpi_cmp_mpi( param, &U ) > 0 )
+    if (mbedtls_mpi_lset(&L, 2) != 0 || mbedtls_mpi_sub_int(&U, P, 2) != 0)
     {
-        ret = MBEDTLS_ERR_DHM_BAD_INPUT_DATA;
+        ret = SEOS_ERROR_ABORTED;
+        goto cleanup;
+    }
+
+    if (mbedtls_mpi_cmp_mpi(param, &L) < 0 || mbedtls_mpi_cmp_mpi(param, &U) > 0)
+    {
+        ret = SEOS_ERROR_INVALID_PARAMETER;
     }
 
 cleanup:
-    mbedtls_mpi_free( &L );
-    mbedtls_mpi_free( &U );
-    return ( ret );
+    mbedtls_mpi_free(&U);
+    mbedtls_mpi_free(&L);
+
+    return ret;
 }
 
 static size_t
-getMpiLen(const unsigned char* xVal,
-          size_t xLen)
+getMpiLen(const unsigned char*  xVal,
+          size_t                xLen)
 {
     mbedtls_mpi x;
     size_t n;
 
     mbedtls_mpi_init(&x);
+
     mbedtls_mpi_read_binary(&x, xVal, xLen);
     n = mbedtls_mpi_bitlen(&x);
+
     mbedtls_mpi_free(&x);
 
     return n;
@@ -206,7 +215,7 @@ deInitImpl(SeosCrypto_MemIf*            memIf,
     // We may have stored sensitive key data here, better make sure to remove it.
     if (!self->empty)
     {
-        zeroize(self->keyBytes, self->keySize);
+        zeroizeMemory(self->keyBytes, self->keySize);
     }
     memIf->free(self->keyBytes);
 
@@ -226,10 +235,8 @@ genImpl(SeosCryptoKey*      self,
     switch (self->type)
     {
     case SeosCryptoKey_Type_AES:
-    {
         retval = SeosCryptoRng_getBytes(rng, &ptr, self->keySize);
         break;
-    }
     default:
         retval = SEOS_ERROR_NOT_SUPPORTED;
     }
@@ -285,42 +292,20 @@ genDHPairImpl(SeosCryptoKey*  prvKey,
     SeosCryptoKey_DHPrv* prvDh = (SeosCryptoKey_DHPrv*) prvKey->keyBytes;
     SeosCryptoKey_DHPub* pubDh = (SeosCryptoKey_DHPub*) pubKey->keyBytes;
     mbedtls_dhm_context dh;
-    mbedtls_mpi Q, X, GX;
+    mbedtls_mpi X, GX;
     void* rngFunc = SeosCryptoRng_getBytesMbedtls;
     size_t retries;
 
     mbedtls_dhm_init(&dh);
-    mbedtls_mpi_init(&Q);
     mbedtls_mpi_init(&X);
     mbedtls_mpi_init(&GX);
 
     // Generate a "safe prime" P such that Q=(P-1)/2 is also prime
     retval = SEOS_ERROR_ABORTED;
-    retries = 10;
-    while (retries > 0)
-    {
-        if (mbedtls_mpi_gen_prime(&dh.P, prvKey->bits, 1, rngFunc, rng) != 0 ||
-            mbedtls_mpi_sub_int(&Q, &dh.P, 1) != 0 ||
-            mbedtls_mpi_div_int(&Q, NULL, &Q, 2) != 0)
-        {
-            break;
-        }
-        // The prime test is iterated; a general recommendation is to set the amount
-        // of iterations to half of the security parameter, e.g., the numbe of
-        // bits of prime.
-        else if (mbedtls_mpi_is_prime_ext(&Q, prvKey->bits / 2, rngFunc, rng) == 0)
-        {
-            retval = SEOS_SUCCESS;
-            break;
-        }
-        retries--;
-        Debug_LOG_WARNING("Could not generate prime P for DH, retrying..");
-    }
-
-    if (SEOS_SUCCESS == retval)
+    if (0 == mbedtls_mpi_gen_prime(&dh.P, prvKey->bits,
+                                   MBEDTLS_MPI_GEN_PRIME_FLAG_DH, rngFunc, rng))
     {
         // Generate an X as large as possible
-        retval = SEOS_ERROR_ABORTED;
         retries = 10;
         while (retries > 0)
         {
@@ -328,13 +313,11 @@ genDHPairImpl(SeosCryptoKey*  prvKey,
             {
                 break;
             }
-
             while (mbedtls_mpi_cmp_mpi(&X, &dh.P) >= 0)
             {
                 mbedtls_mpi_shift_r(&X, 1);
             }
-
-            if (dhm_check_range(&X, &dh.P) == 0)
+            if (checkDhRange(&X, &dh.P) == 0)
             {
                 retval = SEOS_SUCCESS;
                 break;
@@ -346,27 +329,26 @@ genDHPairImpl(SeosCryptoKey*  prvKey,
         if (SEOS_SUCCESS == retval
             && mbedtls_mpi_lset(&dh.G, SeosCryptoKey_DH_GENERATOR) == 0
             && mbedtls_mpi_exp_mod(&GX, &dh.G, &X, &dh.P, &dh.RP) == 0
-            && dhm_check_range(&GX, &dh.P) == 0)
+            && checkDhRange(&GX, &dh.P) == 0)
         {
-            prvDh->pLen = mbedtls_mpi_size(&dh.P);
-            prvDh->gLen = mbedtls_mpi_size(&dh.G);
-            prvDh->xLen = mbedtls_mpi_size(&X);
-            pubDh->pLen = mbedtls_mpi_size(&dh.P);
-            pubDh->gLen = mbedtls_mpi_size(&dh.G);
-            pubDh->yLen = mbedtls_mpi_size(&GX);
-            retval = mbedtls_mpi_write_binary(&X,    prvDh->xBytes, prvDh->xLen) != 0 ||
-                     mbedtls_mpi_write_binary(&GX,   pubDh->yBytes, pubDh->yLen) != 0 ||
-                     mbedtls_mpi_write_binary(&dh.P, prvDh->pBytes, prvDh->pLen) != 0 ||
-                     mbedtls_mpi_write_binary(&dh.G, prvDh->gBytes, prvDh->gLen) != 0 ||
-                     mbedtls_mpi_write_binary(&dh.G, pubDh->gBytes, pubDh->gLen) != 0 ||
-                     mbedtls_mpi_write_binary(&dh.P, pubDh->pBytes, pubDh->pLen) != 0 ?
+            prvDh->pLen  = mbedtls_mpi_size(&dh.P);
+            prvDh->gLen  = mbedtls_mpi_size(&dh.G);
+            prvDh->xLen  = mbedtls_mpi_size(&X);
+            pubDh->pLen  = mbedtls_mpi_size(&dh.P);
+            pubDh->gLen  = mbedtls_mpi_size(&dh.G);
+            pubDh->gxLen = mbedtls_mpi_size(&GX);
+            retval = mbedtls_mpi_write_binary(&X,    prvDh->xBytes,  prvDh->xLen) != 0 ||
+                     mbedtls_mpi_write_binary(&GX,   pubDh->gxBytes, pubDh->gxLen) != 0 ||
+                     mbedtls_mpi_write_binary(&dh.P, prvDh->pBytes,  prvDh->pLen) != 0 ||
+                     mbedtls_mpi_write_binary(&dh.G, prvDh->gBytes,  prvDh->gLen) != 0 ||
+                     mbedtls_mpi_write_binary(&dh.G, pubDh->gBytes,  pubDh->gLen) != 0 ||
+                     mbedtls_mpi_write_binary(&dh.P, pubDh->pBytes,  pubDh->pLen) != 0 ?
                      SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         }
     }
 
     mbedtls_mpi_free(&GX);
     mbedtls_mpi_free(&X);
-    mbedtls_mpi_free(&Q);
     mbedtls_dhm_free(&dh);
 
     return retval;
@@ -406,9 +388,9 @@ genSECP256r1PairImpl(SeosCryptoKey*  prvKey,
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
     }
 
-    mbedtls_ecp_group_free(&grp);
-    mbedtls_ecp_point_free(&Q);
     mbedtls_mpi_free(&d);
+    mbedtls_ecp_point_free(&Q);
+    mbedtls_ecp_group_free(&grp);
 
     return retval;
 }
@@ -651,8 +633,8 @@ SeosCryptoKey_writeDHPub(const SeosCryptoKey* key,
 {
     SeosCryptoKey_DHPub* dhKey;
     return (dhKey = SeosCryptoKey_getDHPub(key)) == NULL
-           || mbedtls_mpi_read_binary(&dh->GY, dhKey->yBytes, dhKey->yLen) != 0
-           || dhm_check_range(&dh->GY, &dh->P) != 0 ?
+           || mbedtls_mpi_read_binary(&dh->GY, dhKey->gxBytes, dhKey->gxLen) != 0
+           || checkDhRange(&dh->GY, &dh->P) != 0 ?
            SEOS_ERROR_INVALID_PARAMETER : SEOS_SUCCESS;
 }
 
@@ -665,7 +647,7 @@ SeosCryptoKey_writeDHPrv(const SeosCryptoKey* key,
            || mbedtls_mpi_read_binary(&dh->P, dhKey->pBytes, dhKey->pLen) != 0
            || mbedtls_mpi_read_binary(&dh->G, dhKey->gBytes, dhKey->gLen) != 0
            || mbedtls_mpi_read_binary(&dh->X, dhKey->xBytes, dhKey->xLen) != 0
-           || dhm_check_range(&dh->X, &dh->P) != 0 ?
+           || checkDhRange(&dh->X, &dh->P) != 0 ?
            SEOS_ERROR_INVALID_PARAMETER : SEOS_SUCCESS;
 }
 

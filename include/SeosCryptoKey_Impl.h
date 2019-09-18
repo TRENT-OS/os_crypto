@@ -106,8 +106,8 @@ typedef struct __attribute__((__packed__))
     size_t          pLen;
     unsigned char   gBytes[SeosCryptoKey_Size_DH_PUB]; ///< shared generator
     size_t          gLen;
-    unsigned char   yBytes[SeosCryptoKey_Size_DH_PUB]; ///< public key y=g^x mod p
-    size_t          yLen;
+    unsigned char   gxBytes[SeosCryptoKey_Size_DH_PUB]; ///< public key g^x mod p
+    size_t          gxLen;
 }
 SeosCryptoKey_DHPub;
 
