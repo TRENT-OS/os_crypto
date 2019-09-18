@@ -32,20 +32,25 @@ initImpl(SeosCrypto_MemIf*      memIf,
     return retval;
 }
 
-static void
+static seos_err_t
 deInitImpl(SeosCrypto_MemIf*        memIf,
            SeosCryptoSignature*     self)
 {
     UNUSED_VAR(memIf);
+    seos_err_t retval = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
     case SeosCryptoSignature_Algorithm_RSA_PKCS1:
         mbedtls_rsa_free(&self->mbedtls.rsa);
+        retval = SEOS_SUCCESS;
         break;
     default:
+        retval = SEOS_ERROR_NOT_SUPPORTED;
         break;
     }
+
+    return retval;
 }
 
 static seos_err_t
@@ -134,6 +139,7 @@ signHashImpl(SeosCryptoSignature*       self,
     case SeosCryptoSignature_Algorithm_RSA_PKCS1:
         if (self->mbedtls.rsa.len > *signatureSize)
         {
+            Debug_PRINTF("%s: %i, %i\n", __func__, self->mbedtls.rsa.len, *signatureSize);
             retval = SEOS_ERROR_BUFFER_TOO_SMALL;
         }
         else
@@ -200,14 +206,16 @@ exit:
     return retval;
 }
 
-void
+seos_err_t
 SeosCryptoSignature_deInit(SeosCrypto_MemIf*            memIf,
                            SeosCryptoSignature*         self)
 {
-    if (NULL != memIf && NULL != self)
+    if (NULL == memIf || NULL == self)
     {
-        deInitImpl(memIf, self);
+        return SEOS_ERROR_INVALID_PARAMETER;
     }
+
+    return deInitImpl(memIf, self);
 }
 
 seos_err_t
@@ -215,7 +223,7 @@ SeosCryptoSignature_sign(SeosCryptoSignature*       self,
                          SeosCryptoRng*             rng,
                          const void*                hash,
                          size_t                     hashSize,
-                         void*                      signature,
+                         void**                     signature,
                          size_t*                    signatureSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -227,8 +235,13 @@ SeosCryptoSignature_sign(SeosCryptoSignature*       self,
     }
     else
     {
+        if (NULL == *signature)
+        {
+            *signature      = self->outBuf;
+            *signatureSize  = sizeof(self->outBuf);
+        }
         retval = (self->prvKey != NULL) ?
-                 signHashImpl(self, rng, hash, hashSize, signature, signatureSize) :
+                 signHashImpl(self, rng, hash, hashSize, *signature, signatureSize) :
                  SEOS_ERROR_ABORTED;
     }
 

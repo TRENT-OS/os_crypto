@@ -6,6 +6,7 @@
 #include "SeosCryptoKey.h"
 #include "SeosCryptoRng.h"
 #include "SeosCryptoDigest.h"
+#include "SeosCryptoSignature.h"
 #include "SeosCrypto.h"
 
 #include "LibDebug/Debug.h"
@@ -24,6 +25,10 @@ static const SeosCryptoCtx_Vtable SeosCrypto_vtable =
     .keyImport       = SeosCrypto_keyImport,
     .keyExport       = SeosCrypto_keyExport,
     .keyDeInit       = SeosCrypto_keyDeInit,
+    .signatureInit   = SeosCrypto_signatureInit,
+    .signatureDeInit = SeosCrypto_signatureDeInit,
+    .signatureSign   = SeosCrypto_signatureSign,
+    .signatureVerify = SeosCrypto_signatureVerify,
     .cipherInit      = SeosCrypto_cipherInit,
     .cipherClose     = SeosCrypto_cipherClose,
     .cipherUpdate    = SeosCrypto_cipherUpdate,
@@ -95,6 +100,11 @@ SeosCrypto_init(SeosCrypto*             self,
             retval = SEOS_ERROR_ABORTED;
             goto err1;
         }
+        else if (!PointerVector_ctor(&self->signatureHandleVector, 1))
+        {
+            retval = SEOS_ERROR_ABORTED;
+            goto err2;
+        }
     }
     else
     {
@@ -108,19 +118,21 @@ SeosCrypto_init(SeosCrypto*             self,
                                          entropyFunc,
                                          entropyCtx)) != SEOS_SUCCESS)
         {
-            goto err2;
+            goto err3;
         }
     }
     else
     {
         retval = SEOS_ERROR_INVALID_PARAMETER;
-        goto err2;
+        goto err3;
     }
 
     self->parent.vtable = &SeosCrypto_vtable;
     retval = SEOS_SUCCESS;
     goto exit;
 
+err3:
+    PointerVector_dtor(&self->signatureHandleVector);
 err2:
     PointerVector_dtor(&self->cipherHandleVector);
 err1:
@@ -137,9 +149,10 @@ SeosCrypto_deInit(SeosCryptoCtx* api)
     SeosCrypto* self = (SeosCrypto*) api;
     Debug_ASSERT_SELF(self);
 
-    PointerVector_dtor(&self->digestHandleVector);
-    PointerVector_dtor(&self->keyHandleVector);
+    PointerVector_dtor(&self->signatureHandleVector);
     PointerVector_dtor(&self->cipherHandleVector);
+    PointerVector_dtor(&self->keyHandleVector);
+    PointerVector_dtor(&self->digestHandleVector);
 
     SeosCryptoRng_deInit(&self->mem.memIf, &self->cryptoRng);
 }
@@ -296,6 +309,121 @@ SeosCrypto_digestFinalize(SeosCryptoCtx*          api,
         retval = SEOS_ERROR_INVALID_HANDLE;
     }
     return retval;
+}
+
+seos_err_t
+SeosCrypto_signatureInit(SeosCryptoCtx*                api,
+                         SeosCrypto_SignatureHandle*   pSigHandle,
+                         unsigned int                  algorithm,
+                         SeosCrypto_KeyHandle          prvHandle,
+                         SeosCrypto_KeyHandle          pubHandle)
+{
+    SeosCrypto* self = (SeosCrypto*) api;
+    Debug_ASSERT_SELF(self);
+    Debug_ASSERT(self->parent.vtable == &SeosCrypto_vtable);
+
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    *pSigHandle = self->mem.memIf.malloc(sizeof(SeosCryptoSignature));
+    if (NULL == *pSigHandle)
+    {
+        retval = SEOS_ERROR_INSUFFICIENT_SPACE;
+        goto exit;
+    }
+    else
+    {
+        retval = SeosCryptoSignature_init(&self->mem.memIf, *pSigHandle, algorithm,
+                                          prvHandle, pubHandle);
+        if (retval != SEOS_SUCCESS)
+        {
+            goto err0;
+        }
+        else if (!PointerVector_pushBack(&self->signatureHandleVector,
+                                         *pSigHandle))
+        {
+            retval = SEOS_ERROR_INSUFFICIENT_SPACE;
+            goto err1;
+        }
+        else
+        {
+            goto exit;
+        }
+    }
+err1:
+    SeosCryptoSignature_deInit(&self->mem.memIf, *pSigHandle);
+err0:
+    self->mem.memIf.free(*pSigHandle);
+exit:
+    return retval;
+}
+
+seos_err_t
+SeosCrypto_signatureDeInit(SeosCryptoCtx*               api,
+                           SeosCrypto_SignatureHandle   sigHandle)
+{
+    seos_err_t retval = SEOS_SUCCESS;
+    SeosCrypto* self = (SeosCrypto*) api;
+
+    Debug_ASSERT_SELF(self);
+    Debug_ASSERT(self->parent.vtable == &SeosCrypto_vtable);
+
+    size_t handlePos = SeosCrypto_findHandle(&self->signatureHandleVector,
+                                             sigHandle);
+    if (handlePos != -1)
+    {
+        if ((retval = SeosCryptoSignature_deInit(&self->mem.memIf,
+                                                 sigHandle)) != SEOS_SUCCESS)
+        {
+            SeosCrypto_removeHandle(&self->signatureHandleVector, handlePos);
+            self->mem.memIf.free(sigHandle);
+        }
+    }
+    else
+    {
+        retval = SEOS_ERROR_INVALID_HANDLE;
+    }
+
+    return retval;
+}
+
+seos_err_t
+SeosCrypto_signatureSign(SeosCryptoCtx*                 api,
+                         SeosCrypto_SignatureHandle     sigHandle,
+                         const void*                    hash,
+                         size_t                         hashSize,
+                         void**                         signature,
+                         size_t*                        signatureSize)
+{
+    SeosCrypto* self = (SeosCrypto*) api;
+
+    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    return SeosCrypto_findHandle(&self->signatureHandleVector, sigHandle) != -1 ?
+           SeosCryptoSignature_sign(sigHandle, &self->cryptoRng, hash, hashSize, signature,
+                                    signatureSize) : SEOS_ERROR_INVALID_HANDLE;
+}
+
+seos_err_t
+SeosCrypto_signatureVerify(SeosCryptoCtx*                 api,
+                           SeosCrypto_SignatureHandle     sigHandle,
+                           const void*                    hash,
+                           size_t                         hashSize,
+                           const void*                    signature,
+                           size_t                         signatureSize)
+{
+    SeosCrypto* self = (SeosCrypto*) api;
+
+    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    return SeosCrypto_findHandle(&self->signatureHandleVector, sigHandle) != -1 ?
+           SeosCryptoSignature_verify(sigHandle, &self->cryptoRng, hash, hashSize,
+                                      signature, signatureSize) : SEOS_ERROR_INVALID_HANDLE;
 }
 
 seos_err_t

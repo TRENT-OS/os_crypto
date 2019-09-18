@@ -22,6 +22,10 @@ static const SeosCryptoCtx_Vtable SeosCryptoClient_vtable =
     .keyImport       = SeosCryptoClient_keyImport,
     .keyExport       = SeosCryptoClient_keyExport,
     .keyDeInit       = SeosCryptoClient_keyDeInit,
+    .signatureInit   = SeosCryptoClient_signatureInit,
+    .signatureDeInit = SeosCryptoClient_signatureDeInit,
+    .signatureSign   = SeosCryptoClient_signatureSign,
+    .signatureVerify = SeosCryptoClient_signatureVerify,
     .cipherInit      = SeosCryptoClient_cipherInit,
     .cipherClose     = SeosCryptoClient_cipherClose,
     .cipherUpdate    = SeosCryptoClient_cipherUpdate,
@@ -247,6 +251,122 @@ SeosCryptoClient_digestFinalize(SeosCryptoCtx*              api,
             }
         }
     }
+    return retval;
+}
+
+
+seos_err_t
+SeosCryptoClient_signatureInit(SeosCryptoCtx*                api,
+                               SeosCrypto_SignatureHandle*   pSigHandle,
+                               unsigned int                  algorithm,
+                               SeosCrypto_KeyHandle          prvHandle,
+                               SeosCrypto_KeyHandle          pubHandle)
+{
+    SeosCryptoClient* self = (SeosCryptoClient*) api;
+
+    if (NULL == api || NULL == pSigHandle
+        || self->parent.vtable != &SeosCryptoClient_vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    return SeosCryptoRpc_signatureInit(self->rpcHandle, pSigHandle, algorithm,
+                                       prvHandle, pubHandle);
+}
+
+seos_err_t
+SeosCryptoClient_signatureDeInit(SeosCryptoCtx*               api,
+                                 SeosCrypto_SignatureHandle   sigHandle)
+{
+    SeosCryptoClient* self = (SeosCryptoClient*) api;
+
+    if (NULL == api || self->parent.vtable != &SeosCryptoClient_vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    return SeosCryptoRpc_signatureDeInit(self->rpcHandle, sigHandle);
+}
+
+seos_err_t
+SeosCryptoClient_signatureSign(SeosCryptoCtx*                 api,
+                               SeosCrypto_SignatureHandle     sigHandle,
+                               const void*                    hash,
+                               size_t                         hashSize,
+                               void**                         signature,
+                               size_t*                        signatureSize)
+{
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+    SeosCryptoClient* self = (SeosCryptoClient*) api;
+
+    if (NULL == api || self->parent.vtable != &SeosCryptoClient_vtable
+        || NULL == hash || NULL == signature || NULL == signatureSize)
+    {
+        retval = SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else if (hashSize > PAGE_SIZE)
+    {
+        retval = SEOS_ERROR_BUFFER_TOO_SMALL;
+    }
+    else
+    {
+        memcpy(self->clientDataport, hash, hashSize);
+        if ((retval = SeosCryptoRpc_signatureSign(self->rpcHandle, sigHandle,
+                                                  hashSize)) == SEOS_SUCCESS)
+        {
+            size_t* serverSigLen = (size_t*) self->clientDataport;
+            char*   serverSig    = (char*) self->clientDataport + sizeof(size_t);
+            if (*signature != NULL)
+            {
+                if  (*signatureSize < *serverSigLen)
+                {
+                    retval = SEOS_ERROR_BUFFER_TOO_SMALL;
+                }
+                else
+                {
+                    *signatureSize = *serverSigLen;
+                    memcpy(*signature, serverSig, *serverSigLen);
+                }
+            }
+            else
+            {
+                *signatureSize = *serverSigLen;
+                *signature     = serverSig;
+            }
+        }
+    }
+
+    return retval;
+}
+
+seos_err_t
+SeosCryptoClient_signatureVerify(SeosCryptoCtx*                 api,
+                                 SeosCrypto_SignatureHandle     sigHandle,
+                                 const void*                    hash,
+                                 size_t                         hashSize,
+                                 const void*                    signature,
+                                 size_t                         signatureSize)
+{
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+    SeosCryptoClient* self = (SeosCryptoClient*) api;
+
+    if (NULL == api || self->parent.vtable != &SeosCryptoClient_vtable
+        || NULL == hash || NULL == signature)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else if (hashSize + signatureSize > PAGE_SIZE)
+    {
+        retval = SEOS_ERROR_BUFFER_TOO_SMALL;
+    }
+    else
+    {
+        memcpy(self->clientDataport, hash, hashSize);
+        memcpy(self->clientDataport + hashSize, signature, signatureSize);
+        retval = SeosCryptoRpc_signatureVerify(self->rpcHandle, sigHandle, hashSize,
+                                               signatureSize);
+    }
+
     return retval;
 }
 

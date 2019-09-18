@@ -88,6 +88,34 @@ typedef seos_err_t
 (*SeosCryptoCtx_keyDeInitT)(SeosCryptoCtx*                 self,
                             SeosCrypto_KeyHandle           keyHandle);
 
+
+typedef seos_err_t
+(*SeosCryptoCtx_signatureInitT)(SeosCryptoCtx*                self,
+                                SeosCrypto_SignatureHandle*   pSigHandle,
+                                unsigned int                  algorithm,
+                                SeosCrypto_KeyHandle          prvHandle,
+                                SeosCrypto_KeyHandle          pubHandle);
+
+typedef seos_err_t
+(*SeosCryptoCtx_signatureDeInitT)(SeosCryptoCtx*               self,
+                                  SeosCrypto_SignatureHandle   sigHandle);
+
+typedef seos_err_t
+(*SeosCryptoCtx_signatureSignT)(SeosCryptoCtx*                 self,
+                                SeosCrypto_SignatureHandle     sigHandle,
+                                const void*                    hash,
+                                size_t                         hashSize,
+                                void**                         signature,
+                                size_t*                        signatureSize);
+
+typedef seos_err_t
+(*SeosCryptoCtx_signatureVerifyT)(SeosCryptoCtx*                 self,
+                                  SeosCrypto_SignatureHandle     sigHandle,
+                                  const void*                    hash,
+                                  size_t                         hashSize,
+                                  const void*                    signature,
+                                  size_t                         signatureSize);
+
 typedef seos_err_t
 (*SeosCryptoCtx_cipherInitT)(SeosCryptoCtx*                 self,
                              SeosCrypto_CipherHandle*       pCipherHandle,
@@ -144,6 +172,10 @@ typedef struct
     SeosCryptoCtx_keyImportT        keyImport;
     SeosCryptoCtx_keyExportT        keyExport;
     SeosCryptoCtx_keyDeInitT        keyDeInit;
+    SeosCryptoCtx_signatureInitT    signatureInit;
+    SeosCryptoCtx_signatureDeInitT  signatureDeInit;
+    SeosCryptoCtx_signatureSignT    signatureSign;
+    SeosCryptoCtx_signatureVerifyT  signatureVerify;
     SeosCryptoCtx_cipherInitT       cipherInit;
     SeosCryptoCtx_cipherCloseT      cipherClose;
     SeosCryptoCtx_cipherUpdateT     cipherUpdate;

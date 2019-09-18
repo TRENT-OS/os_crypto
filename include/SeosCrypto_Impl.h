@@ -51,6 +51,7 @@ typedef struct
     PointerVector keyHandleVector;
     PointerVector digestHandleVector;
     PointerVector cipherHandleVector;
+    PointerVector signatureHandleVector;
 } SeosCrypto;
 
 /** @} */

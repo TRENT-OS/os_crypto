@@ -48,7 +48,7 @@ SeosCryptoSignature_init(SeosCrypto_MemIf*              memIf,
  * @param self (required) pointer to context to initialize
  *
  */
-void
+seos_err_t
 SeosCryptoSignature_deInit(SeosCrypto_MemIf*            memIf,
                            SeosCryptoSignature*         self);
 
@@ -85,7 +85,7 @@ SeosCryptoSignature_sign(SeosCryptoSignature*       self,
                          SeosCryptoRng*             rng,
                          const void*                hash,
                          size_t                     hashSize,
-                         void*                      signature,
+                         void**                     signature,
                          size_t*                    signatureSize);
 
 /**

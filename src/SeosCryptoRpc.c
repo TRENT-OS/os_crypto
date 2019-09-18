@@ -330,6 +330,69 @@ SeosCryptoRpc_keyDeInit(SeosCryptoRpc*                  self,
 }
 
 seos_err_t
+SeosCryptoRpc_signatureInit(SeosCryptoRpc*                   self,
+                            SeosCrypto_SignatureHandle*      pSigHandle,
+                            unsigned int                     algorithm,
+                            SeosCrypto_KeyHandle             prvHandle,
+                            SeosCrypto_KeyHandle             pubHandle)
+{
+    return !isValidHandle(self) ?
+           SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_signatureInit(self->seosCryptoApi, pSigHandle, algorithm, prvHandle,
+                                    pubHandle);
+}
+
+seos_err_t
+SeosCryptoRpc_signatureVerify(SeosCryptoRpc*                self,
+                              SeosCrypto_SignatureHandle    sigHandle,
+                              size_t                        hashSize,
+                              size_t                        signatureSize)
+{
+    return !isValidHandle(self) ?
+           SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_signatureVerify(self->seosCryptoApi, sigHandle, self->serverDataport,
+                                      hashSize, self->serverDataport + hashSize, signatureSize);
+}
+
+seos_err_t
+SeosCryptoRpc_signatureSign(SeosCryptoRpc*                self,
+                            SeosCrypto_SignatureHandle    sigHandle,
+                            size_t                        hashSize)
+{
+    seos_err_t      retval = SEOS_ERROR_GENERIC;
+    size_t          sigSize = 0;
+    void*           pSig = NULL;
+
+    if (!isValidHandle(self))
+    {
+        retval = SEOS_ERROR_INVALID_HANDLE;
+    }
+    else if ((retval = SeosCrypto_signatureSign(self->seosCryptoApi, sigHandle,
+                                                self->serverDataport, hashSize, &pSig, &sigSize)) == SEOS_SUCCESS)
+    {
+        if (sigSize + sizeof(sigSize) > PAGE_SIZE)
+        {
+            retval = SEOS_ERROR_BUFFER_TOO_SMALL;
+        }
+        else
+        {
+            memcpy(self->serverDataport, &sigSize, sizeof(sigSize));
+            memcpy(self->serverDataport + sizeof(sigSize), pSig, sigSize);
+        }
+    }
+
+    return retval;
+}
+
+seos_err_t
+SeosCryptoRpc_signatureDeInit(SeosCryptoRpc*                  self,
+                              SeosCrypto_SignatureHandle      sigHandle)
+{
+    return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_signatureDeInit(self->seosCryptoApi, sigHandle);
+}
+
+seos_err_t
 SeosCryptoRpc_cipherInit(SeosCryptoRpc*              self,
                          SeosCrypto_CipherHandle*    pCipherHandle,
                          SeosCryptoCipher_Algorithm algorithm,

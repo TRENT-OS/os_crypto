@@ -294,4 +294,51 @@ SeosCrypto_cipherVerifyTag(SeosCryptoCtx*                api,
                            const void*                   tag,
                            size_t                        tagSize);
 
+/**
+ * @brief implements SeosCryptoApi_signatureInit() in a local connection
+ * (function call, no rpc)
+ *
+ */
+seos_err_t
+SeosCrypto_signatureInit(SeosCryptoCtx*                api,
+                         SeosCrypto_SignatureHandle*   pSigHandle,
+                         unsigned int                  algorithm,
+                         SeosCrypto_KeyHandle          prvHandle,
+                         SeosCrypto_KeyHandle          pubHandle);
+
+/**
+ * @brief implements SeosCryptoApi_signatureDeInit() in a local connection
+ * (function call, no rpc)
+ *
+ */
+seos_err_t
+SeosCrypto_signatureDeInit(SeosCryptoCtx*               api,
+                           SeosCrypto_SignatureHandle   sigHandle);
+
+/**
+ * @brief implements SeosCryptoApi_signatureSign() in a local connection
+ * (function call, no rpc)
+ *
+ */
+seos_err_t
+SeosCrypto_signatureSign(SeosCryptoCtx*                 api,
+                         SeosCrypto_SignatureHandle     sigHandle,
+                         const void*                    hash,
+                         size_t                         hashSize,
+                         void**                         signature,
+                         size_t*                        signatureSize);
+
+/**
+ * @brief implements SeosCryptoApi_signatureVerify() in a local connection
+ * (function call, no rpc)
+ *
+ */
+seos_err_t
+SeosCrypto_signatureVerify(SeosCryptoCtx*                 api,
+                           SeosCrypto_SignatureHandle     sigHandle,
+                           const void*                    hash,
+                           size_t                         hashSize,
+                           const void*                    signature,
+                           size_t                         signatureSize);
+
 /** @} */

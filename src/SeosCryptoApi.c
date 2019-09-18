@@ -83,6 +83,53 @@ SeosCryptoApi_digestFinalize(SeosCryptoCtx*              cryptoCtx,
 }
 
 seos_err_t
+SeosCryptoApi_signatureInit(SeosCryptoCtx*                cryptoCtx,
+                            SeosCrypto_SignatureHandle*   pSigHandle,
+                            unsigned int                  algorithm,
+                            SeosCrypto_KeyHandle          prvHandle,
+                            SeosCrypto_KeyHandle          pubHandle)
+{
+    Debug_ASSERT_SELF(cryptoCtx);
+    return cryptoCtx->vtable->signatureInit(cryptoCtx, pSigHandle, algorithm,
+                                            prvHandle, pubHandle);
+}
+
+seos_err_t
+SeosCryptoApi_signatureDeInit(SeosCryptoCtx*               cryptoCtx,
+                              SeosCrypto_SignatureHandle   sigHandle)
+{
+    Debug_ASSERT_SELF(cryptoCtx);
+    return cryptoCtx->vtable->signatureDeInit(cryptoCtx, sigHandle);
+}
+
+seos_err_t
+SeosCryptoApi_signatureSign(SeosCryptoCtx*                 cryptoCtx,
+                            SeosCrypto_SignatureHandle     sigHandle,
+                            const void*                    hash,
+                            size_t                         hashSize,
+                            void*                          signature,
+                            size_t*                        signatureSize)
+{
+    Debug_ASSERT_SELF(cryptoCtx);
+    void* pSig = signature;
+    return cryptoCtx->vtable->signatureSign(cryptoCtx, sigHandle, hash, hashSize,
+                                            &pSig, signatureSize);
+}
+
+seos_err_t
+SeosCryptoApi_signatureVerify(SeosCryptoCtx*                 cryptoCtx,
+                              SeosCrypto_SignatureHandle     sigHandle,
+                              const void*                    hash,
+                              size_t                         hashSize,
+                              const void*                    signature,
+                              size_t                         signatureSize)
+{
+    Debug_ASSERT_SELF(cryptoCtx);
+    return cryptoCtx->vtable->signatureVerify(cryptoCtx, sigHandle, hash, hashSize,
+                                              signature, signatureSize);
+}
+
+seos_err_t
 SeosCryptoApi_keyInit(SeosCryptoCtx*                   ctx,
                       SeosCrypto_KeyHandle*            keyHandle,
                       unsigned int                     type,

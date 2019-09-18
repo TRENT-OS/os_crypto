@@ -152,6 +152,33 @@ SeosCryptoClient_digestFinalizeNoData2(SeosCryptoClient*        self,
 }
 
 seos_err_t
+SeosCryptoClient_signatureInit(SeosCryptoCtx*                api,
+                               SeosCrypto_SignatureHandle*   pSigHandle,
+                               unsigned int                  algorithm,
+                               SeosCrypto_KeyHandle          prvHandle,
+                               SeosCrypto_KeyHandle          pubHandle);
+
+seos_err_t
+SeosCryptoClient_signatureDeInit(SeosCryptoCtx*               api,
+                                 SeosCrypto_SignatureHandle   sigHandle);
+
+seos_err_t
+SeosCryptoClient_signatureSign(SeosCryptoCtx*                 api,
+                               SeosCrypto_SignatureHandle     sigHandle,
+                               const void*                    hash,
+                               size_t                         hashSize,
+                               void**                         signature,
+                               size_t*                        signatureSize);
+
+seos_err_t
+SeosCryptoClient_signatureVerify(SeosCryptoCtx*                 api,
+                                 SeosCrypto_SignatureHandle     sigHandle,
+                                 const void*                    hash,
+                                 size_t                         hashSize,
+                                 const void*                    signature,
+                                 size_t                         signatureSize);
+
+seos_err_t
 SeosCryptoClient_keyInit(SeosCryptoCtx*                   ctx,
                          SeosCrypto_KeyHandle*            keyHandle,
                          unsigned int                     type,
