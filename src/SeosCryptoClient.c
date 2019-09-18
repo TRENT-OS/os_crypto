@@ -10,29 +10,32 @@
 
 static const SeosCryptoCtx_Vtable SeosCryptoClient_vtable =
 {
-    .rngGetBytes     = SeosCryptoClient_rngGetBytes,
-    .rngReSeed       = SeosCryptoClient_rngReSeed,
-    .digestInit      = SeosCryptoClient_digestInit,
-    .digestClose     = SeosCryptoClient_digestClose,
-    .digestUpdate    = SeosCryptoClient_digestUpdate,
-    .digestFinalize  = SeosCryptoClient_digestFinalize,
-    .keyInit         = SeosCryptoClient_keyInit,
-    .keyGenerate     = SeosCryptoClient_keyGenerate,
-    .keyGeneratePair = SeosCryptoClient_keyGeneratePair,
-    .keyImport       = SeosCryptoClient_keyImport,
-    .keyExport       = SeosCryptoClient_keyExport,
-    .keyDeInit       = SeosCryptoClient_keyDeInit,
-    .signatureInit   = SeosCryptoClient_signatureInit,
-    .signatureDeInit = SeosCryptoClient_signatureDeInit,
-    .signatureSign   = SeosCryptoClient_signatureSign,
-    .signatureVerify = SeosCryptoClient_signatureVerify,
-    .cipherInit      = SeosCryptoClient_cipherInit,
-    .cipherClose     = SeosCryptoClient_cipherClose,
-    .cipherUpdate    = SeosCryptoClient_cipherUpdate,
-    .cipherUpdateAd  = SeosCryptoClient_cipherUpdateAd,
-    .cipherFinalize  = SeosCryptoClient_cipherFinalize,
-    .cipherVerifyTag = SeosCryptoClient_cipherVerifyTag,
-    .deInit          = SeosCryptoClient_deInit
+    .rngGetBytes             = SeosCryptoClient_rngGetBytes,
+    .rngReSeed               = SeosCryptoClient_rngReSeed,
+    .digestInit              = SeosCryptoClient_digestInit,
+    .digestClose             = SeosCryptoClient_digestClose,
+    .digestUpdate            = SeosCryptoClient_digestUpdate,
+    .digestFinalize          = SeosCryptoClient_digestFinalize,
+    .keyInit                 = SeosCryptoClient_keyInit,
+    .keyGenerate             = SeosCryptoClient_keyGenerate,
+    .keyGeneratePair         = SeosCryptoClient_keyGeneratePair,
+    .keyImport               = SeosCryptoClient_keyImport,
+    .keyExport               = SeosCryptoClient_keyExport,
+    .keyDeInit               = SeosCryptoClient_keyDeInit,
+    .signatureInit           = SeosCryptoClient_signatureInit,
+    .signatureDeInit         = SeosCryptoClient_signatureDeInit,
+    .signatureSign           = SeosCryptoClient_signatureSign,
+    .signatureVerify         = SeosCryptoClient_signatureVerify,
+    .agreementInit           = SeosCryptoClient_agreementInit,
+    .agreementDeInit         = SeosCryptoClient_agreementDeInit,
+    .agreementComputeShared  = SeosCryptoClient_agreementComputeShared,
+    .cipherInit              = SeosCryptoClient_cipherInit,
+    .cipherClose             = SeosCryptoClient_cipherClose,
+    .cipherUpdate            = SeosCryptoClient_cipherUpdate,
+    .cipherUpdateAd          = SeosCryptoClient_cipherUpdateAd,
+    .cipherFinalize          = SeosCryptoClient_cipherFinalize,
+    .cipherVerifyTag         = SeosCryptoClient_cipherVerifyTag,
+    .deInit                  = SeosCryptoClient_deInit
 };
 
 // Public functions ------------------------------------------------------------
@@ -254,7 +257,6 @@ SeosCryptoClient_digestFinalize(SeosCryptoCtx*              api,
     return retval;
 }
 
-
 seos_err_t
 SeosCryptoClient_signatureInit(SeosCryptoCtx*                api,
                                SeosCrypto_SignatureHandle*   pSigHandle,
@@ -365,6 +367,81 @@ SeosCryptoClient_signatureVerify(SeosCryptoCtx*                 api,
         memcpy(self->clientDataport + hashSize, signature, signatureSize);
         retval = SeosCryptoRpc_signatureVerify(self->rpcHandle, sigHandle, hashSize,
                                                signatureSize);
+    }
+
+    return retval;
+}
+
+seos_err_t
+SeosCryptoClient_agreementInit(SeosCryptoCtx*                api,
+                               SeosCrypto_AgreementHandle*   pAgrHandle,
+                               unsigned int                  algorithm,
+                               SeosCrypto_KeyHandle          prvHandle)
+{
+    SeosCryptoClient* self = (SeosCryptoClient*) api;
+
+    if (NULL == api || NULL == pAgrHandle
+        || self->parent.vtable != &SeosCryptoClient_vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    return SeosCryptoRpc_agreementInit(self->rpcHandle, pAgrHandle, algorithm,
+                                       prvHandle);
+}
+
+seos_err_t
+SeosCryptoClient_agreementDeInit(SeosCryptoCtx*               api,
+                                 SeosCrypto_AgreementHandle   agrHandle)
+{
+    SeosCryptoClient* self = (SeosCryptoClient*) api;
+
+    if (NULL == api || self->parent.vtable != &SeosCryptoClient_vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    return SeosCryptoRpc_agreementDeInit(self->rpcHandle, agrHandle);
+}
+
+seos_err_t
+SeosCryptoClient_agreementComputeShared(SeosCryptoCtx*                 api,
+                                        SeosCrypto_AgreementHandle     agrHandle,
+                                        SeosCrypto_KeyHandle           pubHandle,
+                                        void**                         shared,
+                                        size_t*                        sharedSize)
+{
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+    SeosCryptoClient* self = (SeosCryptoClient*) api;
+
+    if (NULL == api || self->parent.vtable != &SeosCryptoClient_vtable
+        || NULL == shared || NULL == sharedSize)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else if ((retval = SeosCryptoRpc_agreementComputeShared(self->rpcHandle,
+                                                            agrHandle, pubHandle)) == SEOS_SUCCESS)
+    {
+        size_t* serverSharedLen = (size_t*) self->clientDataport;
+        void*   serverShared = self->clientDataport + sizeof(size_t);
+
+        if (*shared != NULL)
+        {
+            if  (*sharedSize < *serverSharedLen)
+            {
+                retval = SEOS_ERROR_BUFFER_TOO_SMALL;
+            }
+            else
+            {
+                *sharedSize = *serverSharedLen;
+                memcpy(*shared, serverShared, *serverSharedLen);
+            }
+        }
+        else
+        {
+            *sharedSize = *serverSharedLen;
+            *shared     = serverShared;
+        }
     }
 
     return retval;

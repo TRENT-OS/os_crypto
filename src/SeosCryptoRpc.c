@@ -330,6 +330,56 @@ SeosCryptoRpc_keyDeInit(SeosCryptoRpc*                  self,
 }
 
 seos_err_t
+SeosCryptoRpc_agreementInit(SeosCryptoRpc*                   self,
+                            SeosCrypto_AgreementHandle*      pAgrHandle,
+                            unsigned int                     algorithm,
+                            SeosCrypto_KeyHandle             prvHandle)
+{
+    return !isValidHandle(self) ?
+           SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_agreementInit(self->seosCryptoApi, pAgrHandle, algorithm, prvHandle);
+}
+
+seos_err_t
+SeosCryptoRpc_agreementComputeShared(SeosCryptoRpc*                self,
+                                     SeosCrypto_AgreementHandle    agrHandle,
+                                     SeosCrypto_KeyHandle          pubHandle)
+{
+    seos_err_t  retval      = SEOS_ERROR_GENERIC;
+    void*       shared      = NULL;
+    size_t      sharedSize  = 0;
+
+    if (!isValidHandle(self))
+    {
+        retval = SEOS_ERROR_INVALID_HANDLE;
+    }
+    else if ((retval = SeosCrypto_agreementComputeShared(self->seosCryptoApi,
+                                                         agrHandle, pubHandle, &shared, &sharedSize)) == SEOS_SUCCESS)
+    {
+        if (sharedSize + sizeof(sharedSize) > PAGE_SIZE)
+        {
+            retval = SEOS_ERROR_ABORTED;
+        }
+        else
+        {
+            memcpy(self->serverDataport, &sharedSize, sizeof(sharedSize));
+            memcpy(self->serverDataport + sizeof(sharedSize), shared, sharedSize);
+        }
+    }
+
+    return retval;
+}
+
+seos_err_t
+SeosCryptoRpc_agreementDeInit(SeosCryptoRpc*                self,
+                              SeosCrypto_AgreementHandle    agrHandle)
+{
+    return !isValidHandle(self) ?
+           SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_agreementDeInit(self->seosCryptoApi, agrHandle);
+}
+
+seos_err_t
 SeosCryptoRpc_signatureInit(SeosCryptoRpc*                   self,
                             SeosCrypto_SignatureHandle*      pSigHandle,
                             unsigned int                     algorithm,

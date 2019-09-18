@@ -7,35 +7,39 @@
 #include "SeosCryptoRng.h"
 #include "SeosCryptoDigest.h"
 #include "SeosCryptoSignature.h"
+#include "SeosCryptoAgreement.h"
 #include "SeosCrypto.h"
 
 #include "LibDebug/Debug.h"
 
 static const SeosCryptoCtx_Vtable SeosCrypto_vtable =
 {
-    .rngGetBytes     = SeosCrypto_rngGetBytes,
-    .rngReSeed       = SeosCrypto_rngReSeed,
-    .digestInit      = SeosCrypto_digestInit,
-    .digestClose     = SeosCrypto_digestClose,
-    .digestUpdate    = SeosCrypto_digestUpdate,
-    .digestFinalize  = SeosCrypto_digestFinalize,
-    .keyInit         = SeosCrypto_keyInit,
-    .keyGenerate     = SeosCrypto_keyGenerate,
-    .keyGeneratePair = SeosCrypto_keyGeneratePair,
-    .keyImport       = SeosCrypto_keyImport,
-    .keyExport       = SeosCrypto_keyExport,
-    .keyDeInit       = SeosCrypto_keyDeInit,
-    .signatureInit   = SeosCrypto_signatureInit,
-    .signatureDeInit = SeosCrypto_signatureDeInit,
-    .signatureSign   = SeosCrypto_signatureSign,
-    .signatureVerify = SeosCrypto_signatureVerify,
-    .cipherInit      = SeosCrypto_cipherInit,
-    .cipherClose     = SeosCrypto_cipherClose,
-    .cipherUpdate    = SeosCrypto_cipherUpdate,
-    .cipherUpdateAd  = SeosCrypto_cipherUpdateAd,
-    .cipherFinalize  = SeosCrypto_cipherFinalize,
-    .cipherVerifyTag = SeosCrypto_cipherVerifyTag,
-    .deInit          = SeosCrypto_deInit
+    .rngGetBytes            = SeosCrypto_rngGetBytes,
+    .rngReSeed              = SeosCrypto_rngReSeed,
+    .digestInit             = SeosCrypto_digestInit,
+    .digestClose            = SeosCrypto_digestClose,
+    .digestUpdate           = SeosCrypto_digestUpdate,
+    .digestFinalize         = SeosCrypto_digestFinalize,
+    .keyInit                = SeosCrypto_keyInit,
+    .keyGenerate            = SeosCrypto_keyGenerate,
+    .keyGeneratePair        = SeosCrypto_keyGeneratePair,
+    .keyImport              = SeosCrypto_keyImport,
+    .keyExport              = SeosCrypto_keyExport,
+    .keyDeInit              = SeosCrypto_keyDeInit,
+    .signatureInit          = SeosCrypto_signatureInit,
+    .signatureDeInit        = SeosCrypto_signatureDeInit,
+    .signatureSign          = SeosCrypto_signatureSign,
+    .signatureVerify        = SeosCrypto_signatureVerify,
+    .agreementInit          = SeosCrypto_agreementInit,
+    .agreementDeInit        = SeosCrypto_agreementDeInit,
+    .agreementComputeShared = SeosCrypto_agreementComputeShared,
+    .cipherInit             = SeosCrypto_cipherInit,
+    .cipherClose            = SeosCrypto_cipherClose,
+    .cipherUpdate           = SeosCrypto_cipherUpdate,
+    .cipherUpdateAd         = SeosCrypto_cipherUpdateAd,
+    .cipherFinalize         = SeosCrypto_cipherFinalize,
+    .cipherVerifyTag        = SeosCrypto_cipherVerifyTag,
+    .deInit                 = SeosCrypto_deInit
 };
 
 // Private static functions ----------------------------------------------------
@@ -65,8 +69,8 @@ SeosCrypto_removeHandle(PointerVector* v, size_t pos)
     PointerVector_popBack(v);
 }
 
-
 // Public functions ------------------------------------------------------------
+
 seos_err_t
 SeosCrypto_init(SeosCrypto*             self,
                 SeosCrypto_MallocFunc   mallocFunc,
@@ -105,6 +109,11 @@ SeosCrypto_init(SeosCrypto*             self,
             retval = SEOS_ERROR_ABORTED;
             goto err2;
         }
+        else if (!PointerVector_ctor(&self->agreementHandleVector, 1))
+        {
+            retval = SEOS_ERROR_ABORTED;
+            goto err3;
+        }
     }
     else
     {
@@ -118,19 +127,21 @@ SeosCrypto_init(SeosCrypto*             self,
                                          entropyFunc,
                                          entropyCtx)) != SEOS_SUCCESS)
         {
-            goto err3;
+            goto err4;
         }
     }
     else
     {
         retval = SEOS_ERROR_INVALID_PARAMETER;
-        goto err3;
+        goto err4;
     }
 
     self->parent.vtable = &SeosCrypto_vtable;
     retval = SEOS_SUCCESS;
     goto exit;
 
+err4:
+    PointerVector_dtor(&self->agreementHandleVector);
 err3:
     PointerVector_dtor(&self->signatureHandleVector);
 err2:
@@ -149,12 +160,13 @@ SeosCrypto_deInit(SeosCryptoCtx* api)
     SeosCrypto* self = (SeosCrypto*) api;
     Debug_ASSERT_SELF(self);
 
+    SeosCryptoRng_deInit(&self->mem.memIf, &self->cryptoRng);
+
+    PointerVector_dtor(&self->agreementHandleVector);
     PointerVector_dtor(&self->signatureHandleVector);
     PointerVector_dtor(&self->cipherHandleVector);
     PointerVector_dtor(&self->keyHandleVector);
     PointerVector_dtor(&self->digestHandleVector);
-
-    SeosCryptoRng_deInit(&self->mem.memIf, &self->cryptoRng);
 }
 
 //-------------------------- Crpyto API functions ------------------------------
@@ -424,6 +436,97 @@ SeosCrypto_signatureVerify(SeosCryptoCtx*                 api,
     return SeosCrypto_findHandle(&self->signatureHandleVector, sigHandle) != -1 ?
            SeosCryptoSignature_verify(sigHandle, &self->cryptoRng, hash, hashSize,
                                       signature, signatureSize) : SEOS_ERROR_INVALID_HANDLE;
+}
+
+seos_err_t
+SeosCrypto_agreementInit(SeosCryptoCtx*                api,
+                         SeosCrypto_AgreementHandle*   pAgrHandle,
+                         unsigned int                  algorithm,
+                         SeosCrypto_KeyHandle          prvHandle)
+{
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+    SeosCrypto* self = (SeosCrypto*) api;
+
+    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else if (SeosCrypto_findHandle(&self->keyHandleVector, prvHandle) == -1)
+    {
+        return SEOS_ERROR_INVALID_HANDLE;
+    }
+    else if ((*pAgrHandle = self->mem.memIf.malloc(
+                                sizeof(SeosCryptoAgreement))) == NULL)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
+
+    if ((retval = SeosCryptoAgreement_init(&self->mem.memIf, *pAgrHandle, algorithm,
+                                           prvHandle)) != SEOS_SUCCESS)
+    {
+        goto err0;
+    }
+    else if (!PointerVector_pushBack(&self->agreementHandleVector, *pAgrHandle))
+    {
+        retval = SEOS_ERROR_INSUFFICIENT_SPACE;
+        goto err1;
+    }
+
+    return retval;
+
+err1:
+    SeosCryptoAgreement_deInit(&self->mem.memIf, *pAgrHandle);
+err0:
+    self->mem.memIf.free(*pAgrHandle);
+    return retval;
+}
+
+seos_err_t
+SeosCrypto_agreementDeInit(SeosCryptoCtx*               api,
+                           SeosCrypto_AgreementHandle   agrHandle)
+{
+    seos_err_t retval = SEOS_SUCCESS;
+    SeosCrypto* self = (SeosCrypto*) api;
+    size_t handlePos;
+
+    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+    if ((handlePos = SeosCrypto_findHandle(&self->agreementHandleVector,
+                                           agrHandle)) != -1)
+    {
+        return SEOS_ERROR_INVALID_HANDLE;
+    }
+
+    if ((retval = SeosCryptoAgreement_deInit(&self->mem.memIf,
+                                             agrHandle)) != SEOS_SUCCESS)
+    {
+        SeosCrypto_removeHandle(&self->agreementHandleVector, handlePos);
+        self->mem.memIf.free(agrHandle);
+    }
+
+    return retval;
+}
+
+seos_err_t
+SeosCrypto_agreementComputeShared(SeosCryptoCtx*                 api,
+                                  SeosCrypto_AgreementHandle     agrHandle,
+                                  SeosCrypto_KeyHandle           pubHandle,
+                                  void**                         shared,
+                                  size_t*                        sharedSize)
+{
+    SeosCrypto* self = (SeosCrypto*) api;
+
+    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    return SeosCrypto_findHandle(&self->agreementHandleVector, agrHandle) != -1
+           && SeosCrypto_findHandle(&self->keyHandleVector, pubHandle) != -1 ?
+           SeosCryptoAgreement_computeShared(agrHandle, &self->cryptoRng, pubHandle,
+                                             shared, sharedSize) : SEOS_ERROR_INVALID_HANDLE;
 }
 
 seos_err_t

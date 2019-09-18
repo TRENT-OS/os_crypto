@@ -117,6 +117,23 @@ typedef seos_err_t
                                   size_t                         signatureSize);
 
 typedef seos_err_t
+(*SeosCryptoCtx_agreementInitT)(SeosCryptoCtx*                self,
+                                SeosCrypto_AgreementHandle*   pAgrHandle,
+                                unsigned int                  algorithm,
+                                SeosCrypto_KeyHandle          prvHandle);
+
+typedef seos_err_t
+(*SeosCryptoCtx_agreementDeInitT)(SeosCryptoCtx*               self,
+                                  SeosCrypto_AgreementHandle   agrHandle);
+
+typedef seos_err_t
+(*SeosCryptoCtx_agreementComputeSharedT)(SeosCryptoCtx*                 self,
+                                         SeosCrypto_AgreementHandle     agrHandle,
+                                         SeosCrypto_KeyHandle           pubHandle,
+                                         void**                         shared,
+                                         size_t*                        sharedSize);
+
+typedef seos_err_t
 (*SeosCryptoCtx_cipherInitT)(SeosCryptoCtx*                 self,
                              SeosCrypto_CipherHandle*       pCipherHandle,
                              unsigned int                   algorithm,
@@ -160,29 +177,32 @@ typedef void
 
 typedef struct
 {
-    SeosCryptoCtx_rngGetBytesT      rngGetBytes;
-    SeosCryptoCtx_rngReSeedT        rngReSeed;
-    SeosCryptoCtx_digestInitT       digestInit;
-    SeosCryptoCtx_digestCloseT      digestClose;
-    SeosCryptoCtx_digestUpdateT     digestUpdate;
-    SeosCryptoCtx_digestFinalizeT   digestFinalize;
-    SeosCryptoCtx_keyInitT          keyInit;
-    SeosCryptoCtx_keyGenerateT      keyGenerate;
-    SeosCryptoCtx_keyGeneratePairT  keyGeneratePair;
-    SeosCryptoCtx_keyImportT        keyImport;
-    SeosCryptoCtx_keyExportT        keyExport;
-    SeosCryptoCtx_keyDeInitT        keyDeInit;
-    SeosCryptoCtx_signatureInitT    signatureInit;
-    SeosCryptoCtx_signatureDeInitT  signatureDeInit;
-    SeosCryptoCtx_signatureSignT    signatureSign;
-    SeosCryptoCtx_signatureVerifyT  signatureVerify;
-    SeosCryptoCtx_cipherInitT       cipherInit;
-    SeosCryptoCtx_cipherCloseT      cipherClose;
-    SeosCryptoCtx_cipherUpdateT     cipherUpdate;
-    SeosCryptoCtx_cipherUpdateAdT   cipherUpdateAd;
-    SeosCryptoCtx_cipherFinalizeT   cipherFinalize;
-    SeosCryptoCtx_cipherVerifyTagT  cipherVerifyTag;
-    SeosCryptoCtx_deInitT           deInit;
+    SeosCryptoCtx_rngGetBytesT              rngGetBytes;
+    SeosCryptoCtx_rngReSeedT                rngReSeed;
+    SeosCryptoCtx_digestInitT               digestInit;
+    SeosCryptoCtx_digestCloseT              digestClose;
+    SeosCryptoCtx_digestUpdateT             digestUpdate;
+    SeosCryptoCtx_digestFinalizeT           digestFinalize;
+    SeosCryptoCtx_keyInitT                  keyInit;
+    SeosCryptoCtx_keyGenerateT              keyGenerate;
+    SeosCryptoCtx_keyGeneratePairT          keyGeneratePair;
+    SeosCryptoCtx_keyImportT                keyImport;
+    SeosCryptoCtx_keyExportT                keyExport;
+    SeosCryptoCtx_keyDeInitT                keyDeInit;
+    SeosCryptoCtx_signatureInitT            signatureInit;
+    SeosCryptoCtx_signatureDeInitT          signatureDeInit;
+    SeosCryptoCtx_signatureSignT            signatureSign;
+    SeosCryptoCtx_signatureVerifyT          signatureVerify;
+    SeosCryptoCtx_agreementInitT            agreementInit;
+    SeosCryptoCtx_agreementDeInitT          agreementDeInit;
+    SeosCryptoCtx_agreementComputeSharedT   agreementComputeShared;
+    SeosCryptoCtx_cipherInitT               cipherInit;
+    SeosCryptoCtx_cipherCloseT              cipherClose;
+    SeosCryptoCtx_cipherUpdateT             cipherUpdate;
+    SeosCryptoCtx_cipherUpdateAdT           cipherUpdateAd;
+    SeosCryptoCtx_cipherFinalizeT           cipherFinalize;
+    SeosCryptoCtx_cipherVerifyTagT          cipherVerifyTag;
+    SeosCryptoCtx_deInitT                   deInit;
 }
 SeosCryptoCtx_Vtable;
 

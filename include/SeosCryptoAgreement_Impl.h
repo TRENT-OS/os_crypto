@@ -35,6 +35,7 @@ typedef struct
     mbedtls;
 
     const SeosCryptoKey*        prvKey;
+    unsigned char               outBuf[PAGE_SIZE];
 }
 SeosCryptoAgreement;
 

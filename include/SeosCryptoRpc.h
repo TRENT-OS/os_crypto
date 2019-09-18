@@ -197,6 +197,34 @@ seos_err_t
 SeosCryptoRpc_signatureDeInit(SeosCryptoRpc*                  self,
                               SeosCrypto_SignatureHandle      sigHandle);
 
+
+/**
+ * @brief rpc management of SeosCrypto_agreementInit()
+ *
+ */
+seos_err_t
+SeosCryptoRpc_agreementInit(SeosCryptoRpc*                   self,
+                            SeosCrypto_AgreementHandle*      pAgrHandle,
+                            unsigned int                     algorithm,
+                            SeosCrypto_KeyHandle             prvHandle);
+
+/**
+ * @brief rpc management of SeosCrypto_agreementComputeShared()
+ *
+ */
+seos_err_t
+SeosCryptoRpc_agreementComputeShared(SeosCryptoRpc*                self,
+                                     SeosCrypto_AgreementHandle    agrHandle,
+                                     SeosCrypto_KeyHandle          pubHandle);
+
+/**
+ * @brief rpc management of SeosCrypto_agreementDeInit()
+ *
+ */
+seos_err_t
+SeosCryptoRpc_agreementDeInit(SeosCryptoRpc*                self,
+                              SeosCrypto_AgreementHandle    agrHandle);
+
 /**
  * @brief rpc management of SeosCrypto_cipherInit()
  *

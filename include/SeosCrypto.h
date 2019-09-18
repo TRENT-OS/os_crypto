@@ -341,4 +341,36 @@ SeosCrypto_signatureVerify(SeosCryptoCtx*                 api,
                            const void*                    signature,
                            size_t                         signatureSize);
 
+/**
+ * @brief implements SeosCryptoApi_agreementInit() in a local connection
+ * (function call, no rpc)
+ *
+ */
+seos_err_t
+SeosCrypto_agreementInit(SeosCryptoCtx*                api,
+                         SeosCrypto_AgreementHandle*   pAgrHandle,
+                         unsigned int                  algorithm,
+                         SeosCrypto_KeyHandle          prvHandle);
+
+/**
+ * @brief implements SeosCryptoApi_agreementDeInit() in a local connection
+ * (function call, no rpc)
+ *
+ */
+seos_err_t
+SeosCrypto_agreementDeInit(SeosCryptoCtx*               api,
+                           SeosCrypto_AgreementHandle   agrHandle);
+
+/**
+ * @brief implements SeosCryptoApi_agreementComputeShared() in a local connection
+ * (function call, no rpc)
+ *
+ */
+seos_err_t
+SeosCrypto_agreementComputeShared(SeosCryptoCtx*                 api,
+                                  SeosCrypto_AgreementHandle     agrHandle,
+                                  SeosCrypto_KeyHandle           pubHandle,
+                                  void**                         shared,
+                                  size_t*                        sharedSize);
+
 /** @} */

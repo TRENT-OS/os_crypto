@@ -37,23 +37,29 @@ initImpl(SeosCrypto_MemIf*               memIf,
     return retval;
 }
 
-static void
+static seos_err_t
 deInitImpl(SeosCrypto_MemIf*               memIf,
            SeosCryptoAgreement*            self)
 {
     UNUSED_VAR(memIf);
+    seos_err_t retval = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
     case SeosCryptoAgreement_Algorithm_DH:
         mbedtls_dhm_free(&self->mbedtls.dh);
+        retval = SEOS_SUCCESS;
         break;
     case SeosCryptoAgreement_Algorithm_ECDH:
         mbedtls_ecdh_free(&self->mbedtls.ecdh);
+        retval = SEOS_SUCCESS;
         break;
     default:
+        retval = SEOS_ERROR_NOT_SUPPORTED;
         break;
     }
+
+    return retval;
 }
 
 static seos_err_t
@@ -166,29 +172,36 @@ seos_err_t
 SeosCryptoAgreement_computeShared(SeosCryptoAgreement*  self,
                                   SeosCryptoRng*        rng,
                                   SeosCryptoKey*        pubKey,
-                                  unsigned char*        buf,
-                                  size_t*               bufSize)
+                                  void**                shared,
+                                  size_t*               sharedSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
-    if (NULL == self || NULL == pubKey || NULL == buf || NULL == bufSize)
+    if (NULL == self || NULL == pubKey || NULL == shared || NULL == sharedSize)
     {
         retval = SEOS_ERROR_INVALID_PARAMETER;
     }
     else
     {
-        retval = computeImpl(self, rng, pubKey, buf, bufSize);
+        if (NULL == *shared)
+        {
+            *shared      = self->outBuf;
+            *sharedSize  = sizeof(self->outBuf);
+        }
+        retval = computeImpl(self, rng, pubKey, *shared, sharedSize);
     }
 
     return retval;
 }
 
-void
+seos_err_t
 SeosCryptoAgreement_deInit(SeosCrypto_MemIf*        memIf,
                            SeosCryptoAgreement*     self)
 {
-    if (NULL == self || NULL != memIf)
+    if (NULL == self || NULL == memIf)
     {
-        deInitImpl(memIf, self);
+        return SEOS_ERROR_INVALID_PARAMETER;
     }
+
+    return deInitImpl(memIf, self);;
 }

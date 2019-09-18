@@ -130,6 +130,38 @@ SeosCryptoApi_signatureVerify(SeosCryptoCtx*                 cryptoCtx,
 }
 
 seos_err_t
+SeosCryptoApi_agreementInit(SeosCryptoCtx*                cryptoCtx,
+                            SeosCrypto_AgreementHandle*   pAgrHandle,
+                            unsigned int                  algorithm,
+                            SeosCrypto_KeyHandle          prvHandle)
+{
+    Debug_ASSERT_SELF(cryptoCtx);
+    return cryptoCtx->vtable->agreementInit(cryptoCtx, pAgrHandle, algorithm,
+                                            prvHandle);
+}
+
+seos_err_t
+SeosCryptoApi_agreementDeInit(SeosCryptoCtx*               cryptoCtx,
+                              SeosCrypto_AgreementHandle   agrHandle)
+{
+    Debug_ASSERT_SELF(cryptoCtx);
+    return cryptoCtx->vtable->agreementDeInit(cryptoCtx, agrHandle);
+}
+
+seos_err_t
+SeosCryptoApi_agreementComputeShared(SeosCryptoCtx*                 cryptoCtx,
+                                     SeosCrypto_AgreementHandle     agrHandle,
+                                     SeosCrypto_KeyHandle           pubHandle,
+                                     void*                          shared,
+                                     size_t*                        sharedSize)
+{
+    Debug_ASSERT_SELF(cryptoCtx);
+    void* pShared = shared;
+    return cryptoCtx->vtable->agreementComputeShared(cryptoCtx, agrHandle,
+                                                     pubHandle, &pShared, sharedSize);
+}
+
+seos_err_t
 SeosCryptoApi_keyInit(SeosCryptoCtx*                   ctx,
                       SeosCrypto_KeyHandle*            keyHandle,
                       unsigned int                     type,

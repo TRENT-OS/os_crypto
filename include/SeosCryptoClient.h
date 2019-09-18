@@ -179,6 +179,23 @@ SeosCryptoClient_signatureVerify(SeosCryptoCtx*                 api,
                                  size_t                         signatureSize);
 
 seos_err_t
+SeosCryptoClient_agreementInit(SeosCryptoCtx*                api,
+                               SeosCrypto_AgreementHandle*   pAgrHandle,
+                               unsigned int                  algorithm,
+                               SeosCrypto_KeyHandle          prvHandle);
+
+seos_err_t
+SeosCryptoClient_agreementDeInit(SeosCryptoCtx*               api,
+                                 SeosCrypto_AgreementHandle   agrHandle);
+
+seos_err_t
+SeosCryptoClient_agreementComputeShared(SeosCryptoCtx*                 api,
+                                        SeosCrypto_AgreementHandle     agrHandle,
+                                        SeosCrypto_KeyHandle           pubHandle,
+                                        void**                         shared,
+                                        size_t*                        sharedSize);
+
+seos_err_t
 SeosCryptoClient_keyInit(SeosCryptoCtx*                   ctx,
                          SeosCrypto_KeyHandle*            keyHandle,
                          unsigned int                     type,
