@@ -67,17 +67,17 @@ setKeyImpl(SeosCryptoAgreement*            self)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
-    switch (self->prvKey->type)
+    switch (self->algorithm)
     {
-    case SeosCryptoKey_Type_DH_PRV:
-        retval = (self->algorithm == SeosCryptoAgreement_Algorithm_DH) ?
-                 SeosCryptoKey_writeDHPrv(self->prvKey,
-                                          &self->mbedtls.dh) : SEOS_ERROR_INVALID_PARAMETER;
+    case SeosCryptoAgreement_Algorithm_DH:
+        retval = (self->prvKey->type != SeosCryptoKey_Type_DH_PRV) ?
+                 SEOS_ERROR_INVALID_PARAMETER :
+                 SeosCryptoKey_writeDHPrv(self->prvKey, &self->mbedtls.dh);
         break;
-    case SeosCryptoKey_Type_SECP256R1_PRV:
-        retval =  (self->algorithm == SeosCryptoAgreement_Algorithm_ECDH) ?
-                  SeosCryptoKey_writeSECP256r1Prv(self->prvKey,
-                                                  &self->mbedtls.ecdh) : SEOS_ERROR_INVALID_PARAMETER;
+    case SeosCryptoAgreement_Algorithm_ECDH:
+        retval = (self->prvKey->type != SeosCryptoKey_Type_SECP256R1_PRV) ?
+                 SEOS_ERROR_INVALID_PARAMETER :
+                 SeosCryptoKey_writeSECP256r1Prv(self->prvKey, &self->mbedtls.ecdh);
         break;
     default:
         retval = SEOS_ERROR_INVALID_PARAMETER;
@@ -95,24 +95,39 @@ computeImpl(SeosCryptoAgreement*            self,
 {
     void* rngFunc = (NULL != rng) ? SeosCryptoRng_getBytesMbedtls : NULL;
     seos_err_t retval = SEOS_ERROR_GENERIC;
-    size_t outLen = 0;
+    size_t rc, outLen = 0;
 
-    switch (pubKey->type)
+    switch (self->algorithm)
     {
-    case SeosCryptoKey_Type_DH_PUB:
-        retval = (self->algorithm != SeosCryptoAgreement_Algorithm_DH)
-                 || SeosCryptoKey_writeDHPub(pubKey, &self->mbedtls.dh) != SEOS_SUCCESS
-                 || mbedtls_dhm_calc_secret(&self->mbedtls.dh, buf, *bufSize, &outLen, rngFunc,
-                                            rng) != 0 ?
-                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+    case SeosCryptoAgreement_Algorithm_DH:
+        if ((pubKey->type != SeosCryptoKey_Type_DH_PUB)
+            || SeosCryptoKey_writeDHPub(pubKey, &self->mbedtls.dh) != SEOS_SUCCESS)
+        {
+            retval = SEOS_ERROR_INVALID_PARAMETER;
+        }
+        else
+        {
+            rc = mbedtls_dhm_calc_secret(&self->mbedtls.dh, buf, *bufSize, &outLen,
+                                         rngFunc, rng);
+            retval = (rc == 0) ? SEOS_SUCCESS :
+                     (rc == MBEDTLS_ERR_DHM_BAD_INPUT_DATA) ?
+                     SEOS_ERROR_BUFFER_TOO_SMALL : SEOS_ERROR_ABORTED;
+        }
         break;
-    case SeosCryptoKey_Type_SECP256R1_PUB:
-        retval = (self->algorithm != SeosCryptoAgreement_Algorithm_ECDH)
-                 || SeosCryptoKey_writeSECP256r1Pub(pubKey,
-                                                    &self->mbedtls.ecdh) != SEOS_SUCCESS
-                 || mbedtls_ecdh_calc_secret(&self->mbedtls.ecdh, &outLen, buf, *bufSize,
-                                             rngFunc, rng) != 0 ?
-                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+    case SeosCryptoAgreement_Algorithm_ECDH:
+        if ((pubKey->type != SeosCryptoKey_Type_SECP256R1_PUB)
+            || SeosCryptoKey_writeSECP256r1Pub(pubKey, &self->mbedtls.ecdh) != SEOS_SUCCESS)
+        {
+            retval = SEOS_ERROR_INVALID_PARAMETER;
+        }
+        else
+        {
+            rc = mbedtls_ecdh_calc_secret(&self->mbedtls.ecdh, &outLen, buf, *bufSize,
+                                          rngFunc, rng);
+            retval = (rc == 0) ? SEOS_SUCCESS :
+                     (rc == MBEDTLS_ERR_ECP_BAD_INPUT_DATA) ?
+                     SEOS_ERROR_BUFFER_TOO_SMALL : SEOS_ERROR_ABORTED;
+        }
         break;
     default:
         retval = SEOS_ERROR_INVALID_PARAMETER;
@@ -160,11 +175,6 @@ SeosCryptoAgreement_init(SeosCrypto_MemIf*               memIf,
 err0:
     deInitImpl(memIf, self);
 exit:
-    if (retval != SEOS_SUCCESS)
-    {
-        Debug_LOG_ERROR("%s: failed with err %d", __func__, retval);
-    }
-
     return retval;
 }
 
@@ -176,6 +186,8 @@ SeosCryptoAgreement_computeShared(SeosCryptoAgreement*  self,
                                   size_t*               sharedSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
+
+
 
     if (NULL == self || NULL == pubKey || NULL == shared || NULL == sharedSize)
     {

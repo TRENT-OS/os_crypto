@@ -135,8 +135,9 @@ SeosCryptoApi_agreementInit(SeosCryptoCtx*                cryptoCtx,
                             unsigned int                  algorithm,
                             SeosCrypto_KeyHandle          prvHandle)
 {
-    Debug_ASSERT_SELF(cryptoCtx);
-    return cryptoCtx->vtable->agreementInit(cryptoCtx, pAgrHandle, algorithm,
+    return (NULL == cryptoCtx) ?
+           SEOS_ERROR_INVALID_PARAMETER :
+           cryptoCtx->vtable->agreementInit(cryptoCtx, pAgrHandle, algorithm,
                                             prvHandle);
 }
 
@@ -144,8 +145,9 @@ seos_err_t
 SeosCryptoApi_agreementDeInit(SeosCryptoCtx*               cryptoCtx,
                               SeosCrypto_AgreementHandle   agrHandle)
 {
-    Debug_ASSERT_SELF(cryptoCtx);
-    return cryptoCtx->vtable->agreementDeInit(cryptoCtx, agrHandle);
+    return (NULL == cryptoCtx) ?
+           SEOS_ERROR_INVALID_PARAMETER :
+           cryptoCtx->vtable->agreementDeInit(cryptoCtx, agrHandle);
 }
 
 seos_err_t
@@ -155,9 +157,11 @@ SeosCryptoApi_agreementComputeShared(SeosCryptoCtx*                 cryptoCtx,
                                      void*                          shared,
                                      size_t*                        sharedSize)
 {
-    Debug_ASSERT_SELF(cryptoCtx);
     void* pShared = shared;
-    return cryptoCtx->vtable->agreementComputeShared(cryptoCtx, agrHandle,
+
+    return (NULL == cryptoCtx || NULL == shared) ?
+           SEOS_ERROR_INVALID_PARAMETER :
+           cryptoCtx->vtable->agreementComputeShared(cryptoCtx, agrHandle,
                                                      pubHandle, &pShared, sharedSize);
 }
 

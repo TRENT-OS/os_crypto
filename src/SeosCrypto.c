@@ -57,8 +57,6 @@ SeosCrypto_findHandle(PointerVector* v, Pointer handle)
             return i;
         }
     }
-    Debug_LOG_ERROR("%s: unable to find handle %p, in vector %p",
-                    __func__, handle, v);
     return -1;
 }
 
@@ -447,7 +445,8 @@ SeosCrypto_agreementInit(SeosCryptoCtx*                api,
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCrypto* self = (SeosCrypto*) api;
 
-    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable)
+    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable
+        || NULL == pAgrHandle)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -494,7 +493,7 @@ SeosCrypto_agreementDeInit(SeosCryptoCtx*               api,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
     if ((handlePos = SeosCrypto_findHandle(&self->agreementHandleVector,
-                                           agrHandle)) != -1)
+                                           agrHandle)) == -1)
     {
         return SEOS_ERROR_INVALID_HANDLE;
     }
