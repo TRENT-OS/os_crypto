@@ -175,7 +175,11 @@ SeosCrypto_rngGetBytes(SeosCryptoCtx*   api,
                        size_t           bufLen)
 {
     SeosCrypto* self = (SeosCrypto*) api;
-    Debug_ASSERT_SELF(self);
+
+    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
 
     return SeosCryptoRng_getBytes(&self->cryptoRng, buf, bufLen);
 }
@@ -186,7 +190,11 @@ SeosCrypto_rngReSeed(SeosCryptoCtx*     api,
                      size_t             seedLen)
 {
     SeosCrypto* self = (SeosCrypto*) api;
-    Debug_ASSERT_SELF(self);
+
+    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
 
     return SeosCryptoRng_reSeed(&self->cryptoRng, seed, seedLen);
 }

@@ -45,7 +45,7 @@ SeosCryptoRng_getBytes(SeosCryptoRng*  self,
 {
     Debug_ASSERT_SELF(self);
 
-    if (NULL == buf)
+    if (NULL == buf || 0 == bufSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }

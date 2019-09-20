@@ -11,10 +11,9 @@ SeosCryptoApi_rngGetBytes(SeosCryptoCtx*    cryptoCtx,
                           void**            buffer,
                           size_t            dataLen)
 {
-    Debug_ASSERT_SELF(cryptoCtx);
-    return cryptoCtx->vtable->rngGetBytes(cryptoCtx,
-                                          buffer,
-                                          dataLen);
+    return (NULL == cryptoCtx) ?
+           SEOS_ERROR_INVALID_PARAMETER :
+           cryptoCtx->vtable->rngGetBytes(cryptoCtx, buffer, dataLen);
 }
 
 seos_err_t
@@ -22,10 +21,9 @@ SeosCryptoApi_rngReSeed(SeosCryptoCtx*      cryptoCtx,
                         const void*         seed,
                         size_t              seedLen)
 {
-    Debug_ASSERT_SELF(cryptoCtx);
-    return cryptoCtx->vtable->rngReSeed(cryptoCtx,
-                                        seed,
-                                        seedLen);
+    return (NULL == cryptoCtx) ?
+           SEOS_ERROR_INVALID_PARAMETER :
+           cryptoCtx->vtable->rngReSeed(cryptoCtx, seed, seedLen);
 }
 
 seos_err_t

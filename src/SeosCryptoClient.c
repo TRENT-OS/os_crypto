@@ -74,22 +74,22 @@ SeosCryptoClient_rngGetBytes(SeosCryptoCtx*       api,
                              void**               buffer,
                              size_t               dataLen)
 {
-    SeosCryptoClient* self = (SeosCryptoClient*) api;
-    Debug_ASSERT_SELF(self);
-    Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
-
     seos_err_t retval = SEOS_ERROR_GENERIC;
+    SeosCryptoClient* self = (SeosCryptoClient*) api;
 
-    if (NULL == buffer || dataLen > PAGE_SIZE)
+    if (NULL == api || NULL == buffer
+        || self->parent.vtable != &SeosCryptoClient_vtable)
     {
         retval = SEOS_ERROR_INVALID_PARAMETER;
     }
+    else if (dataLen > PAGE_SIZE)
+    {
+        retval = SEOS_ERROR_BUFFER_TOO_SMALL;
+    }
     else
     {
-        retval = SeosCryptoRpc_rngGetBytes(self->rpcHandle,
-                                           dataLen);
-
-        if (SEOS_SUCCESS == retval)
+        if ((retval = SeosCryptoRpc_rngGetBytes(self->rpcHandle,
+                                                dataLen)) == SEOS_SUCCESS)
         {
             if (*buffer != NULL)
             {
@@ -110,24 +110,24 @@ SeosCryptoClient_rngReSeed(SeosCryptoCtx*       api,
                            const void*          seed,
                            size_t               seedLen)
 {
-    SeosCryptoClient* self = (SeosCryptoClient*) api;
-    Debug_ASSERT_SELF(self);
-    Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
-
     seos_err_t retval = SEOS_ERROR_GENERIC;
+    SeosCryptoClient* self = (SeosCryptoClient*) api;
 
-    if (seedLen > PAGE_SIZE)
+    if (NULL == api || NULL == seed
+        || self->parent.vtable != &SeosCryptoClient_vtable)
     {
         retval = SEOS_ERROR_INVALID_PARAMETER;
     }
+    else if (seedLen > PAGE_SIZE)
+    {
+        retval = SEOS_ERROR_BUFFER_TOO_SMALL;
+    }
     else
     {
-        if (seed != NULL)
-        {
-            memcpy(self->clientDataport, seed, seedLen);
-        }
+        memcpy(self->clientDataport, seed, seedLen);
         retval = SeosCryptoRpc_rngReSeed(self->rpcHandle, seedLen);
     }
+
     return retval;
 }
 
