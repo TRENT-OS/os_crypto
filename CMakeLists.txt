@@ -20,11 +20,30 @@ if (ENABLE_LINT)
         set(CMAKE_C_CLANG_TIDY "clang-tidy;-checks=*")
 endif()
 
-target_compile_options(${PROJECT_NAME}
-    PUBLIC
-        -Wall
-        -Werror
-)
+# when building for the x64 architecture, some warnings are 
+# reported (i.e. printf formatting) that the code is full of,
+# and that are otherwise not reported, so as a quick fix we
+# remove the -Werror in this build situation
+if(NO_KERNEL_BUILD)
+    # when building for the x64 architecture, some warnings are 
+    # reported (i.e. printf formatting) that the code is full of,
+    # and that are otherwise not reported, so as a quick fix we
+    # remove the -Werror in this build situation
+    target_compile_options(${PROJECT_NAME}
+        PUBLIC
+            -Wall
+    )
+
+    # since PAGE_SIZE is normally defined as part of musllibc 
+    # (which is missing here) we have to define it
+    target_compile_definitions(${PROJECT_NAME} PRIVATE PAGE_SIZE=${PAGE_SIZE_VALUE})
+else()
+    target_compile_options(${PROJECT_NAME}
+        PUBLIC
+            -Wall
+            -Werror
+    )
+endif(NO_KERNEL_BUILD)
 
 if (DEBUG_CONFIG_H_FILE)
     list(APPEND PUBLIC_TARGET_COMPILE_DEFINITIONS
@@ -97,10 +116,8 @@ target_link_libraries(${PROJECT_NAME}
 get_target_property(SEOS_CORE_API_INCLUDES seos_core_api INTERFACE_INCLUDE_DIRECTORIES)
 find_file(SEOS_CRYPTO_API_HEADER SeosCryptoApi.h PATHS ${SEOS_CORE_API_INCLUDES} CMAKE_FIND_ROOT_PATH_BOTH)
 
-find_package(Doxygen
-             REQUIRED dot
-             OPTIONAL_COMPONENTS mscgen dia)
-if (DOXYGEN_FOUND)
+find_package(Doxygen)
+if (DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
     add_custom_target( seos_crypto_doc
         COMMAND
             export DOXYGEN_OUTPUT_DIR=${CMAKE_CURRENT_BINARY_DIR}
@@ -113,7 +130,7 @@ if (DOXYGEN_FOUND)
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "Generating API documentation for seos_crypto with Doxygen"
         VERBATIM )
-else(DOXYGEN_FOUND)
-    message("Doxygen needs to be installed to generate the doxygen documentation")
-endif(DOXYGEN_FOUND)
+else(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
+    message("Doxygen and dot needs to be installed to generate the doxygen documentation")
+endif(DOXYGEN_FOUND AND DOXYGEN_DOT_FOUND)
 
