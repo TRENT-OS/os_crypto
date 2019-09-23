@@ -461,32 +461,34 @@ SeosCryptoRpc_cipherClose(SeosCryptoRpc*                self,
 seos_err_t
 SeosCryptoRpc_cipherUpdate(SeosCryptoRpc*           self,
                            SeosCrypto_CipherHandle  cipherHandle,
-                           size_t                   len)
+                           size_t                   inputLen,
+                           size_t                   outputSize)
 {
-    seos_err_t  retval      = SEOS_ERROR_GENERIC;
-    void*       output      = NULL;
-    size_t      outputSize  = 0;
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+    size_t outputLen;
 
     if (!isValidHandle(self))
     {
         return SEOS_ERROR_INVALID_HANDLE;
     }
-    else if (len > PAGE_SIZE)
+    else if (inputLen > PAGE_SIZE)
     {
         return SEOS_ERROR_BUFFER_TOO_SMALL;
     }
 
+    outputLen = outputSize;
+    memcpy(self->buffer, self->serverDataport, inputLen);
     if ((retval = SeosCrypto_cipherUpdate(self->seosCryptoApi, cipherHandle,
-                                          self->serverDataport, len, &output, &outputSize)) == SEOS_SUCCESS)
+                                          self->serverDataport, inputLen, self->buffer, &outputLen)) == SEOS_SUCCESS)
     {
-        if (outputSize + sizeof(outputSize) > PAGE_SIZE)
+        if (outputLen + sizeof(outputLen) > PAGE_SIZE)
         {
             retval = SEOS_ERROR_BUFFER_TOO_SMALL;
         }
         else
         {
-            memcpy(self->serverDataport, &outputSize,  sizeof(outputSize));
-            memcpy(self->serverDataport + sizeof(outputSize), output, outputSize);
+            memcpy(self->serverDataport, &outputLen,  sizeof(outputLen));
+            memcpy(self->serverDataport + sizeof(outputLen), self->buffer, outputLen);
         }
     }
 

@@ -596,7 +596,7 @@ SeosCryptoClient_cipherUpdate(SeosCryptoCtx*                api,
                               SeosCrypto_CipherHandle       cipherHandle,
                               const void*                   data,
                               size_t                        dataLen,
-                              void**                        output,
+                              void*                         output,
                               size_t*                       outputSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -615,9 +615,9 @@ SeosCryptoClient_cipherUpdate(SeosCryptoCtx*                api,
     memcpy(self->clientDataport, data, dataLen);
 
     if ((retval = SeosCryptoRpc_cipherUpdate(self->rpcHandle, cipherHandle,
-                                             dataLen)) == SEOS_SUCCESS)
+                                             dataLen, *outputSize)) == SEOS_SUCCESS)
     {
-        retval = parseRpcOutput(self, output, outputSize);
+        retval = parseRpcOutput(self, &output, outputSize);
     }
 
     return retval;

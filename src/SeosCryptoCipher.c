@@ -189,109 +189,121 @@ static seos_err_t
 updateImpl(SeosCryptoCipher*    self,
            const void*          input,
            size_t               inputSize,
-           void**               output,
+           void*                output,
            size_t*              outputSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
-    switch (self->algorithm)
+    if (*outputSize < inputSize)
     {
-    case SeosCryptoCipher_Algorithm_AES_ECB_ENC:
-    case SeosCryptoCipher_Algorithm_AES_ECB_DEC:
+        retval = SEOS_ERROR_BUFFER_TOO_SMALL;
+    }
+    else
     {
-        size_t offs;
-        int mode = (self->algorithm == SeosCryptoCipher_Algorithm_AES_ECB_ENC) ?
-                   MBEDTLS_AES_ENCRYPT : MBEDTLS_AES_DECRYPT;
-
-        if (*outputSize < inputSize)
+        switch (self->algorithm)
         {
-            retval = SEOS_ERROR_BUFFER_TOO_SMALL;;
-        }
-        else if  (inputSize % SeosCryptoCipher_AES_BLOCK_SIZE)
+        case SeosCryptoCipher_Algorithm_AES_ECB_ENC:
+        case SeosCryptoCipher_Algorithm_AES_ECB_DEC:
         {
-            retval = SEOS_ERROR_INVALID_PARAMETER;
-        }
-        else
-        {
-            retval = SEOS_SUCCESS;
-            for (offs = 0; offs < inputSize; offs += SeosCryptoCipher_AES_BLOCK_SIZE)
+            if  (inputSize % SeosCryptoCipher_AES_BLOCK_SIZE)
             {
-                if (mbedtls_aes_crypt_ecb(&self->algorithmCtx.aes, mode, input + offs,
-                                          *output + offs) != 0)
+                retval = SEOS_ERROR_INVALID_PARAMETER;
+            }
+            else
+            {
+                size_t offs;
+                int mode = (self->algorithm == SeosCryptoCipher_Algorithm_AES_ECB_ENC) ?
+                           MBEDTLS_AES_ENCRYPT : MBEDTLS_AES_DECRYPT;
+
+                retval = SEOS_SUCCESS;
+                for (offs = 0; offs < inputSize; offs += SeosCryptoCipher_AES_BLOCK_SIZE)
                 {
-                    retval = SEOS_ERROR_ABORTED;
-                    break;
+                    if (mbedtls_aes_crypt_ecb(&self->algorithmCtx.aes, mode, input + offs,
+                                              output + offs) != 0)
+                    {
+                        retval = SEOS_ERROR_ABORTED;
+                        break;
+                    }
                 }
             }
         }
+        break;
 
-        *outputSize = inputSize;
-    }
-    break;
+        case SeosCryptoCipher_Algorithm_AES_CBC_ENC:
+        case SeosCryptoCipher_Algorithm_AES_CBC_DEC:
+        {
+            if (inputSize % SeosCryptoCipher_AES_BLOCK_SIZE)
+            {
+                retval = SEOS_ERROR_INVALID_PARAMETER;
+            }
+            else
+            {
+                int mode = (self->algorithm == SeosCryptoCipher_Algorithm_AES_CBC_ENC) ?
+                           MBEDTLS_AES_ENCRYPT : MBEDTLS_AES_DECRYPT;
+                retval = mbedtls_aes_crypt_cbc(&self->algorithmCtx.aes, mode, inputSize,
+                                               self->ivLen > 0 ? self->iv : NULL, input, output) ?
+                         SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+            }
+        }
+        break;
 
-    case SeosCryptoCipher_Algorithm_AES_CBC_ENC:
-    case SeosCryptoCipher_Algorithm_AES_CBC_DEC:
-    {
-        int mode = (self->algorithm == SeosCryptoCipher_Algorithm_AES_CBC_ENC) ?
-                   MBEDTLS_AES_ENCRYPT : MBEDTLS_AES_DECRYPT;
-        retval = (*outputSize < inputSize)
-                 || (inputSize % SeosCryptoCipher_AES_BLOCK_SIZE)
-                 || mbedtls_aes_crypt_cbc(&self->algorithmCtx.aes, mode, inputSize,
-                                          self->ivLen > 0 ? self->iv : NULL, input, *output) ?
-                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
-        *outputSize = inputSize;
-    }
-    break;
-
-    case SeosCryptoCipher_Algorithm_AES_GCM_ENC:
-    case SeosCryptoCipher_Algorithm_AES_GCM_DEC:
-    {
-        // mbedtls allows us to feed it an inputSize which is not a multiple of the
-        // blocksize ONLY if we do it in the last call before calling finish. Here
-        // we check that the user is not calling update after having already fed a
-        // non-aligned block.
-        retval = (*outputSize < inputSize)
-                 || (self->inputLen % SeosCryptoCipher_AES_BLOCK_SIZE)
-                 || mbedtls_gcm_update(&self->algorithmCtx.gcm, inputSize, input, *output) ?
-                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
-        *outputSize = inputSize;
-    }
-    break;
+        case SeosCryptoCipher_Algorithm_AES_GCM_ENC:
+        case SeosCryptoCipher_Algorithm_AES_GCM_DEC:
+        {
+            // mbedtls allows us to feed it an inputSize which is not a multiple of the
+            // blocksize ONLY if we do it in the last call before calling finish. Here
+            // we check that the user is not calling update after having already fed a
+            // non-aligned block.
+            retval = (self->inputLen % SeosCryptoCipher_AES_BLOCK_SIZE) ||
+                     !self->started || self->finalized ||
+                     mbedtls_gcm_update(&self->algorithmCtx.gcm, inputSize, input,
+                                        output) ? SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+        }
+        break;
 
 #if 0
-    case SeosCryptoCipher_Algorithm_RSA_PKCS1_ENC:
-    {
-        mbedtls_rsa_context* rsa = (mbedtls_rsa_context*) self->key->algoKeyCtx;
+        case SeosCryptoCipher_Algorithm_RSA_PKCS1_ENC:
+        {
+            mbedtls_rsa_context* rsa = (mbedtls_rsa_context*) self->key->algoKeyCtx;
 
-        retval = *outputSize >= rsa->len
-                 || mbedtls_rsa_pkcs1_encrypt(self->key->algoKeyCtx,
-                                              NULL,
-                                              NULL,
-                                              MBEDTLS_RSA_PUBLIC,
-                                              inputSize,
-                                              (unsigned const char*) input,
-                                              (unsigned char*) output) ?
-                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
-    }
-    case SeosCryptoCipher_Algorithm_RSA_PKCS1_DEC:
-    {
-        retval = mbedtls_rsa_pkcs1_decrypt(self->key->algoKeyCtx,
-                                           NULL,
-                                           NULL,
-                                           MBEDTLS_RSA_PRIVATE,
-                                           outputSize,
-                                           (unsigned const char*) input,
-                                           (unsigned char*) output,
-                                           *outputSize) ?
-                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
-    }
-    break;
+            retval = *outputSize >= rsa->len
+                     || mbedtls_rsa_pkcs1_encrypt(self->key->algoKeyCtx,
+                                                  NULL,
+                                                  NULL,
+                                                  MBEDTLS_RSA_PUBLIC,
+                                                  inputSize,
+                                                  (unsigned const char*) input,
+                                                  (unsigned char*) output) ?
+                     SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+        }
+        case SeosCryptoCipher_Algorithm_RSA_PKCS1_DEC:
+        {
+            retval = mbedtls_rsa_pkcs1_decrypt(self->key->algoKeyCtx,
+                                               NULL,
+                                               NULL,
+                                               MBEDTLS_RSA_PRIVATE,
+                                               outputSize,
+                                               (unsigned const char*) input,
+                                               (unsigned char*) output,
+                                               *outputSize) ?
+                     SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+        }
+        break;
 #endif
 
-    default:
-        retval = SEOS_ERROR_NOT_SUPPORTED;
-        break;
+        default:
+            retval = SEOS_ERROR_NOT_SUPPORTED;
+            break;
+        }
     }
+
+    if (SEOS_SUCCESS == retval || SEOS_ERROR_BUFFER_TOO_SMALL == retval)
+    {
+        // Set output size also if the input size was too small, so user can
+        // learn and adjust.
+        *outputSize = inputSize;
+    }
+
     return retval;
 }
 
@@ -314,7 +326,8 @@ startImpl(SeosCryptoCipher*     self,
         return SEOS_ERROR_NOT_SUPPORTED;
     }
 
-    return mbedtls_gcm_starts(&self->algorithmCtx.gcm, mode, self->iv, self->ivLen,
+    return self->started || self->updated || self->finalized ||
+           mbedtls_gcm_starts(&self->algorithmCtx.gcm, mode, self->iv, self->ivLen,
                               adLen > 0 ? ad : NULL, adLen) != 0 ?
            SEOS_ERROR_ABORTED : SEOS_SUCCESS;
 }
@@ -346,16 +359,17 @@ finalizeImpl(SeosCryptoCipher* self,
              void*             buf,
              size_t*           bufSize)
 {
-    seos_err_t retval;
+    seos_err_t retval = SEOS_ERROR_GENERIC;
 
-    retval = SEOS_SUCCESS;
     switch (self->algorithm)
     {
     case SeosCryptoCipher_Algorithm_AES_GCM_DEC:
     {
-        // Recompute the tag and compare it
         unsigned char check[SeosCryptoCipher_AES_GCM_TAG_SIZE];
+        // Recompute the tag and compare it; bufSize is used here as INPUT param,
+        // so we can compare at least TAG_SIZE bytes, but it can also be less
         retval = (*bufSize > SeosCryptoCipher_AES_GCM_TAG_SIZE) ||
+                 !self->started || !self->updated || self->finalized ||
                  mbedtls_gcm_finish(&self->algorithmCtx.gcm, check, *bufSize) != 0 ||
                  cmemcmp(buf, check, *bufSize) != 0 ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
@@ -367,19 +381,12 @@ finalizeImpl(SeosCryptoCipher* self,
         // size of which is determined by the AES blocksize
         *bufSize = (*bufSize > SeosCryptoCipher_AES_BLOCK_SIZE) ?
                    SeosCryptoCipher_AES_BLOCK_SIZE : *bufSize;
-        retval = mbedtls_gcm_finish(&self->algorithmCtx.gcm, buf, *bufSize) != 0 ?
+        retval = !self->started || !self->updated || self->finalized ||
+                 mbedtls_gcm_finish(&self->algorithmCtx.gcm, buf, *bufSize) != 0 ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
     }
-    case SeosCryptoCipher_Algorithm_AES_ECB_ENC:
-    case SeosCryptoCipher_Algorithm_AES_ECB_DEC:
-    case SeosCryptoCipher_Algorithm_AES_CBC_ENC:
-    case SeosCryptoCipher_Algorithm_AES_CBC_DEC:
-        // ECB and CBC can all call finalize as well, but it won't do anything
-        // for now; later we may want to apply some padding..
-        *bufSize = 0;
-        retval = SEOS_SUCCESS;
-        break;
+
     default:
         retval = SEOS_ERROR_NOT_SUPPORTED;
         break;
@@ -410,6 +417,10 @@ SeosCryptoCipher_init(SeosCrypto_MemIf*              memIf,
     self->algorithm  = algorithm;
     self->key        = key;
     self->inputLen   = 0;
+    // Use these to keep track that everything is being called in proper order
+    self->started    = false;
+    self->updated    = false;
+    self->finalized  = false;
 
     if ((retval = initImpl(memIf, self)) != SEOS_SUCCESS)
     {
@@ -446,43 +457,43 @@ SeosCryptoCipher_start(SeosCryptoCipher* self,
                        const void*       input,
                        size_t            inputSize)
 {
+    seos_err_t retval = SEOS_ERROR_GENERIC;
 
     if (NULL == self)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return startImpl(self, input, inputSize);
+    retval = startImpl(self, input, inputSize);
+    if (!self->started)
+    {
+        self->started = (SEOS_SUCCESS == retval);
+    }
+
+    return retval;
 }
 
 seos_err_t
-SeosCryptoCipher_update(SeosCryptoCipher*    self,
+SeosCryptoCipher_update(SeosCryptoCipher*   self,
                         const void*         input,
                         size_t              inputSize,
-                        void**              output,
+                        void*               output,
                         size_t*             outputSize)
 {
-    seos_err_t retval;
+    seos_err_t retval = SEOS_ERROR_GENERIC;
 
-    if (NULL == self || NULL == input || 0 == inputSize ||
-        NULL == outputSize || NULL == output)
+    if (NULL == self || NULL == input || 0 == inputSize || NULL == output
+        || NULL == outputSize || 0 == *outputSize)
     {
         retval = SEOS_ERROR_INVALID_PARAMETER;
     }
-    else
+    else if ((retval = updateImpl(self, input, inputSize, output,
+                                  outputSize)) == SEOS_SUCCESS)
     {
-        if (NULL == *output)
-        {
-            *output     = self->outputBuf;
-            *outputSize = sizeof(self->outputBuf);
-        }
-        if ((retval = updateImpl(self, input, inputSize, output,
-                                 outputSize)) == SEOS_SUCCESS)
-        {
-            self->inputLen += inputSize;
-        }
-
+        self->inputLen += inputSize;
+        self->updated   = true;
     }
+
     return retval;
 }
 
@@ -491,10 +502,18 @@ SeosCryptoCipher_finalize(SeosCryptoCipher* self,
                           void*             buf,
                           size_t*           bufSize)
 {
-    if (NULL == self || NULL == buf)
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    if (NULL == self || NULL == buf || NULL == bufSize || 0 == *bufSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return finalizeImpl(self, buf, bufSize);
+    retval = finalizeImpl(self, buf, bufSize);
+    if (!self->finalized)
+    {
+        self->finalized = (SEOS_SUCCESS == retval);
+    }
+
+    return retval;
 }

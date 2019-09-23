@@ -252,7 +252,7 @@ SeosCryptoApi_cipherUpdate(SeosCryptoCtx*           cryptoCtx,
                            SeosCrypto_CipherHandle  cipherHandle,
                            const void*              data,
                            size_t                   dataLen,
-                           void**                   output,
+                           void*                    output,
                            size_t*                  outputSize)
 {
     return (NULL == cryptoCtx) ? SEOS_ERROR_INVALID_PARAMETER :

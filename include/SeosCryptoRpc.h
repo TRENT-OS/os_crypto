@@ -249,7 +249,8 @@ SeosCryptoRpc_cipherClose(SeosCryptoRpc*                self,
 seos_err_t
 SeosCryptoRpc_cipherUpdate(SeosCryptoRpc*               self,
                            SeosCrypto_CipherHandle      cipherHandle,
-                           size_t                       len);
+                           size_t                       inputLen,
+                           size_t                       outputSize);
 /**
  * @brief rpc management of SeosCrypto_cipherStart()
  *

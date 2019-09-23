@@ -260,7 +260,7 @@ SeosCrypto_cipherUpdate(SeosCryptoCtx*              api,
                         SeosCrypto_CipherHandle     cipherHandle,
                         const void*                 input,
                         size_t                      inputSize,
-                        void**                      output,
+                        void*                       output,
                         size_t*                     outputSize);
 /**
  * @brief implements SeosCryptoApi_cipherStart() in a local connection

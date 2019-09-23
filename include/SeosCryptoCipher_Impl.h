@@ -53,6 +53,9 @@ typedef struct
     size_t                      ivLen;
     size_t                      inputLen;
     char                        outputBuf[SeosCryptoCipher_OUTPUT_BUFFER_SIZE];
+    bool                        started;
+    bool                        updated;
+    bool                        finalized;
 }
 SeosCryptoCipher;
 

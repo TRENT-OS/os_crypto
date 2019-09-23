@@ -150,7 +150,7 @@ typedef seos_err_t
                                SeosCrypto_CipherHandle      cipherHandle,
                                const void*                  data,
                                size_t                       dataLen,
-                               void**                       output,
+                               void*                        output,
                                size_t*                      outputSize);
 
 typedef seos_err_t

@@ -64,7 +64,7 @@ seos_err_t
 SeosCryptoCipher_update(SeosCryptoCipher*   self,
                         const void*         input,
                         size_t              inputSize,
-                        void**              output,
+                        void *              output,
                         size_t*             outputSize);
 
 /**
