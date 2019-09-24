@@ -622,7 +622,7 @@ seos_err_t
 SeosCrypto_keyExport(SeosCryptoCtx*                 api,
                      SeosCrypto_KeyHandle           keyHandle,
                      SeosCrypto_KeyHandle           wrapKeyHandle,
-                     void**                         buf,
+                     void*                          buf,
                      size_t*                        bufSize)
 {
     SeosCrypto* self = (SeosCrypto*) api;

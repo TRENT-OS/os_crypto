@@ -176,7 +176,7 @@ seos_err_t
 SeosCryptoClient_keyExport(SeosCryptoCtx*                 ctx,
                            SeosCrypto_KeyHandle           keyHandle,
                            SeosCrypto_KeyHandle           wrapKeyHandle,
-                           void**                         key,
+                           void*                          key,
                            size_t*                        keySize);
 
 seos_err_t

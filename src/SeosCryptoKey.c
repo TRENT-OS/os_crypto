@@ -458,7 +458,7 @@ importImpl(SeosCryptoKey*        self,
 static seos_err_t
 exportImpl(SeosCryptoKey*        self,
            SeosCryptoKey*        wrapKey,
-           void**                buf,
+           void*                 buf,
            size_t*               bufSize)
 {
     if (NULL != wrapKey)
@@ -467,19 +467,12 @@ exportImpl(SeosCryptoKey*        self,
         return SEOS_ERROR_NOT_SUPPORTED;
     }
 
-    if (NULL == *buf)
+    if (*bufSize < self->keySize)
     {
-        *buf = self->keyBytes;
-    }
-    else
-    {
-        if (*bufSize < self->keySize)
-        {
-            return SEOS_ERROR_BUFFER_TOO_SMALL;
-        }
-        memcpy(*buf, self->keyBytes, self->keySize);
+        return SEOS_ERROR_BUFFER_TOO_SMALL;
     }
 
+    memcpy(buf, self->keyBytes, self->keySize);
     *bufSize = self->keySize;
 
     return SEOS_SUCCESS;
@@ -583,7 +576,7 @@ SeosCryptoKey_import(SeosCryptoKey*        self,
 seos_err_t
 SeosCryptoKey_export(SeosCryptoKey*        self,
                      SeosCryptoKey*        wrapKey,
-                     void**                buf,
+                     void*                 buf,
                      size_t*               bufSize)
 {
     if (NULL == self || NULL == self->keyBytes || 0 == self->keySize || NULL == buf

@@ -52,7 +52,7 @@ SeosCryptoKey_import(SeosCryptoKey*             self,
 seos_err_t
 SeosCryptoKey_export(SeosCryptoKey*             self,
                      SeosCryptoKey*             wrapKey,
-                     void**                     buf,
+                     void*                      buf,
                      size_t*                    bufSize);
 
 seos_err_t

@@ -63,6 +63,8 @@ SeosCrypto_init(SeosCrypto*             self,
 void
 SeosCrypto_deInit(SeosCryptoCtx* api);
 
+// -------------------------------- RNG API ------------------------------------
+
 /**
  * @brief implements SeosCryptoApi_rngGetBytes() in a local connection
  *  (function call, no rpc)
@@ -73,11 +75,15 @@ SeosCrypto_rngGetBytes(SeosCryptoCtx*   api,
                        void**           buffer,
                        size_t           bufferLen);
 
+/**
+ * @brief implements SeosCryptoApi_rngReSeed() in a local connection
+ *  (function call, no rpc)
+ *
+ */
 seos_err_t
 SeosCrypto_rngReSeed(SeosCryptoCtx*     api,
                      const void*        seed,
                      size_t             seedLen);
-
 
 // ------------------------------ Digest API -----------------------------------
 /**
@@ -119,6 +125,12 @@ SeosCrypto_digestFinalize(SeosCryptoCtx*                api,
                           size_t*                       digestSize);
 
 // -------------------------------- Key API ------------------------------------
+
+/**
+ * @brief implements SeosCryptoApi_keyInit() in a local connection
+ * (function call, no rpc)
+ *
+ */
 seos_err_t
 SeosCrypto_keyInit(SeosCryptoCtx*                   api,
                    SeosCrypto_KeyHandle*            pKeyHandle,
@@ -126,15 +138,30 @@ SeosCrypto_keyInit(SeosCryptoCtx*                   api,
                    unsigned int                     flags,
                    size_t                           bits);
 
+/**
+ * @brief implements SeosCryptoApi_keyGenerate() in a local connection
+ * (function call, no rpc)
+ *
+ */
 seos_err_t
 SeosCrypto_keyGenerate(SeosCryptoCtx*               api,
                        SeosCrypto_KeyHandle         keyHandle);
 
+/**
+ * @brief implements SeosCryptoApi_keyGeneratePair() in a local connection
+ * (function call, no rpc)
+ *
+ */
 seos_err_t
 SeosCrypto_keyGeneratePair(SeosCryptoCtx*           api,
                            SeosCrypto_KeyHandle     prvKeyHandle,
                            SeosCrypto_KeyHandle     pubKeyHandle);
 
+/**
+ * @brief implements SeosCryptoApi_keyImport() in a local connection
+ * (function call, no rpc)
+ *
+ */
 seos_err_t
 SeosCrypto_keyImport(SeosCryptoCtx*                 api,
                      SeosCrypto_KeyHandle           keyHandle,
@@ -142,90 +169,29 @@ SeosCrypto_keyImport(SeosCryptoCtx*                 api,
                      const void*                    keyBytes,
                      size_t                         keySize);
 
+/**
+ * @brief implements SeosCryptoApi_keyExport() in a local connection
+ * (function call, no rpc)
+ *
+ */
 seos_err_t
 SeosCrypto_keyExport(SeosCryptoCtx*                 api,
                      SeosCrypto_KeyHandle           keyHandle,
                      SeosCrypto_KeyHandle           wrapKeyHandle,
-                     void**                         buf,
+                     void*                          buf,
                      size_t*                        bufSize);
 
+/**
+ * @brief implements SeosCryptoApi_keyDeInit() in a local connection
+ * (function call, no rpc)
+ *
+ */
 seos_err_t
 SeosCrypto_keyDeInit(SeosCryptoCtx*                 api,
                      SeosCrypto_KeyHandle           keyHandle);
 
-
-// ----------------------------- Key Derivation --------------------------------
-
-/**
- * @brief closes a key handle. The buffer of the key will no longer be in use,
- *  however any pending operation with this key can continue
- *
- * @param api (optional) pointer to the seos_crypto context
- * @param flags contains key specific setting about what to export and which
- *  format is used the format of the key material is specific to the key type
- * @param hKey ///TODO: NOT DOCUMENTED in Wiki
- * @param buffer (optional) if NULL, then the parameter len_buffer contains the
- *  buffer size that is needed on output
- * @param buffer_len (optional) if the parameter buffer is not NULL, the
- *  parameter len_buffer must contain the buffer size on input and will contain
- *  the length used on return
- *
- * @return an error code
- * @retval SEOS_SUCCESS if all right
- * @retval SEOS_ERROR_INVALID_PARAMETER if any of the required parameters is
- *  missing or if any parameter is invalid
- * @retval SEOS_ERROR_INVALID_HANDLE invalid key store handle
- * @retval SEOS_ERROR_BUFFER_TOO_SMALL lenKeyBlobBuffer contains the size
- *  that would be needed for the key blob
- * @retval SEOS_ERROR_ACCESS_DENIED export denied
- *
- */
-seos_err_t
-SeosCrypto_deriveKey(SeosCryptoCtx* api,
-                     SeosCrypto_KeyHandle hParentKey,
-                     unsigned int lifetime,
-                     unsigned int algorithm,
-                     void const* saltBuffer,
-                     size_t saltLen,
-                     SeosCrypto_KeyHandle* hKey,
-                     void* keyBlobBuffer,
-                     size_t* lenKeyBlobBuffer);
-/**
- * @brief closes a key handle. The buffer of the key will no longer be in use,
- *  however any pending operation with this key can continue
- *
- * @param api (optional) pointer to the seos_crypto context
- * @param flags contains key specific setting about what to export and which
- *  format is used the format of the key material is specific to the key type
- * @param hKey ///TODO: NOT DOCUMENTED in Wiki
- * @param buffer (optional) if NULL, then the parameter len_buffer contains the
- *  buffer size that is needed on output
- * @param buffer_len (optional) if the parameter buffer is not NULL, the
- *  parameter len_buffer must contain the buffer size on input and will contain
- *  the length used on return
- *
- * @return an error code
- * @retval SEOS_SUCCESS if all right
- * @retval SEOS_ERROR_INVALID_PARAMETER if any of the required parameters is
- *  missing or if any parameter is invalid
- * @retval SEOS_ERROR_INVALID_HANDLE invalid key store handle
- * @retval SEOS_ERROR_BUFFER_TOO_SMALL len_keyBlobBuffer contains the size
- *  that would be needed for the key blob
- * @retval SEOS_ERROR_ACCESS_DENIED export denied
- *
- */
-//seos_err_t
-//SeosCrypto_deriveKey(SeosCrypto* api,
-//                       SeosCrypto_HKey hParentKey,
-//                       unsigned int lifetime,
-//                       unsigned int algorithm,
-//                       void const* saltBuffer,
-//                       size_t saltLen,
-//                       SeosCrypto_HKey* hKey,
-//                       void* keyBlobBuffer,
-//                       size_t* len_keyBlobBuffer);
-
 // ------------------------------ Cipher API -----------------------------------
+
 /**
  * @brief implements SeosCryptoApi_cipherInit() in a local connection
  * (function call, no rpc)
@@ -279,6 +245,8 @@ SeosCrypto_cipherFinalize(SeosCryptoCtx*                api,
                           void*                         output,
                           size_t*                       outputSize);
 
+// ----------------------------- Signature API ---------------------------------
+
 /**
  * @brief implements SeosCryptoApi_signatureInit() in a local connection
  * (function call, no rpc)
@@ -325,6 +293,8 @@ SeosCrypto_signatureVerify(SeosCryptoCtx*                 api,
                            size_t                         hashSize,
                            const void*                    signature,
                            size_t                         signatureSize);
+
+// ----------------------------- Agreement API ---------------------------------
 
 /**
  * @brief implements SeosCryptoApi_agreementInit() in a local connection

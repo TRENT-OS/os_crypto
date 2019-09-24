@@ -9,6 +9,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <sys/user.h>
 
 // At the moment we manage one handle only.
 SeosCryptoRpc* handle = NULL;
@@ -243,18 +244,25 @@ SeosCryptoRpc_keyImport(SeosCryptoRpc*                 self,
 seos_err_t
 SeosCryptoRpc_keyExport(SeosCryptoRpc*                 self,
                         SeosCrypto_KeyHandle           keyHandle,
-                        SeosCrypto_KeyHandle           wrapKeyHandle)
+                        SeosCrypto_KeyHandle           wrapKeyHandle,
+                        size_t                         bufSize)
 {
     seos_err_t  retval      = SEOS_ERROR_GENERIC;
-    void*       output      = NULL;
     size_t      outputSize  = 0;
 
     if (!isValidHandle(self))
     {
-        retval = SEOS_ERROR_INVALID_HANDLE;
+        return SEOS_ERROR_INVALID_HANDLE;
     }
-    else if ((retval = SeosCrypto_keyExport(self->seosCryptoApi, keyHandle,
-                                            wrapKeyHandle, &output, &outputSize)) == SEOS_SUCCESS)
+    else if (bufSize > PAGE_SIZE)
+    {
+        return SEOS_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    outputSize = bufSize;
+
+    if ((retval = SeosCrypto_keyExport(self->seosCryptoApi, keyHandle,
+                                       wrapKeyHandle, self->buffer, &outputSize)) == SEOS_SUCCESS)
     {
         if (outputSize + sizeof(outputSize) > PAGE_SIZE)
         {
@@ -262,12 +270,11 @@ SeosCryptoRpc_keyExport(SeosCryptoRpc*                 self,
         }
         else
         {
-            void* dest = memcpy(self->serverDataport,
-                                &outputSize,
-                                sizeof(outputSize)) + sizeof(outputSize);
-            memcpy(dest, output, outputSize);
+            memcpy(self->serverDataport, &outputSize, sizeof(outputSize));
+            memcpy(self->serverDataport + + sizeof(outputSize), self->buffer, outputSize);
         }
     }
+
     return retval;
 }
 

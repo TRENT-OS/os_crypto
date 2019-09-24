@@ -150,7 +150,8 @@ SeosCryptoRpc_keyImport(SeosCryptoRpc*                 self,
 seos_err_t
 SeosCryptoRpc_keyExport(SeosCryptoRpc*                 self,
                         SeosCrypto_KeyHandle           keyHandle,
-                        SeosCrypto_KeyHandle           wrapKeyHandle);
+                        SeosCrypto_KeyHandle           wrapKeyHandle,
+                        size_t                         bufSize);
 
 /**
  * @brief rpc management of SeosCryptoRpc_keyDeInit()

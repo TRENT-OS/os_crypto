@@ -7,6 +7,7 @@
 #include "LibDebug/Debug.h"
 
 #include <string.h>
+#include <sys/user.h>
 
 static const SeosCryptoCtx_Vtable SeosCryptoClient_vtable =
 {
@@ -465,7 +466,7 @@ seos_err_t
 SeosCryptoClient_keyExport(SeosCryptoCtx*                 api,
                            SeosCrypto_KeyHandle           keyHandle,
                            SeosCrypto_KeyHandle           wrapKeyHandle,
-                           void**                         key,
+                           void*                          key,
                            size_t*                        keySize)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
@@ -478,9 +479,9 @@ SeosCryptoClient_keyExport(SeosCryptoCtx*                 api,
     }
 
     if ((retval = SeosCryptoRpc_keyExport(self->rpcHandle, keyHandle,
-                                          wrapKeyHandle)) == SEOS_SUCCESS)
+                                          wrapKeyHandle, *keySize)) == SEOS_SUCCESS)
     {
-        retval = parseRpcOutput(self, key, keySize);
+        retval = parseRpcOutput(self, &key, keySize);
     }
 
     return retval;

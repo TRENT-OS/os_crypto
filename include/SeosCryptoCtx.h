@@ -77,7 +77,7 @@ typedef seos_err_t
 (*SeosCryptoCtx_keyExportT)(SeosCryptoCtx*                 self,
                             SeosCrypto_KeyHandle           keyHandle,
                             SeosCrypto_KeyHandle           wrapKeyHandle,
-                            void**                         key,
+                            void*                          key,
                             size_t*                        keySize);
 
 typedef seos_err_t
