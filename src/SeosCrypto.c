@@ -169,6 +169,7 @@ SeosCrypto_free(SeosCryptoCtx* api)
 
 seos_err_t
 SeosCrypto_rngGetBytes(SeosCryptoCtx*   api,
+                       unsigned int     flags,
                        void*            buf,
                        size_t           bufLen)
 {
@@ -179,7 +180,7 @@ SeosCrypto_rngGetBytes(SeosCryptoCtx*   api,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoRng_getBytes(&self->cryptoRng, buf, bufLen);
+    return SeosCryptoRng_getBytes(&self->cryptoRng, flags, buf, bufLen);
 }
 
 seos_err_t
@@ -521,7 +522,7 @@ seos_err_t
 SeosCrypto_keyInit(SeosCryptoCtx*                   api,
                    SeosCrypto_KeyHandle*            pKeyHandle,
                    unsigned int                     type,
-                   SeosCryptoKey_Flag               flags,
+                   SeosCryptoKey_Flags               flags,
                    size_t                           bits)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;

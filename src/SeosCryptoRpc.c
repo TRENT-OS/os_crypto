@@ -99,6 +99,7 @@ SeosCryptoRpc_free(SeosCryptoRpc* self)
 
 seos_err_t
 SeosCryptoRpc_rngGetBytes(SeosCryptoRpc*    self,
+                          unsigned int      flags,
                           size_t            bufSize)
 {
     if (!isValidHandle(self))
@@ -110,7 +111,7 @@ SeosCryptoRpc_rngGetBytes(SeosCryptoRpc*    self,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCrypto_rngGetBytes(self->seosCryptoApi, self->serverDataport,
+    return SeosCrypto_rngGetBytes(self->seosCryptoApi, flags, self->serverDataport,
                                   bufSize);
 }
 
@@ -192,7 +193,7 @@ seos_err_t
 SeosCryptoRpc_keyInit(SeosCryptoRpc*                   self,
                       SeosCrypto_KeyHandle*            keyHandle,
                       unsigned int                     type,
-                      SeosCryptoKey_Flag               flags,
+                      SeosCryptoKey_Flags               flags,
                       size_t                           bits)
 {
     return !isValidHandle(self) ?

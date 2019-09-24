@@ -28,11 +28,11 @@
 
 typedef enum
 {
-    SeosCryptoKey_Flags_NONE                = 0,
-    SeosCryptoKey_Flags_EXPORTABLE_RAW      = (1 << 0),
-    SeosCryptoKey_Flags_EXPORTABLE_WRAPPED  = (1 << 1)
+    SeosCryptoKey_Flags_NONE                = 0x0000,
+    SeosCryptoKey_Flags_EXPORTABLE_RAW      = 0x0001,
+    SeosCryptoKey_Flags_EXPORTABLE_WRAPPED  = 0x0002
 }
-SeosCryptoKey_Flag;
+SeosCryptoKey_Flags;
 
 typedef enum
 {
@@ -49,7 +49,7 @@ SeosCryptoKey_Type;
 
 typedef struct
 {
-    SeosCryptoKey_Flag  flags;      ///< flags, see above
+    SeosCryptoKey_Flags  flags;      ///< flags, see above
     SeosCryptoKey_Type  type;       ///< type of key, see above
     uint32_t            bits;       ///< the security parameter (e.g., key size)
     void*               keyBytes;   ///< pointer to raw key material

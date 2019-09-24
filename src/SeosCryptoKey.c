@@ -476,7 +476,7 @@ seos_err_t
 SeosCryptoKey_init(SeosCryptoKey*               self,
                    SeosCrypto_MemIf*            memIf,
                    SeosCryptoKey_Type           type,
-                   SeosCryptoKey_Flag           flags,
+                   SeosCryptoKey_Flags          flags,
                    size_t                       bits)
 {
     if (NULL == memIf || NULL == self)

@@ -43,16 +43,21 @@ err0:
 }
 
 seos_err_t
-SeosCryptoRng_getBytes(SeosCryptoRng*  self,
-                       void*           buf,
-                       size_t          bufLen)
+SeosCryptoRng_getBytes(SeosCryptoRng*       self,
+                       SeosCryptoRng_Flags  flags,
+                       void*                buf,
+                       size_t               bufSize)
 {
-    if (NULL == self || NULL == buf || 0 == bufLen)
+    if (NULL == self || NULL == buf || 0 == bufSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
+    else if (flags != 0)
+    {
+        return SEOS_ERROR_NOT_SUPPORTED;
+    }
 
-    return (mbedtls_ctr_drbg_random(&self->drbg, buf, bufLen) != 0) ?
+    return (mbedtls_ctr_drbg_random(&self->drbg, buf, bufSize) != 0) ?
            SEOS_ERROR_ABORTED : SEOS_SUCCESS;
 }
 

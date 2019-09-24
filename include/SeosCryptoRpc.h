@@ -59,6 +59,7 @@ SeosCryptoRpc_free(SeosCryptoRpc* self);
  */
 seos_err_t
 SeosCryptoRpc_rngGetBytes(SeosCryptoRpc*    self,
+                          unsigned int      flags,
                           size_t            dataLen);
 
 /**
@@ -116,7 +117,7 @@ seos_err_t
 SeosCryptoRpc_keyInit(SeosCryptoRpc*                   self,
                       SeosCrypto_KeyHandle*            keyHandle,
                       unsigned int                     type,
-                      SeosCryptoKey_Flag               flags,
+                      SeosCryptoKey_Flags               flags,
                       size_t                           bits);
 
 /**

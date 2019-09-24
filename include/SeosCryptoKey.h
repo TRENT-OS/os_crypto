@@ -31,7 +31,7 @@ seos_err_t
 SeosCryptoKey_init(SeosCryptoKey*               self,
                    SeosCrypto_MemIf*            memIf,
                    unsigned int                 type,
-                   SeosCryptoKey_Flag           flags,
+                   SeosCryptoKey_Flags          flags,
                    size_t                       bits);
 
 /**

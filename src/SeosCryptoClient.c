@@ -123,6 +123,7 @@ SeosCryptoClient_free(SeosCryptoCtx* api)
 
 seos_err_t
 SeosCryptoClient_rngGetBytes(SeosCryptoCtx*       api,
+                             unsigned int         flags,
                              void*                buf,
                              size_t               bufLen)
 {
@@ -139,7 +140,7 @@ SeosCryptoClient_rngGetBytes(SeosCryptoCtx*       api,
         return SEOS_ERROR_BUFFER_TOO_SMALL;
     }
 
-    if ((retval = SeosCryptoRpc_rngGetBytes(self->rpcHandle,
+    if ((retval = SeosCryptoRpc_rngGetBytes(self->rpcHandle, flags,
                                             bufLen)) == SEOS_SUCCESS)
     {
         memcpy(buf, self->clientDataport, bufLen);
@@ -405,7 +406,7 @@ seos_err_t
 SeosCryptoClient_keyInit(SeosCryptoCtx*                   api,
                          SeosCrypto_KeyHandle*            pKeyHandle,
                          unsigned int                     type,
-                         SeosCryptoKey_Flag               flags,
+                         SeosCryptoKey_Flags               flags,
                          size_t                           bits)
 {
 

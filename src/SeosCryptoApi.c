@@ -16,12 +16,13 @@ SeosCryptoApi_free(SeosCryptoCtx* cryptoCtx)
 
 seos_err_t
 SeosCryptoApi_rngGetBytes(SeosCryptoCtx*    cryptoCtx,
+                          unsigned int      flags,
                           void*             buf,
                           size_t            bufSize)
 {
     return (NULL == cryptoCtx) ?
            SEOS_ERROR_INVALID_PARAMETER :
-           cryptoCtx->vtable->rngGetBytes(cryptoCtx, buf, bufSize);
+           cryptoCtx->vtable->rngGetBytes(cryptoCtx, flags, buf, bufSize);
 }
 
 seos_err_t
@@ -171,7 +172,7 @@ seos_err_t
 SeosCryptoApi_keyInit(SeosCryptoCtx*                   ctx,
                       SeosCrypto_KeyHandle*            keyHandle,
                       unsigned int                     type,
-                      SeosCryptoKey_Flag               flags,
+                      SeosCryptoKey_Flags               flags,
                       size_t                           bits)
 {
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :

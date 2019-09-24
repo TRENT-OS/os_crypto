@@ -72,6 +72,7 @@ SeosCrypto_free(SeosCryptoCtx* api);
  */
 seos_err_t
 SeosCrypto_rngGetBytes(SeosCryptoCtx*   api,
+                       unsigned int     flags,
                        void*            buf,
                        size_t           bufLen);
 
