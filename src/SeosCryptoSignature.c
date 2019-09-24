@@ -222,29 +222,18 @@ SeosCryptoSignature_sign(SeosCryptoSignature*       self,
                          SeosCryptoRng*             rng,
                          const void*                hash,
                          size_t                     hashSize,
-                         void**                     signature,
+                         void*                      signature,
                          size_t*                    signatureSize)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
-
     if (NULL == self || NULL == hash || 0 == hashSize || NULL == signature
         || NULL == signatureSize)
     {
-        retval = SEOS_ERROR_INVALID_PARAMETER;
-    }
-    else
-    {
-        if (NULL == *signature)
-        {
-            *signature      = self->outBuf;
-            *signatureSize  = sizeof(self->outBuf);
-        }
-        retval = (self->prvKey != NULL) ?
-                 signHashImpl(self, rng, hash, hashSize, *signature, signatureSize) :
-                 SEOS_ERROR_ABORTED;
+        return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return retval;
+    return (self->prvKey != NULL) ?
+           signHashImpl(self, rng, hash, hashSize, signature, signatureSize) :
+           SEOS_ERROR_ABORTED;
 }
 
 seos_err_t

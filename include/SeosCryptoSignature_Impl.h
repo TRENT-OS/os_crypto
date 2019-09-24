@@ -35,7 +35,6 @@ typedef struct
     SeosCryptoSignature_Algorithm   algorithm;
     SeosCryptoKey*                  prvKey;
     SeosCryptoKey*                  pubKey;
-    unsigned char                   outBuf[PAGE_SIZE];
 }
 SeosCryptoSignature;
 

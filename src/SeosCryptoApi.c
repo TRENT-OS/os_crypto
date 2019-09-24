@@ -109,12 +109,10 @@ SeosCryptoApi_signatureSign(SeosCryptoCtx*                 cryptoCtx,
                             void*                          signature,
                             size_t*                        signatureSize)
 {
-    void* pSignature = signature;
-
     return (NULL == cryptoCtx || NULL == signature) ?
            SEOS_ERROR_INVALID_PARAMETER :
            cryptoCtx->vtable->signatureSign(cryptoCtx, sigHandle, hash, hashSize,
-                                            &pSignature, signatureSize);
+                                            signature, signatureSize);
 }
 
 seos_err_t

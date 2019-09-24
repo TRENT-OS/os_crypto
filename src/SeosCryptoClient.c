@@ -276,7 +276,7 @@ SeosCryptoClient_signatureSign(SeosCryptoCtx*                 api,
                                SeosCrypto_SignatureHandle     sigHandle,
                                const void*                    hash,
                                size_t                         hashSize,
-                               void**                         signature,
+                               void*                          signature,
                                size_t*                        signatureSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -295,9 +295,9 @@ SeosCryptoClient_signatureSign(SeosCryptoCtx*                 api,
     memcpy(self->clientDataport, hash, hashSize);
 
     if ((retval = SeosCryptoRpc_signatureSign(self->rpcHandle, sigHandle,
-                                              hashSize)) == SEOS_SUCCESS)
+                                              hashSize, *signatureSize)) == SEOS_SUCCESS)
     {
-        retval = parseRpcOutput(self, signature, signatureSize);
+        retval = parseRpcOutput(self, &signature, signatureSize);
     }
 
     return retval;

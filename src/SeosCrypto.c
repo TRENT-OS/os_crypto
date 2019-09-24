@@ -387,7 +387,7 @@ SeosCrypto_signatureSign(SeosCryptoCtx*                 api,
                          SeosCrypto_SignatureHandle     sigHandle,
                          const void*                    hash,
                          size_t                         hashSize,
-                         void**                         signature,
+                         void*                          signature,
                          size_t*                        signatureSize)
 {
     SeosCrypto* self = (SeosCrypto*) api;

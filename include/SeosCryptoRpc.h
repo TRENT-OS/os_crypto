@@ -187,7 +187,8 @@ SeosCryptoRpc_signatureVerify(SeosCryptoRpc*                self,
 seos_err_t
 SeosCryptoRpc_signatureSign(SeosCryptoRpc*                self,
                             SeosCrypto_SignatureHandle    sigHandle,
-                            size_t                        hashSize);
+                            size_t                        hashSize,
+                            size_t                        signatureSize);
 
 /**
  * @brief rpc management of SeosCrypto_signatureDeInit()
