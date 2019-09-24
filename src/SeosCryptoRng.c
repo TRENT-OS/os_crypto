@@ -9,8 +9,8 @@
 #include <string.h>
 
 seos_err_t
-SeosCryptoRng_init(SeosCrypto_MemIf*        memIf,
-                   SeosCryptoRng*           self,
+SeosCryptoRng_init(SeosCryptoRng*           self,
+                   SeosCrypto_MemIf*        memIf,
                    SeosCrypto_EntropyFunc   entropyFunc,
                    void*                    entropyCtx)
 {
@@ -76,8 +76,8 @@ SeosCryptoRng_reSeed(SeosCryptoRng*  self,
 }
 
 seos_err_t
-SeosCryptoRng_free(SeosCrypto_MemIf*              memIf,
-                   SeosCryptoRng*                 self)
+SeosCryptoRng_free(SeosCryptoRng*                 self,
+                   SeosCrypto_MemIf*              memIf)
 {
     UNUSED_VAR(memIf);
     if (NULL == memIf || NULL == self)

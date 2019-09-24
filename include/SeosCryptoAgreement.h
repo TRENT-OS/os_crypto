@@ -23,8 +23,8 @@
  *
  */
 seos_err_t
-SeosCryptoAgreement_init(SeosCrypto_MemIf*                 memIf,
-                         SeosCryptoAgreement*              self,
+SeosCryptoAgreement_init(SeosCryptoAgreement*              self,
+                         SeosCrypto_MemIf*                 memIf,
                          SeosCryptoAgreement_Algorithm     algorithm,
                          SeosCryptoKey*                    privateKey);
 
@@ -44,7 +44,7 @@ SeosCryptoAgreement_agree(SeosCryptoAgreement*  self,
  *
  */
 seos_err_t
-SeosCryptoAgreement_free(SeosCrypto_MemIf*           memIf,
-                         SeosCryptoAgreement*        self);
+SeosCryptoAgreement_free(SeosCryptoAgreement*        self,
+                         SeosCrypto_MemIf*           memIf);
 
 /** @} */

@@ -32,27 +32,14 @@ SeosCrypto_MemIf;
 
 typedef struct
 {
-    void*   buf;
-    size_t  len;
-}
-SeosCrypto_StaticBuf;
-
-typedef struct
-{
-    SeosCryptoCtx   parent;
-    union
-    {
-        SeosCrypto_MemIf        memIf;
-        SeosCrypto_StaticBuf    staticBuf;
-    }
-    mem;
-
-    SeosCryptoRng cryptoRng;
-    PointerVector keyHandleVector;
-    PointerVector digestHandleVector;
-    PointerVector cipherHandleVector;
-    PointerVector signatureHandleVector;
-    PointerVector agreementHandleVector;
+    SeosCryptoCtx       parent;
+    SeosCrypto_MemIf    memIf;
+    SeosCryptoRng       cryptoRng;
+    PointerVector       keyHandleVector;
+    PointerVector       digestHandleVector;
+    PointerVector       cipherHandleVector;
+    PointerVector       signatureHandleVector;
+    PointerVector       agreementHandleVector;
 } SeosCrypto;
 
 /** @} */

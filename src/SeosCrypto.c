@@ -83,8 +83,8 @@ SeosCrypto_init(SeosCrypto*             self,
 
     if (NULL != mallocFunc && NULL != freeFunc)
     {
-        self->mem.memIf.malloc   = mallocFunc;
-        self->mem.memIf.free     = freeFunc;
+        self->memIf.malloc = mallocFunc;
+        self->memIf.free   = freeFunc;
 
         if (!PointerVector_ctor(&self->digestHandleVector, 1))
         {
@@ -120,9 +120,8 @@ SeosCrypto_init(SeosCrypto*             self,
 
     if (NULL != entropyFunc)
     {
-        if ((retval = SeosCryptoRng_init(&self->mem.memIf, &self->cryptoRng,
-                                         entropyFunc,
-                                         entropyCtx)) != SEOS_SUCCESS)
+        if ((retval = SeosCryptoRng_init(&self->cryptoRng, &self->memIf,
+                                         entropyFunc, entropyCtx)) != SEOS_SUCCESS)
         {
             goto err4;
         }
@@ -157,7 +156,7 @@ SeosCrypto_free(SeosCryptoCtx* api)
     SeosCrypto* self = (SeosCrypto*) api;
     Debug_ASSERT_SELF(self);
 
-    SeosCryptoRng_free(&self->mem.memIf, &self->cryptoRng);
+    SeosCryptoRng_free(&self->cryptoRng, &self->memIf);
 
     PointerVector_dtor(&self->agreementHandleVector);
     PointerVector_dtor(&self->signatureHandleVector);
@@ -213,13 +212,13 @@ SeosCrypto_digestInit(SeosCryptoCtx*                api,
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if ((*pDigestHandle = self->mem.memIf.malloc(
+    else if ((*pDigestHandle = self->memIf.malloc(
                                    sizeof(SeosCryptoDigest))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((retval = SeosCryptoDigest_init(&self->mem.memIf, *pDigestHandle,
+    if ((retval = SeosCryptoDigest_init(*pDigestHandle, &self->memIf,
                                         algorithm)) != SEOS_SUCCESS)
     {
         goto err0;
@@ -233,9 +232,9 @@ SeosCrypto_digestInit(SeosCryptoCtx*                api,
     return SEOS_SUCCESS;
 
 err1:
-    SeosCryptoDigest_free(&self->mem.memIf, *pDigestHandle);
+    SeosCryptoDigest_free(*pDigestHandle, &self->memIf);
 err0:
-    self->mem.memIf.free(*pDigestHandle);
+    self->memIf.free(*pDigestHandle);
 
     return retval;
 }
@@ -256,11 +255,11 @@ SeosCrypto_digestFree(SeosCryptoCtx*           api,
     if ((handlePos = SeosCrypto_findHandle(&self->digestHandleVector,
                                            digestHandle)) != -1)
     {
-        if ((retval = SeosCryptoDigest_free(&self->mem.memIf,
-                                            digestHandle)) == SEOS_SUCCESS)
+        if ((retval = SeosCryptoDigest_free(digestHandle,
+                                            &self->memIf)) == SEOS_SUCCESS)
         {
             SeosCrypto_removeHandle(&self->digestHandleVector, handlePos);
-            self->mem.memIf.free(digestHandle);
+            self->memIf.free(digestHandle);
         }
     }
     else
@@ -324,13 +323,13 @@ SeosCrypto_signatureInit(SeosCryptoCtx*                api,
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if ((*pSigHandle = self->mem.memIf.malloc(
+    else if ((*pSigHandle = self->memIf.malloc(
                                 sizeof(SeosCryptoSignature))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((retval = SeosCryptoSignature_init(&self->mem.memIf, *pSigHandle, algorithm,
+    if ((retval = SeosCryptoSignature_init(*pSigHandle, &self->memIf, algorithm,
                                            prvHandle, pubHandle)) != SEOS_SUCCESS)
     {
         goto err0;
@@ -344,9 +343,9 @@ SeosCrypto_signatureInit(SeosCryptoCtx*                api,
     return SEOS_SUCCESS;
 
 err1:
-    SeosCryptoSignature_free(&self->mem.memIf, *pSigHandle);
+    SeosCryptoSignature_free(*pSigHandle, &self->memIf);
 err0:
-    self->mem.memIf.free(*pSigHandle);
+    self->memIf.free(*pSigHandle);
 
     return retval;
 }
@@ -367,11 +366,11 @@ SeosCrypto_signatureFree(SeosCryptoCtx*               api,
     if ((handlePos = SeosCrypto_findHandle(&self->signatureHandleVector,
                                            sigHandle)) != -1)
     {
-        if ((retval = SeosCryptoSignature_free(&self->mem.memIf,
-                                               sigHandle)) != SEOS_SUCCESS)
+        if ((retval = SeosCryptoSignature_free(sigHandle,
+                                               &self->memIf)) != SEOS_SUCCESS)
         {
             SeosCrypto_removeHandle(&self->signatureHandleVector, handlePos);
-            self->mem.memIf.free(sigHandle);
+            self->memIf.free(sigHandle);
         }
     }
     else
@@ -442,13 +441,13 @@ SeosCrypto_agreementInit(SeosCryptoCtx*                api,
     {
         return SEOS_ERROR_INVALID_HANDLE;
     }
-    else if ((*pAgrHandle = self->mem.memIf.malloc(
+    else if ((*pAgrHandle = self->memIf.malloc(
                                 sizeof(SeosCryptoAgreement))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((retval = SeosCryptoAgreement_init(&self->mem.memIf, *pAgrHandle, algorithm,
+    if ((retval = SeosCryptoAgreement_init(*pAgrHandle, &self->memIf, algorithm,
                                            prvHandle)) != SEOS_SUCCESS)
     {
         goto err0;
@@ -462,9 +461,9 @@ SeosCrypto_agreementInit(SeosCryptoCtx*                api,
     return retval;
 
 err1:
-    SeosCryptoAgreement_free(&self->mem.memIf, *pAgrHandle);
+    SeosCryptoAgreement_free(*pAgrHandle, &self->memIf);
 err0:
-    self->mem.memIf.free(*pAgrHandle);
+    self->memIf.free(*pAgrHandle);
     return retval;
 }
 
@@ -486,11 +485,11 @@ SeosCrypto_agreementFree(SeosCryptoCtx*               api,
         return SEOS_ERROR_INVALID_HANDLE;
     }
 
-    if ((retval = SeosCryptoAgreement_free(&self->mem.memIf,
-                                           agrHandle)) != SEOS_SUCCESS)
+    if ((retval = SeosCryptoAgreement_free(agrHandle,
+                                           &self->memIf)) != SEOS_SUCCESS)
     {
         SeosCrypto_removeHandle(&self->agreementHandleVector, handlePos);
-        self->mem.memIf.free(agrHandle);
+        self->memIf.free(agrHandle);
     }
 
     return retval;
@@ -534,7 +533,7 @@ SeosCrypto_keyInit(SeosCryptoCtx*                   api,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    *pKeyHandle = self->mem.memIf.malloc(sizeof(SeosCryptoKey));
+    *pKeyHandle = self->memIf.malloc(sizeof(SeosCryptoKey));
     if (NULL == *pKeyHandle)
     {
         retval = SEOS_ERROR_INSUFFICIENT_SPACE;
@@ -542,7 +541,7 @@ SeosCrypto_keyInit(SeosCryptoCtx*                   api,
     }
     else
     {
-        retval = SeosCryptoKey_init(&self->mem.memIf, *pKeyHandle, type, flags, bits);
+        retval = SeosCryptoKey_init(*pKeyHandle, &self->memIf, type, flags, bits);
         if (retval != SEOS_SUCCESS)
         {
             goto err0;
@@ -556,9 +555,9 @@ SeosCrypto_keyInit(SeosCryptoCtx*                   api,
     goto exit;
 
 err1:
-    SeosCryptoKey_free(&self->mem.memIf, *pKeyHandle);
+    SeosCryptoKey_free(*pKeyHandle, &self->memIf);
 err0:
-    self->mem.memIf.free(*pKeyHandle);
+    self->memIf.free(*pKeyHandle);
 exit:
     return retval;
 }
@@ -671,11 +670,11 @@ SeosCrypto_keyFree(SeosCryptoCtx*                 api,
     handlePos = SeosCrypto_findHandle(&self->keyHandleVector, keyHandle);
     if (-1 != handlePos)
     {
-        retval = SeosCryptoKey_free(&self->mem.memIf, keyHandle);
+        retval = SeosCryptoKey_free(keyHandle, &self->memIf);
         if (SEOS_SUCCESS == retval)
         {
             SeosCrypto_removeHandle(&self->keyHandleVector, handlePos);
-            self->mem.memIf.free(keyHandle);
+            self->memIf.free(keyHandle);
         }
     }
     else
@@ -709,14 +708,14 @@ SeosCrypto_cipherInit(SeosCryptoCtx*                api,
         return SEOS_ERROR_INVALID_HANDLE;
     }
 
-    if ((*pCipherHandle = self->mem.memIf.malloc(sizeof(SeosCryptoCipher))) ==
+    if ((*pCipherHandle = self->memIf.malloc(sizeof(SeosCryptoCipher))) ==
         NULL)
     {
         retval = SEOS_ERROR_INSUFFICIENT_SPACE;
     }
     else
     {
-        if ((retval = SeosCryptoCipher_init(&self->mem.memIf, *pCipherHandle, algorithm,
+        if ((retval = SeosCryptoCipher_init(*pCipherHandle, &self->memIf, algorithm,
                                             key,  iv, ivLen)) != SEOS_SUCCESS)
         {
             goto err0;
@@ -731,9 +730,9 @@ SeosCrypto_cipherInit(SeosCryptoCtx*                api,
     return retval;
 
 err1:
-    SeosCryptoCipher_free(&self->mem.memIf, *pCipherHandle);
+    SeosCryptoCipher_free(*pCipherHandle, &self->memIf);
 err0:
-    self->mem.memIf.free(*pCipherHandle);
+    self->memIf.free(*pCipherHandle);
 
     return retval;
 }
@@ -754,11 +753,11 @@ SeosCrypto_cipherFree(SeosCryptoCtx*           api,
     if ((handlePos = SeosCrypto_findHandle(&self->cipherHandleVector,
                                            cipherHandle)) != -1)
     {
-        if ((retval = SeosCryptoCipher_free(&self->mem.memIf,
-                                            cipherHandle)) == SEOS_SUCCESS)
+        if ((retval = SeosCryptoCipher_free(cipherHandle,
+                                            &self->memIf)) == SEOS_SUCCESS)
         {
             SeosCrypto_removeHandle(&self->cipherHandleVector, handlePos);
-            self->mem.memIf.free(cipherHandle);
+            self->memIf.free(cipherHandle);
         }
     }
     else

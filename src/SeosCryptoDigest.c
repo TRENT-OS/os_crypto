@@ -11,8 +11,8 @@
 // Private Functions -----------------------------------------------------------
 
 static seos_err_t
-initImpl(SeosCrypto_MemIf*   memIf,
-         SeosCryptoDigest*   self)
+initImpl(SeosCryptoDigest*   self,
+         SeosCrypto_MemIf*   memIf)
 {
     UNUSED_VAR(memIf);
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -37,8 +37,8 @@ initImpl(SeosCrypto_MemIf*   memIf,
 }
 
 static seos_err_t
-freeImpl(SeosCrypto_MemIf*   memIf,
-         SeosCryptoDigest*   self)
+freeImpl(SeosCryptoDigest*   self,
+         SeosCrypto_MemIf*   memIf)
 {
     UNUSED_VAR(memIf);
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -126,9 +126,9 @@ updateImpl(SeosCryptoDigest*        self,
 // Public Functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoDigest_init(SeosCrypto_MemIf*              memIf,
-                      SeosCryptoDigest*              self,
-                      SeosCryptoDigest_Algorithm    algorithm)
+SeosCryptoDigest_init(SeosCryptoDigest*              self,
+                      SeosCrypto_MemIf*              memIf,
+                      SeosCryptoDigest_Algorithm     algorithm)
 {
     if (NULL == memIf || NULL == self)
     {
@@ -141,19 +141,19 @@ SeosCryptoDigest_init(SeosCrypto_MemIf*              memIf,
     self->updated   = false;
     self->finalized = false;
 
-    return initImpl(memIf, self);
+    return initImpl(self, memIf);
 }
 
 seos_err_t
-SeosCryptoDigest_free(SeosCrypto_MemIf*    memIf,
-                      SeosCryptoDigest*    self)
+SeosCryptoDigest_free(SeosCryptoDigest*    self,
+                      SeosCrypto_MemIf*    memIf)
 {
     if (NULL == memIf || NULL == self)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return freeImpl(memIf, self);
+    return freeImpl(self, memIf);
 }
 
 seos_err_t

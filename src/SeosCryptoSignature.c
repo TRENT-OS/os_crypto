@@ -13,8 +13,9 @@
 // Private Functions -----------------------------------------------------------
 
 static seos_err_t
-initImpl(SeosCrypto_MemIf*      memIf,
-         SeosCryptoSignature*   self)
+initImpl(SeosCryptoSignature*   self,
+         SeosCrypto_MemIf*      memIf)
+
 {
     UNUSED_VAR(memIf);
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -33,8 +34,8 @@ initImpl(SeosCrypto_MemIf*      memIf,
 }
 
 static seos_err_t
-freeImpl(SeosCrypto_MemIf*        memIf,
-         SeosCryptoSignature*     self)
+freeImpl(SeosCryptoSignature*     self,
+         SeosCrypto_MemIf*        memIf)
 {
     UNUSED_VAR(memIf);
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -163,8 +164,8 @@ signHashImpl(SeosCryptoSignature*       self,
 // Public Functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoSignature_init(SeosCrypto_MemIf*              memIf,
-                         SeosCryptoSignature*           self,
+SeosCryptoSignature_init(SeosCryptoSignature*           self,
+                         SeosCrypto_MemIf*              memIf,
                          SeosCryptoSignature_Algorithm  algorithm,
                          SeosCryptoKey*                 prvKey,
                          SeosCryptoKey*                 pubKey)
@@ -184,7 +185,7 @@ SeosCryptoSignature_init(SeosCrypto_MemIf*              memIf,
     self->prvKey     = prvKey;
     self->pubKey     = pubKey;
 
-    retval = initImpl(memIf, self);
+    retval = initImpl(self, memIf);
     if (retval != SEOS_SUCCESS)
     {
         goto exit;
@@ -198,21 +199,21 @@ SeosCryptoSignature_init(SeosCrypto_MemIf*              memIf,
 
     goto exit;
 err0:
-    freeImpl(memIf, self);
+    freeImpl(self, memIf);
 exit:
     return retval;
 }
 
 seos_err_t
-SeosCryptoSignature_free(SeosCrypto_MemIf*            memIf,
-                         SeosCryptoSignature*         self)
+SeosCryptoSignature_free(SeosCryptoSignature*         self,
+                         SeosCrypto_MemIf*            memIf)
 {
     if (NULL == memIf || NULL == self)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return freeImpl(memIf, self);
+    return freeImpl(self, memIf);
 }
 
 seos_err_t

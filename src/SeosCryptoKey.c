@@ -143,8 +143,8 @@ getEffectiveKeylength(unsigned int  type,
 }
 
 static seos_err_t
-initImpl(SeosCrypto_MemIf*            memIf,
-         SeosCryptoKey*               self)
+initImpl(SeosCryptoKey*               self,
+         SeosCrypto_MemIf*            memIf)
 {
     size_t keySize;
 
@@ -209,8 +209,8 @@ initImpl(SeosCrypto_MemIf*            memIf,
 }
 
 static seos_err_t
-freeImpl(SeosCrypto_MemIf*            memIf,
-         SeosCryptoKey*               self)
+freeImpl(SeosCryptoKey*               self,
+         SeosCrypto_MemIf*            memIf)
 {
     // We may have stored sensitive key data here, better make sure to remove it.
     if (!self->empty)
@@ -473,9 +473,9 @@ exportImpl(SeosCryptoKey*        self,
 // Public functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoKey_init(SeosCrypto_MemIf*            memIf,
-                   SeosCryptoKey*               self,
-                   unsigned int                 type,
+SeosCryptoKey_init(SeosCryptoKey*               self,
+                   SeosCrypto_MemIf*            memIf,
+                   SeosCryptoKey_Type           type,
                    SeosCryptoKey_Flag           flags,
                    size_t                       bits)
 {
@@ -491,7 +491,7 @@ SeosCryptoKey_init(SeosCrypto_MemIf*            memIf,
     self->flags   = flags;
     self->empty   = true;
 
-    return initImpl(memIf, self);
+    return initImpl(self, memIf);
 }
 
 seos_err_t
@@ -591,15 +591,15 @@ SeosCryptoKey_export(SeosCryptoKey*        self,
 }
 
 seos_err_t
-SeosCryptoKey_free(SeosCrypto_MemIf*          memIf,
-                   SeosCryptoKey*             self)
+SeosCryptoKey_free(SeosCryptoKey*             self,
+                   SeosCrypto_MemIf*          memIf)
 {
     if (NULL == memIf || NULL == self || NULL == self->keyBytes)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return freeImpl(memIf, self);
+    return freeImpl(self, memIf);
 }
 
 seos_err_t

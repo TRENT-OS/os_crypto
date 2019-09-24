@@ -28,8 +28,8 @@
  *
  */
 seos_err_t
-SeosCryptoKey_init(SeosCrypto_MemIf*            memIf,
-                   SeosCryptoKey*               self,
+SeosCryptoKey_init(SeosCryptoKey*               self,
+                   SeosCrypto_MemIf*            memIf,
                    unsigned int                 type,
                    SeosCryptoKey_Flag           flags,
                    size_t                       bits);
@@ -76,8 +76,8 @@ SeosCryptoKey_export(SeosCryptoKey*             self,
  *
  */
 seos_err_t
-SeosCryptoKey_free(SeosCrypto_MemIf*          memIf,
-                   SeosCryptoKey*             self);
+SeosCryptoKey_free(SeosCryptoKey*             self,
+                   SeosCrypto_MemIf*          memIf);
 
 /**
  * @brief Translates key data into RSA public key

@@ -24,8 +24,8 @@
  *
  */
 seos_err_t
-SeosCryptoDigest_init(SeosCrypto_MemIf*             memIf,
-                      SeosCryptoDigest*             self,
+SeosCryptoDigest_init(SeosCryptoDigest*             self,
+                      SeosCrypto_MemIf*             memIf,
                       SeosCryptoDigest_Algorithm    algorithm);
 
 /**
@@ -33,8 +33,8 @@ SeosCryptoDigest_init(SeosCrypto_MemIf*             memIf,
  *
  */
 seos_err_t
-SeosCryptoDigest_free(SeosCrypto_MemIf*           memIf,
-                      SeosCryptoDigest*           self);
+SeosCryptoDigest_free(SeosCryptoDigest*           self,
+                      SeosCrypto_MemIf*           memIf);
 
 /**
  * @brief Updates the computation of the digest providing a new block of data

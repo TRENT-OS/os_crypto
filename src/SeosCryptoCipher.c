@@ -12,8 +12,8 @@
 // Private static functions ----------------------------------------------------
 
 static seos_err_t
-initImpl(SeosCrypto_MemIf*      memIf,
-         SeosCryptoCipher*      self)
+initImpl(SeosCryptoCipher*      self,
+         SeosCrypto_MemIf*      memIf)
 {
     UNUSED_VAR(memIf);
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -44,8 +44,8 @@ initImpl(SeosCrypto_MemIf*      memIf,
 }
 
 static seos_err_t
-freeImpl(SeosCrypto_MemIf*    memIf,
-         SeosCryptoCipher*    self)
+freeImpl(SeosCryptoCipher*    self,
+         SeosCrypto_MemIf*    memIf)
 {
     UNUSED_VAR(memIf);
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -338,8 +338,8 @@ finalizeImpl(SeosCryptoCipher* self,
 // Public functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoCipher_init(SeosCrypto_MemIf*              memIf,
-                      SeosCryptoCipher*              self,
+SeosCryptoCipher_init(SeosCryptoCipher*              self,
+                      SeosCrypto_MemIf*              memIf,
                       SeosCryptoCipher_Algorithm     algorithm,
                       SeosCryptoKey const*           key,
                       const void*                    iv,
@@ -362,7 +362,7 @@ SeosCryptoCipher_init(SeosCrypto_MemIf*              memIf,
     self->updated    = false;
     self->finalized  = false;
 
-    if ((retval = initImpl(memIf, self)) != SEOS_SUCCESS)
+    if ((retval = initImpl(self, memIf)) != SEOS_SUCCESS)
     {
         return retval;
     }
@@ -376,20 +376,20 @@ SeosCryptoCipher_init(SeosCrypto_MemIf*              memIf,
     return SEOS_SUCCESS;
 
 err0:
-    freeImpl(memIf, self);
+    freeImpl(self, memIf);
     return retval;
 }
 
 seos_err_t
-SeosCryptoCipher_free(SeosCrypto_MemIf*    memIf,
-                      SeosCryptoCipher*    self)
+SeosCryptoCipher_free(SeosCryptoCipher*    self,
+                      SeosCrypto_MemIf*    memIf)
 {
     if (NULL == memIf || NULL == self)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return freeImpl(memIf, self);
+    return freeImpl(self, memIf);
 }
 
 seos_err_t
