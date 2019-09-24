@@ -26,7 +26,6 @@ SeosCryptoAgreement_Algorithm;
 
 typedef struct
 {
-    SeosCryptoAgreement_Algorithm algorithm;
     union
     {
         mbedtls_dhm_context     dh;
@@ -34,8 +33,8 @@ typedef struct
     }
     mbedtls;
 
-    const SeosCryptoKey*        prvKey;
-    unsigned char               outBuf[PAGE_SIZE];
+    SeosCryptoAgreement_Algorithm   algorithm;
+    const SeosCryptoKey*            prvKey;
 }
 SeosCryptoAgreement;
 

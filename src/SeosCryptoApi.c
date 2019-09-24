@@ -155,18 +155,16 @@ SeosCryptoApi_agreementDeInit(SeosCryptoCtx*               cryptoCtx,
 }
 
 seos_err_t
-SeosCryptoApi_agreementComputeShared(SeosCryptoCtx*                 cryptoCtx,
-                                     SeosCrypto_AgreementHandle     agrHandle,
-                                     SeosCrypto_KeyHandle           pubHandle,
-                                     void*                          shared,
-                                     size_t*                        sharedSize)
+SeosCryptoApi_agreementAgree(SeosCryptoCtx*                 cryptoCtx,
+                             SeosCrypto_AgreementHandle     agrHandle,
+                             SeosCrypto_KeyHandle           pubHandle,
+                             void*                          shared,
+                             size_t*                        sharedSize)
 {
-    void* pShared = shared;
-
     return (NULL == cryptoCtx || NULL == shared) ?
            SEOS_ERROR_INVALID_PARAMETER :
-           cryptoCtx->vtable->agreementComputeShared(cryptoCtx, agrHandle,
-                                                     pubHandle, &pShared, sharedSize);
+           cryptoCtx->vtable->agreementAgree(cryptoCtx, agrHandle,
+                                             pubHandle, shared, sharedSize);
 }
 
 // -------------------------------- Key API ------------------------------------

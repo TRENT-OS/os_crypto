@@ -123,11 +123,11 @@ typedef seos_err_t
                                   SeosCrypto_AgreementHandle   agrHandle);
 
 typedef seos_err_t
-(*SeosCryptoCtx_agreementComputeSharedT)(SeosCryptoCtx*                 self,
-                                         SeosCrypto_AgreementHandle     agrHandle,
-                                         SeosCrypto_KeyHandle           pubHandle,
-                                         void**                         shared,
-                                         size_t*                        sharedSize);
+(*SeosCryptoCtx_agreementAgreeT)(SeosCryptoCtx*                 self,
+                                 SeosCrypto_AgreementHandle     agrHandle,
+                                 SeosCrypto_KeyHandle           pubHandle,
+                                 void*                          shared,
+                                 size_t*                        sharedSize);
 
 typedef seos_err_t
 (*SeosCryptoCtx_cipherInitT)(SeosCryptoCtx*                 self,
@@ -185,7 +185,7 @@ typedef struct
     SeosCryptoCtx_signatureVerifyT          signatureVerify;
     SeosCryptoCtx_agreementInitT            agreementInit;
     SeosCryptoCtx_agreementDeInitT          agreementDeInit;
-    SeosCryptoCtx_agreementComputeSharedT   agreementComputeShared;
+    SeosCryptoCtx_agreementAgreeT           agreementAgree;
     SeosCryptoCtx_cipherInitT               cipherInit;
     SeosCryptoCtx_cipherCloseT              cipherClose;
     SeosCryptoCtx_cipherUpdateT             cipherUpdate;

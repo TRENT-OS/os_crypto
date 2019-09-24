@@ -32,7 +32,7 @@ static const SeosCryptoCtx_Vtable SeosCrypto_vtable =
     .signatureVerify        = SeosCrypto_signatureVerify,
     .agreementInit          = SeosCrypto_agreementInit,
     .agreementDeInit        = SeosCrypto_agreementDeInit,
-    .agreementComputeShared = SeosCrypto_agreementComputeShared,
+    .agreementAgree         = SeosCrypto_agreementAgree,
     .cipherInit             = SeosCrypto_cipherInit,
     .cipherClose            = SeosCrypto_cipherClose,
     .cipherUpdate           = SeosCrypto_cipherUpdate,
@@ -497,11 +497,11 @@ SeosCrypto_agreementDeInit(SeosCryptoCtx*               api,
 }
 
 seos_err_t
-SeosCrypto_agreementComputeShared(SeosCryptoCtx*                 api,
-                                  SeosCrypto_AgreementHandle     agrHandle,
-                                  SeosCrypto_KeyHandle           pubHandle,
-                                  void**                         shared,
-                                  size_t*                        sharedSize)
+SeosCrypto_agreementAgree(SeosCryptoCtx*                 api,
+                          SeosCrypto_AgreementHandle     agrHandle,
+                          SeosCrypto_KeyHandle           pubHandle,
+                          void*                          shared,
+                          size_t*                        sharedSize)
 {
     SeosCrypto* self = (SeosCrypto*) api;
 
@@ -512,8 +512,8 @@ SeosCrypto_agreementComputeShared(SeosCryptoCtx*                 api,
 
     return SeosCrypto_findHandle(&self->agreementHandleVector, agrHandle) != -1
            && SeosCrypto_findHandle(&self->keyHandleVector, pubHandle) != -1 ?
-           SeosCryptoAgreement_computeShared(agrHandle, &self->cryptoRng, pubHandle,
-                                             shared, sharedSize) : SEOS_ERROR_INVALID_HANDLE;
+           SeosCryptoAgreement_agree(agrHandle, &self->cryptoRng, pubHandle,
+                                     shared, sharedSize) : SEOS_ERROR_INVALID_HANDLE;
 }
 
 // -------------------------------- Key API ------------------------------------

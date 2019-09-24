@@ -317,15 +317,15 @@ SeosCrypto_agreementDeInit(SeosCryptoCtx*               api,
                            SeosCrypto_AgreementHandle   agrHandle);
 
 /**
- * @brief implements SeosCryptoApi_agreementComputeShared() in a local connection
+ * @brief implements SeosCryptoApi_agreementAgree() in a local connection
  * (function call, no rpc)
  *
  */
 seos_err_t
-SeosCrypto_agreementComputeShared(SeosCryptoCtx*                 api,
-                                  SeosCrypto_AgreementHandle     agrHandle,
-                                  SeosCrypto_KeyHandle           pubHandle,
-                                  void**                         shared,
-                                  size_t*                        sharedSize);
+SeosCrypto_agreementAgree(SeosCryptoCtx*                 api,
+                          SeosCrypto_AgreementHandle     agrHandle,
+                          SeosCrypto_KeyHandle           pubHandle,
+                          void*                          shared,
+                          size_t*                        sharedSize);
 
 /** @} */

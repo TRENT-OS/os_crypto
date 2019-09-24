@@ -286,29 +286,36 @@ SeosCryptoRpc_agreementInit(SeosCryptoRpc*                   self,
 }
 
 seos_err_t
-SeosCryptoRpc_agreementComputeShared(SeosCryptoRpc*                self,
-                                     SeosCrypto_AgreementHandle    agrHandle,
-                                     SeosCrypto_KeyHandle          pubHandle)
+SeosCryptoRpc_agreementAgree(SeosCryptoRpc*                self,
+                             SeosCrypto_AgreementHandle    agrHandle,
+                             SeosCrypto_KeyHandle          pubHandle,
+                             size_t                        sharedSize)
 {
     seos_err_t  retval      = SEOS_ERROR_GENERIC;
-    void*       shared      = NULL;
-    size_t      sharedSize  = 0;
+    size_t      outputSize  = 0;
 
     if (!isValidHandle(self))
     {
-        retval = SEOS_ERROR_INVALID_HANDLE;
+        return SEOS_ERROR_INVALID_HANDLE;
     }
-    else if ((retval = SeosCrypto_agreementComputeShared(self->seosCryptoApi,
-                                                         agrHandle, pubHandle, &shared, &sharedSize)) == SEOS_SUCCESS)
+    else if (sharedSize > PAGE_SIZE)
     {
-        if (sharedSize + sizeof(sharedSize) > PAGE_SIZE)
+        return SEOS_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    outputSize = sharedSize;
+
+    if ((retval = SeosCrypto_agreementAgree(self->seosCryptoApi, agrHandle,
+                                            pubHandle, self->buffer, &outputSize)) == SEOS_SUCCESS)
+    {
+        if (outputSize + sizeof(outputSize) > PAGE_SIZE)
         {
-            retval = SEOS_ERROR_ABORTED;
+            retval = SEOS_ERROR_BUFFER_TOO_SMALL;
         }
         else
         {
-            memcpy(self->serverDataport, &sharedSize, sizeof(sharedSize));
-            memcpy(self->serverDataport + sizeof(sharedSize), shared, sharedSize);
+            memcpy(self->serverDataport, &outputSize, sizeof(outputSize));
+            memcpy(self->serverDataport + sizeof(outputSize), self->buffer, outputSize);
         }
     }
 

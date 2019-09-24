@@ -29,7 +29,7 @@ static const SeosCryptoCtx_Vtable SeosCryptoClient_vtable =
     .signatureVerify         = SeosCryptoClient_signatureVerify,
     .agreementInit           = SeosCryptoClient_agreementInit,
     .agreementDeInit         = SeosCryptoClient_agreementDeInit,
-    .agreementComputeShared  = SeosCryptoClient_agreementComputeShared,
+    .agreementAgree          = SeosCryptoClient_agreementAgree,
     .cipherInit              = SeosCryptoClient_cipherInit,
     .cipherClose             = SeosCryptoClient_cipherClose,
     .cipherUpdate            = SeosCryptoClient_cipherUpdate,
@@ -365,11 +365,11 @@ SeosCryptoClient_agreementDeInit(SeosCryptoCtx*               api,
 }
 
 seos_err_t
-SeosCryptoClient_agreementComputeShared(SeosCryptoCtx*                 api,
-                                        SeosCrypto_AgreementHandle     agrHandle,
-                                        SeosCrypto_KeyHandle           pubHandle,
-                                        void**                         shared,
-                                        size_t*                        sharedSize)
+SeosCryptoClient_agreementAgree(SeosCryptoCtx*                 api,
+                                SeosCrypto_AgreementHandle     agrHandle,
+                                SeosCrypto_KeyHandle           pubHandle,
+                                void*                          shared,
+                                size_t*                        sharedSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoClient* self = (SeosCryptoClient*) api;
@@ -380,10 +380,10 @@ SeosCryptoClient_agreementComputeShared(SeosCryptoCtx*                 api,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((retval = SeosCryptoRpc_agreementComputeShared(self->rpcHandle, agrHandle,
-                                                       pubHandle)) == SEOS_SUCCESS)
+    if ((retval = SeosCryptoRpc_agreementAgree(self->rpcHandle, agrHandle,
+                                               pubHandle, *sharedSize)) == SEOS_SUCCESS)
     {
-        retval = parseRpcOutput(self, shared, sharedSize);
+        retval = parseRpcOutput(self, &shared, sharedSize);
     }
 
     return retval;

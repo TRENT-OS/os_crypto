@@ -50,16 +50,19 @@ SeosCryptoRpc_init(SeosCryptoRpc* self,
  */
 void
 SeosCryptoRpc_deInit(SeosCryptoRpc* self);
+
 /**
  * @brief rpc management of SeosCrypto_rngGetBytes()
- *
- * @retval SEOS_ERROR_INVALID_PARAMETER if dataLen > PAGE_SIZE
  *
  */
 seos_err_t
 SeosCryptoRpc_rngGetBytes(SeosCryptoRpc*    self,
                           size_t            dataLen);
 
+/**
+ * @brief rpc management of SeosCrypto_rngReSeed()
+ *
+ */
 seos_err_t
 SeosCryptoRpc_rngReSeed(SeosCryptoRpc*      self,
                         size_t              seedLen);
@@ -82,8 +85,7 @@ SeosCryptoRpc_digestClose(SeosCryptoRpc*            self,
                           SeosCrypto_DigestHandle   digestHandle);
 
 /**
- * @brief rpc management of SeosCrypto_digestUpdate() using the server dataport
- *  as input
+ * @brief rpc management of SeosCrypto_digestUpdate()
  *
  */
 seos_err_t
@@ -92,13 +94,8 @@ SeosCryptoRpc_digestUpdate(SeosCryptoRpc*           self,
                            size_t                   inLen);
 
 /**
- * @brief rpc management of SeosCrypto_digestFinalize(). It uses the server
- *  dataport as input buffer if len > 0 (otherwise padding happens). The result
- *  is consequently written in the same dataport. The first sizeof(size_t)
- *  bytes are the size of the result and the following bytes (according to the
- *  size stored as header) are the result itself.
+ * @brief rpc management of SeosCrypto_digestFinalize()
  *
- * @retval SEOS_ERROR_INVALID_PARAMETER if dataLen > PAGE_SIZE
  */
 seos_err_t
 SeosCryptoRpc_digestFinalize(SeosCryptoRpc*             self,
@@ -212,13 +209,14 @@ SeosCryptoRpc_agreementInit(SeosCryptoRpc*                   self,
                             SeosCrypto_KeyHandle             prvHandle);
 
 /**
- * @brief rpc management of SeosCrypto_agreementComputeShared()
+ * @brief rpc management of SeosCrypto_agreementAgree()
  *
  */
 seos_err_t
-SeosCryptoRpc_agreementComputeShared(SeosCryptoRpc*                self,
-                                     SeosCrypto_AgreementHandle    agrHandle,
-                                     SeosCrypto_KeyHandle          pubHandle);
+SeosCryptoRpc_agreementAgree(SeosCryptoRpc*                self,
+                             SeosCrypto_AgreementHandle    agrHandle,
+                             SeosCrypto_KeyHandle          pubHandle,
+                             size_t                        sharedSize);
 
 /**
  * @brief rpc management of SeosCrypto_agreementDeInit()

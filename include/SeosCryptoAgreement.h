@@ -57,11 +57,11 @@ SeosCryptoAgreement_init(SeosCrypto_MemIf*                 memIf,
  *
  */
 seos_err_t
-SeosCryptoAgreement_computeShared(SeosCryptoAgreement*  self,
-                                  SeosCryptoRng*        rng,
-                                  SeosCryptoKey*        pubKey,
-                                  void**                shared,
-                                  size_t*               sharedSize);
+SeosCryptoAgreement_agree(SeosCryptoAgreement*  self,
+                          SeosCryptoRng*        rng,
+                          SeosCryptoKey*        pubKey,
+                          void*                 shared,
+                          size_t*               sharedSize);
 
 /**
  * @brief closes a key agreement context.

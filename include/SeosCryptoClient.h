@@ -48,6 +48,8 @@ SeosCryptoClient_init(SeosCryptoClient*     self,
 void
 SeosCryptoClient_deInit(SeosCryptoCtx* api);
 
+// -------------------------------- RNG API ------------------------------------
+
 /**
  * @brief implements SeosCryptoApi_rngGetBytes() in a rpc connection
  *
@@ -75,6 +77,8 @@ SeosCryptoClient_digestInit(SeosCryptoCtx*              api,
                             SeosCrypto_DigestHandle*    pDigestHandle,
                             unsigned int                algorithm);
 
+// ------------------------------ Digest API -----------------------------------
+
 /**
  * @brief implements SeosCryptoApi_digestClose() in a rpc connection
  *
@@ -101,6 +105,8 @@ SeosCryptoClient_digestFinalize(SeosCryptoCtx*              api,
                                 SeosCrypto_DigestHandle     digestHandle,
                                 void*                       digest,
                                 size_t*                     digestSize);
+
+// ----------------------------- Signature API ---------------------------------
 
 /**
  * @brief implements SeosCryptoApi_signatureInit() in a rpc connection
@@ -145,6 +151,8 @@ SeosCryptoClient_signatureVerify(SeosCryptoCtx*                 api,
                                  const void*                    signature,
                                  size_t                         signatureSize);
 
+// ----------------------------- Agreement API ---------------------------------
+
 /**
  * @brief implements SeosCryptoApi_agreementInit() in a rpc connection
  *
@@ -164,15 +172,17 @@ SeosCryptoClient_agreementDeInit(SeosCryptoCtx*               api,
                                  SeosCrypto_AgreementHandle   agrHandle);
 
 /**
- * @brief implements SeosCryptoApi_agreemenComputeShared() in a rpc connection
+ * @brief implements SeosCryptoApi_agreemenAgree() in a rpc connection
  *
  */
 seos_err_t
-SeosCryptoClient_agreementComputeShared(SeosCryptoCtx*                 api,
-                                        SeosCrypto_AgreementHandle     agrHandle,
-                                        SeosCrypto_KeyHandle           pubHandle,
-                                        void**                         shared,
-                                        size_t*                        sharedSize);
+SeosCryptoClient_agreementAgree(SeosCryptoCtx*                 api,
+                                SeosCrypto_AgreementHandle     agrHandle,
+                                SeosCrypto_KeyHandle           pubHandle,
+                                void*                          shared,
+                                size_t*                        sharedSize);
+
+// -------------------------------- Key API ------------------------------------
 
 /**
  * @brief implements SeosCryptoApi_keyInit() in a rpc connection
@@ -231,6 +241,8 @@ SeosCryptoClient_keyExport(SeosCryptoCtx*                 ctx,
 seos_err_t
 SeosCryptoClient_keyDeInit(SeosCryptoCtx*                 ctx,
                            SeosCrypto_KeyHandle           keyHandle);
+
+// ------------------------------- Cipher API ----------------------------------
 
 /**
  * @brief implements SeosCryptoApi_cipherInit() in a rpc connection

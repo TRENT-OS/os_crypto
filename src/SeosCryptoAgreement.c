@@ -179,31 +179,18 @@ exit:
 }
 
 seos_err_t
-SeosCryptoAgreement_computeShared(SeosCryptoAgreement*  self,
-                                  SeosCryptoRng*        rng,
-                                  SeosCryptoKey*        pubKey,
-                                  void**                shared,
-                                  size_t*               sharedSize)
+SeosCryptoAgreement_agree(SeosCryptoAgreement*  self,
+                          SeosCryptoRng*        rng,
+                          SeosCryptoKey*        pubKey,
+                          void*                 shared,
+                          size_t*               sharedSize)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
-
-
-
     if (NULL == self || NULL == pubKey || NULL == shared || NULL == sharedSize)
     {
-        retval = SEOS_ERROR_INVALID_PARAMETER;
-    }
-    else
-    {
-        if (NULL == *shared)
-        {
-            *shared      = self->outBuf;
-            *sharedSize  = sizeof(self->outBuf);
-        }
-        retval = computeImpl(self, rng, pubKey, *shared, sharedSize);
+        return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return retval;
+    return computeImpl(self, rng, pubKey, shared, sharedSize);
 }
 
 seos_err_t
