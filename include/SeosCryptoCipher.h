@@ -26,7 +26,7 @@ seos_err_t
 SeosCryptoCipher_init(SeosCryptoCipher*             self,
                       SeosCrypto_MemIf*             memIf,
                       SeosCryptoCipher_Algorithm    algorithm,
-                      SeosCryptoKey const*          key,
+                      SeosCryptoKey*                key,
                       const void*                   iv,
                       size_t                        ivLen);
 
