@@ -51,6 +51,8 @@ SeosCryptoRpc_init(SeosCryptoRpc* self,
 void
 SeosCryptoRpc_deInit(SeosCryptoRpc* self);
 
+// -------------------------------- RNG API ------------------------------------
+
 /**
  * @brief rpc management of SeosCrypto_rngGetBytes()
  *
@@ -66,6 +68,8 @@ SeosCryptoRpc_rngGetBytes(SeosCryptoRpc*    self,
 seos_err_t
 SeosCryptoRpc_rngReSeed(SeosCryptoRpc*      self,
                         size_t              seedLen);
+
+// ------------------------------ Digest API -----------------------------------
 
 /**
  * @brief rpc management of SeosCrypto_digestInit()
@@ -101,6 +105,8 @@ seos_err_t
 SeosCryptoRpc_digestFinalize(SeosCryptoRpc*             self,
                              SeosCrypto_DigestHandle    digestHandle,
                              size_t                     outSize);
+
+// -------------------------------- Key API ------------------------------------
 
 /**
  * @brief rpc management of SeosCryptoRpc_keyInit()
@@ -158,6 +164,7 @@ seos_err_t
 SeosCryptoRpc_keyDeInit(SeosCryptoRpc*                 self,
                         SeosCrypto_KeyHandle           keyHandle);
 
+// ----------------------------- Signature API ---------------------------------
 
 /**
  * @brief rpc management of SeosCrypto_signatureInit()
@@ -199,6 +206,8 @@ SeosCryptoRpc_signatureDeInit(SeosCryptoRpc*                  self,
                               SeosCrypto_SignatureHandle      sigHandle);
 
 
+// ----------------------------- Agreement API ---------------------------------
+
 /**
  * @brief rpc management of SeosCrypto_agreementInit()
  *
@@ -226,6 +235,8 @@ SeosCryptoRpc_agreementAgree(SeosCryptoRpc*                self,
 seos_err_t
 SeosCryptoRpc_agreementDeInit(SeosCryptoRpc*                self,
                               SeosCrypto_AgreementHandle    agrHandle);
+
+// ------------------------------- Cipher API ----------------------------------
 
 /**
  * @brief rpc management of SeosCrypto_cipherInit()
