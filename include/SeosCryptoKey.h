@@ -76,8 +76,8 @@ SeosCryptoKey_export(SeosCryptoKey*             self,
  *
  */
 seos_err_t
-SeosCryptoKey_deInit(SeosCrypto_MemIf*          memIf,
-                     SeosCryptoKey*             self);
+SeosCryptoKey_free(SeosCrypto_MemIf*          memIf,
+                   SeosCryptoKey*             self);
 
 /**
  * @brief Translates key data into RSA public key

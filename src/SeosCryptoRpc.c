@@ -82,7 +82,7 @@ SeosCryptoRpc_init(SeosCryptoRpc*   self,
 
     if (!registerHandle(self))
     {
-        SeosCryptoRpc_deInit(self);
+        SeosCryptoRpc_free(self);
         retval = SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 exit:
@@ -90,7 +90,7 @@ exit:
 }
 
 void
-SeosCryptoRpc_deInit(SeosCryptoRpc* self)
+SeosCryptoRpc_free(SeosCryptoRpc* self)
 {
     return;
 }
@@ -136,12 +136,12 @@ SeosCryptoRpc_digestInit(SeosCryptoRpc*                 self,
 }
 
 seos_err_t
-SeosCryptoRpc_digestClose(SeosCryptoRpc*            self,
-                          SeosCrypto_DigestHandle   digestHandle)
+SeosCryptoRpc_digestFree(SeosCryptoRpc*            self,
+                         SeosCrypto_DigestHandle   digestHandle)
 {
     return !isValidHandle(self) ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCrypto_digestClose(self->seosCryptoApi, digestHandle);
+           SeosCrypto_digestFree(self->seosCryptoApi, digestHandle);
 }
 
 seos_err_t
@@ -261,11 +261,11 @@ SeosCryptoRpc_keyExport(SeosCryptoRpc*                 self,
 }
 
 seos_err_t
-SeosCryptoRpc_keyDeInit(SeosCryptoRpc*                  self,
-                        SeosCrypto_KeyHandle            keyHandle)
+SeosCryptoRpc_keyFree(SeosCryptoRpc*                  self,
+                      SeosCrypto_KeyHandle            keyHandle)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCrypto_keyDeInit(self->seosCryptoApi, keyHandle);
+           SeosCrypto_keyFree(self->seosCryptoApi, keyHandle);
 }
 
 // ----------------------------- Agreement API ---------------------------------
@@ -311,12 +311,12 @@ SeosCryptoRpc_agreementAgree(SeosCryptoRpc*                self,
 }
 
 seos_err_t
-SeosCryptoRpc_agreementDeInit(SeosCryptoRpc*                self,
-                              SeosCrypto_AgreementHandle    agrHandle)
+SeosCryptoRpc_agreementFree(SeosCryptoRpc*                self,
+                            SeosCrypto_AgreementHandle    agrHandle)
 {
     return !isValidHandle(self) ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCrypto_agreementDeInit(self->seosCryptoApi, agrHandle);
+           SeosCrypto_agreementFree(self->seosCryptoApi, agrHandle);
 }
 
 // ----------------------------- Signature API ---------------------------------
@@ -376,11 +376,11 @@ SeosCryptoRpc_signatureSign(SeosCryptoRpc*                self,
 }
 
 seos_err_t
-SeosCryptoRpc_signatureDeInit(SeosCryptoRpc*                  self,
-                              SeosCrypto_SignatureHandle      sigHandle)
+SeosCryptoRpc_signatureFree(SeosCryptoRpc*                  self,
+                            SeosCrypto_SignatureHandle      sigHandle)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCrypto_signatureDeInit(self->seosCryptoApi, sigHandle);
+           SeosCrypto_signatureFree(self->seosCryptoApi, sigHandle);
 }
 
 // ------------------------------- Cipher API ----------------------------------
@@ -398,11 +398,11 @@ SeosCryptoRpc_cipherInit(SeosCryptoRpc*                 self,
 }
 
 seos_err_t
-SeosCryptoRpc_cipherClose(SeosCryptoRpc*                self,
-                          SeosCrypto_CipherHandle       cipherHandle)
+SeosCryptoRpc_cipherFree(SeosCryptoRpc*                self,
+                         SeosCrypto_CipherHandle       cipherHandle)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCrypto_cipherClose(self->seosCryptoApi, cipherHandle);
+           SeosCrypto_cipherFree(self->seosCryptoApi, cipherHandle);
 }
 
 seos_err_t

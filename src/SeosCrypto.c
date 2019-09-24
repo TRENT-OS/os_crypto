@@ -17,7 +17,7 @@ static const SeosCryptoCtx_Vtable SeosCrypto_vtable =
     .rngGetBytes            = SeosCrypto_rngGetBytes,
     .rngReSeed              = SeosCrypto_rngReSeed,
     .digestInit             = SeosCrypto_digestInit,
-    .digestClose            = SeosCrypto_digestClose,
+    .digestFree             = SeosCrypto_digestFree,
     .digestUpdate           = SeosCrypto_digestUpdate,
     .digestFinalize         = SeosCrypto_digestFinalize,
     .keyInit                = SeosCrypto_keyInit,
@@ -25,20 +25,20 @@ static const SeosCryptoCtx_Vtable SeosCrypto_vtable =
     .keyGeneratePair        = SeosCrypto_keyGeneratePair,
     .keyImport              = SeosCrypto_keyImport,
     .keyExport              = SeosCrypto_keyExport,
-    .keyDeInit              = SeosCrypto_keyDeInit,
+    .keyFree                = SeosCrypto_keyFree,
     .signatureInit          = SeosCrypto_signatureInit,
-    .signatureDeInit        = SeosCrypto_signatureDeInit,
+    .signatureFree          = SeosCrypto_signatureFree,
     .signatureSign          = SeosCrypto_signatureSign,
     .signatureVerify        = SeosCrypto_signatureVerify,
     .agreementInit          = SeosCrypto_agreementInit,
-    .agreementDeInit        = SeosCrypto_agreementDeInit,
+    .agreementFree          = SeosCrypto_agreementFree,
     .agreementAgree         = SeosCrypto_agreementAgree,
     .cipherInit             = SeosCrypto_cipherInit,
-    .cipherClose            = SeosCrypto_cipherClose,
+    .cipherFree             = SeosCrypto_cipherFree,
     .cipherUpdate           = SeosCrypto_cipherUpdate,
     .cipherStart            = SeosCrypto_cipherStart,
     .cipherFinalize         = SeosCrypto_cipherFinalize,
-    .deInit                 = SeosCrypto_deInit
+    .free                   = SeosCrypto_free
 };
 
 // Private static functions ----------------------------------------------------
@@ -152,12 +152,12 @@ exit:
 }
 
 void
-SeosCrypto_deInit(SeosCryptoCtx* api)
+SeosCrypto_free(SeosCryptoCtx* api)
 {
     SeosCrypto* self = (SeosCrypto*) api;
     Debug_ASSERT_SELF(self);
 
-    SeosCryptoRng_deInit(&self->mem.memIf, &self->cryptoRng);
+    SeosCryptoRng_free(&self->mem.memIf, &self->cryptoRng);
 
     PointerVector_dtor(&self->agreementHandleVector);
     PointerVector_dtor(&self->signatureHandleVector);
@@ -233,7 +233,7 @@ SeosCrypto_digestInit(SeosCryptoCtx*                api,
     return SEOS_SUCCESS;
 
 err1:
-    SeosCryptoDigest_deInit(&self->mem.memIf, *pDigestHandle);
+    SeosCryptoDigest_free(&self->mem.memIf, *pDigestHandle);
 err0:
     self->mem.memIf.free(*pDigestHandle);
 
@@ -241,8 +241,8 @@ err0:
 }
 
 seos_err_t
-SeosCrypto_digestClose(SeosCryptoCtx*           api,
-                       SeosCrypto_DigestHandle  digestHandle)
+SeosCrypto_digestFree(SeosCryptoCtx*           api,
+                      SeosCrypto_DigestHandle  digestHandle)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCrypto* self = (SeosCrypto*) api;
@@ -256,8 +256,8 @@ SeosCrypto_digestClose(SeosCryptoCtx*           api,
     if ((handlePos = SeosCrypto_findHandle(&self->digestHandleVector,
                                            digestHandle)) != -1)
     {
-        if ((retval = SeosCryptoDigest_deInit(&self->mem.memIf,
-                                              digestHandle)) == SEOS_SUCCESS)
+        if ((retval = SeosCryptoDigest_free(&self->mem.memIf,
+                                            digestHandle)) == SEOS_SUCCESS)
         {
             SeosCrypto_removeHandle(&self->digestHandleVector, handlePos);
             self->mem.memIf.free(digestHandle);
@@ -344,7 +344,7 @@ SeosCrypto_signatureInit(SeosCryptoCtx*                api,
     return SEOS_SUCCESS;
 
 err1:
-    SeosCryptoSignature_deInit(&self->mem.memIf, *pSigHandle);
+    SeosCryptoSignature_free(&self->mem.memIf, *pSigHandle);
 err0:
     self->mem.memIf.free(*pSigHandle);
 
@@ -352,8 +352,8 @@ err0:
 }
 
 seos_err_t
-SeosCrypto_signatureDeInit(SeosCryptoCtx*               api,
-                           SeosCrypto_SignatureHandle   sigHandle)
+SeosCrypto_signatureFree(SeosCryptoCtx*               api,
+                         SeosCrypto_SignatureHandle   sigHandle)
 {
     seos_err_t retval = SEOS_SUCCESS;
     SeosCrypto* self = (SeosCrypto*) api;
@@ -367,8 +367,8 @@ SeosCrypto_signatureDeInit(SeosCryptoCtx*               api,
     if ((handlePos = SeosCrypto_findHandle(&self->signatureHandleVector,
                                            sigHandle)) != -1)
     {
-        if ((retval = SeosCryptoSignature_deInit(&self->mem.memIf,
-                                                 sigHandle)) != SEOS_SUCCESS)
+        if ((retval = SeosCryptoSignature_free(&self->mem.memIf,
+                                               sigHandle)) != SEOS_SUCCESS)
         {
             SeosCrypto_removeHandle(&self->signatureHandleVector, handlePos);
             self->mem.memIf.free(sigHandle);
@@ -462,15 +462,15 @@ SeosCrypto_agreementInit(SeosCryptoCtx*                api,
     return retval;
 
 err1:
-    SeosCryptoAgreement_deInit(&self->mem.memIf, *pAgrHandle);
+    SeosCryptoAgreement_free(&self->mem.memIf, *pAgrHandle);
 err0:
     self->mem.memIf.free(*pAgrHandle);
     return retval;
 }
 
 seos_err_t
-SeosCrypto_agreementDeInit(SeosCryptoCtx*               api,
-                           SeosCrypto_AgreementHandle   agrHandle)
+SeosCrypto_agreementFree(SeosCryptoCtx*               api,
+                         SeosCrypto_AgreementHandle   agrHandle)
 {
     seos_err_t retval = SEOS_SUCCESS;
     SeosCrypto* self = (SeosCrypto*) api;
@@ -486,8 +486,8 @@ SeosCrypto_agreementDeInit(SeosCryptoCtx*               api,
         return SEOS_ERROR_INVALID_HANDLE;
     }
 
-    if ((retval = SeosCryptoAgreement_deInit(&self->mem.memIf,
-                                             agrHandle)) != SEOS_SUCCESS)
+    if ((retval = SeosCryptoAgreement_free(&self->mem.memIf,
+                                           agrHandle)) != SEOS_SUCCESS)
     {
         SeosCrypto_removeHandle(&self->agreementHandleVector, handlePos);
         self->mem.memIf.free(agrHandle);
@@ -556,7 +556,7 @@ SeosCrypto_keyInit(SeosCryptoCtx*                   api,
     goto exit;
 
 err1:
-    SeosCryptoKey_deInit(&self->mem.memIf, *pKeyHandle);
+    SeosCryptoKey_free(&self->mem.memIf, *pKeyHandle);
 err0:
     self->mem.memIf.free(*pKeyHandle);
 exit:
@@ -656,8 +656,8 @@ SeosCrypto_keyExport(SeosCryptoCtx*                 api,
 }
 
 seos_err_t
-SeosCrypto_keyDeInit(SeosCryptoCtx*                 api,
-                     SeosCrypto_KeyHandle           keyHandle)
+SeosCrypto_keyFree(SeosCryptoCtx*                 api,
+                   SeosCrypto_KeyHandle           keyHandle)
 {
     seos_err_t retval = SEOS_SUCCESS;
     SeosCrypto* self = (SeosCrypto*) api;
@@ -671,7 +671,7 @@ SeosCrypto_keyDeInit(SeosCryptoCtx*                 api,
     handlePos = SeosCrypto_findHandle(&self->keyHandleVector, keyHandle);
     if (-1 != handlePos)
     {
-        retval = SeosCryptoKey_deInit(&self->mem.memIf, keyHandle);
+        retval = SeosCryptoKey_free(&self->mem.memIf, keyHandle);
         if (SEOS_SUCCESS == retval)
         {
             SeosCrypto_removeHandle(&self->keyHandleVector, handlePos);
@@ -731,7 +731,7 @@ SeosCrypto_cipherInit(SeosCryptoCtx*                api,
     return retval;
 
 err1:
-    SeosCryptoCipher_deInit(&self->mem.memIf, *pCipherHandle);
+    SeosCryptoCipher_free(&self->mem.memIf, *pCipherHandle);
 err0:
     self->mem.memIf.free(*pCipherHandle);
 
@@ -739,8 +739,8 @@ err0:
 }
 
 seos_err_t
-SeosCrypto_cipherClose(SeosCryptoCtx*           api,
-                       SeosCrypto_CipherHandle  cipherHandle)
+SeosCrypto_cipherFree(SeosCryptoCtx*           api,
+                      SeosCrypto_CipherHandle  cipherHandle)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCrypto* self = (SeosCrypto*) api;
@@ -754,8 +754,8 @@ SeosCrypto_cipherClose(SeosCryptoCtx*           api,
     if ((handlePos = SeosCrypto_findHandle(&self->cipherHandleVector,
                                            cipherHandle)) != -1)
     {
-        if ((retval = SeosCryptoCipher_deInit(&self->mem.memIf,
-                                              cipherHandle)) == SEOS_SUCCESS)
+        if ((retval = SeosCryptoCipher_free(&self->mem.memIf,
+                                            cipherHandle)) == SEOS_SUCCESS)
         {
             SeosCrypto_removeHandle(&self->cipherHandleVector, handlePos);
             self->mem.memIf.free(cipherHandle);

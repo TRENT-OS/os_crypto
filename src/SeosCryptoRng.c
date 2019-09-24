@@ -76,8 +76,8 @@ SeosCryptoRng_reSeed(SeosCryptoRng*  self,
 }
 
 seos_err_t
-SeosCryptoRng_deInit(SeosCrypto_MemIf*              memIf,
-                     SeosCryptoRng*                 self)
+SeosCryptoRng_free(SeosCrypto_MemIf*              memIf,
+                   SeosCryptoRng*                 self)
 {
     UNUSED_VAR(memIf);
     if (NULL == memIf || NULL == self)

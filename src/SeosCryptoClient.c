@@ -14,7 +14,7 @@ static const SeosCryptoCtx_Vtable SeosCryptoClient_vtable =
     .rngGetBytes             = SeosCryptoClient_rngGetBytes,
     .rngReSeed               = SeosCryptoClient_rngReSeed,
     .digestInit              = SeosCryptoClient_digestInit,
-    .digestClose             = SeosCryptoClient_digestClose,
+    .digestFree              = SeosCryptoClient_digestFree,
     .digestUpdate            = SeosCryptoClient_digestUpdate,
     .digestFinalize          = SeosCryptoClient_digestFinalize,
     .keyInit                 = SeosCryptoClient_keyInit,
@@ -22,20 +22,20 @@ static const SeosCryptoCtx_Vtable SeosCryptoClient_vtable =
     .keyGeneratePair         = SeosCryptoClient_keyGeneratePair,
     .keyImport               = SeosCryptoClient_keyImport,
     .keyExport               = SeosCryptoClient_keyExport,
-    .keyDeInit               = SeosCryptoClient_keyDeInit,
+    .keyFree                 = SeosCryptoClient_keyFree,
     .signatureInit           = SeosCryptoClient_signatureInit,
-    .signatureDeInit         = SeosCryptoClient_signatureDeInit,
+    .signatureFree           = SeosCryptoClient_signatureFree,
     .signatureSign           = SeosCryptoClient_signatureSign,
     .signatureVerify         = SeosCryptoClient_signatureVerify,
     .agreementInit           = SeosCryptoClient_agreementInit,
-    .agreementDeInit         = SeosCryptoClient_agreementDeInit,
+    .agreementFree           = SeosCryptoClient_agreementFree,
     .agreementAgree          = SeosCryptoClient_agreementAgree,
     .cipherInit              = SeosCryptoClient_cipherInit,
-    .cipherClose             = SeosCryptoClient_cipherClose,
+    .cipherFree              = SeosCryptoClient_cipherFree,
     .cipherUpdate            = SeosCryptoClient_cipherUpdate,
     .cipherStart             = SeosCryptoClient_cipherStart,
     .cipherFinalize          = SeosCryptoClient_cipherFinalize,
-    .deInit                  = SeosCryptoClient_deInit
+    .free                    = SeosCryptoClient_free
 };
 
 // Private functions -----------------------------------------------------------
@@ -114,7 +114,7 @@ exit:
 }
 
 void
-SeosCryptoClient_deInit(SeosCryptoCtx* api)
+SeosCryptoClient_free(SeosCryptoCtx* api)
 {
     return;
 }
@@ -189,8 +189,8 @@ SeosCryptoClient_digestInit(SeosCryptoCtx*                  api,
 }
 
 seos_err_t
-SeosCryptoClient_digestClose(SeosCryptoCtx*             api,
-                             SeosCrypto_DigestHandle digestHandle)
+SeosCryptoClient_digestFree(SeosCryptoCtx*             api,
+                            SeosCrypto_DigestHandle digestHandle)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
 
@@ -199,7 +199,7 @@ SeosCryptoClient_digestClose(SeosCryptoCtx*             api,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoRpc_digestClose(self->rpcHandle, digestHandle);
+    return SeosCryptoRpc_digestFree(self->rpcHandle, digestHandle);
 }
 
 seos_err_t
@@ -271,8 +271,8 @@ SeosCryptoClient_signatureInit(SeosCryptoCtx*                api,
 }
 
 seos_err_t
-SeosCryptoClient_signatureDeInit(SeosCryptoCtx*               api,
-                                 SeosCrypto_SignatureHandle   sigHandle)
+SeosCryptoClient_signatureFree(SeosCryptoCtx*               api,
+                               SeosCrypto_SignatureHandle   sigHandle)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
 
@@ -281,7 +281,7 @@ SeosCryptoClient_signatureDeInit(SeosCryptoCtx*               api,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoRpc_signatureDeInit(self->rpcHandle, sigHandle);
+    return SeosCryptoRpc_signatureFree(self->rpcHandle, sigHandle);
 }
 
 seos_err_t
@@ -361,8 +361,8 @@ SeosCryptoClient_agreementInit(SeosCryptoCtx*                api,
 }
 
 seos_err_t
-SeosCryptoClient_agreementDeInit(SeosCryptoCtx*               api,
-                                 SeosCrypto_AgreementHandle   agrHandle)
+SeosCryptoClient_agreementFree(SeosCryptoCtx*               api,
+                               SeosCrypto_AgreementHandle   agrHandle)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
 
@@ -371,7 +371,7 @@ SeosCryptoClient_agreementDeInit(SeosCryptoCtx*               api,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoRpc_agreementDeInit(self->rpcHandle, agrHandle);
+    return SeosCryptoRpc_agreementFree(self->rpcHandle, agrHandle);
 }
 
 seos_err_t
@@ -501,8 +501,8 @@ SeosCryptoClient_keyExport(SeosCryptoCtx*                 api,
 }
 
 seos_err_t
-SeosCryptoClient_keyDeInit(SeosCryptoCtx*                 api,
-                           SeosCrypto_KeyHandle           keyHandle)
+SeosCryptoClient_keyFree(SeosCryptoCtx*                 api,
+                         SeosCrypto_KeyHandle           keyHandle)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
 
@@ -511,7 +511,7 @@ SeosCryptoClient_keyDeInit(SeosCryptoCtx*                 api,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoRpc_keyDeInit(self->rpcHandle, keyHandle);
+    return SeosCryptoRpc_keyFree(self->rpcHandle, keyHandle);
 }
 
 // ------------------------------ Cipher API -----------------------------------
@@ -543,8 +543,8 @@ SeosCryptoClient_cipherInit(SeosCryptoCtx*                  api,
 }
 
 seos_err_t
-SeosCryptoClient_cipherClose(SeosCryptoCtx*             api,
-                             SeosCrypto_CipherHandle    cipherHandle)
+SeosCryptoClient_cipherFree(SeosCryptoCtx*             api,
+                            SeosCrypto_CipherHandle    cipherHandle)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
 
@@ -553,7 +553,7 @@ SeosCryptoClient_cipherClose(SeosCryptoCtx*             api,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoRpc_cipherClose(self->rpcHandle, cipherHandle);
+    return SeosCryptoRpc_cipherFree(self->rpcHandle, cipherHandle);
 }
 
 seos_err_t

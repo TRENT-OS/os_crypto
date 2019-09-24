@@ -34,8 +34,8 @@ SeosCryptoSignature_init(SeosCrypto_MemIf*              memIf,
  *
  */
 seos_err_t
-SeosCryptoSignature_deInit(SeosCrypto_MemIf*            memIf,
-                           SeosCryptoSignature*         self);
+SeosCryptoSignature_free(SeosCrypto_MemIf*            memIf,
+                         SeosCryptoSignature*         self);
 
 /**
  * @brief Sign a hash value

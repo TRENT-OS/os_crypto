@@ -44,8 +44,8 @@ initImpl(SeosCrypto_MemIf*      memIf,
 }
 
 static seos_err_t
-deInitImpl(SeosCrypto_MemIf*    memIf,
-           SeosCryptoCipher*    self)
+freeImpl(SeosCrypto_MemIf*    memIf,
+         SeosCryptoCipher*    self)
 {
     UNUSED_VAR(memIf);
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -376,20 +376,20 @@ SeosCryptoCipher_init(SeosCrypto_MemIf*              memIf,
     return SEOS_SUCCESS;
 
 err0:
-    deInitImpl(memIf, self);
+    freeImpl(memIf, self);
     return retval;
 }
 
 seos_err_t
-SeosCryptoCipher_deInit(SeosCrypto_MemIf*    memIf,
-                        SeosCryptoCipher*    self)
+SeosCryptoCipher_free(SeosCrypto_MemIf*    memIf,
+                      SeosCryptoCipher*    self)
 {
     if (NULL == memIf || NULL == self)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return deInitImpl(memIf, self);
+    return freeImpl(memIf, self);
 }
 
 seos_err_t

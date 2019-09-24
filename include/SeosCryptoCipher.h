@@ -35,8 +35,8 @@ SeosCryptoCipher_init(SeosCrypto_MemIf*             memIf,
  *
  */
 seos_err_t
-SeosCryptoCipher_deInit(SeosCrypto_MemIf*           memIf,
-                        SeosCryptoCipher*           self);
+SeosCryptoCipher_free(SeosCrypto_MemIf*           memIf,
+                      SeosCryptoCipher*           self);
 
 /**
  * @brief Function for AEAD algorithms only to start computation

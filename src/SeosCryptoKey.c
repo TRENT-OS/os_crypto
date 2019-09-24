@@ -209,8 +209,8 @@ initImpl(SeosCrypto_MemIf*            memIf,
 }
 
 static seos_err_t
-deInitImpl(SeosCrypto_MemIf*            memIf,
-           SeosCryptoKey*               self)
+freeImpl(SeosCrypto_MemIf*            memIf,
+         SeosCryptoKey*               self)
 {
     // We may have stored sensitive key data here, better make sure to remove it.
     if (!self->empty)
@@ -591,15 +591,15 @@ SeosCryptoKey_export(SeosCryptoKey*        self,
 }
 
 seos_err_t
-SeosCryptoKey_deInit(SeosCrypto_MemIf*          memIf,
-                     SeosCryptoKey*             self)
+SeosCryptoKey_free(SeosCrypto_MemIf*          memIf,
+                   SeosCryptoKey*             self)
 {
     if (NULL == memIf || NULL == self || NULL == self->keyBytes)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return deInitImpl(memIf, self);
+    return freeImpl(memIf, self);
 }
 
 seos_err_t

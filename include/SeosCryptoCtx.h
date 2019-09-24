@@ -39,8 +39,8 @@ typedef seos_err_t
                              unsigned int                   algorithm);
 
 typedef seos_err_t
-(*SeosCryptoCtx_digestCloseT)(SeosCryptoCtx*                self,
-                              SeosCrypto_DigestHandle       digestHandle);
+(*SeosCryptoCtx_digestFreeT)(SeosCryptoCtx*                self,
+                             SeosCrypto_DigestHandle       digestHandle);
 
 typedef seos_err_t
 (*SeosCryptoCtx_digestUpdateT)(SeosCryptoCtx*               self,
@@ -87,8 +87,8 @@ typedef seos_err_t
                             size_t*                        keySize);
 
 typedef seos_err_t
-(*SeosCryptoCtx_keyDeInitT)(SeosCryptoCtx*                 self,
-                            SeosCrypto_KeyHandle           keyHandle);
+(*SeosCryptoCtx_keyFreeT)(SeosCryptoCtx*                 self,
+                          SeosCrypto_KeyHandle           keyHandle);
 
 
 // ----------------------------- Signature API ---------------------------------
@@ -101,8 +101,8 @@ typedef seos_err_t
                                 SeosCrypto_KeyHandle          pubHandle);
 
 typedef seos_err_t
-(*SeosCryptoCtx_signatureDeInitT)(SeosCryptoCtx*               self,
-                                  SeosCrypto_SignatureHandle   sigHandle);
+(*SeosCryptoCtx_signatureFreeT)(SeosCryptoCtx*               self,
+                                SeosCrypto_SignatureHandle   sigHandle);
 
 typedef seos_err_t
 (*SeosCryptoCtx_signatureSignT)(SeosCryptoCtx*                 self,
@@ -129,8 +129,8 @@ typedef seos_err_t
                                 SeosCrypto_KeyHandle          prvHandle);
 
 typedef seos_err_t
-(*SeosCryptoCtx_agreementDeInitT)(SeosCryptoCtx*               self,
-                                  SeosCrypto_AgreementHandle   agrHandle);
+(*SeosCryptoCtx_agreementFreeT)(SeosCryptoCtx*               self,
+                                SeosCrypto_AgreementHandle   agrHandle);
 
 typedef seos_err_t
 (*SeosCryptoCtx_agreementAgreeT)(SeosCryptoCtx*                 self,
@@ -150,8 +150,8 @@ typedef seos_err_t
                              size_t                         ivLen);
 
 typedef seos_err_t
-(*SeosCryptoCtx_cipherCloseT)(SeosCryptoCtx*                self,
-                              SeosCrypto_CipherHandle       cipherHandle);
+(*SeosCryptoCtx_cipherFreeT)(SeosCryptoCtx*                self,
+                             SeosCrypto_CipherHandle       cipherHandle);
 
 typedef seos_err_t
 (*SeosCryptoCtx_cipherUpdateT)(SeosCryptoCtx*               self,
@@ -175,14 +175,14 @@ typedef seos_err_t
 
 // -----------------------------------------------------------------------------
 
-typedef void (*SeosCryptoCtx_deInitT)(SeosCryptoCtx* self);
+typedef void (*SeosCryptoCtx_freeT)(SeosCryptoCtx* self);
 
 typedef struct
 {
     SeosCryptoCtx_rngGetBytesT              rngGetBytes;
     SeosCryptoCtx_rngReSeedT                rngReSeed;
     SeosCryptoCtx_digestInitT               digestInit;
-    SeosCryptoCtx_digestCloseT              digestClose;
+    SeosCryptoCtx_digestFreeT               digestFree;
     SeosCryptoCtx_digestUpdateT             digestUpdate;
     SeosCryptoCtx_digestFinalizeT           digestFinalize;
     SeosCryptoCtx_keyInitT                  keyInit;
@@ -190,20 +190,20 @@ typedef struct
     SeosCryptoCtx_keyGeneratePairT          keyGeneratePair;
     SeosCryptoCtx_keyImportT                keyImport;
     SeosCryptoCtx_keyExportT                keyExport;
-    SeosCryptoCtx_keyDeInitT                keyDeInit;
+    SeosCryptoCtx_keyFreeT                  keyFree;
     SeosCryptoCtx_signatureInitT            signatureInit;
-    SeosCryptoCtx_signatureDeInitT          signatureDeInit;
+    SeosCryptoCtx_signatureFreeT            signatureFree;
     SeosCryptoCtx_signatureSignT            signatureSign;
     SeosCryptoCtx_signatureVerifyT          signatureVerify;
     SeosCryptoCtx_agreementInitT            agreementInit;
-    SeosCryptoCtx_agreementDeInitT          agreementDeInit;
+    SeosCryptoCtx_agreementFreeT            agreementFree;
     SeosCryptoCtx_agreementAgreeT           agreementAgree;
     SeosCryptoCtx_cipherInitT               cipherInit;
-    SeosCryptoCtx_cipherCloseT              cipherClose;
+    SeosCryptoCtx_cipherFreeT               cipherFree;
     SeosCryptoCtx_cipherUpdateT             cipherUpdate;
     SeosCryptoCtx_cipherStartT              cipherStart;
     SeosCryptoCtx_cipherFinalizeT           cipherFinalize;
-    SeosCryptoCtx_deInitT                   deInit;
+    SeosCryptoCtx_freeT                     free;
 }
 SeosCryptoCtx_Vtable;
 

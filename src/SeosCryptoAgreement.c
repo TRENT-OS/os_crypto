@@ -37,8 +37,8 @@ initImpl(SeosCrypto_MemIf*               memIf,
 }
 
 static seos_err_t
-deInitImpl(SeosCrypto_MemIf*               memIf,
-           SeosCryptoAgreement*            self)
+freeImpl(SeosCrypto_MemIf*               memIf,
+         SeosCryptoAgreement*            self)
 {
     UNUSED_VAR(memIf);
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -171,7 +171,7 @@ SeosCryptoAgreement_init(SeosCrypto_MemIf*               memIf,
 
     goto exit;
 err0:
-    deInitImpl(memIf, self);
+    freeImpl(memIf, self);
 exit:
     return retval;
 }
@@ -192,13 +192,13 @@ SeosCryptoAgreement_agree(SeosCryptoAgreement*  self,
 }
 
 seos_err_t
-SeosCryptoAgreement_deInit(SeosCrypto_MemIf*        memIf,
-                           SeosCryptoAgreement*     self)
+SeosCryptoAgreement_free(SeosCrypto_MemIf*        memIf,
+                         SeosCryptoAgreement*     self)
 {
     if (NULL == self || NULL == memIf)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return deInitImpl(memIf, self);;
+    return freeImpl(memIf, self);;
 }

@@ -6,10 +6,10 @@
 #include "SeosCryptoApi.h"
 
 void
-SeosCryptoApi_deInit(SeosCryptoCtx* cryptoCtx)
+SeosCryptoApi_free(SeosCryptoCtx* cryptoCtx)
 {
     Debug_ASSERT_SELF(cryptoCtx);
-    cryptoCtx->vtable->deInit(cryptoCtx);
+    cryptoCtx->vtable->free(cryptoCtx);
 }
 
 // -------------------------------- RNG API ------------------------------------
@@ -47,12 +47,12 @@ SeosCryptoApi_digestInit(SeosCryptoCtx*              cryptoCtx,
 }
 
 seos_err_t
-SeosCryptoApi_digestClose(SeosCryptoCtx*             cryptoCtx,
-                          SeosCrypto_DigestHandle    digestHandle)
+SeosCryptoApi_digestFree(SeosCryptoCtx*             cryptoCtx,
+                         SeosCrypto_DigestHandle    digestHandle)
 {
     return (NULL == cryptoCtx) ?
            SEOS_ERROR_INVALID_PARAMETER :
-           cryptoCtx->vtable->digestClose(cryptoCtx, digestHandle);
+           cryptoCtx->vtable->digestFree(cryptoCtx, digestHandle);
 }
 
 seos_err_t
@@ -93,12 +93,12 @@ SeosCryptoApi_signatureInit(SeosCryptoCtx*                cryptoCtx,
 }
 
 seos_err_t
-SeosCryptoApi_signatureDeInit(SeosCryptoCtx*               cryptoCtx,
-                              SeosCrypto_SignatureHandle   sigHandle)
+SeosCryptoApi_signatureFree(SeosCryptoCtx*               cryptoCtx,
+                            SeosCrypto_SignatureHandle   sigHandle)
 {
     return (NULL == cryptoCtx) ?
            SEOS_ERROR_INVALID_PARAMETER :
-           cryptoCtx->vtable->signatureDeInit(cryptoCtx, sigHandle);
+           cryptoCtx->vtable->signatureFree(cryptoCtx, sigHandle);
 }
 
 seos_err_t
@@ -144,12 +144,12 @@ SeosCryptoApi_agreementInit(SeosCryptoCtx*                cryptoCtx,
 }
 
 seos_err_t
-SeosCryptoApi_agreementDeInit(SeosCryptoCtx*               cryptoCtx,
-                              SeosCrypto_AgreementHandle   agrHandle)
+SeosCryptoApi_agreementFree(SeosCryptoCtx*               cryptoCtx,
+                            SeosCrypto_AgreementHandle   agrHandle)
 {
     return (NULL == cryptoCtx) ?
            SEOS_ERROR_INVALID_PARAMETER :
-           cryptoCtx->vtable->agreementDeInit(cryptoCtx, agrHandle);
+           cryptoCtx->vtable->agreementFree(cryptoCtx, agrHandle);
 }
 
 seos_err_t
@@ -218,11 +218,11 @@ SeosCryptoApi_keyExport(SeosCryptoCtx*                 ctx,
 }
 
 seos_err_t
-SeosCryptoApi_keyDeInit(SeosCryptoCtx*                 ctx,
-                        SeosCrypto_KeyHandle           keyHandle)
+SeosCryptoApi_keyFree(SeosCryptoCtx*                 ctx,
+                      SeosCrypto_KeyHandle           keyHandle)
 {
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->keyDeInit(ctx, keyHandle);
+           ctx->vtable->keyFree(ctx, keyHandle);
 }
 
 // ------------------------------ Cipher API -----------------------------------
@@ -241,11 +241,11 @@ SeosCryptoApi_cipherInit(SeosCryptoCtx*             cryptoCtx,
 }
 
 seos_err_t
-SeosCryptoApi_cipherClose(SeosCryptoCtx*            cryptoCtx,
-                          SeosCrypto_CipherHandle   cipherHandle)
+SeosCryptoApi_cipherFree(SeosCryptoCtx*            cryptoCtx,
+                         SeosCrypto_CipherHandle   cipherHandle)
 {
     return (NULL == cryptoCtx) ? SEOS_ERROR_INVALID_PARAMETER :
-           cryptoCtx->vtable->cipherClose(cryptoCtx, cipherHandle);
+           cryptoCtx->vtable->cipherFree(cryptoCtx, cipherHandle);
 }
 
 seos_err_t

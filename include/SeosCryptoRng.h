@@ -71,7 +71,7 @@ SeosCryptoRng_getBytesMbedtls(void*            self,
  *
  */
 seos_err_t
-SeosCryptoRng_deInit(SeosCrypto_MemIf*           memIf,
-                     SeosCryptoRng*              self);
+SeosCryptoRng_free(SeosCrypto_MemIf*           memIf,
+                   SeosCryptoRng*              self);
 
 /** @} */

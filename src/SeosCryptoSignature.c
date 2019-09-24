@@ -33,8 +33,8 @@ initImpl(SeosCrypto_MemIf*      memIf,
 }
 
 static seos_err_t
-deInitImpl(SeosCrypto_MemIf*        memIf,
-           SeosCryptoSignature*     self)
+freeImpl(SeosCrypto_MemIf*        memIf,
+         SeosCryptoSignature*     self)
 {
     UNUSED_VAR(memIf);
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -198,21 +198,21 @@ SeosCryptoSignature_init(SeosCrypto_MemIf*              memIf,
 
     goto exit;
 err0:
-    deInitImpl(memIf, self);
+    freeImpl(memIf, self);
 exit:
     return retval;
 }
 
 seos_err_t
-SeosCryptoSignature_deInit(SeosCrypto_MemIf*            memIf,
-                           SeosCryptoSignature*         self)
+SeosCryptoSignature_free(SeosCrypto_MemIf*            memIf,
+                         SeosCryptoSignature*         self)
 {
     if (NULL == memIf || NULL == self)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return deInitImpl(memIf, self);
+    return freeImpl(memIf, self);
 }
 
 seos_err_t

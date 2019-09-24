@@ -46,7 +46,7 @@ SeosCryptoClient_init(SeosCryptoClient*     self,
  *
  */
 void
-SeosCryptoClient_deInit(SeosCryptoCtx* api);
+SeosCryptoClient_free(SeosCryptoCtx* api);
 
 // -------------------------------- RNG API ------------------------------------
 
@@ -68,6 +68,8 @@ SeosCryptoClient_rngReSeed(SeosCryptoCtx*       self,
                            const void*          seed,
                            size_t               seedLen);
 
+// ------------------------------ Digest API -----------------------------------
+
 /**
  * @brief implements SeosCryptoApi_digestInit() in a rpc connection
  *
@@ -77,15 +79,13 @@ SeosCryptoClient_digestInit(SeosCryptoCtx*              api,
                             SeosCrypto_DigestHandle*    pDigestHandle,
                             unsigned int                algorithm);
 
-// ------------------------------ Digest API -----------------------------------
-
 /**
- * @brief implements SeosCryptoApi_digestClose() in a rpc connection
+ * @brief implements SeosCryptoApi_digestFree() in a rpc connection
  *
  */
 seos_err_t
-SeosCryptoClient_digestClose(SeosCryptoCtx*             api,
-                             SeosCrypto_DigestHandle    digestHandle);
+SeosCryptoClient_digestFree(SeosCryptoCtx*             api,
+                            SeosCrypto_DigestHandle    digestHandle);
 
 /**
  * @brief implements SeosCryptoApi_digestUpdate() in a rpc connection
@@ -120,12 +120,12 @@ SeosCryptoClient_signatureInit(SeosCryptoCtx*                api,
                                SeosCrypto_KeyHandle          pubHandle);
 
 /**
- * @brief implements SeosCryptoApi_signatureDeInit() in a rpc connection
+ * @brief implements SeosCryptoApi_signatureFree() in a rpc connection
  *
  */
 seos_err_t
-SeosCryptoClient_signatureDeInit(SeosCryptoCtx*               api,
-                                 SeosCrypto_SignatureHandle   sigHandle);
+SeosCryptoClient_signatureFree(SeosCryptoCtx*               api,
+                               SeosCrypto_SignatureHandle   sigHandle);
 
 /**
  * @brief implements SeosCryptoApi_signatureSign() in a rpc connection
@@ -164,12 +164,12 @@ SeosCryptoClient_agreementInit(SeosCryptoCtx*                api,
                                SeosCrypto_KeyHandle          prvHandle);
 
 /**
- * @brief implements SeosCryptoApi_agreementDeInit() in a rpc connection
+ * @brief implements SeosCryptoApi_agreementFree() in a rpc connection
  *
  */
 seos_err_t
-SeosCryptoClient_agreementDeInit(SeosCryptoCtx*               api,
-                                 SeosCrypto_AgreementHandle   agrHandle);
+SeosCryptoClient_agreementFree(SeosCryptoCtx*               api,
+                               SeosCrypto_AgreementHandle   agrHandle);
 
 /**
  * @brief implements SeosCryptoApi_agreemenAgree() in a rpc connection
@@ -235,12 +235,12 @@ SeosCryptoClient_keyExport(SeosCryptoCtx*                 ctx,
                            size_t*                        keySize);
 
 /**
- * @brief implements SeosCryptoApi_keyDeInit() in a rpc connection
+ * @brief implements SeosCryptoApi_keyFree() in a rpc connection
  *
  */
 seos_err_t
-SeosCryptoClient_keyDeInit(SeosCryptoCtx*                 ctx,
-                           SeosCrypto_KeyHandle           keyHandle);
+SeosCryptoClient_keyFree(SeosCryptoCtx*                 ctx,
+                         SeosCrypto_KeyHandle           keyHandle);
 
 // ------------------------------- Cipher API ----------------------------------
 
@@ -256,12 +256,12 @@ SeosCryptoClient_cipherInit(SeosCryptoCtx*                  api,
                             const void*                     iv,
                             size_t                          ivLen);
 /**
- * @brief implements SeosCryptoApi_cipherClose() in a rpc connection
+ * @brief implements SeosCryptoApi_cipherFree() in a rpc connection
  *
  */
 seos_err_t
-SeosCryptoClient_cipherClose(SeosCryptoCtx*             api,
-                             SeosCrypto_CipherHandle    cipherHandle);
+SeosCryptoClient_cipherFree(SeosCryptoCtx*             api,
+                            SeosCrypto_CipherHandle    cipherHandle);
 /**
  * @brief implements SeosCryptoApi_cipherUpdate() in a rpc connection
  *
