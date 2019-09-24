@@ -513,17 +513,21 @@ seos_err_t
 SeosCryptoKey_generate(SeosCryptoKey*      self,
                        SeosCryptoRng*      rng)
 {
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
     if (NULL == self || NULL == rng)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-
-    if (!self->empty)
+    else if (!self->empty)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return genImpl(self, rng);
+    retval = genImpl(self, rng);
+    self->empty = (retval != SEOS_SUCCESS);
+
+    return retval;
 }
 
 seos_err_t
@@ -531,18 +535,22 @@ SeosCryptoKey_generatePair(SeosCryptoKey*  prvKey,
                            SeosCryptoKey*  pubKey,
                            SeosCryptoRng*  rng)
 {
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
     if (NULL == prvKey || NULL == pubKey || NULL == rng
         || prvKey->bits != pubKey->bits)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-
-    if (!prvKey->empty || !pubKey->empty)
+    else if (!prvKey->empty || !pubKey->empty)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return genPairImpl(prvKey, pubKey, rng);
+    retval = genPairImpl(prvKey, pubKey, rng);
+    prvKey->empty = pubKey->empty = (retval != SEOS_SUCCESS);
+
+    return retval;
 }
 
 seos_err_t

@@ -29,15 +29,17 @@ SeosCryptoCipher_init(SeosCrypto_MemIf*             memIf,
                       SeosCryptoKey const*          key,
                       const void*                   iv,
                       size_t                        ivLen);
+
 /**
  * @brief closes a cipher context.
  *
  * @param self (required) pointer to context to initialize
  *
  */
-void
+seos_err_t
 SeosCryptoCipher_deInit(SeosCrypto_MemIf*           memIf,
                         SeosCryptoCipher*           self);
+
 /**
  * @brief update function for AEAD algorithms only
  *
@@ -50,9 +52,10 @@ SeosCryptoCipher_deInit(SeosCrypto_MemIf*           memIf,
  *
  */
 seos_err_t
-SeosCryptoCipher_updateAd(SeosCryptoCipher* self,
-                          const void*       input,
-                          size_t            inputSize);
+SeosCryptoCipher_start(SeosCryptoCipher* self,
+                       const void*       input,
+                       size_t            inputSize);
+
 /**
  * @brief implements SeosCryptoApi_cipherUpdate()
  *
@@ -63,6 +66,7 @@ SeosCryptoCipher_update(SeosCryptoCipher*   self,
                         size_t              inputSize,
                         void**              output,
                         size_t*             outputSize);
+
 /**
  * @brief perform operation on final block, applies padding automatically if
  *  requested
@@ -91,25 +95,7 @@ SeosCryptoCipher_update(SeosCryptoCipher*   self,
  */
 seos_err_t
 SeosCryptoCipher_finalize(SeosCryptoCipher* self,
-                          void**            output,
+                          void*             output,
                           size_t*           outputSize);
-/**
- * @brief checks the previously computed tag against the provided one
- *
- * @param self (required) pointer to context
- * @param tag (required) the tag buffer
- * @param tagSize the size of the tag buffer
- *
- * @return an error code
- * @retval SEOS_SUCCESS if all right
- * @retval SEOS_ERROR_INVALID_PARAMETER if any of the required parameters is
- *  missing or wrong
- * @retval SEOS_ERROR_GENERIC if it does not match
- *
- */
-seos_err_t
-SeosCryptoCipher_verifyTag(SeosCryptoCipher*    self,
-                           const void*          tag,
-                           size_t               tagSize);
 
 ///@}

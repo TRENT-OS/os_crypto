@@ -13,6 +13,8 @@
 
 #include "SeosCryptoCtx.h"
 
+#include <sys/user.h>
+
 typedef struct
 {
     /**
@@ -23,6 +25,10 @@ typedef struct
      * the server's address of the dataport shared with the client
      */
     void*           serverDataport;
+    /**
+     * Buffer for outputs produced by crypto
+     */
+    unsigned char   buffer[PAGE_SIZE];
 }
 SeosCryptoRpc;
 

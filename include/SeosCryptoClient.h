@@ -235,7 +235,7 @@ SeosCryptoClient_keyDeInit(SeosCryptoCtx*                 ctx,
  */
 seos_err_t
 SeosCryptoClient_cipherInit(SeosCryptoCtx*                  api,
-                            SeosCrypto_CipherHandle*        pKeyHandle,
+                            SeosCrypto_CipherHandle*        pCipherHandle,
                             unsigned int                    algorithm,
                             SeosCrypto_KeyHandle            key,
                             const void*                     iv,
@@ -260,14 +260,14 @@ SeosCryptoClient_cipherUpdate(SeosCryptoCtx*                api,
                               size_t*                       outputSize);
 
 /**
- * @brief implements SeosCryptoApi_cipherUpdateAd() in a rpc connection
+ * @brief implements SeosCryptoApi_cipherStart() in a rpc connection
  *
  */
 seos_err_t
-SeosCryptoClient_cipherUpdateAd(SeosCryptoCtx*                api,
-                                SeosCrypto_CipherHandle       cipherHandle,
-                                const void*                   ad,
-                                size_t                        adLen);
+SeosCryptoClient_cipherStart(SeosCryptoCtx*                api,
+                             SeosCrypto_CipherHandle       cipherHandle,
+                             const void*                   ad,
+                             size_t                        adLen);
 /**
  * @brief implements SeosCryptoApi_cipherFinalize() in a rpc connection
  *
@@ -275,16 +275,7 @@ SeosCryptoClient_cipherUpdateAd(SeosCryptoCtx*                api,
 seos_err_t
 SeosCryptoClient_cipherFinalize(SeosCryptoCtx*              api,
                                 SeosCrypto_CipherHandle     cipherHandle,
-                                void**                      output,
+                                void*                       output,
                                 size_t*                     outputSize);
-/**
- * @brief implements SeosCryptoApi_cipherVerifyTag() in a rpc connection
- *
- */
-seos_err_t
-SeosCryptoClient_cipherVerifyTag(SeosCryptoCtx*              api,
-                                 SeosCrypto_CipherHandle     cipherHandle,
-                                 const void*                 tag,
-                                 size_t                      tagLen);
 
 /** @} */

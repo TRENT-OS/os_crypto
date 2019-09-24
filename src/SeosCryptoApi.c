@@ -126,7 +126,7 @@ SeosCryptoApi_signatureVerify(SeosCryptoCtx*                 cryptoCtx,
                               const void*                    signature,
                               size_t                         signatureSize)
 {
-    return (NULL == cryptoCtx ) ?
+    return (NULL == cryptoCtx) ?
            SEOS_ERROR_INVALID_PARAMETER :
            cryptoCtx->vtable->signatureVerify(cryptoCtx, sigHandle, hash, hashSize,
                                               signature, signatureSize);
@@ -175,16 +175,16 @@ SeosCryptoApi_keyInit(SeosCryptoCtx*                   ctx,
                       SeosCryptoKey_Flag               flags,
                       size_t                           bits)
 {
-    Debug_ASSERT_SELF(ctx);
-    return ctx->vtable->keyInit(ctx, keyHandle, type, flags, bits);
+    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
+           ctx->vtable->keyInit(ctx, keyHandle, type, flags, bits);
 }
 
 seos_err_t
 SeosCryptoApi_keyGenerate(SeosCryptoCtx*               ctx,
                           SeosCrypto_KeyHandle         keyHandle)
 {
-    Debug_ASSERT_SELF(ctx);
-    return ctx->vtable->keyGenerate(ctx, keyHandle);
+    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
+           ctx->vtable->keyGenerate(ctx, keyHandle);
 }
 
 seos_err_t
@@ -192,8 +192,8 @@ SeosCryptoApi_keyGeneratePair(SeosCryptoCtx*           ctx,
                               SeosCrypto_KeyHandle     prvKeyHandle,
                               SeosCrypto_KeyHandle     pubKeyHandle)
 {
-    Debug_ASSERT_SELF(ctx);
-    return ctx->vtable->keyGeneratePair(ctx, prvKeyHandle, pubKeyHandle);
+    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
+           ctx->vtable->keyGeneratePair(ctx, prvKeyHandle, pubKeyHandle);
 }
 
 seos_err_t
@@ -203,8 +203,8 @@ SeosCryptoApi_keyImport(SeosCryptoCtx*                 ctx,
                         const void*                    key,
                         size_t                         keyLen)
 {
-    Debug_ASSERT_SELF(ctx);
-    return ctx->vtable->keyImport(ctx, keyHandle, wrapKeyHandle, key, keyLen);
+    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
+           ctx->vtable->keyImport(ctx, keyHandle, wrapKeyHandle, key, keyLen);
 }
 
 seos_err_t
@@ -214,16 +214,16 @@ SeosCryptoApi_keyExport(SeosCryptoCtx*                 ctx,
                         void**                         key,
                         size_t*                        keySize)
 {
-    Debug_ASSERT_SELF(ctx);
-    return ctx->vtable->keyExport(ctx, keyHandle, wrapKeyHandle, key, keySize);
+    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
+           ctx->vtable->keyExport(ctx, keyHandle, wrapKeyHandle, key, keySize);
 }
 
 seos_err_t
 SeosCryptoApi_keyDeInit(SeosCryptoCtx*                 ctx,
                         SeosCrypto_KeyHandle           keyHandle)
 {
-    Debug_ASSERT_SELF(ctx);
-    return ctx->vtable->keyDeInit(ctx, keyHandle);
+    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
+           ctx->vtable->keyDeInit(ctx, keyHandle);
 }
 
 seos_err_t
@@ -234,22 +234,17 @@ SeosCryptoApi_cipherInit(SeosCryptoCtx*             cryptoCtx,
                          const void*                iv,
                          size_t                     ivLen)
 {
-    Debug_ASSERT_SELF(cryptoCtx);
-    return cryptoCtx->vtable->cipherInit(cryptoCtx,
-                                         pCipherHandle,
-                                         algorithm,
-                                         keyHandle,
-                                         iv,
-                                         ivLen);
+    return (NULL == cryptoCtx) ? SEOS_ERROR_INVALID_PARAMETER :
+           cryptoCtx->vtable->cipherInit(cryptoCtx, pCipherHandle, algorithm, keyHandle,
+                                         iv, ivLen);
 }
 
 seos_err_t
 SeosCryptoApi_cipherClose(SeosCryptoCtx*            cryptoCtx,
                           SeosCrypto_CipherHandle   cipherHandle)
 {
-    Debug_ASSERT_SELF(cryptoCtx);
-    return cryptoCtx->vtable->cipherClose(cryptoCtx,
-                                          cipherHandle);
+    return (NULL == cryptoCtx) ? SEOS_ERROR_INVALID_PARAMETER :
+           cryptoCtx->vtable->cipherClose(cryptoCtx, cipherHandle);
 }
 
 seos_err_t
@@ -260,54 +255,29 @@ SeosCryptoApi_cipherUpdate(SeosCryptoCtx*           cryptoCtx,
                            void**                   output,
                            size_t*                  outputSize)
 {
-    Debug_ASSERT_SELF(cryptoCtx);
-    return cryptoCtx->vtable->cipherUpdate(cryptoCtx,
-                                           cipherHandle,
-                                           data,
-                                           dataLen,
-                                           output,
+    return (NULL == cryptoCtx) ? SEOS_ERROR_INVALID_PARAMETER :
+           cryptoCtx->vtable->cipherUpdate(cryptoCtx, cipherHandle, data, dataLen, output,
                                            outputSize);
 }
 
 seos_err_t
-SeosCryptoApi_cipherUpdateAd(SeosCryptoCtx*           cryptoCtx,
-                             SeosCrypto_CipherHandle  cipherHandle,
-                             const void*              ad,
-                             size_t                   adLen)
+SeosCryptoApi_cipherStart(SeosCryptoCtx*           cryptoCtx,
+                          SeosCrypto_CipherHandle  cipherHandle,
+                          const void*              ad,
+                          size_t                   adLen)
 {
-    Debug_ASSERT_SELF(cryptoCtx);
-    return cryptoCtx->vtable->cipherUpdateAd(cryptoCtx,
-                                             cipherHandle,
-                                             ad,
-                                             adLen);
+    return (NULL == cryptoCtx) ? SEOS_ERROR_INVALID_PARAMETER :
+           cryptoCtx->vtable->cipherStart(cryptoCtx, cipherHandle, ad, adLen);
 }
 
 seos_err_t
 SeosCryptoApi_cipherFinalize(SeosCryptoCtx*           cryptoCtx,
                              SeosCrypto_CipherHandle  cipherHandle,
-                             void**                   output,
+                             void*                    output,
                              size_t*                  outputSize)
 {
-    Debug_ASSERT_SELF(cryptoCtx);
-    return cryptoCtx->vtable->cipherFinalize(cryptoCtx,
-                                             cipherHandle,
-                                             output,
-                                             outputSize);
-
-}
-
-seos_err_t
-SeosCryptoApi_cipherVerifyTag(SeosCryptoCtx*           cryptoCtx,
-                              SeosCrypto_CipherHandle  cipherHandle,
-                              const void*              tag,
-                              size_t                   tagSize)
-{
-    Debug_ASSERT_SELF(cryptoCtx);
-    return cryptoCtx->vtable->cipherVerifyTag(cryptoCtx,
-                                              cipherHandle,
-                                              tag,
-                                              tagSize);
-
+    return (NULL == cryptoCtx) ? SEOS_ERROR_INVALID_PARAMETER :
+           cryptoCtx->vtable->cipherFinalize(cryptoCtx, cipherHandle, output, outputSize);
 }
 
 void

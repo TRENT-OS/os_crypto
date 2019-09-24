@@ -263,15 +263,15 @@ SeosCrypto_cipherUpdate(SeosCryptoCtx*              api,
                         void**                      output,
                         size_t*                     outputSize);
 /**
- * @brief implements SeosCryptoApi_cipherUpdateAd() in a local connection
+ * @brief implements SeosCryptoApi_cipherStart() in a local connection
  * (function call, no rpc)
  *
  */
 seos_err_t
-SeosCrypto_cipherUpdateAd(SeosCryptoCtx*              api,
-                          SeosCrypto_CipherHandle     cipherHandle,
-                          const void*                 input,
-                          size_t                      inputSize);
+SeosCrypto_cipherStart(SeosCryptoCtx*              api,
+                       SeosCrypto_CipherHandle     cipherHandle,
+                       const void*                 input,
+                       size_t                      inputSize);
 /**
  * @brief implements SeosCryptoApi_cipherFinalize() in a local connection
  * (function call, no rpc)
@@ -280,19 +280,8 @@ SeosCrypto_cipherUpdateAd(SeosCryptoCtx*              api,
 seos_err_t
 SeosCrypto_cipherFinalize(SeosCryptoCtx*                api,
                           SeosCrypto_CipherHandle       cipherHandle,
-                          void**                        output,
+                          void*                         output,
                           size_t*                       outputSize);
-
-/**
- * @brief implements SeosCryptoApi_cipherVerifyTag() in a local connection
- * (function call, no rpc)
- *
- */
-seos_err_t
-SeosCrypto_cipherVerifyTag(SeosCryptoCtx*                api,
-                           SeosCrypto_CipherHandle       cipherHandle,
-                           const void*                   tag,
-                           size_t                        tagSize);
 
 /**
  * @brief implements SeosCryptoApi_signatureInit() in a local connection

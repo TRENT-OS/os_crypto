@@ -36,9 +36,8 @@ static const SeosCryptoCtx_Vtable SeosCrypto_vtable =
     .cipherInit             = SeosCrypto_cipherInit,
     .cipherClose            = SeosCrypto_cipherClose,
     .cipherUpdate           = SeosCrypto_cipherUpdate,
-    .cipherUpdateAd         = SeosCrypto_cipherUpdateAd,
+    .cipherStart            = SeosCrypto_cipherStart,
     .cipherFinalize         = SeosCrypto_cipherFinalize,
-    .cipherVerifyTag        = SeosCrypto_cipherVerifyTag,
     .deInit                 = SeosCrypto_deInit
 };
 
@@ -717,52 +716,45 @@ SeosCrypto_cipherInit(SeosCryptoCtx*                api,
                       const void*                   iv,
                       size_t                        ivLen)
 {
-    SeosCrypto* self = (SeosCrypto*) api;
-    Debug_ASSERT_SELF(self);
-    Debug_ASSERT(self->parent.vtable == &SeosCrypto_vtable);
-
     seos_err_t retval = SEOS_ERROR_GENERIC;
+    SeosCrypto* self = (SeosCrypto*) api;
 
-    if (SeosCrypto_findHandle(&self->keyHandleVector, key) == -1)
+    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable
+        || NULL == pCipherHandle)
     {
-        retval = SEOS_ERROR_INVALID_HANDLE;
-        goto exit;
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else if (SeosCrypto_findHandle(&self->keyHandleVector, key) == -1)
+    {
+        return SEOS_ERROR_INVALID_HANDLE;
     }
 
-    *pCipherHandle = self->mem.memIf.malloc(sizeof(SeosCryptoCipher));
-    if (NULL == *pCipherHandle)
+    if ((*pCipherHandle = self->mem.memIf.malloc(sizeof(SeosCryptoCipher))) ==
+        NULL)
     {
         retval = SEOS_ERROR_INSUFFICIENT_SPACE;
-        goto exit;
     }
     else
     {
-        retval = SeosCryptoCipher_init(&self->mem.memIf,
-                                       *pCipherHandle,
-                                       algorithm,
-                                       key,
-                                       iv,
-                                       ivLen);
-        if (retval != SEOS_SUCCESS)
+        if ((retval = SeosCryptoCipher_init(&self->mem.memIf, *pCipherHandle, algorithm,
+                                            key,  iv, ivLen)) != SEOS_SUCCESS)
         {
             goto err0;
         }
-        else if (!PointerVector_pushBack(&self->cipherHandleVector,
-                                         *pCipherHandle))
+        else if (!PointerVector_pushBack(&self->cipherHandleVector, *pCipherHandle))
         {
             retval = SEOS_ERROR_INSUFFICIENT_SPACE;
             goto err1;
         }
-        else
-        {
-            goto exit;
-        }
     }
+
+    return retval;
+
 err1:
     SeosCryptoCipher_deInit(&self->mem.memIf, *pCipherHandle);
 err0:
     self->mem.memIf.free(*pCipherHandle);
-exit:
+
     return retval;
 }
 
@@ -770,27 +762,30 @@ seos_err_t
 SeosCrypto_cipherClose(SeosCryptoCtx*           api,
                        SeosCrypto_CipherHandle  cipherHandle)
 {
+    seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCrypto* self = (SeosCrypto*) api;
-    Debug_ASSERT_SELF(self);
-    Debug_ASSERT(self->parent.vtable == &SeosCrypto_vtable);
+    size_t handlePos;
 
-    seos_err_t retval = SEOS_SUCCESS;
-
-    size_t handlePos = SeosCrypto_findHandle(&self->cipherHandleVector,
-                                             cipherHandle);
-    if (handlePos != -1)
+    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable)
     {
-        SeosCryptoCipher* cipher = cipherHandle;
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
 
-        SeosCryptoCipher_deInit(&self->mem.memIf, cipher);
-        SeosCrypto_removeHandle(&self->cipherHandleVector, handlePos);
-
-        self->mem.memIf.free(cipher);
+    if ((handlePos = SeosCrypto_findHandle(&self->cipherHandleVector,
+                                           cipherHandle)) != -1)
+    {
+        if ((retval = SeosCryptoCipher_deInit(&self->mem.memIf,
+                                              cipherHandle)) == SEOS_SUCCESS)
+        {
+            SeosCrypto_removeHandle(&self->cipherHandleVector, handlePos);
+            self->mem.memIf.free(cipherHandle);
+        }
     }
     else
     {
         retval = SEOS_ERROR_INVALID_HANDLE;
     }
+
     return retval;
 }
 
@@ -803,102 +798,49 @@ SeosCrypto_cipherUpdate(SeosCryptoCtx*          api,
                         size_t*                 outputSize)
 {
     SeosCrypto* self = (SeosCrypto*) api;
-    Debug_ASSERT_SELF(self);
-    Debug_ASSERT(self->parent.vtable == &SeosCrypto_vtable);
 
-    seos_err_t retval = SEOS_SUCCESS;
+    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
 
-    size_t handlePos = SeosCrypto_findHandle(&self->cipherHandleVector,
-                                             cipherHandle);
-    if (handlePos != -1)
-    {
-        retval = SeosCryptoCipher_update(cipherHandle,
-                                         input, inputSize,
-                                         output, outputSize);
-    }
-    else
-    {
-        retval = SEOS_ERROR_INVALID_HANDLE;
-    }
-    return retval;
+    return (SeosCrypto_findHandle(&self->cipherHandleVector, cipherHandle) == -1) ?
+           SEOS_ERROR_INVALID_HANDLE :
+           SeosCryptoCipher_update(cipherHandle, input, inputSize, output, outputSize);
 }
 
 seos_err_t
-SeosCrypto_cipherUpdateAd(SeosCryptoCtx*          api,
-                          SeosCrypto_CipherHandle cipherHandle,
-                          const void*             input,
-                          size_t                  inputSize)
+SeosCrypto_cipherStart(SeosCryptoCtx*          api,
+                       SeosCrypto_CipherHandle cipherHandle,
+                       const void*             input,
+                       size_t                  inputSize)
 {
     SeosCrypto* self = (SeosCrypto*) api;
-    Debug_ASSERT_SELF(self);
-    Debug_ASSERT(self->parent.vtable == &SeosCrypto_vtable);
 
-    seos_err_t retval = SEOS_SUCCESS;
+    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
 
-    size_t handlePos = SeosCrypto_findHandle(&self->cipherHandleVector,
-                                             cipherHandle);
-    if (handlePos != -1)
-    {
-        retval = SeosCryptoCipher_updateAd(cipherHandle,
-                                           input, inputSize);
-    }
-    else
-    {
-        retval = SEOS_ERROR_INVALID_HANDLE;
-    }
-    return retval;
+    return (SeosCrypto_findHandle(&self->cipherHandleVector, cipherHandle) == -1) ?
+           SEOS_ERROR_INVALID_HANDLE :
+           SeosCryptoCipher_start(cipherHandle, input, inputSize);
 }
 
 seos_err_t
 SeosCrypto_cipherFinalize(SeosCryptoCtx*            api,
                           SeosCrypto_CipherHandle   cipherHandle,
-                          void**                    output,
-                          size_t*                   outputSize)
+                          void*                     buf,
+                          size_t*                   bufSize)
 {
     SeosCrypto* self = (SeosCrypto*) api;
-    Debug_ASSERT_SELF(self);
-    Debug_ASSERT(self->parent.vtable == &SeosCrypto_vtable);
 
-    seos_err_t retval = SEOS_SUCCESS;
+    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
 
-    size_t handlePos = SeosCrypto_findHandle(&self->cipherHandleVector,
-                                             cipherHandle);
-    if (handlePos != -1)
-    {
-        retval = SeosCryptoCipher_finalize(cipherHandle,
-                                           output, outputSize);
-    }
-    else
-    {
-        retval = SEOS_ERROR_INVALID_HANDLE;
-    }
-    return retval;
+    return (SeosCrypto_findHandle(&self->cipherHandleVector, cipherHandle) == -1) ?
+           SEOS_ERROR_INVALID_HANDLE :
+           SeosCryptoCipher_finalize(cipherHandle, buf, bufSize);
 }
-
-
-seos_err_t
-SeosCrypto_cipherVerifyTag(SeosCryptoCtx*            api,
-                           SeosCrypto_CipherHandle   cipherHandle,
-                           const void*               tag,
-                           size_t                    tagSize)
-{
-    SeosCrypto* self = (SeosCrypto*) api;
-    Debug_ASSERT_SELF(self);
-    Debug_ASSERT(self->parent.vtable == &SeosCrypto_vtable);
-
-    seos_err_t retval = SEOS_SUCCESS;
-
-    size_t handlePos = SeosCrypto_findHandle(&self->cipherHandleVector,
-                                             cipherHandle);
-    if (handlePos != -1)
-    {
-        retval = SeosCryptoCipher_verifyTag(cipherHandle,
-                                            tag, tagSize);
-    }
-    else
-    {
-        retval = SEOS_ERROR_INVALID_HANDLE;
-    }
-    return retval;
-}
-

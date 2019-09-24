@@ -18,8 +18,10 @@
 #include "mbedtls/gcm.h"
 
 #define SeosCryptoCipher_OUTPUT_BUFFER_SIZE     PAGE_SIZE
-#define SeosCryptoCipher_TAG_BUFFER_SIZE        16
 #define SeosCryptoCipher_AES_BLOCK_SIZE         16
+#define SeosCryptoCipher_AES_CBC_IV_SIZE        16
+#define SeosCryptoCipher_AES_GCM_IV_SIZE        12
+#define SeosCryptoCipher_AES_GCM_TAG_SIZE       16
 
 typedef enum
 {
