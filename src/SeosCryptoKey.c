@@ -227,16 +227,24 @@ genImpl(SeosCryptoKey*      self,
         SeosCryptoRng*      rng)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
-    void* ptr;
-
-    ptr = self->keyBytes;
-    self->keySize = self->bits >> 3;
 
     switch (self->type)
     {
     case SeosCryptoKey_Type_AES:
-        retval = SeosCryptoRng_getBytes(rng, &ptr, self->keySize);
+    {
+        SeosCryptoKey_AES* key = (SeosCryptoKey_AES*) self->keyBytes;
+        key->len = self->bits >> 3;
+        /*todo: remove void* cast since it is fixed in the newer version
+                of the library*/
+        void* ptr = self->keyBytes;
+        retval = SeosCryptoRng_getBytes(rng, &ptr, key->len);
+
+        if (retval == SEOS_SUCCESS)
+        {
+            self->empty = false;
+        }
         break;
+    }
     default:
         retval = SEOS_ERROR_NOT_SUPPORTED;
     }
@@ -418,6 +426,12 @@ genPairImpl(SeosCryptoKey*  prvKey,
         break;
     default:
         retval = SEOS_ERROR_NOT_SUPPORTED;
+    }
+
+    if (retval == SEOS_SUCCESS)
+    {
+        pubKey->empty = false;
+        prvKey->empty = false;
     }
 
     return retval;
