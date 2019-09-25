@@ -172,14 +172,14 @@ initImpl(SeosCryptoKey*             self,
         keySize = sizeof(SeosCryptoKey_RSAPub);
         break;
     case SeosCryptoKey_Type_DH_PRV:
-        if (self->bits > (SeosCryptoKey_Size_DH_PRV * 8))
+        if (self->bits > (SeosCryptoKey_Size_DH_PRV * 8) || self->bits < 64)
         {
             return SEOS_ERROR_INVALID_PARAMETER;
         }
         keySize = sizeof(SeosCryptoKey_DHPrv);
         break;
     case SeosCryptoKey_Type_DH_PUB:
-        if (self->bits > (SeosCryptoKey_Size_DH_PUB * 8))
+        if (self->bits > (SeosCryptoKey_Size_DH_PUB * 8) || self->bits < 64)
         {
             return SEOS_ERROR_INVALID_PARAMETER;
         }
@@ -506,7 +506,7 @@ SeosCryptoKey_generate(SeosCryptoKey*      self,
     }
     else if (!self->empty)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return SEOS_ERROR_ABORTED;
     }
 
     retval = genImpl(self, rng);
@@ -529,7 +529,7 @@ SeosCryptoKey_generatePair(SeosCryptoKey*  prvKey,
     }
     else if (!prvKey->empty || !pubKey->empty)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return SEOS_ERROR_ABORTED;
     }
 
     retval = genPairImpl(prvKey, pubKey, rng);
@@ -545,16 +545,15 @@ SeosCryptoKey_import(SeosCryptoKey*         self,
                      const size_t           keySize)
 {
     if (NULL == self || NULL == self->keyBytes || 0 == self->keySize
-        || NULL == keyBytes || 0 == keySize)
+        || NULL == keyBytes || 0 == keySize || keySize != self->keySize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    // Can we store the key (e.g. have we allocated the correct amount of bytes
-    // and do we not already hold a key?)
-    if (keySize != self->keySize || !self->empty)
+    else if (!self->empty)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return SEOS_ERROR_ABORTED;
     }
+
     // Make sure the imported key has the key length the user set when he
     // instantiated the key in the first place..
     if (getEffectiveKeylength(self->type, keyBytes) != self->bits)
@@ -576,15 +575,17 @@ SeosCryptoKey_export(SeosCryptoKey*         self,
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    // Is there any actual key material?
-    if (self->empty)
+    else if (self->empty)
     {
-        return SEOS_ERROR_NOT_FOUND;
+        return SEOS_ERROR_ABORTED;
     }
-    // Can we export the key without wrapping?
-    if (NULL == wrapKey && !(self->flags & SeosCryptoKey_Flags_EXPORTABLE_RAW))
+    else if (!(self->flags & SeosCryptoKey_Flags_EXPORTABLE_RAW))
     {
         return SEOS_ERROR_ACCESS_DENIED;
+    }
+    else if (NULL != wrapKey)
+    {
+        return SEOS_ERROR_NOT_SUPPORTED;
     }
 
     return exportImpl(self, wrapKey, buf, bufSize);

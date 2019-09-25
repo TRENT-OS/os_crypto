@@ -78,7 +78,7 @@ setKeyImpl(SeosCryptoAgreement*            self)
                  SeosCryptoKey_writeSECP256r1Prv(self->prvKey, &self->mbedtls.ecdh);
         break;
     default:
-        retval = SEOS_ERROR_INVALID_PARAMETER;
+        retval = SEOS_ERROR_NOT_SUPPORTED;
     }
 
     return retval;
@@ -128,7 +128,7 @@ agreeImpl(SeosCryptoAgreement*    self,
         }
         break;
     default:
-        retval = SEOS_ERROR_INVALID_PARAMETER;
+        retval = SEOS_ERROR_NOT_SUPPORTED;
     }
 
     *bufSize = outLen;

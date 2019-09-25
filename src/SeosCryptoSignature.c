@@ -56,34 +56,31 @@ freeImpl(SeosCryptoSignature*       self,
 static seos_err_t
 setKeyImpl(SeosCryptoSignature* self)
 {
-    seos_err_t retval = SEOS_SUCCESS;
+    seos_err_t retval;
 
-    if (NULL != self->pubKey)
+    retval = SEOS_SUCCESS;
+    switch (self->algorithm)
     {
-        switch (self->pubKey->type)
+    case SeosCryptoSignature_Algorithm_RSA_PKCS1:
+        if (NULL != self->pubKey)
         {
-        case SeosCryptoKey_Type_RSA_PUB:
-            retval = (self->algorithm != SeosCryptoSignature_Algorithm_RSA_PKCS1) ?
-                     SEOS_ERROR_ABORTED :
-                     SeosCryptoKey_writeRSAPub(self->pubKey, &self->mbedtls.rsa);
-            break;
-        default:
-            retval = SEOS_ERROR_NOT_SUPPORTED;
+            if (self->pubKey->type != SeosCryptoKey_Type_RSA_PUB)
+            {
+                return SEOS_ERROR_INVALID_PARAMETER;
+            }
+            retval = SeosCryptoKey_writeRSAPub(self->pubKey, &self->mbedtls.rsa);
         }
-    }
-
-    if (SEOS_SUCCESS == retval && NULL != self->prvKey)
-    {
-        switch (self->prvKey->type)
+        if (SEOS_SUCCESS == retval && NULL != self->prvKey)
         {
-        case SeosCryptoKey_Type_RSA_PRV:
-            retval = (self->algorithm != SeosCryptoSignature_Algorithm_RSA_PKCS1) ?
-                     SEOS_ERROR_ABORTED :
-                     SeosCryptoKey_writeRSAPrv(self->prvKey, &self->mbedtls.rsa);
-            break;
-        default:
-            retval = SEOS_ERROR_NOT_SUPPORTED;
+            if (self->prvKey->type != SeosCryptoKey_Type_RSA_PRV)
+            {
+                return SEOS_ERROR_INVALID_PARAMETER;
+            }
+            retval = SeosCryptoKey_writeRSAPrv(self->prvKey, &self->mbedtls.rsa);
         }
+        break;
+    default:
+        retval = SEOS_ERROR_NOT_SUPPORTED;
     }
 
     return retval;
@@ -109,10 +106,9 @@ verifyHashImpl(SeosCryptoSignature* self,
         }
         else
         {
-            retval = (self->pubKey->type != SeosCryptoKey_Type_RSA_PUB)
-                     || mbedtls_rsa_pkcs1_verify(&self->mbedtls.rsa, rngFunc, rng,
-                                                 MBEDTLS_RSA_PUBLIC, MBEDTLS_MD_NONE, hashSize,
-                                                 hash, signature) != 0 ?
+            retval = mbedtls_rsa_pkcs1_verify(&self->mbedtls.rsa, rngFunc, rng,
+                                              MBEDTLS_RSA_PUBLIC, MBEDTLS_MD_NONE, hashSize,
+                                              hash, signature) != 0 ?
                      SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         }
         break;
@@ -143,10 +139,9 @@ signHashImpl(SeosCryptoSignature*   self,
         }
         else
         {
-            retval = (self->prvKey->type != SeosCryptoKey_Type_RSA_PRV)
-                     ||  mbedtls_rsa_pkcs1_sign(&self->mbedtls.rsa, rngFunc, rng,
-                                                MBEDTLS_RSA_PRIVATE, MBEDTLS_MD_NONE, hashSize,
-                                                hash, signature) != 0 ?
+            retval = mbedtls_rsa_pkcs1_sign(&self->mbedtls.rsa, rngFunc, rng,
+                                            MBEDTLS_RSA_PRIVATE, MBEDTLS_MD_NONE, hashSize,
+                                            hash, signature) != 0 ?
                      SEOS_ERROR_ABORTED : SEOS_SUCCESS;
             if (retval == SEOS_SUCCESS)
             {

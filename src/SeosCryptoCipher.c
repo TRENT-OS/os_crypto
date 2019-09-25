@@ -86,13 +86,10 @@ setKeyImpl(SeosCryptoCipher* self)
     case SeosCryptoCipher_Algorithm_AES_CBC_DEC:
     case SeosCryptoCipher_Algorithm_AES_GCM_ENC:
     case SeosCryptoCipher_Algorithm_AES_GCM_DEC:
-        if (SeosCryptoKey_Type_AES != self->key->type)
+        if (SeosCryptoKey_Type_AES != self->key->type ||
+            (aesKey = SeosCryptoKey_getAES(self->key)) == NULL)
         {
-            return SEOS_ERROR_NOT_SUPPORTED;
-        }
-        else if ((aesKey = SeosCryptoKey_getAES(self->key)) == NULL)
-        {
-            return SEOS_ERROR_NOT_SUPPORTED;
+            return SEOS_ERROR_INVALID_PARAMETER;
         }
         break;
     default:
@@ -122,7 +119,6 @@ setKeyImpl(SeosCryptoCipher* self)
         break;
     default:
         retval = SEOS_ERROR_NOT_SUPPORTED;
-        break;
     }
 
     return retval;
@@ -194,7 +190,6 @@ processImpl(SeosCryptoCipher*    self,
                 size_t offs;
                 int mode = (self->algorithm == SeosCryptoCipher_Algorithm_AES_ECB_ENC) ?
                            MBEDTLS_AES_ENCRYPT : MBEDTLS_AES_DECRYPT;
-
                 retval = SEOS_SUCCESS;
                 for (offs = 0; offs < inputSize; offs += SeosCryptoCipher_AES_BLOCK_SIZE)
                 {
@@ -265,7 +260,7 @@ startImpl(SeosCryptoCipher* self,
         mode = MBEDTLS_GCM_DECRYPT;
         break;
     default:
-        return SEOS_ERROR_NOT_SUPPORTED;
+        return SEOS_ERROR_ABORTED;
     }
 
     return self->started || self->processed || self->finalized ||
