@@ -87,7 +87,7 @@ cleanup:
 
 static size_t
 getMpiLen(const unsigned char*  xVal,
-          size_t                xLen)
+          const size_t          xLen)
 {
     mbedtls_mpi x;
     size_t n;
@@ -103,8 +103,8 @@ getMpiLen(const unsigned char*  xVal,
 }
 
 static size_t
-getEffectiveKeylength(unsigned int  type,
-                      const void*   keyBytes)
+getEffectiveKeylength(const SeosCryptoKey_Type  type,
+                      const void*               keyBytes)
 {
     switch (type)
     {
@@ -143,8 +143,8 @@ getEffectiveKeylength(unsigned int  type,
 }
 
 static seos_err_t
-initImpl(SeosCryptoKey*               self,
-         SeosCrypto_MemIf*            memIf)
+initImpl(SeosCryptoKey*             self,
+         const SeosCrypto_MemIf*    memIf)
 {
     size_t keySize;
 
@@ -209,8 +209,8 @@ initImpl(SeosCryptoKey*               self,
 }
 
 static seos_err_t
-freeImpl(SeosCryptoKey*               self,
-         SeosCrypto_MemIf*            memIf)
+freeImpl(SeosCryptoKey*             self,
+         const SeosCrypto_MemIf*    memIf)
 {
     // We may have stored sensitive key data here, better make sure to remove it.
     if (!self->empty)
@@ -430,10 +430,10 @@ genPairImpl(SeosCryptoKey*  prvKey,
 }
 
 static seos_err_t
-importImpl(SeosCryptoKey*        self,
-           SeosCryptoKey*        wrapKey,
-           const void*           keyBytes,
-           size_t                keySize)
+importImpl(SeosCryptoKey*       self,
+           const SeosCryptoKey* wrapKey,
+           const void*          keyBytes,
+           const size_t         keySize)
 {
     if (NULL != wrapKey)
     {
@@ -448,10 +448,10 @@ importImpl(SeosCryptoKey*        self,
 }
 
 static seos_err_t
-exportImpl(SeosCryptoKey*        self,
-           SeosCryptoKey*        wrapKey,
-           void*                 buf,
-           size_t*               bufSize)
+exportImpl(SeosCryptoKey*       self,
+           const SeosCryptoKey* wrapKey,
+           void*                buf,
+           size_t*              bufSize)
 {
     if (NULL != wrapKey)
     {
@@ -474,10 +474,10 @@ exportImpl(SeosCryptoKey*        self,
 
 seos_err_t
 SeosCryptoKey_init(SeosCryptoKey*               self,
-                   SeosCrypto_MemIf*            memIf,
-                   SeosCryptoKey_Type           type,
-                   SeosCryptoKey_Flags          flags,
-                   size_t                       bits)
+                   const SeosCrypto_MemIf*      memIf,
+                   const SeosCryptoKey_Type     type,
+                   const SeosCryptoKey_Flags    flags,
+                   const size_t                 bits)
 {
     if (NULL == memIf || NULL == self)
     {
@@ -539,10 +539,10 @@ SeosCryptoKey_generatePair(SeosCryptoKey*  prvKey,
 }
 
 seos_err_t
-SeosCryptoKey_import(SeosCryptoKey*        self,
-                     SeosCryptoKey*        wrapKey,
-                     const void*           keyBytes,
-                     size_t                keySize)
+SeosCryptoKey_import(SeosCryptoKey*         self,
+                     const SeosCryptoKey*   wrapKey,
+                     const void*            keyBytes,
+                     const size_t           keySize)
 {
     if (NULL == self || NULL == self->keyBytes || 0 == self->keySize
         || NULL == keyBytes || 0 == keySize)
@@ -566,10 +566,10 @@ SeosCryptoKey_import(SeosCryptoKey*        self,
 }
 
 seos_err_t
-SeosCryptoKey_export(SeosCryptoKey*        self,
-                     SeosCryptoKey*        wrapKey,
-                     void*                 buf,
-                     size_t*               bufSize)
+SeosCryptoKey_export(SeosCryptoKey*         self,
+                     const SeosCryptoKey*   wrapKey,
+                     void*                  buf,
+                     size_t*                bufSize)
 {
     if (NULL == self || NULL == self->keyBytes || 0 == self->keySize || NULL == buf
         || NULL == bufSize || 0 == bufSize)
@@ -591,8 +591,8 @@ SeosCryptoKey_export(SeosCryptoKey*        self,
 }
 
 seos_err_t
-SeosCryptoKey_free(SeosCryptoKey*             self,
-                   SeosCrypto_MemIf*          memIf)
+SeosCryptoKey_free(SeosCryptoKey*           self,
+                   const SeosCrypto_MemIf*  memIf)
 {
     if (NULL == memIf || NULL == self || NULL == self->keyBytes)
     {

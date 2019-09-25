@@ -23,10 +23,10 @@
  *
  */
 seos_err_t
-SeosCryptoAgreement_init(SeosCryptoAgreement*              self,
-                         SeosCrypto_MemIf*                 memIf,
-                         SeosCryptoAgreement_Algorithm     algorithm,
-                         SeosCryptoKey*                    privateKey);
+SeosCryptoAgreement_init(SeosCryptoAgreement*                   self,
+                         const SeosCrypto_MemIf*                memIf,
+                         const SeosCryptoAgreement_Algorithm    algorithm,
+                         const SeosCryptoKey*                   privateKey);
 
 /**
  * @brief Computes a shared secret
@@ -35,7 +35,7 @@ SeosCryptoAgreement_init(SeosCryptoAgreement*              self,
 seos_err_t
 SeosCryptoAgreement_agree(SeosCryptoAgreement*  self,
                           SeosCryptoRng*        rng,
-                          SeosCryptoKey*        pubKey,
+                          const SeosCryptoKey*  pubKey,
                           void*                 shared,
                           size_t*               sharedSize);
 
@@ -44,7 +44,7 @@ SeosCryptoAgreement_agree(SeosCryptoAgreement*  self,
  *
  */
 seos_err_t
-SeosCryptoAgreement_free(SeosCryptoAgreement*        self,
-                         SeosCrypto_MemIf*           memIf);
+SeosCryptoAgreement_free(SeosCryptoAgreement*       self,
+                         const SeosCrypto_MemIf*    memIf);
 
 /** @} */

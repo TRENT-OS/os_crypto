@@ -11,8 +11,8 @@
 // Private Functions -----------------------------------------------------------
 
 static seos_err_t
-initImpl(SeosCryptoDigest*   self,
-         SeosCrypto_MemIf*   memIf)
+initImpl(SeosCryptoDigest*          self,
+         const SeosCrypto_MemIf*    memIf)
 {
     UNUSED_VAR(memIf);
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -37,8 +37,8 @@ initImpl(SeosCryptoDigest*   self,
 }
 
 static seos_err_t
-freeImpl(SeosCryptoDigest*   self,
-         SeosCrypto_MemIf*   memIf)
+freeImpl(SeosCryptoDigest*          self,
+         const SeosCrypto_MemIf*    memIf)
 {
     UNUSED_VAR(memIf);
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -101,9 +101,9 @@ finalizeImpl(SeosCryptoDigest*  self,
 }
 
 static seos_err_t
-updateImpl(SeosCryptoDigest*        self,
-           const void*              data,
-           size_t                   len)
+processImpl(SeosCryptoDigest*    self,
+            const void*          data,
+            const size_t         len)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -126,9 +126,9 @@ updateImpl(SeosCryptoDigest*        self,
 // Public Functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoDigest_init(SeosCryptoDigest*              self,
-                      SeosCrypto_MemIf*              memIf,
-                      SeosCryptoDigest_Algorithm     algorithm)
+SeosCryptoDigest_init(SeosCryptoDigest*                 self,
+                      const SeosCrypto_MemIf*           memIf,
+                      const SeosCryptoDigest_Algorithm  algorithm)
 {
     if (NULL == memIf || NULL == self)
     {
@@ -138,15 +138,15 @@ SeosCryptoDigest_init(SeosCryptoDigest*              self,
     memset(self, 0, sizeof(*self));
 
     self->algorithm = algorithm;
-    self->updated   = false;
+    self->processed   = false;
     self->finalized = false;
 
     return initImpl(self, memIf);
 }
 
 seos_err_t
-SeosCryptoDigest_free(SeosCryptoDigest*    self,
-                      SeosCrypto_MemIf*    memIf)
+SeosCryptoDigest_free(SeosCryptoDigest*         self,
+                      const SeosCrypto_MemIf*   memIf)
 {
     if (NULL == memIf || NULL == self)
     {
@@ -157,9 +157,9 @@ SeosCryptoDigest_free(SeosCryptoDigest*    self,
 }
 
 seos_err_t
-SeosCryptoDigest_update(SeosCryptoDigest*    self,
-                        const void*         data,
-                        size_t              len)
+SeosCryptoDigest_process(SeosCryptoDigest*   self,
+                         const void*         data,
+                         const size_t        len)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -169,8 +169,8 @@ SeosCryptoDigest_update(SeosCryptoDigest*    self,
     }
 
     retval = self->finalized ?
-             SEOS_ERROR_ABORTED : updateImpl(self, data, len);
-    self->updated |= (SEOS_SUCCESS == retval);
+             SEOS_ERROR_ABORTED : processImpl(self, data, len);
+    self->processed |= (SEOS_SUCCESS == retval);
 
     return retval;
 }
@@ -187,7 +187,7 @@ SeosCryptoDigest_finalize(SeosCryptoDigest* self,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    retval = !self->updated || self->finalized ?
+    retval = !self->processed || self->finalized ?
              SEOS_ERROR_ABORTED : finalizeImpl(self, digest, digestSize);
     self->finalized |= (SEOS_SUCCESS == retval);
 

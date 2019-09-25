@@ -18,7 +18,7 @@ static const SeosCryptoCtx_Vtable SeosCrypto_vtable =
     .rngReSeed              = SeosCrypto_rngReSeed,
     .digestInit             = SeosCrypto_digestInit,
     .digestFree             = SeosCrypto_digestFree,
-    .digestUpdate           = SeosCrypto_digestUpdate,
+    .digestProcess          = SeosCrypto_digestProcess,
     .digestFinalize         = SeosCrypto_digestFinalize,
     .keyInit                = SeosCrypto_keyInit,
     .keyGenerate            = SeosCrypto_keyGenerate,
@@ -35,7 +35,7 @@ static const SeosCryptoCtx_Vtable SeosCrypto_vtable =
     .agreementAgree         = SeosCrypto_agreementAgree,
     .cipherInit             = SeosCrypto_cipherInit,
     .cipherFree             = SeosCrypto_cipherFree,
-    .cipherUpdate           = SeosCrypto_cipherUpdate,
+    .cipherProcess          = SeosCrypto_cipherProcess,
     .cipherStart            = SeosCrypto_cipherStart,
     .cipherFinalize         = SeosCrypto_cipherFinalize,
     .free                   = SeosCrypto_free
@@ -121,7 +121,7 @@ SeosCrypto_init(SeosCrypto*             self,
     if (NULL != entropyFunc)
     {
         if ((retval = SeosCryptoRng_init(&self->cryptoRng, &self->memIf,
-                                         entropyFunc, entropyCtx)) != SEOS_SUCCESS)
+                                         (const SeosCrypto_EntropyFunc*) entropyFunc, entropyCtx)) != SEOS_SUCCESS)
         {
             goto err4;
         }
@@ -168,10 +168,10 @@ SeosCrypto_free(SeosCryptoCtx* api)
 // -------------------------------- RNG API ------------------------------------
 
 seos_err_t
-SeosCrypto_rngGetBytes(SeosCryptoCtx*   api,
-                       unsigned int     flags,
-                       void*            buf,
-                       size_t           bufLen)
+SeosCrypto_rngGetBytes(SeosCryptoCtx*               api,
+                       const SeosCryptoRng_Flags    flags,
+                       void*                        buf,
+                       const size_t                 bufLen)
 {
     SeosCrypto* self = (SeosCrypto*) api;
 
@@ -184,9 +184,9 @@ SeosCrypto_rngGetBytes(SeosCryptoCtx*   api,
 }
 
 seos_err_t
-SeosCrypto_rngReSeed(SeosCryptoCtx*     api,
-                     const void*        seed,
-                     size_t             seedLen)
+SeosCrypto_rngReSeed(SeosCryptoCtx* api,
+                     const void*    seed,
+                     const size_t   seedLen)
 {
     SeosCrypto* self = (SeosCrypto*) api;
 
@@ -201,9 +201,9 @@ SeosCrypto_rngReSeed(SeosCryptoCtx*     api,
 // ------------------------------ Digest API -----------------------------------
 
 seos_err_t
-SeosCrypto_digestInit(SeosCryptoCtx*                api,
-                      SeosCrypto_DigestHandle*      pDigestHandle,
-                      unsigned                      algorithm)
+SeosCrypto_digestInit(SeosCryptoCtx*                    api,
+                      SeosCrypto_DigestHandle*          pDigestHandle,
+                      const SeosCryptoDigest_Algorithm  algorithm)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCrypto* self = (SeosCrypto*) api;
@@ -241,8 +241,8 @@ err0:
 }
 
 seos_err_t
-SeosCrypto_digestFree(SeosCryptoCtx*           api,
-                      SeosCrypto_DigestHandle  digestHandle)
+SeosCrypto_digestFree(SeosCryptoCtx*                api,
+                      const SeosCrypto_DigestHandle digestHandle)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCrypto* self = (SeosCrypto*) api;
@@ -272,10 +272,10 @@ SeosCrypto_digestFree(SeosCryptoCtx*           api,
 }
 
 seos_err_t
-SeosCrypto_digestUpdate(SeosCryptoCtx*           api,
-                        SeosCrypto_DigestHandle  digestHandle,
-                        const void*              data,
-                        size_t                   len)
+SeosCrypto_digestProcess(SeosCryptoCtx*                  api,
+                         const SeosCrypto_DigestHandle   digestHandle,
+                         const void*                     data,
+                         const size_t                    len)
 {
     SeosCrypto* self = (SeosCrypto*) api;
 
@@ -286,14 +286,14 @@ SeosCrypto_digestUpdate(SeosCryptoCtx*           api,
 
     return SeosCrypto_findHandle(&self->digestHandleVector, digestHandle) == -1 ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoDigest_update(digestHandle, data, len);
+           SeosCryptoDigest_process(digestHandle, data, len);
 }
 
 seos_err_t
-SeosCrypto_digestFinalize(SeosCryptoCtx*          api,
-                          SeosCrypto_DigestHandle digestHandle,
-                          void*                   digest,
-                          size_t*                 digestSize)
+SeosCrypto_digestFinalize(SeosCryptoCtx*                api,
+                          const SeosCrypto_DigestHandle digestHandle,
+                          void*                         digest,
+                          size_t*                       digestSize)
 {
     SeosCrypto* self = (SeosCrypto*) api;
 
@@ -310,11 +310,11 @@ SeosCrypto_digestFinalize(SeosCryptoCtx*          api,
 // ----------------------------- Signature API ---------------------------------
 
 seos_err_t
-SeosCrypto_signatureInit(SeosCryptoCtx*                api,
-                         SeosCrypto_SignatureHandle*   pSigHandle,
-                         unsigned int                  algorithm,
-                         SeosCrypto_KeyHandle          prvHandle,
-                         SeosCrypto_KeyHandle          pubHandle)
+SeosCrypto_signatureInit(SeosCryptoCtx*                         api,
+                         SeosCrypto_SignatureHandle*            pSigHandle,
+                         const SeosCryptoSignature_Algorithm    algorithm,
+                         const SeosCrypto_KeyHandle             prvHandle,
+                         const SeosCrypto_KeyHandle             pubHandle)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCrypto* self = (SeosCrypto*) api;
@@ -352,8 +352,8 @@ err0:
 }
 
 seos_err_t
-SeosCrypto_signatureFree(SeosCryptoCtx*               api,
-                         SeosCrypto_SignatureHandle   sigHandle)
+SeosCrypto_signatureFree(SeosCryptoCtx*                     api,
+                         const SeosCrypto_SignatureHandle   sigHandle)
 {
     seos_err_t retval = SEOS_SUCCESS;
     SeosCrypto* self = (SeosCrypto*) api;
@@ -383,12 +383,12 @@ SeosCrypto_signatureFree(SeosCryptoCtx*               api,
 }
 
 seos_err_t
-SeosCrypto_signatureSign(SeosCryptoCtx*                 api,
-                         SeosCrypto_SignatureHandle     sigHandle,
-                         const void*                    hash,
-                         size_t                         hashSize,
-                         void*                          signature,
-                         size_t*                        signatureSize)
+SeosCrypto_signatureSign(SeosCryptoCtx*                     api,
+                         const SeosCrypto_SignatureHandle   sigHandle,
+                         const void*                        hash,
+                         const size_t                       hashSize,
+                         void*                              signature,
+                         size_t*                            signatureSize)
 {
     SeosCrypto* self = (SeosCrypto*) api;
 
@@ -403,12 +403,12 @@ SeosCrypto_signatureSign(SeosCryptoCtx*                 api,
 }
 
 seos_err_t
-SeosCrypto_signatureVerify(SeosCryptoCtx*                 api,
-                           SeosCrypto_SignatureHandle     sigHandle,
-                           const void*                    hash,
-                           size_t                         hashSize,
-                           const void*                    signature,
-                           size_t                         signatureSize)
+SeosCrypto_signatureVerify(SeosCryptoCtx*                   api,
+                           const SeosCrypto_SignatureHandle sigHandle,
+                           const void*                      hash,
+                           const size_t                     hashSize,
+                           const void*                      signature,
+                           const size_t                     signatureSize)
 {
     SeosCrypto* self = (SeosCrypto*) api;
 
@@ -425,10 +425,10 @@ SeosCrypto_signatureVerify(SeosCryptoCtx*                 api,
 // ----------------------------- Agreement API ---------------------------------
 
 seos_err_t
-SeosCrypto_agreementInit(SeosCryptoCtx*                api,
-                         SeosCrypto_AgreementHandle*   pAgrHandle,
-                         unsigned int                  algorithm,
-                         SeosCrypto_KeyHandle          prvHandle)
+SeosCrypto_agreementInit(SeosCryptoCtx*                         api,
+                         SeosCrypto_AgreementHandle*            pAgrHandle,
+                         const SeosCryptoAgreement_Algorithm    algorithm,
+                         const SeosCrypto_KeyHandle             prvHandle)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCrypto* self = (SeosCrypto*) api;
@@ -469,8 +469,8 @@ err0:
 }
 
 seos_err_t
-SeosCrypto_agreementFree(SeosCryptoCtx*               api,
-                         SeosCrypto_AgreementHandle   agrHandle)
+SeosCrypto_agreementFree(SeosCryptoCtx*                     api,
+                         const SeosCrypto_AgreementHandle   agrHandle)
 {
     seos_err_t retval = SEOS_SUCCESS;
     SeosCrypto* self = (SeosCrypto*) api;
@@ -497,11 +497,11 @@ SeosCrypto_agreementFree(SeosCryptoCtx*               api,
 }
 
 seos_err_t
-SeosCrypto_agreementAgree(SeosCryptoCtx*                 api,
-                          SeosCrypto_AgreementHandle     agrHandle,
-                          SeosCrypto_KeyHandle           pubHandle,
-                          void*                          shared,
-                          size_t*                        sharedSize)
+SeosCrypto_agreementAgree(SeosCryptoCtx*                    api,
+                          const SeosCrypto_AgreementHandle  agrHandle,
+                          const SeosCrypto_KeyHandle        pubHandle,
+                          void*                             shared,
+                          size_t*                           sharedSize)
 {
     SeosCrypto* self = (SeosCrypto*) api;
 
@@ -519,11 +519,11 @@ SeosCrypto_agreementAgree(SeosCryptoCtx*                 api,
 // -------------------------------- Key API ------------------------------------
 
 seos_err_t
-SeosCrypto_keyInit(SeosCryptoCtx*                   api,
-                   SeosCrypto_KeyHandle*            pKeyHandle,
-                   unsigned int                     type,
-                   SeosCryptoKey_Flags               flags,
-                   size_t                           bits)
+SeosCrypto_keyInit(SeosCryptoCtx*               api,
+                   SeosCrypto_KeyHandle*        pKeyHandle,
+                   const SeosCryptoKey_Type     type,
+                   const SeosCryptoKey_Flags    flags,
+                   const size_t                 bits)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCrypto* self = (SeosCrypto*) api;
@@ -565,7 +565,7 @@ exit:
 
 seos_err_t
 SeosCrypto_keyGenerate(SeosCryptoCtx*               api,
-                       SeosCrypto_KeyHandle         keyHandle)
+                       const SeosCrypto_KeyHandle   keyHandle)
 {
     SeosCrypto* self = (SeosCrypto*) api;
 
@@ -580,9 +580,9 @@ SeosCrypto_keyGenerate(SeosCryptoCtx*               api,
 }
 
 seos_err_t
-SeosCrypto_keyGeneratePair(SeosCryptoCtx*           api,
-                           SeosCrypto_KeyHandle     prvKeyHandle,
-                           SeosCrypto_KeyHandle     pubKeyHandle)
+SeosCrypto_keyGeneratePair(SeosCryptoCtx*               api,
+                           const SeosCrypto_KeyHandle   prvKeyHandle,
+                           const SeosCrypto_KeyHandle   pubKeyHandle)
 {
     SeosCrypto* self = (SeosCrypto*) api;
 
@@ -598,11 +598,11 @@ SeosCrypto_keyGeneratePair(SeosCryptoCtx*           api,
 }
 
 seos_err_t
-SeosCrypto_keyImport(SeosCryptoCtx*                 api,
-                     SeosCrypto_KeyHandle           keyHandle,
-                     SeosCrypto_KeyHandle           wrapKeyHandle,
-                     const void*                    keyBytes,
-                     size_t                         keySize)
+SeosCrypto_keyImport(SeosCryptoCtx*             api,
+                     const SeosCrypto_KeyHandle keyHandle,
+                     const SeosCrypto_KeyHandle wrapKeyHandle,
+                     const void*                keyBytes,
+                     const size_t               keySize)
 {
     SeosCrypto* self = (SeosCrypto*) api;
 
@@ -627,11 +627,11 @@ SeosCrypto_keyImport(SeosCryptoCtx*                 api,
 }
 
 seos_err_t
-SeosCrypto_keyExport(SeosCryptoCtx*                 api,
-                     SeosCrypto_KeyHandle           keyHandle,
-                     SeosCrypto_KeyHandle           wrapKeyHandle,
-                     void*                          buf,
-                     size_t*                        bufSize)
+SeosCrypto_keyExport(SeosCryptoCtx*             api,
+                     const SeosCrypto_KeyHandle keyHandle,
+                     const SeosCrypto_KeyHandle wrapKeyHandle,
+                     void*                      buf,
+                     size_t*                    bufSize)
 {
     SeosCrypto* self = (SeosCrypto*) api;
 
@@ -656,8 +656,8 @@ SeosCrypto_keyExport(SeosCryptoCtx*                 api,
 }
 
 seos_err_t
-SeosCrypto_keyFree(SeosCryptoCtx*                 api,
-                   SeosCrypto_KeyHandle           keyHandle)
+SeosCrypto_keyFree(SeosCryptoCtx*               api,
+                   const SeosCrypto_KeyHandle   keyHandle)
 {
     seos_err_t retval = SEOS_SUCCESS;
     SeosCrypto* self = (SeosCrypto*) api;
@@ -689,12 +689,12 @@ SeosCrypto_keyFree(SeosCryptoCtx*                 api,
 // ------------------------------ Cipher API -----------------------------------
 
 seos_err_t
-SeosCrypto_cipherInit(SeosCryptoCtx*                api,
-                      SeosCrypto_CipherHandle*      pCipherHandle,
-                      unsigned int                  algorithm,
-                      SeosCrypto_KeyHandle          key,
-                      const void*                   iv,
-                      size_t                        ivLen)
+SeosCrypto_cipherInit(SeosCryptoCtx*                    api,
+                      SeosCrypto_CipherHandle*          pCipherHandle,
+                      const SeosCryptoCipher_Algorithm  algorithm,
+                      const SeosCrypto_KeyHandle        key,
+                      const void*                       iv,
+                      const size_t                      ivLen)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCrypto* self = (SeosCrypto*) api;
@@ -739,8 +739,8 @@ err0:
 }
 
 seos_err_t
-SeosCrypto_cipherFree(SeosCryptoCtx*           api,
-                      SeosCrypto_CipherHandle  cipherHandle)
+SeosCrypto_cipherFree(SeosCryptoCtx*                api,
+                      const SeosCrypto_CipherHandle cipherHandle)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCrypto* self = (SeosCrypto*) api;
@@ -770,12 +770,12 @@ SeosCrypto_cipherFree(SeosCryptoCtx*           api,
 }
 
 seos_err_t
-SeosCrypto_cipherUpdate(SeosCryptoCtx*          api,
-                        SeosCrypto_CipherHandle cipherHandle,
-                        const void*             input,
-                        size_t                  inputSize,
-                        void*                   output,
-                        size_t*                 outputSize)
+SeosCrypto_cipherProcess(SeosCryptoCtx*                  api,
+                         const SeosCrypto_CipherHandle   cipherHandle,
+                         const void*                     input,
+                         const size_t                    inputSize,
+                         void*                           output,
+                         size_t*                         outputSize)
 {
     SeosCrypto* self = (SeosCrypto*) api;
 
@@ -786,14 +786,14 @@ SeosCrypto_cipherUpdate(SeosCryptoCtx*          api,
 
     return (SeosCrypto_findHandle(&self->cipherHandleVector, cipherHandle) == -1) ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoCipher_update(cipherHandle, input, inputSize, output, outputSize);
+           SeosCryptoCipher_process(cipherHandle, input, inputSize, output, outputSize);
 }
 
 seos_err_t
-SeosCrypto_cipherStart(SeosCryptoCtx*          api,
-                       SeosCrypto_CipherHandle cipherHandle,
-                       const void*             input,
-                       size_t                  inputSize)
+SeosCrypto_cipherStart(SeosCryptoCtx*                   api,
+                       const SeosCrypto_CipherHandle    cipherHandle,
+                       const void*                      input,
+                       const size_t                     inputSize)
 {
     SeosCrypto* self = (SeosCrypto*) api;
 
@@ -808,10 +808,10 @@ SeosCrypto_cipherStart(SeosCryptoCtx*          api,
 }
 
 seos_err_t
-SeosCrypto_cipherFinalize(SeosCryptoCtx*            api,
-                          SeosCrypto_CipherHandle   cipherHandle,
-                          void*                     buf,
-                          size_t*                   bufSize)
+SeosCrypto_cipherFinalize(SeosCryptoCtx*                    api,
+                          const SeosCrypto_CipherHandle     cipherHandle,
+                          void*                             buf,
+                          size_t*                           bufSize)
 {
     SeosCrypto* self = (SeosCrypto*) api;
 

@@ -146,17 +146,17 @@ SeosCryptoRpc_digestFree(SeosCryptoRpc*            self,
 }
 
 seos_err_t
-SeosCryptoRpc_digestUpdate(SeosCryptoRpc*           self,
-                           SeosCrypto_DigestHandle  digestHandle,
-                           size_t                   inLen)
+SeosCryptoRpc_digestProcess(SeosCryptoRpc*           self,
+                            SeosCrypto_DigestHandle  digestHandle,
+                            size_t                   inLen)
 {
     if (!isValidHandle(self))
     {
         return SEOS_ERROR_INVALID_HANDLE;
     }
 
-    return SeosCrypto_digestUpdate(self->seosCryptoApi, digestHandle,
-                                   self->serverDataport, inLen);
+    return SeosCrypto_digestProcess(self->seosCryptoApi, digestHandle,
+                                    self->serverDataport, inLen);
 }
 
 seos_err_t
@@ -407,10 +407,10 @@ SeosCryptoRpc_cipherFree(SeosCryptoRpc*                self,
 }
 
 seos_err_t
-SeosCryptoRpc_cipherUpdate(SeosCryptoRpc*           self,
-                           SeosCrypto_CipherHandle  cipherHandle,
-                           size_t                   inputLen,
-                           size_t                   bufSize)
+SeosCryptoRpc_cipherProcess(SeosCryptoRpc*           self,
+                            SeosCrypto_CipherHandle  cipherHandle,
+                            size_t                   inputLen,
+                            size_t                   bufSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     size_t outputSize;
@@ -427,8 +427,8 @@ SeosCryptoRpc_cipherUpdate(SeosCryptoRpc*           self,
     outputSize = bufSize;
     memcpy(self->buffer, self->serverDataport, inputLen);
 
-    if ((retval = SeosCrypto_cipherUpdate(self->seosCryptoApi, cipherHandle,
-                                          self->serverDataport, inputLen, self->buffer, &outputSize)) == SEOS_SUCCESS)
+    if ((retval = SeosCrypto_cipherProcess(self->seosCryptoApi, cipherHandle,
+                                           self->serverDataport, inputLen, self->buffer, &outputSize)) == SEOS_SUCCESS)
     {
         retval = writeRpcResult(self, self->buffer, outputSize);
     }

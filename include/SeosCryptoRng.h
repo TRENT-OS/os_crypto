@@ -22,29 +22,29 @@
  *
  */
 seos_err_t
-SeosCryptoRng_init(SeosCryptoRng*           self,
-                   SeosCrypto_MemIf*        memIf,
-                   SeosCrypto_EntropyFunc   entropyFunc,
-                   void*                    entropyCtx);
+SeosCryptoRng_init(SeosCryptoRng*               self,
+                   const SeosCrypto_MemIf*      memIf,
+                   const SeosCrypto_EntropyFunc entropyFunc,
+                   void*                        entropyCtx);
 
 /**
  * @brief Get random bytes
  *
  */
 seos_err_t
-SeosCryptoRng_getBytes(SeosCryptoRng*       self,
-                       SeosCryptoRng_Flags  flags,
-                       void*                buf,
-                       size_t               bufSize);
+SeosCryptoRng_getBytes(SeosCryptoRng*               self,
+                       const SeosCryptoRng_Flags    flags,
+                       void*                        buf,
+                       const size_t                 bufSize);
 
 /**
  * @brief Reseed the RNG with additional bytes
  *
  */
 seos_err_t
-SeosCryptoRng_reSeed(SeosCryptoRng*  self,
-                     const void*     seed,
-                     size_t          seedLen);
+SeosCryptoRng_reSeed(SeosCryptoRng* self,
+                     const void*    seed,
+                     const size_t   seedLen);
 
 /**
  * @brief Get random bytes for mbedTLS wrapper
@@ -58,9 +58,9 @@ SeosCryptoRng_reSeed(SeosCryptoRng*  self,
  *
  */
 INLINE int
-SeosCryptoRng_getBytesMbedtls(void*            self,
-                              unsigned char*   buf,
-                              size_t           bufSize)
+SeosCryptoRng_getBytesMbedtls(void*             self,
+                              unsigned char*    buf,
+                              size_t            bufSize)
 {
     // Simple wrapper for mbedTLS, to allow the buffered use of the getRandomData()
     // function as is common, but also to directly pass a function to mbedTLS
@@ -72,7 +72,7 @@ SeosCryptoRng_getBytesMbedtls(void*            self,
  *
  */
 seos_err_t
-SeosCryptoRng_free(SeosCryptoRng*              self,
-                   SeosCrypto_MemIf*           memIf);
+SeosCryptoRng_free(SeosCryptoRng*           self,
+                   const SeosCrypto_MemIf*  memIf);
 
 /** @} */

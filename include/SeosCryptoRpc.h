@@ -90,13 +90,13 @@ SeosCryptoRpc_digestFree(SeosCryptoRpc*            self,
                          SeosCrypto_DigestHandle   digestHandle);
 
 /**
- * @brief rpc management of SeosCrypto_digestUpdate()
+ * @brief rpc management of SeosCrypto_digestProcess()
  *
  */
 seos_err_t
-SeosCryptoRpc_digestUpdate(SeosCryptoRpc*           self,
-                           SeosCrypto_DigestHandle  digestHandle,
-                           size_t                   inLen);
+SeosCryptoRpc_digestProcess(SeosCryptoRpc*           self,
+                            SeosCrypto_DigestHandle  digestHandle,
+                            size_t                   inLen);
 
 /**
  * @brief rpc management of SeosCrypto_digestFinalize()
@@ -257,14 +257,14 @@ seos_err_t
 SeosCryptoRpc_cipherFree(SeosCryptoRpc*                self,
                          SeosCrypto_CipherHandle       cipherHandle);
 /**
- * @brief rpc management of SeosCrypto_cipherUpdate()
+ * @brief rpc management of SeosCrypto_cipherProcess()
  *
  */
 seos_err_t
-SeosCryptoRpc_cipherUpdate(SeosCryptoRpc*               self,
-                           SeosCrypto_CipherHandle      cipherHandle,
-                           size_t                       inputLen,
-                           size_t                       outputSize);
+SeosCryptoRpc_cipherProcess(SeosCryptoRpc*               self,
+                            SeosCrypto_CipherHandle      cipherHandle,
+                            size_t                       inputLen,
+                            size_t                       outputSize);
 /**
  * @brief rpc management of SeosCrypto_cipherStart()
  *

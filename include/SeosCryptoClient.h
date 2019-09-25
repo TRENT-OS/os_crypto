@@ -89,14 +89,14 @@ SeosCryptoClient_digestFree(SeosCryptoCtx*             api,
                             SeosCrypto_DigestHandle    digestHandle);
 
 /**
- * @brief implements SeosCryptoApi_digestUpdate() in a rpc connection
+ * @brief implements SeosCryptoApi_digestProcess() in a rpc connection
  *
  */
 seos_err_t
-SeosCryptoClient_digestUpdate(SeosCryptoCtx*                api,
-                              SeosCrypto_DigestHandle       digestHandle,
-                              const void*                   data,
-                              size_t                        dataLen);
+SeosCryptoClient_digestProcess(SeosCryptoCtx*                api,
+                               SeosCrypto_DigestHandle       digestHandle,
+                               const void*                   data,
+                               size_t                        dataLen);
 /**
  * @brief implements SeosCryptoApi_digestFinalize() in a rpc connection
  *
@@ -264,16 +264,16 @@ seos_err_t
 SeosCryptoClient_cipherFree(SeosCryptoCtx*             api,
                             SeosCrypto_CipherHandle    cipherHandle);
 /**
- * @brief implements SeosCryptoApi_cipherUpdate() in a rpc connection
+ * @brief implements SeosCryptoApi_cipherProcess() in a rpc connection
  *
  */
 seos_err_t
-SeosCryptoClient_cipherUpdate(SeosCryptoCtx*                api,
-                              SeosCrypto_CipherHandle       cipherHandle,
-                              const void*                   data,
-                              size_t                        dataLen,
-                              void*                         output,
-                              size_t*                       outputSize);
+SeosCryptoClient_cipherProcess(SeosCryptoCtx*                api,
+                               SeosCrypto_CipherHandle       cipherHandle,
+                               const void*                   data,
+                               size_t                        dataLen,
+                               void*                         output,
+                               size_t*                       outputSize);
 
 /**
  * @brief implements SeosCryptoApi_cipherStart() in a rpc connection

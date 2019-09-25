@@ -20,7 +20,7 @@ typedef int (SeosCrypto_EntropyFunc)(void* ctx, unsigned char* buf, size_t len);
 typedef enum
 {
     SeosCryptoRng_Flags_NONE                = 0x0000,
-} SeosCryptoRng_Flags ;
+} SeosCryptoRng_Flags;
 
 typedef struct
 {

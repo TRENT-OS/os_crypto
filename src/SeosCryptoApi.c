@@ -15,10 +15,10 @@ SeosCryptoApi_free(SeosCryptoCtx* ctx)
 // -------------------------------- RNG API ------------------------------------
 
 seos_err_t
-SeosCryptoApi_rngGetBytes(SeosCryptoCtx*    ctx,
-                          unsigned int      flags,
-                          void*             buf,
-                          const size_t      bufSize)
+SeosCryptoApi_rngGetBytes(SeosCryptoCtx*            ctx,
+                          const SeosCryptoRng_Flags flags,
+                          void*                     buf,
+                          const size_t              bufSize)
 {
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
            ctx->vtable->rngGetBytes(ctx, flags, buf, bufSize);
@@ -36,9 +36,9 @@ SeosCryptoApi_rngReSeed(SeosCryptoCtx*      ctx,
 // ------------------------------ Digest API -----------------------------------
 
 seos_err_t
-SeosCryptoApi_digestInit(SeosCryptoCtx*              ctx,
-                         SeosCrypto_DigestHandle*    pDigestHandle,
-                         const unsigned int          algorithm)
+SeosCryptoApi_digestInit(SeosCryptoCtx*                     ctx,
+                         SeosCrypto_DigestHandle*           pDigestHandle,
+                         const SeosCryptoDigest_Algorithm   algorithm)
 {
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
            ctx->vtable->digestInit(ctx, pDigestHandle, algorithm);
@@ -53,13 +53,13 @@ SeosCryptoApi_digestFree(SeosCryptoCtx*                 ctx,
 }
 
 seos_err_t
-SeosCryptoApi_digestUpdate(SeosCryptoCtx*                   ctx,
-                           const SeosCrypto_DigestHandle    digestHandle,
-                           const void*                      data,
-                           const size_t                     dataLen)
+SeosCryptoApi_digestProcess(SeosCryptoCtx*                   ctx,
+                            const SeosCrypto_DigestHandle    digestHandle,
+                            const void*                      data,
+                            const size_t                     dataLen)
 {
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->digestUpdate(ctx, digestHandle, data, dataLen);
+           ctx->vtable->digestProcess(ctx, digestHandle, data, dataLen);
 }
 
 seos_err_t
@@ -75,11 +75,11 @@ SeosCryptoApi_digestFinalize(SeosCryptoCtx*                 ctx,
 // ----------------------------- Signature API ---------------------------------
 
 seos_err_t
-SeosCryptoApi_signatureInit(SeosCryptoCtx*                ctx,
-                            SeosCrypto_SignatureHandle*   pSigHandle,
-                            const unsigned int            algorithm,
-                            const SeosCrypto_KeyHandle    prvHandle,
-                            const SeosCrypto_KeyHandle    pubHandle)
+SeosCryptoApi_signatureInit(SeosCryptoCtx*                      ctx,
+                            SeosCrypto_SignatureHandle*         pSigHandle,
+                            const SeosCryptoSignature_Algorithm algorithm,
+                            const SeosCrypto_KeyHandle          prvHandle,
+                            const SeosCrypto_KeyHandle          pubHandle)
 {
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
            ctx->vtable->signatureInit(ctx, pSigHandle, algorithm, prvHandle, pubHandle);
@@ -122,10 +122,10 @@ SeosCryptoApi_signatureVerify(SeosCryptoCtx*                    ctx,
 // ----------------------------- Agreement API ---------------------------------
 
 seos_err_t
-SeosCryptoApi_agreementInit(SeosCryptoCtx*                  ctx,
-                            SeosCrypto_AgreementHandle*     pAgrHandle,
-                            const unsigned int              algorithm,
-                            const SeosCrypto_KeyHandle      prvHandle)
+SeosCryptoApi_agreementInit(SeosCryptoCtx*                          ctx,
+                            SeosCrypto_AgreementHandle*             pAgrHandle,
+                            const SeosCryptoAgreement_Algorithm     algorithm,
+                            const SeosCrypto_KeyHandle              prvHandle)
 {
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
            ctx->vtable->agreementInit(ctx, pAgrHandle, algorithm, prvHandle);
@@ -153,11 +153,11 @@ SeosCryptoApi_agreementAgree(SeosCryptoCtx*                     ctx,
 // -------------------------------- Key API ------------------------------------
 
 seos_err_t
-SeosCryptoApi_keyInit(SeosCryptoCtx*                   ctx,
-                      SeosCrypto_KeyHandle*            keyHandle,
-                      const unsigned int               type,
-                      const SeosCryptoKey_Flags        flags,
-                      const size_t                     bits)
+SeosCryptoApi_keyInit(SeosCryptoCtx*            ctx,
+                      SeosCrypto_KeyHandle*     keyHandle,
+                      const SeosCryptoKey_Type  type,
+                      const SeosCryptoKey_Flags flags,
+                      const size_t              bits)
 {
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
            ctx->vtable->keyInit(ctx, keyHandle, type, flags, bits);
@@ -213,12 +213,12 @@ SeosCryptoApi_keyFree(SeosCryptoCtx*                 ctx,
 // ------------------------------ Cipher API -----------------------------------
 
 seos_err_t
-SeosCryptoApi_cipherInit(SeosCryptoCtx*             ctx,
-                         SeosCrypto_CipherHandle*   pCipherHandle,
-                         const unsigned int         algorithm,
-                         const SeosCrypto_KeyHandle keyHandle,
-                         const void*                iv,
-                         const size_t               ivLen)
+SeosCryptoApi_cipherInit(SeosCryptoCtx*                     ctx,
+                         SeosCrypto_CipherHandle*           pCipherHandle,
+                         const SeosCryptoCipher_Algorithm   algorithm,
+                         const SeosCrypto_KeyHandle         keyHandle,
+                         const void*                        iv,
+                         const size_t                       ivLen)
 {
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
            ctx->vtable->cipherInit(ctx, pCipherHandle, algorithm, keyHandle, iv, ivLen);
@@ -233,15 +233,16 @@ SeosCryptoApi_cipherFree(SeosCryptoCtx*                 ctx,
 }
 
 seos_err_t
-SeosCryptoApi_cipherUpdate(SeosCryptoCtx*                   ctx,
-                           const SeosCrypto_CipherHandle    cipherHandle,
-                           const void*                      data,
-                           const size_t                     dataLen,
-                           void*                            output,
-                           size_t*                          outputSize)
+SeosCryptoApi_cipherProcess(SeosCryptoCtx*                   ctx,
+                            const SeosCrypto_CipherHandle    cipherHandle,
+                            const void*                      data,
+                            const size_t                     dataLen,
+                            void*                            output,
+                            size_t*                          outputSize)
 {
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->cipherUpdate(ctx, cipherHandle, data, dataLen, output, outputSize);
+           ctx->vtable->cipherProcess(ctx, cipherHandle, data, dataLen, output,
+                                      outputSize);
 }
 
 seos_err_t

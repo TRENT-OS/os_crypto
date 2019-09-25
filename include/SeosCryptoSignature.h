@@ -23,42 +23,42 @@
  *
  */
 seos_err_t
-SeosCryptoSignature_init(SeosCryptoSignature*           self,
-                         SeosCrypto_MemIf*              memIf,
-                         SeosCryptoSignature_Algorithm  algorithm,
-                         SeosCryptoKey*                 prvKey,
-                         SeosCryptoKey*                 pubKey);
+SeosCryptoSignature_init(SeosCryptoSignature*                   self,
+                         const SeosCrypto_MemIf*                memIf,
+                         const SeosCryptoSignature_Algorithm    algorithm,
+                         const SeosCryptoKey*                   prvKey,
+                         const SeosCryptoKey*                   pubKey);
 
 /**
  * @brief closes a signature context.
  *
  */
 seos_err_t
-SeosCryptoSignature_free(SeosCryptoSignature*         self,
-                         SeosCrypto_MemIf*            memIf);
+SeosCryptoSignature_free(SeosCryptoSignature*       self,
+                         const SeosCrypto_MemIf*    memIf);
 
 /**
  * @brief Sign a hash value
  *
  */
 seos_err_t
-SeosCryptoSignature_sign(SeosCryptoSignature*       self,
-                         SeosCryptoRng*             rng,
-                         const void*                hash,
-                         size_t                     hashSize,
-                         void*                      signature,
-                         size_t*                    signatureSize);
+SeosCryptoSignature_sign(SeosCryptoSignature*   self,
+                         SeosCryptoRng*         rng,
+                         const void*            hash,
+                         const size_t           hashSize,
+                         void*                  signature,
+                         size_t*                signatureSize);
 
 /**
  * @brief Verify a hash value
  *
  */
 seos_err_t
-SeosCryptoSignature_verify(SeosCryptoSignature*         self,
-                           SeosCryptoRng*               rng,
-                           const void*                  hash,
-                           size_t                       hashSize,
-                           const void*                  signature,
-                           size_t                       signatureSize);
+SeosCryptoSignature_verify(SeosCryptoSignature* self,
+                           SeosCryptoRng*       rng,
+                           const void*          hash,
+                           const size_t         hashSize,
+                           const void*          signature,
+                           const size_t         signatureSize);
 
 ///@}

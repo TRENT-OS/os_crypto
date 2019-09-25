@@ -29,10 +29,10 @@
  */
 seos_err_t
 SeosCryptoKey_init(SeosCryptoKey*               self,
-                   SeosCrypto_MemIf*            memIf,
-                   unsigned int                 type,
-                   SeosCryptoKey_Flags          flags,
-                   size_t                       bits);
+                   const SeosCrypto_MemIf*      memIf,
+                   const SeosCryptoKey_Type     type,
+                   const SeosCryptoKey_Flags    flags,
+                   const size_t                 bits);
 
 /**
  * @brief Fills a key context with randomly generated data
@@ -56,28 +56,28 @@ SeosCryptoKey_generatePair(SeosCryptoKey*       prvKey,
  *
  */
 seos_err_t
-SeosCryptoKey_import(SeosCryptoKey*             self,
-                     SeosCryptoKey*             wrapKey,
-                     const void*                keyBytes,
-                     size_t                     keySize);
+SeosCryptoKey_import(SeosCryptoKey*         self,
+                     const SeosCryptoKey*   wrapKey,
+                     const void*            keyBytes,
+                     size_t                 keySize);
 
 /**
  * @brief Exports key context into buffer
  *
  */
 seos_err_t
-SeosCryptoKey_export(SeosCryptoKey*             self,
-                     SeosCryptoKey*             wrapKey,
-                     void*                      buf,
-                     size_t*                    bufSize);
+SeosCryptoKey_export(SeosCryptoKey*         self,
+                     const SeosCryptoKey*   wrapKey,
+                     void*                  buf,
+                     size_t*                bufSize);
 
 /**
  * @brief Finishes a key context
  *
  */
 seos_err_t
-SeosCryptoKey_free(SeosCryptoKey*             self,
-                   SeosCrypto_MemIf*          memIf);
+SeosCryptoKey_free(SeosCryptoKey*           self,
+                   const SeosCrypto_MemIf*  memIf);
 
 /**
  * @brief Translates key data into RSA public key

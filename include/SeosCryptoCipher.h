@@ -23,40 +23,40 @@
  *
  */
 seos_err_t
-SeosCryptoCipher_init(SeosCryptoCipher*             self,
-                      SeosCrypto_MemIf*             memIf,
-                      SeosCryptoCipher_Algorithm    algorithm,
-                      SeosCryptoKey*                key,
-                      const void*                   iv,
-                      size_t                        ivLen);
+SeosCryptoCipher_init(SeosCryptoCipher*                 self,
+                      const SeosCrypto_MemIf*           memIf,
+                      const SeosCryptoCipher_Algorithm  algorithm,
+                      const SeosCryptoKey*              key,
+                      const void*                       iv,
+                      size_t                            ivLen);
 
 /**
  * @brief closes a cipher context.
  *
  */
 seos_err_t
-SeosCryptoCipher_free(SeosCryptoCipher*           self,
-                      SeosCrypto_MemIf*           memIf);
+SeosCryptoCipher_free(SeosCryptoCipher*         self,
+                      const SeosCrypto_MemIf*   memIf);
 
 /**
  * @brief Function for AEAD algorithms only to start computation
  *
  */
 seos_err_t
-SeosCryptoCipher_start(SeosCryptoCipher* self,
-                       const void*       input,
-                       size_t            inputSize);
+SeosCryptoCipher_start(SeosCryptoCipher*    self,
+                       const void*          input,
+                       const size_t         inputSize);
 
 /**
  * @brief Perform cipher operation on a block
  *
  */
 seos_err_t
-SeosCryptoCipher_update(SeosCryptoCipher*   self,
-                        const void*         input,
-                        size_t              inputSize,
-                        void*               output,
-                        size_t*             outputSize);
+SeosCryptoCipher_process(SeosCryptoCipher*   self,
+                         const void*         input,
+                         const size_t        inputSize,
+                         void*               output,
+                         size_t*             outputSize);
 
 /**
  * @brief Perform operation on final block

@@ -13,8 +13,8 @@
 // Private Functions -----------------------------------------------------------
 
 static seos_err_t
-initImpl(SeosCryptoSignature*   self,
-         SeosCrypto_MemIf*      memIf)
+initImpl(SeosCryptoSignature*       self,
+         const SeosCrypto_MemIf*    memIf)
 
 {
     UNUSED_VAR(memIf);
@@ -34,8 +34,8 @@ initImpl(SeosCryptoSignature*   self,
 }
 
 static seos_err_t
-freeImpl(SeosCryptoSignature*     self,
-         SeosCrypto_MemIf*        memIf)
+freeImpl(SeosCryptoSignature*       self,
+         const SeosCrypto_MemIf*    memIf)
 {
     UNUSED_VAR(memIf);
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -54,7 +54,7 @@ freeImpl(SeosCryptoSignature*     self,
 }
 
 static seos_err_t
-setKeyImpl(SeosCryptoSignature*     self)
+setKeyImpl(SeosCryptoSignature* self)
 {
     seos_err_t retval = SEOS_SUCCESS;
 
@@ -90,12 +90,12 @@ setKeyImpl(SeosCryptoSignature*     self)
 }
 
 static seos_err_t
-verifyHashImpl(SeosCryptoSignature*         self,
-               SeosCryptoRng*               rng,
-               const void*                  hash,
-               size_t                       hashSize,
-               const void*                  signature,
-               size_t                       signatureSize)
+verifyHashImpl(SeosCryptoSignature* self,
+               SeosCryptoRng*       rng,
+               const void*          hash,
+               const size_t         hashSize,
+               const void*          signature,
+               const size_t         signatureSize)
 {
     void* rngFunc = (NULL != rng) ? SeosCryptoRng_getBytesMbedtls : NULL;
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -124,12 +124,12 @@ verifyHashImpl(SeosCryptoSignature*         self,
 }
 
 static seos_err_t
-signHashImpl(SeosCryptoSignature*       self,
-             SeosCryptoRng*             rng,
-             const void*                hash,
-             size_t                     hashSize,
-             void*                      signature,
-             size_t*                    signatureSize)
+signHashImpl(SeosCryptoSignature*   self,
+             SeosCryptoRng*         rng,
+             const void*            hash,
+             const size_t           hashSize,
+             void*                  signature,
+             size_t*                signatureSize)
 {
     void* rngFunc = (NULL != rng) ? SeosCryptoRng_getBytesMbedtls : NULL;
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -164,11 +164,11 @@ signHashImpl(SeosCryptoSignature*       self,
 // Public Functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoSignature_init(SeosCryptoSignature*           self,
-                         SeosCrypto_MemIf*              memIf,
-                         SeosCryptoSignature_Algorithm  algorithm,
-                         SeosCryptoKey*                 prvKey,
-                         SeosCryptoKey*                 pubKey)
+SeosCryptoSignature_init(SeosCryptoSignature*                   self,
+                         const SeosCrypto_MemIf*                memIf,
+                         const SeosCryptoSignature_Algorithm    algorithm,
+                         const SeosCryptoKey*                   prvKey,
+                         const SeosCryptoKey*                   pubKey)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -205,8 +205,8 @@ exit:
 }
 
 seos_err_t
-SeosCryptoSignature_free(SeosCryptoSignature*         self,
-                         SeosCrypto_MemIf*            memIf)
+SeosCryptoSignature_free(SeosCryptoSignature*       self,
+                         const SeosCrypto_MemIf*    memIf)
 {
     if (NULL == memIf || NULL == self)
     {
@@ -217,12 +217,12 @@ SeosCryptoSignature_free(SeosCryptoSignature*         self,
 }
 
 seos_err_t
-SeosCryptoSignature_sign(SeosCryptoSignature*       self,
-                         SeosCryptoRng*             rng,
-                         const void*                hash,
-                         size_t                     hashSize,
-                         void*                      signature,
-                         size_t*                    signatureSize)
+SeosCryptoSignature_sign(SeosCryptoSignature*   self,
+                         SeosCryptoRng*         rng,
+                         const void*            hash,
+                         const size_t           hashSize,
+                         void*                  signature,
+                         size_t*                signatureSize)
 {
     if (NULL == self || NULL == hash || 0 == hashSize || NULL == signature
         || NULL == signatureSize)
@@ -236,12 +236,12 @@ SeosCryptoSignature_sign(SeosCryptoSignature*       self,
 }
 
 seos_err_t
-SeosCryptoSignature_verify(SeosCryptoSignature*         self,
-                           SeosCryptoRng*               rng,
-                           const void*                  hash,
-                           size_t                       hashSize,
-                           const void*                  signature,
-                           size_t                       signatureSize)
+SeosCryptoSignature_verify(SeosCryptoSignature* self,
+                           SeosCryptoRng*       rng,
+                           const void*          hash,
+                           const size_t         hashSize,
+                           const void*          signature,
+                           const size_t         signatureSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 

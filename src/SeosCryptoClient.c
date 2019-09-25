@@ -15,7 +15,7 @@ static const SeosCryptoCtx_Vtable SeosCryptoClient_vtable =
     .rngReSeed               = SeosCryptoClient_rngReSeed,
     .digestInit              = SeosCryptoClient_digestInit,
     .digestFree              = SeosCryptoClient_digestFree,
-    .digestUpdate            = SeosCryptoClient_digestUpdate,
+    .digestProcess           = SeosCryptoClient_digestProcess,
     .digestFinalize          = SeosCryptoClient_digestFinalize,
     .keyInit                 = SeosCryptoClient_keyInit,
     .keyGenerate             = SeosCryptoClient_keyGenerate,
@@ -32,7 +32,7 @@ static const SeosCryptoCtx_Vtable SeosCryptoClient_vtable =
     .agreementAgree          = SeosCryptoClient_agreementAgree,
     .cipherInit              = SeosCryptoClient_cipherInit,
     .cipherFree              = SeosCryptoClient_cipherFree,
-    .cipherUpdate            = SeosCryptoClient_cipherUpdate,
+    .cipherProcess           = SeosCryptoClient_cipherProcess,
     .cipherStart             = SeosCryptoClient_cipherStart,
     .cipherFinalize          = SeosCryptoClient_cipherFinalize,
     .free                    = SeosCryptoClient_free
@@ -204,10 +204,10 @@ SeosCryptoClient_digestFree(SeosCryptoCtx*             api,
 }
 
 seos_err_t
-SeosCryptoClient_digestUpdate(SeosCryptoCtx*                api,
-                              SeosCrypto_DigestHandle       digestHandle,
-                              const void*                   data,
-                              size_t                        dataLen)
+SeosCryptoClient_digestProcess(SeosCryptoCtx*                api,
+                               SeosCrypto_DigestHandle       digestHandle,
+                               const void*                   data,
+                               size_t                        dataLen)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoClient* self = (SeosCryptoClient*) api;
@@ -220,7 +220,7 @@ SeosCryptoClient_digestUpdate(SeosCryptoCtx*                api,
 
     if ((retval = writeRpcArguments(self, data, dataLen, NULL, 0)) == SEOS_SUCCESS)
     {
-        retval = SeosCryptoRpc_digestUpdate(self->rpcHandle, digestHandle, dataLen);
+        retval = SeosCryptoRpc_digestProcess(self->rpcHandle, digestHandle, dataLen);
     }
 
     return retval;
@@ -558,12 +558,12 @@ SeosCryptoClient_cipherFree(SeosCryptoCtx*             api,
 }
 
 seos_err_t
-SeosCryptoClient_cipherUpdate(SeosCryptoCtx*                api,
-                              SeosCrypto_CipherHandle       cipherHandle,
-                              const void*                   data,
-                              size_t                        dataLen,
-                              void*                         output,
-                              size_t*                       outputSize)
+SeosCryptoClient_cipherProcess(SeosCryptoCtx*                api,
+                               SeosCrypto_CipherHandle       cipherHandle,
+                               const void*                   data,
+                               size_t                        dataLen,
+                               void*                         output,
+                               size_t*                       outputSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoClient* self = (SeosCryptoClient*) api;
@@ -576,8 +576,8 @@ SeosCryptoClient_cipherUpdate(SeosCryptoCtx*                api,
 
     if ((retval = writeRpcArguments(self, data, dataLen, NULL, 0)) == SEOS_SUCCESS)
     {
-        if ((retval = SeosCryptoRpc_cipherUpdate(self->rpcHandle, cipherHandle,
-                                                 dataLen, *outputSize)) == SEOS_SUCCESS)
+        if ((retval = SeosCryptoRpc_cipherProcess(self->rpcHandle, cipherHandle,
+                                                  dataLen, *outputSize)) == SEOS_SUCCESS)
         {
             retval = readRpcResult(self, output, outputSize);
         }

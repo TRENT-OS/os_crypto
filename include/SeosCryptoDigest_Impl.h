@@ -40,7 +40,7 @@ typedef struct
     mbedtls;
 
     SeosCryptoDigest_Algorithm algorithm;
-    bool                       updated;
+    bool                       processed;
     bool                       finalized;
 } SeosCryptoDigest;
 

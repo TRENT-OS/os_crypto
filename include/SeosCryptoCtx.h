@@ -44,10 +44,10 @@ typedef seos_err_t
                              SeosCrypto_DigestHandle       digestHandle);
 
 typedef seos_err_t
-(*SeosCryptoCtx_digestUpdateT)(SeosCryptoCtx*               self,
-                               SeosCrypto_DigestHandle      digestHandle,
-                               const void*                  data,
-                               size_t                       dataLen);
+(*SeosCryptoCtx_digestProcessT)(SeosCryptoCtx*               self,
+                                SeosCrypto_DigestHandle      digestHandle,
+                                const void*                  data,
+                                size_t                       dataLen);
 
 typedef seos_err_t
 (*SeosCryptoCtx_digestFinalizeT)(SeosCryptoCtx*             self,
@@ -155,12 +155,12 @@ typedef seos_err_t
                              SeosCrypto_CipherHandle       cipherHandle);
 
 typedef seos_err_t
-(*SeosCryptoCtx_cipherUpdateT)(SeosCryptoCtx*               self,
-                               SeosCrypto_CipherHandle      cipherHandle,
-                               const void*                  data,
-                               size_t                       dataLen,
-                               void*                        output,
-                               size_t*                      outputSize);
+(*SeosCryptoCtx_cipherProcessT)(SeosCryptoCtx*               self,
+                                SeosCrypto_CipherHandle      cipherHandle,
+                                const void*                  data,
+                                size_t                       dataLen,
+                                void*                        output,
+                                size_t*                      outputSize);
 
 typedef seos_err_t
 (*SeosCryptoCtx_cipherStartT)(SeosCryptoCtx*               self,
@@ -184,7 +184,7 @@ typedef struct
     SeosCryptoCtx_rngReSeedT                rngReSeed;
     SeosCryptoCtx_digestInitT               digestInit;
     SeosCryptoCtx_digestFreeT               digestFree;
-    SeosCryptoCtx_digestUpdateT             digestUpdate;
+    SeosCryptoCtx_digestProcessT            digestProcess;
     SeosCryptoCtx_digestFinalizeT           digestFinalize;
     SeosCryptoCtx_keyInitT                  keyInit;
     SeosCryptoCtx_keyGenerateT              keyGenerate;
@@ -201,7 +201,7 @@ typedef struct
     SeosCryptoCtx_agreementAgreeT           agreementAgree;
     SeosCryptoCtx_cipherInitT               cipherInit;
     SeosCryptoCtx_cipherFreeT               cipherFree;
-    SeosCryptoCtx_cipherUpdateT             cipherUpdate;
+    SeosCryptoCtx_cipherProcessT            cipherProcess;
     SeosCryptoCtx_cipherStartT              cipherStart;
     SeosCryptoCtx_cipherFinalizeT           cipherFinalize;
     SeosCryptoCtx_freeT                     free;

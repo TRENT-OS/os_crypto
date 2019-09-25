@@ -48,12 +48,12 @@ typedef struct
     algorithmCtx;
 
     SeosCryptoCipher_Algorithm  algorithm;
-    SeosCryptoKey*              key;
+    const SeosCryptoKey*        key;
     unsigned char               iv[SeosCryptoCipher_AES_BLOCK_SIZE];
     size_t                      ivLen;
     size_t                      inputLen;
     bool                        started;
-    bool                        updated;
+    bool                        processed;
     bool                        finalized;
 }
 SeosCryptoCipher;

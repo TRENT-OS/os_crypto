@@ -24,26 +24,26 @@
  *
  */
 seos_err_t
-SeosCryptoDigest_init(SeosCryptoDigest*             self,
-                      SeosCrypto_MemIf*             memIf,
-                      SeosCryptoDigest_Algorithm    algorithm);
+SeosCryptoDigest_init(SeosCryptoDigest*                 self,
+                      const SeosCrypto_MemIf*           memIf,
+                      const SeosCryptoDigest_Algorithm  algorithm);
 
 /**
  * @brief closes a cipher context.
  *
  */
 seos_err_t
-SeosCryptoDigest_free(SeosCryptoDigest*           self,
-                      SeosCrypto_MemIf*           memIf);
+SeosCryptoDigest_free(SeosCryptoDigest*         self,
+                      const SeosCrypto_MemIf*   memIf);
 
 /**
- * @brief Updates the computation of the digest providing a new block of data
+ * @brief Processes the computation of the digest based on a new block of data
  *
  */
 seos_err_t
-SeosCryptoDigest_update(SeosCryptoDigest*   self,
-                        const void*         data,
-                        size_t              dataLen);
+SeosCryptoDigest_process(SeosCryptoDigest*   self,
+                         const void*         data,
+                         const size_t        dataLen);
 
 /**
  * @brief Finalizes the computation of the digest

@@ -13,8 +13,8 @@
 // Private Functions -----------------------------------------------------------
 
 static seos_err_t
-initImpl(SeosCryptoAgreement*            self,
-         SeosCrypto_MemIf*               memIf)
+initImpl(SeosCryptoAgreement*       self,
+         const SeosCrypto_MemIf*    memIf)
 {
     UNUSED_VAR(memIf);
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -37,8 +37,8 @@ initImpl(SeosCryptoAgreement*            self,
 }
 
 static seos_err_t
-freeImpl(SeosCryptoAgreement*            self,
-         SeosCrypto_MemIf*               memIf)
+freeImpl(SeosCryptoAgreement*     self,
+         const SeosCrypto_MemIf*  memIf)
 {
     UNUSED_VAR(memIf);
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -85,11 +85,11 @@ setKeyImpl(SeosCryptoAgreement*            self)
 }
 
 static seos_err_t
-computeImpl(SeosCryptoAgreement*            self,
-            SeosCryptoRng*                  rng,
-            SeosCryptoKey*                  pubKey,
-            void*                           buf,
-            size_t*                         bufSize)
+agreeImpl(SeosCryptoAgreement*    self,
+          SeosCryptoRng*          rng,
+          const SeosCryptoKey*    pubKey,
+          void*                   buf,
+          size_t*                 bufSize)
 {
     void* rngFunc = (NULL != rng) ? SeosCryptoRng_getBytesMbedtls : NULL;
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -139,10 +139,10 @@ computeImpl(SeosCryptoAgreement*            self,
 // Public Functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoAgreement_init(SeosCryptoAgreement*            self,
-                         SeosCrypto_MemIf*               memIf,
-                         SeosCryptoAgreement_Algorithm   algorithm,
-                         SeosCryptoKey*                  prvKey)
+SeosCryptoAgreement_init(SeosCryptoAgreement*                   self,
+                         const SeosCrypto_MemIf*                memIf,
+                         const SeosCryptoAgreement_Algorithm    algorithm,
+                         const SeosCryptoKey*                   prvKey)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -178,8 +178,8 @@ exit:
 
 seos_err_t
 SeosCryptoAgreement_agree(SeosCryptoAgreement*  self,
-                          SeosCryptoRng*        rng,
-                          SeosCryptoKey*        pubKey,
+                          SeosCryptoRng*  rng,
+                          const SeosCryptoKey*  pubKey,
                           void*                 shared,
                           size_t*               sharedSize)
 {
@@ -188,12 +188,12 @@ SeosCryptoAgreement_agree(SeosCryptoAgreement*  self,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return computeImpl(self, rng, pubKey, shared, sharedSize);
+    return agreeImpl(self, rng, pubKey, shared, sharedSize);
 }
 
 seos_err_t
-SeosCryptoAgreement_free(SeosCryptoAgreement*     self,
-                         SeosCrypto_MemIf*        memIf)
+SeosCryptoAgreement_free(SeosCryptoAgreement*       self,
+                         const SeosCrypto_MemIf*    memIf)
 {
     if (NULL == self || NULL == memIf)
     {
