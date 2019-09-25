@@ -22,19 +22,19 @@ initImpl(SeosCryptoCipher*          self,
     {
     case SeosCryptoCipher_Algorithm_AES_CBC_ENC:
     case SeosCryptoCipher_Algorithm_AES_CBC_DEC:
-        mbedtls_aes_init(&self->algorithmCtx.aes);
+        mbedtls_aes_init(&self->mbedtls.aes);
         retval = SEOS_SUCCESS;
         break;
 
     case SeosCryptoCipher_Algorithm_AES_ECB_ENC:
     case SeosCryptoCipher_Algorithm_AES_ECB_DEC:
-        mbedtls_aes_init(&self->algorithmCtx.aes);
+        mbedtls_aes_init(&self->mbedtls.aes);
         retval = SEOS_SUCCESS;
         break;
 
     case SeosCryptoCipher_Algorithm_AES_GCM_DEC:
     case SeosCryptoCipher_Algorithm_AES_GCM_ENC:
-        mbedtls_gcm_init(&self->algorithmCtx.gcm);
+        mbedtls_gcm_init(&self->mbedtls.gcm);
         retval = SEOS_SUCCESS;
         break;
     default:
@@ -56,12 +56,12 @@ freeImpl(SeosCryptoCipher*          self,
     case SeosCryptoCipher_Algorithm_AES_ECB_DEC:
     case SeosCryptoCipher_Algorithm_AES_CBC_ENC:
     case SeosCryptoCipher_Algorithm_AES_CBC_DEC:
-        mbedtls_aes_free(&self->algorithmCtx.aes);
+        mbedtls_aes_free(&self->mbedtls.aes);
         retval = SEOS_SUCCESS;
         break;
     case SeosCryptoCipher_Algorithm_AES_GCM_DEC:
     case SeosCryptoCipher_Algorithm_AES_GCM_ENC:
-        mbedtls_gcm_free(&self->algorithmCtx.gcm);
+        mbedtls_gcm_free(&self->mbedtls.gcm);
         retval = SEOS_SUCCESS;
         break;
     default:
@@ -103,19 +103,19 @@ setKeyImpl(SeosCryptoCipher* self)
     {
     case SeosCryptoCipher_Algorithm_AES_ECB_ENC:
     case SeosCryptoCipher_Algorithm_AES_CBC_ENC:
-        retval = mbedtls_aes_setkey_enc(&self->algorithmCtx.aes,
+        retval = mbedtls_aes_setkey_enc(&self->mbedtls.aes,
                                         aesKey->bytes, self->key->bits) ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
     case SeosCryptoCipher_Algorithm_AES_ECB_DEC:
     case SeosCryptoCipher_Algorithm_AES_CBC_DEC:
-        retval = mbedtls_aes_setkey_dec(&self->algorithmCtx.aes,
+        retval = mbedtls_aes_setkey_dec(&self->mbedtls.aes,
                                         aesKey->bytes, self->key->bits) ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
     case SeosCryptoCipher_Algorithm_AES_GCM_ENC:
     case SeosCryptoCipher_Algorithm_AES_GCM_DEC:
-        retval = mbedtls_gcm_setkey(&self->algorithmCtx.gcm,
+        retval = mbedtls_gcm_setkey(&self->mbedtls.gcm,
                                     MBEDTLS_CIPHER_ID_AES,
                                     aesKey->bytes, self->key->bits) ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
@@ -198,7 +198,7 @@ processImpl(SeosCryptoCipher*    self,
                 retval = SEOS_SUCCESS;
                 for (offs = 0; offs < inputSize; offs += SeosCryptoCipher_AES_BLOCK_SIZE)
                 {
-                    if (mbedtls_aes_crypt_ecb(&self->algorithmCtx.aes, mode, input + offs,
+                    if (mbedtls_aes_crypt_ecb(&self->mbedtls.aes, mode, input + offs,
                                               output + offs) != 0)
                     {
                         retval = SEOS_ERROR_ABORTED;
@@ -217,7 +217,7 @@ processImpl(SeosCryptoCipher*    self,
             {
                 int mode = (self->algorithm == SeosCryptoCipher_Algorithm_AES_CBC_ENC) ?
                            MBEDTLS_AES_ENCRYPT : MBEDTLS_AES_DECRYPT;
-                retval = mbedtls_aes_crypt_cbc(&self->algorithmCtx.aes, mode, inputSize,
+                retval = mbedtls_aes_crypt_cbc(&self->mbedtls.aes, mode, inputSize,
                                                self->ivLen > 0 ? self->iv : NULL, input, output) ?
                          SEOS_ERROR_ABORTED : SEOS_SUCCESS;
             }
@@ -230,7 +230,7 @@ processImpl(SeosCryptoCipher*    self,
             // non-aligned block.
             retval = (self->inputLen % SeosCryptoCipher_AES_BLOCK_SIZE) ||
                      !self->started || self->finalized ||
-                     mbedtls_gcm_update(&self->algorithmCtx.gcm, inputSize, input,
+                     mbedtls_gcm_update(&self->mbedtls.gcm, inputSize, input,
                                         output) ? SEOS_ERROR_ABORTED : SEOS_SUCCESS;
 
             break;
@@ -269,7 +269,7 @@ startImpl(SeosCryptoCipher* self,
     }
 
     return self->started || self->processed || self->finalized ||
-           mbedtls_gcm_starts(&self->algorithmCtx.gcm, mode, self->iv, self->ivLen,
+           mbedtls_gcm_starts(&self->mbedtls.gcm, mode, self->iv, self->ivLen,
                               adLen > 0 ? ad : NULL, adLen) != 0 ?
            SEOS_ERROR_ABORTED : SEOS_SUCCESS;
 }
@@ -312,7 +312,7 @@ finalizeImpl(SeosCryptoCipher* self,
         // so we can compare at least TAG_SIZE bytes, but it can also be less
         retval = (*bufSize > SeosCryptoCipher_AES_GCM_TAG_SIZE) ||
                  !self->started || !self->processed || self->finalized ||
-                 mbedtls_gcm_finish(&self->algorithmCtx.gcm, check, *bufSize) != 0 ||
+                 mbedtls_gcm_finish(&self->mbedtls.gcm, check, *bufSize) != 0 ||
                  cmemcmp(buf, check, *bufSize) != 0 ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
@@ -324,7 +324,7 @@ finalizeImpl(SeosCryptoCipher* self,
         *bufSize = (*bufSize > SeosCryptoCipher_AES_BLOCK_SIZE) ?
                    SeosCryptoCipher_AES_BLOCK_SIZE : *bufSize;
         retval = !self->started || !self->processed || self->finalized ||
-                 mbedtls_gcm_finish(&self->algorithmCtx.gcm, buf, *bufSize) != 0 ?
+                 mbedtls_gcm_finish(&self->mbedtls.gcm, buf, *bufSize) != 0 ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
     }

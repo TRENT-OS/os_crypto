@@ -45,7 +45,7 @@ typedef struct
         mbedtls_rsa_context     rsa;
         mbedtls_gcm_context     gcm;
     }
-    algorithmCtx;
+    mbedtls;
 
     SeosCryptoCipher_Algorithm  algorithm;
     const SeosCryptoKey*        key;
