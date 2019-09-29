@@ -20,12 +20,12 @@ if (ENABLE_LINT)
         set(CMAKE_C_CLANG_TIDY "clang-tidy;-checks=*")
 endif()
 
-# when building for the x64 architecture, some warnings are 
+# when building for the x64 architecture, some warnings are
 # reported (i.e. printf formatting) that the code is full of,
 # and that are otherwise not reported, so as a quick fix we
 # remove the -Werror in this build situation
 if(NO_KERNEL_BUILD)
-    # when building for the x64 architecture, some warnings are 
+    # when building for the x64 architecture, some warnings are
     # reported (i.e. printf formatting) that the code is full of,
     # and that are otherwise not reported, so as a quick fix we
     # remove the -Werror in this build situation
@@ -34,7 +34,7 @@ if(NO_KERNEL_BUILD)
             -Wall
     )
 
-    # since PAGE_SIZE is normally defined as part of musllibc 
+    # since PAGE_SIZE is normally defined as part of musllibc
     # (which is missing here) we have to define it
     target_compile_definitions(${PROJECT_NAME} PRIVATE PAGE_SIZE=${PAGE_SIZE_VALUE})
 else()
@@ -76,11 +76,11 @@ if (SEOS_CRYPTO_IMPL_MBEDTLS)
         "3rdParty/mbedtls/library/sha512.c"
         "3rdParty/mbedtls/library/sha256.c"
         "3rdParty/mbedtls/library/aes.c"
-        # GCM 
+        # GCM
         "3rdParty/mbedtls/library/gcm.c"
         "3rdParty/mbedtls/library/cipher.c"
         "3rdParty/mbedtls/library/cipher_wrap.c"
-        # DH 
+        # DH
         "3rdParty/mbedtls/library/dhm.c"
         # EC dependencies
         "3rdParty/mbedtls/library/ecdh.c"
