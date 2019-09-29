@@ -38,20 +38,7 @@ SeosCryptoCipher_Algorithm;
 typedef struct SeosCryptoCipher SeosCryptoCipher;
 
 /**
- * @brief initializes a cipher context
- *
- * @param self (required) pointer to context to initialize
- * @param algorithm the cipher algorithm
- * @param key (required) the cipher key
- * @param iv (optional) the initialization vector
- * @param ivLen the initialization vector length
- *
- * @return an error code
- * @retval SEOS_SUCCESS if all right
- * @retval SEOS_ERROR_INVALID_PARAMETER if any of the required parameters is
- *  missing or wrong
- * @retval SEOS_ERROR_NOT_SUPPORTED if there is no implementation for the given
- *  algorithm
+ * @brief implements SeosCryptoApi_cipherInit()
  *
  */
 seos_err_t
@@ -84,30 +71,7 @@ SeosCryptoCipher_updateAd(SeosCryptoCipher* self,
                           const void*       input,
                           size_t            inputSize);
 /**
- * @brief perform cipher operation on a block
- *
- * @param self (required) pointer to context
- * @param input (required) input buffer
- * @param inputSize input buffer size
- * @param output (optional) input/output parameter cointaining the pointer to
- *  the output buffer. If content is == NULL, then it is set to a local (to the
- *  context) buffer and the content of \p outputSize is set to the correct value
- *  of the amount of written data. Otherwise (!= NULL) the given buffer is used
- *  as output and the value in \p outputSize is used (in the meaning of capacity
- *  of the buffer) for boundary check before writing. If write is possible then
- *  the value of \p outputSize is set to the correct value of the amount of
- *  written data.
- * @param outputSize (required) input/output parameter holding the capacity/size
- *  of \p output
- *
- * @return an error code
- * @retval SEOS_SUCCESS if all right
- * @retval SEOS_ERROR_INVALID_PARAMETER if any of the required parameters is
- *  missing or wrong
- * @retval SEOS_ERROR_NOT_SUPPORTED if there is no implementation for the given
- *  algorithm
- * @retval SEOS_ERROR_ABORTED if the underlying implementation of the algorithm
- *  fails for any reason or the output buffer is not big enough
+ * @brief implements SeosCryptoApi_cipherUpdate()
  *
  */
 seos_err_t

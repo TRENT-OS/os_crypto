@@ -43,19 +43,7 @@ SeosCryptoDigest_Algorithm;
 typedef struct SeosCryptoDigest SeosCryptoDigest;
 
 /**
- * @brief initializes a digest context
- *
- * @param self (required) pointer to context to initialize
- * @param algorithm the digest algorithm
- * @param iv (optional) the initialization vector
- * @param ivLen the initialization vector length
- *
- * @return an error code
- * @retval SEOS_SUCCESS if all right
- * @retval SEOS_ERROR_INVALID_PARAMETER if any of the required parameters is
- *  missing
- * @retval SEOS_ERROR_NOT_SUPPORTED if there is no implementation for the given
- *  algorithm
+ * @brief implements SeosCryptoApi_digestInit()
  *
  */
 seos_err_t
@@ -72,21 +60,7 @@ SeosCryptoDigest_init(SeosCryptoDigest*             self,
 void
 SeosCryptoDigest_deInit(SeosCryptoDigest* self);
 /**
- * @brief updates the computation of the digest providing a new block of data
- *
- * @param self (required) pointer to the SeosCryptoDigest context
- * @param data (required) the data block
- * @param dataLen the length of the data block
- *
- * @return an error code.
- *
- * @retval SEOS_SUCCESS if all right
- * @retval SEOS_ERROR_INVALID_PARAMETER if any of the required parameters is
- *  missing or wrong
- * @retval SEOS_ERROR_NOT_SUPPORTED if there is no implementation for the given
- *  algorithm
- * @retval SEOS_ERROR_ABORTED if the underlying implementation of the algorithm
- *  fails for any reason
+ * @brief implements SeosCryptoApi_digestUpdate()
  *
  */
 seos_err_t
@@ -94,32 +68,7 @@ SeosCryptoDigest_update(SeosCryptoDigest*   self,
                         const void*         data,
                         size_t              dataLen);
 /**
- * @brief finalizes the computation of the digest providing a new block of data
- *  or padding (when data == NULL).
- *
- * @param self (required) pointer to the SeosCryptoDigest context
- * @param data (optional) the data block. When not provided (== NULL) then
- *  padding is done
- * @param dataLen the length of the data block
- * @param digest (required) a pointer to the buffer containing the digest.
- *  When *digest == NULL then a buffer is provided as output parameter otherwise
- *  if provided by the caller then it is just used. In this last case
- *  *digestSize is taken first as input to check the boundaries of the buffer
- *  and then in any case is set to the size of the digest before to return
- * @param digestSize (required) size of digest. Can work both as input or
- *  output parameter as described for \p digest
- *
- * @return an error code.
- *
- * @retval SEOS_SUCCESS if all right
- * @retval SEOS_ERROR_INVALID_PARAMETER if any of the required parameters is
- *  missing or wrong
- * @retval SEOS_ERROR_NOT_SUPPORTED if there is no implementation for the given
- *  algorithm
- * @retval SEOS_ERROR_ABORTED if the underlying implementation of the algorithm
- *  fails for any reason or the output buffer is not big enough
- * @retval SEOS_ERROR_BUFFER_TOO_SMALL if the size of the digest buffer provided
- *  by the caller is not enough to hold the data generated
+ * @brief implements SeosCryptoApi_digestFinalize()
  *
  */
 seos_err_t
