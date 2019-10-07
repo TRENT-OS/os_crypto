@@ -13,6 +13,7 @@
 
 #include <stddef.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #define SeosCryptoKey_DH_GENERATOR          2       ///< Generator for DH
 #define SeosCryptoKey_RSA_EXPONENT          65537   ///< Public exp. 2^16+1
@@ -50,7 +51,7 @@ typedef struct
 {
     SeosCryptoKey_Flag  flags;      ///< flags, see above
     SeosCryptoKey_Type  type;       ///< type of key, see above
-    unsigned int        bits;       ///< the security parameter (e.g., key size)
+    uint32_t            bits;       ///< the security parameter (e.g., key size)
     void*               keyBytes;   ///< pointer to raw key material
     bool                empty;      ///< indicate if key material is there
     size_t              keySize;    ///< amount of bytes stored
@@ -60,65 +61,65 @@ SeosCryptoKey;
 typedef struct __attribute__((__packed__))
 {
     unsigned char   bytes[SeosCryptoKey_Size_AES];
-    size_t          len;
+    uint32_t        len;
 }
 SeosCryptoKey_AES;
 
 typedef struct __attribute__((__packed__))
 {
     unsigned char   nBytes[SeosCryptoKey_Size_RSA_PUB]; ///< public modulus
-    size_t          nLen;
+    uint32_t        nLen;
     unsigned char   eBytes[SeosCryptoKey_Size_RSA_PUB]; ///< public exponent
-    size_t          eLen;
+    uint32_t        eLen;
 }
 SeosCryptoKey_RSAPub;
 typedef struct __attribute__((__packed__))
 {
     unsigned char   nBytes[SeosCryptoKey_Size_RSA_PRV]; ///< public modulus n=p*q
-    size_t          nLen;
+    uint32_t        nLen;
     unsigned char   dBytes[SeosCryptoKey_Size_RSA_PRV]; ///< exponent d=e^-1
-    size_t          dLen;
+    uint32_t        dLen;
     unsigned char   pBytes[SeosCryptoKey_Size_RSA_PRV / 2]; ///< prime factor
-    size_t          pLen;
+    uint32_t        pLen;
     unsigned char   qBytes[SeosCryptoKey_Size_RSA_PRV / 2]; ///< prime factor
-    size_t          qLen;
+    uint32_t        qLen;
 }
 SeosCryptoKey_RSAPrv;
 
 typedef struct __attribute__((__packed__))
 {
     unsigned char   qxBytes[SeosCryptoKey_Size_SECP256R1_PUB]; ///< x of point Q=P*d
-    size_t          qxLen;
+    uint32_t        qxLen;
     unsigned char   qyBytes[SeosCryptoKey_Size_SECP256R1_PUB]; ///< y of point Q=P*d
-    size_t          qyLen;
+    uint32_t        qyLen;
 }
 SeosCryptoKey_SECP256r1Pub;
 typedef struct __attribute__((__packed__))
 {
     unsigned char   dBytes[SeosCryptoKey_Size_SECP256R1_PRV]; ///<  private scalar
-    size_t          dLen;
+    uint32_t        dLen;
 }
 SeosCryptoKey_SECP256r1Prv;
 
 typedef struct __attribute__((__packed__))
 {
     unsigned char   pBytes[SeosCryptoKey_Size_DH_PUB]; ///< shared prime
-    size_t          pLen;
+    uint32_t        pLen;
     unsigned char   gBytes[SeosCryptoKey_Size_DH_PUB]; ///< shared generator
-    size_t          gLen;
+    uint32_t        gLen;
     unsigned char   gxBytes[SeosCryptoKey_Size_DH_PUB]; ///< public key g^x mod p
-    size_t          gxLen;
+    uint32_t        gxLen;
 }
 SeosCryptoKey_DHPub;
 
 typedef struct __attribute__((__packed__))
 {
     unsigned char   pBytes[SeosCryptoKey_Size_DH_PRV]; ///< shared prime
-    size_t          pLen;
+    uint32_t        pLen;
     unsigned char   gBytes[SeosCryptoKey_Size_DH_PRV]; ///< shared generator
-    size_t          gLen;
+    uint32_t        gLen;
     unsigned char   xBytes[SeosCryptoKey_Size_DH_PRV]; ///< private exponent
-    size_t          xLen;
+    uint32_t        xLen;
 }
 SeosCryptoKey_DHPrv;
 
