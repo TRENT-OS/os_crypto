@@ -76,8 +76,7 @@ finalizeImpl(SeosCryptoDigest*  self,
         }
         else
         {
-            retval = !self->updated || self->finalized ||
-                     mbedtls_md5_finish_ret(&self->mbedtls.md5, digest) ?
+            retval = mbedtls_md5_finish_ret(&self->mbedtls.md5, digest) ?
                      SEOS_ERROR_ABORTED : SEOS_SUCCESS;
             *digestSize = SeosCryptoDigest_SIZE_MD5;
         }
@@ -89,15 +88,13 @@ finalizeImpl(SeosCryptoDigest*  self,
         }
         else
         {
-            retval = !self->updated || self->finalized ||
-                     mbedtls_sha256_finish_ret(&self->mbedtls.sha256, digest) ?
+            retval = mbedtls_sha256_finish_ret(&self->mbedtls.sha256, digest) ?
                      SEOS_ERROR_ABORTED : SEOS_SUCCESS;
             *digestSize = SeosCryptoDigest_SIZE_SHA256;
         }
         break;
     default:
         retval = SEOS_ERROR_NOT_SUPPORTED;
-        break;
     }
 
     return retval;
@@ -113,18 +110,15 @@ updateImpl(SeosCryptoDigest*        self,
     switch (self->algorithm)
     {
     case SeosCryptoDigest_Algorithm_MD5:
-        retval = self->finalized ||
-                 mbedtls_md5_update_ret(&self->mbedtls.md5, data, len) ?
+        retval = mbedtls_md5_update_ret(&self->mbedtls.md5, data, len) ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
     case SeosCryptoDigest_Algorithm_SHA256:
-        retval = self->finalized ||
-                 mbedtls_sha256_update_ret(&self->mbedtls.sha256, data, len) ?
+        retval = mbedtls_sha256_update_ret(&self->mbedtls.sha256, data, len) ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
     default:
         retval = SEOS_ERROR_NOT_SUPPORTED;
-        break;
     }
     return retval;
 }
@@ -174,11 +168,9 @@ SeosCryptoDigest_update(SeosCryptoDigest*    self,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    retval = updateImpl(self, data, len);
-    if (!self->updated)
-    {
-        self->updated = (SEOS_SUCCESS == retval);
-    }
+    retval = self->finalized ?
+             SEOS_ERROR_ABORTED : updateImpl(self, data, len);
+    self->updated |= (SEOS_SUCCESS == retval);
 
     return retval;
 }
@@ -195,11 +187,9 @@ SeosCryptoDigest_finalize(SeosCryptoDigest* self,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    retval = finalizeImpl(self, digest, digestSize);
-    if (!self->finalized)
-    {
-        self->finalized = (SEOS_SUCCESS == retval);
-    }
+    retval = !self->updated || self->finalized ?
+             SEOS_ERROR_ABORTED : finalizeImpl(self, digest, digestSize);
+    self->finalized |= (SEOS_SUCCESS == retval);
 
     return retval;
 }

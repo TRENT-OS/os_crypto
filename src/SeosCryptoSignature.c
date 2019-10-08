@@ -27,8 +27,8 @@ initImpl(SeosCrypto_MemIf*      memIf,
         break;
     default:
         retval = SEOS_ERROR_NOT_SUPPORTED;
-        break;
     }
+
     return retval;
 }
 
@@ -47,7 +47,6 @@ deInitImpl(SeosCrypto_MemIf*        memIf,
         break;
     default:
         retval = SEOS_ERROR_NOT_SUPPORTED;
-        break;
     }
 
     return retval;
@@ -118,8 +117,8 @@ verifyHashImpl(SeosCryptoSignature*         self,
         break;
     default:
         retval = SEOS_ERROR_NOT_SUPPORTED;
-        break;
     }
+
     return retval;
 }
 
@@ -156,7 +155,6 @@ signHashImpl(SeosCryptoSignature*       self,
         break;
     default:
         retval = SEOS_ERROR_NOT_SUPPORTED;
-        break;
     }
 
     return retval;

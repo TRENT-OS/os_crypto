@@ -19,6 +19,8 @@
 
 typedef struct SeosCryptoCtx SeosCryptoCtx;
 
+// -------------------------------- RNG API ------------------------------------
+
 typedef seos_err_t
 (*SeosCryptoCtx_rngGetBytesT)(SeosCryptoCtx*  self,
                               void*           buf,
@@ -28,6 +30,8 @@ typedef seos_err_t
 (*SeosCryptoCtx_rngReSeedT)(SeosCryptoCtx*  self,
                             const void*     seed,
                             size_t          seedLen);
+
+// ------------------------------- Digest API ----------------------------------
 
 typedef seos_err_t
 (*SeosCryptoCtx_digestInitT)(SeosCryptoCtx*                 self,
@@ -49,6 +53,8 @@ typedef seos_err_t
                                  SeosCrypto_DigestHandle    digestHandle,
                                  void*                      digest,
                                  size_t*                    digestSize);
+
+// -------------------------------- Key API ------------------------------------
 
 typedef seos_err_t
 (*SeosCryptoCtx_keyInitT)(SeosCryptoCtx*                   self,
@@ -85,6 +91,8 @@ typedef seos_err_t
                             SeosCrypto_KeyHandle           keyHandle);
 
 
+// ----------------------------- Signature API ---------------------------------
+
 typedef seos_err_t
 (*SeosCryptoCtx_signatureInitT)(SeosCryptoCtx*                self,
                                 SeosCrypto_SignatureHandle*   pSigHandle,
@@ -112,6 +120,8 @@ typedef seos_err_t
                                   const void*                    signature,
                                   size_t                         signatureSize);
 
+// ----------------------------- Agreement API ---------------------------------
+
 typedef seos_err_t
 (*SeosCryptoCtx_agreementInitT)(SeosCryptoCtx*                self,
                                 SeosCrypto_AgreementHandle*   pAgrHandle,
@@ -128,6 +138,8 @@ typedef seos_err_t
                                  SeosCrypto_KeyHandle           pubHandle,
                                  void*                          shared,
                                  size_t*                        sharedSize);
+
+// ------------------------------ Cipher API -----------------------------------
 
 typedef seos_err_t
 (*SeosCryptoCtx_cipherInitT)(SeosCryptoCtx*                 self,
@@ -161,9 +173,9 @@ typedef seos_err_t
                                  void*                        output,
                                  size_t*                      outputSize);
 
-typedef void
-(*SeosCryptoCtx_deInitT)(SeosCryptoCtx* self);
+// -----------------------------------------------------------------------------
 
+typedef void (*SeosCryptoCtx_deInitT)(SeosCryptoCtx* self);
 
 typedef struct
 {

@@ -31,7 +31,6 @@ initImpl(SeosCrypto_MemIf*               memIf,
         break;
     default:
         retval = SEOS_ERROR_NOT_SUPPORTED;
-        break;
     }
 
     return retval;
@@ -56,7 +55,6 @@ deInitImpl(SeosCrypto_MemIf*               memIf,
         break;
     default:
         retval = SEOS_ERROR_NOT_SUPPORTED;
-        break;
     }
 
     return retval;
@@ -90,7 +88,7 @@ static seos_err_t
 computeImpl(SeosCryptoAgreement*            self,
             SeosCryptoRng*                  rng,
             SeosCryptoKey*                  pubKey,
-            unsigned char*                  buf,
+            void*                           buf,
             size_t*                         bufSize)
 {
     void* rngFunc = (NULL != rng) ? SeosCryptoRng_getBytesMbedtls : NULL;

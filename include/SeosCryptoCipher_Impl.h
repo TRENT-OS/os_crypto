@@ -52,7 +52,6 @@ typedef struct
     unsigned char               iv[SeosCryptoCipher_AES_BLOCK_SIZE];
     size_t                      ivLen;
     size_t                      inputLen;
-    char                        outputBuf[SeosCryptoCipher_OUTPUT_BUFFER_SIZE];
     bool                        started;
     bool                        updated;
     bool                        finalized;

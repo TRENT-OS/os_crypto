@@ -20,16 +20,6 @@
 /**
  * @brief Initializes an rng context
  *
- * @param memIf (required) pointer to context to initialize
- * @param self (required) pointer to context to initialize
- * @param entropyFunc (required) entropy callback provided by platform
- * @param entropyCtx (optional) pointer passed to entropy function
-   *
- * @return an error code
- * @retval SEOS_SUCCESS if all right
- * @retval SEOS_ERROR_ABORTED if drbg could not be seeded
- * @retval SEOS_ERROR_INVALID_PARAMETER if a parameter is invalid (e.g. NULL)
- *
  */
 seos_err_t
 SeosCryptoRng_init(SeosCrypto_MemIf*        memIf,
@@ -40,13 +30,6 @@ SeosCryptoRng_init(SeosCrypto_MemIf*        memIf,
 /**
  * @brief Get random bytes
  *
- * @param self (required) pointer to context
- * @param buf (required) pointer to the destination buffer
- * @param bufSize size of the destination buffer
- *
- * @return an error code
- * @retval SEOS_SUCCESS if all right
- *
  */
 seos_err_t
 SeosCryptoRng_getBytes(SeosCryptoRng*  self,
@@ -55,13 +38,6 @@ SeosCryptoRng_getBytes(SeosCryptoRng*  self,
 
 /**
  * @brief Reseed the RNG with additional bytes
- *
- * @param self (required) pointer to context
- * @param seed (required) pointer to additional seed data
- * @param seedLen size seed
- *
- * @return an error code
- * @retval SEOS_SUCCESS if all right
  *
  */
 seos_err_t
@@ -93,12 +69,7 @@ SeosCryptoRng_getBytesMbedtls(void*            self,
 /**
  * @brief Deinitializes an rng context
  *
- * @param memIf (required) pointer to memory interface
- * @param self (required) pointer to context to initialize
- *
- * @return an error code
- * @retval SEOS_SUCCESS if all right
-  */
+ */
 seos_err_t
 SeosCryptoRng_deInit(SeosCrypto_MemIf*           memIf,
                      SeosCryptoRng*              self);

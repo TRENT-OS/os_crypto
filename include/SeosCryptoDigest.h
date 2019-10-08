@@ -20,7 +20,7 @@
 #include <string.h>
 
 /**
- * @brief implements SeosCryptoApi_digestInit()
+ * @brief Initializes a digest context
  *
  */
 seos_err_t
@@ -31,15 +31,13 @@ SeosCryptoDigest_init(SeosCrypto_MemIf*             memIf,
 /**
  * @brief closes a cipher context.
  *
- * @param self (required) pointer to context to initialize
- *
  */
 seos_err_t
 SeosCryptoDigest_deInit(SeosCrypto_MemIf*           memIf,
                         SeosCryptoDigest*           self);
 
 /**
- * @brief implements SeosCryptoApi_digestUpdate()
+ * @brief Updates the computation of the digest providing a new block of data
  *
  */
 seos_err_t
@@ -48,7 +46,7 @@ SeosCryptoDigest_update(SeosCryptoDigest*   self,
                         size_t              dataLen);
 
 /**
- * @brief implements SeosCryptoApi_digestFinalize()
+ * @brief Finalizes the computation of the digest
  *
  */
 seos_err_t

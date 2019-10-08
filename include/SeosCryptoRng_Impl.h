@@ -20,7 +20,6 @@ typedef int (SeosCrypto_EntropyFunc)(void* ctx, unsigned char* buf, size_t len);
 typedef struct
 {
     mbedtls_ctr_drbg_context    drbg;
-    unsigned char               rnd[PAGE_SIZE];
 }
 SeosCryptoRng;
 
