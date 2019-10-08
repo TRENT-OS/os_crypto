@@ -75,10 +75,10 @@ typedef struct __attribute__((__packed__))
 SeosCryptoKey_RSAPub;
 typedef struct __attribute__((__packed__))
 {
-    unsigned char   nBytes[SeosCryptoKey_Size_RSA_PRV]; ///< public modulus n=p*q
-    uint32_t        nLen;
-    unsigned char   dBytes[SeosCryptoKey_Size_RSA_PRV]; ///< exponent d=e^-1
+    unsigned char   dBytes[SeosCryptoKey_Size_RSA_PRV]; ///< secret exp.
     uint32_t        dLen;
+    unsigned char   eBytes[SeosCryptoKey_Size_RSA_PRV]; ///< public exp.
+    uint32_t        eLen;
     unsigned char   pBytes[SeosCryptoKey_Size_RSA_PRV / 2]; ///< prime factor
     uint32_t        pLen;
     unsigned char   qBytes[SeosCryptoKey_Size_RSA_PRV / 2]; ///< prime factor
@@ -94,6 +94,7 @@ typedef struct __attribute__((__packed__))
     uint32_t        qyLen;
 }
 SeosCryptoKey_SECP256r1Pub;
+
 typedef struct __attribute__((__packed__))
 {
     unsigned char   dBytes[SeosCryptoKey_Size_SECP256R1_PRV]; ///<  private scalar

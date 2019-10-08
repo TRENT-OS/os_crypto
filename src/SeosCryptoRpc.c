@@ -321,12 +321,8 @@ seos_err_t
 SeosCryptoRpc_keyDeInit(SeosCryptoRpc*                  self,
                         SeosCrypto_KeyHandle            keyHandle)
 {
-    seos_err_t retval = !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-                        SEOS_SUCCESS;
-
-    SeosCrypto_keyDeInit(self->seosCryptoApi, keyHandle);
-
-    return retval;
+    return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_keyDeInit(self->seosCryptoApi, keyHandle);
 }
 
 seos_err_t

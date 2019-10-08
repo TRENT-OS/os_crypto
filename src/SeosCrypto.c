@@ -328,11 +328,14 @@ SeosCrypto_signatureInit(SeosCryptoCtx*                api,
                          SeosCrypto_KeyHandle          prvHandle,
                          SeosCrypto_KeyHandle          pubHandle)
 {
-    SeosCrypto* self = (SeosCrypto*) api;
-    Debug_ASSERT_SELF(self);
-    Debug_ASSERT(self->parent.vtable == &SeosCrypto_vtable);
-
     seos_err_t retval = SEOS_ERROR_GENERIC;
+    SeosCrypto* self = (SeosCrypto*) api;
+
+    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable
+        || NULL == pSigHandle)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
 
     *pSigHandle = self->mem.memIf.malloc(sizeof(SeosCryptoSignature));
     if (NULL == *pSigHandle)
@@ -373,13 +376,15 @@ SeosCrypto_signatureDeInit(SeosCryptoCtx*               api,
 {
     seos_err_t retval = SEOS_SUCCESS;
     SeosCrypto* self = (SeosCrypto*) api;
+    size_t handlePos;
 
-    Debug_ASSERT_SELF(self);
-    Debug_ASSERT(self->parent.vtable == &SeosCrypto_vtable);
+    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
 
-    size_t handlePos = SeosCrypto_findHandle(&self->signatureHandleVector,
-                                             sigHandle);
-    if (handlePos != -1)
+    if ((handlePos = SeosCrypto_findHandle(&self->signatureHandleVector,
+                                           sigHandle)) != -1)
     {
         if ((retval = SeosCryptoSignature_deInit(&self->mem.memIf,
                                                  sigHandle)) != SEOS_SUCCESS)

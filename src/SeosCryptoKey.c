@@ -116,7 +116,7 @@ getEffectiveKeylength(unsigned int  type,
     case SeosCryptoKey_Type_RSA_PRV:
     {
         SeosCryptoKey_RSAPrv* key = (SeosCryptoKey_RSAPrv*) keyBytes;
-        return getMpiLen(key->nBytes, key->nLen);
+        return getMpiLen(key->pBytes, key->pLen) + getMpiLen(key->qBytes, key->qLen);
     }
     case SeosCryptoKey_Type_SECP256R1_PUB:
     case SeosCryptoKey_Type_SECP256R1_PRV:
@@ -273,16 +273,16 @@ genRSAPairImpl(SeosCryptoKey*  prvKey,
     {
         pubRsa->nLen = mbedtls_mpi_size(&rsa.N);
         pubRsa->eLen = mbedtls_mpi_size(&rsa.E);
-        prvRsa->nLen = mbedtls_mpi_size(&rsa.N);
+        prvRsa->eLen = mbedtls_mpi_size(&rsa.E);
         prvRsa->qLen = mbedtls_mpi_size(&rsa.Q);
         prvRsa->pLen = mbedtls_mpi_size(&rsa.P);
         prvRsa->dLen = mbedtls_mpi_size(&rsa.D);
         retval = mbedtls_mpi_write_binary(&rsa.N, pubRsa->nBytes, pubRsa->nLen) ||
                  mbedtls_mpi_write_binary(&rsa.E, pubRsa->eBytes, pubRsa->eLen) ||
-                 mbedtls_mpi_write_binary(&rsa.N, prvRsa->nBytes, prvRsa->nLen) ||
                  mbedtls_mpi_write_binary(&rsa.P, prvRsa->pBytes, prvRsa->pLen) ||
                  mbedtls_mpi_write_binary(&rsa.Q, prvRsa->qBytes, prvRsa->qLen) ||
-                 mbedtls_mpi_write_binary(&rsa.D, prvRsa->dBytes, prvRsa->dLen) ?
+                 mbedtls_mpi_write_binary(&rsa.D, prvRsa->dBytes, prvRsa->dLen) ||
+                 mbedtls_mpi_write_binary(&rsa.E, prvRsa->eBytes, prvRsa->eLen) ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
     }
 
@@ -629,13 +629,14 @@ SeosCryptoKey_writeRSAPrv(const SeosCryptoKey* key,
                           mbedtls_rsa_context* rsa)
 {
     SeosCryptoKey_RSAPrv* prvKey;
+
     return (prvKey = SeosCryptoKey_getRSAPrv(key)) == NULL
            || (mbedtls_rsa_import_raw(rsa,
-                                      prvKey->nBytes, prvKey->nLen,
+                                      NULL, 0,
                                       prvKey->pBytes, prvKey->pLen,
                                       prvKey->qBytes, prvKey->qLen,
                                       prvKey->dBytes, prvKey->dLen,
-                                      NULL, 0) != 0)
+                                      prvKey->eBytes, prvKey->eLen) != 0)
            || (mbedtls_rsa_complete(rsa) != 0)
            || (mbedtls_rsa_check_privkey(rsa) != 0) ?
            SEOS_ERROR_INVALID_PARAMETER : SEOS_SUCCESS;
@@ -685,6 +686,7 @@ SeosCryptoKey_writeSECP256r1Prv(const SeosCryptoKey*  key,
     SeosCryptoKey_SECP256r1Prv* ecKey;
     return (ecKey = SeosCryptoKey_getSECP256r1Prv(key)) == NULL
            || mbedtls_ecp_group_load(&ecdh->grp, MBEDTLS_ECP_DP_SECP256R1) != 0
-           || mbedtls_mpi_read_binary(&ecdh->d, ecKey->dBytes, ecKey->dLen) != 0 ?
+           || mbedtls_mpi_read_binary(&ecdh->d, ecKey->dBytes, ecKey->dLen) != 0
+           || mbedtls_ecp_check_privkey(&ecdh->grp, &ecdh->d) != 0 ?
            SEOS_ERROR_INVALID_PARAMETER : SEOS_SUCCESS;
 }

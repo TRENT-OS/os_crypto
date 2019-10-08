@@ -89,8 +89,9 @@ SeosCryptoApi_signatureInit(SeosCryptoCtx*                cryptoCtx,
                             SeosCrypto_KeyHandle          prvHandle,
                             SeosCrypto_KeyHandle          pubHandle)
 {
-    Debug_ASSERT_SELF(cryptoCtx);
-    return cryptoCtx->vtable->signatureInit(cryptoCtx, pSigHandle, algorithm,
+    return (NULL == cryptoCtx) ?
+           SEOS_ERROR_INVALID_PARAMETER :
+           cryptoCtx->vtable->signatureInit(cryptoCtx, pSigHandle, algorithm,
                                             prvHandle, pubHandle);
 }
 
@@ -98,8 +99,9 @@ seos_err_t
 SeosCryptoApi_signatureDeInit(SeosCryptoCtx*               cryptoCtx,
                               SeosCrypto_SignatureHandle   sigHandle)
 {
-    Debug_ASSERT_SELF(cryptoCtx);
-    return cryptoCtx->vtable->signatureDeInit(cryptoCtx, sigHandle);
+    return (NULL == cryptoCtx) ?
+           SEOS_ERROR_INVALID_PARAMETER :
+           cryptoCtx->vtable->signatureDeInit(cryptoCtx, sigHandle);
 }
 
 seos_err_t
@@ -110,10 +112,12 @@ SeosCryptoApi_signatureSign(SeosCryptoCtx*                 cryptoCtx,
                             void*                          signature,
                             size_t*                        signatureSize)
 {
-    Debug_ASSERT_SELF(cryptoCtx);
-    void* pSig = signature;
-    return cryptoCtx->vtable->signatureSign(cryptoCtx, sigHandle, hash, hashSize,
-                                            &pSig, signatureSize);
+    void* pSignature = signature;
+
+    return (NULL == cryptoCtx || NULL == signature) ?
+           SEOS_ERROR_INVALID_PARAMETER :
+           cryptoCtx->vtable->signatureSign(cryptoCtx, sigHandle, hash, hashSize,
+                                            &pSignature, signatureSize);
 }
 
 seos_err_t
@@ -124,8 +128,9 @@ SeosCryptoApi_signatureVerify(SeosCryptoCtx*                 cryptoCtx,
                               const void*                    signature,
                               size_t                         signatureSize)
 {
-    Debug_ASSERT_SELF(cryptoCtx);
-    return cryptoCtx->vtable->signatureVerify(cryptoCtx, sigHandle, hash, hashSize,
+    return (NULL == cryptoCtx ) ?
+           SEOS_ERROR_INVALID_PARAMETER :
+           cryptoCtx->vtable->signatureVerify(cryptoCtx, sigHandle, hash, hashSize,
                                               signature, signatureSize);
 }
 

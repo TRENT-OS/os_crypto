@@ -58,14 +58,14 @@ setKeyImpl(SeosCryptoSignature*     self)
 {
     seos_err_t retval = SEOS_SUCCESS;
 
-    if (self->pubKey != NULL)
+    if (NULL != self->pubKey)
     {
         switch (self->pubKey->type)
         {
         case SeosCryptoKey_Type_RSA_PUB:
-            retval = (self->algorithm == SeosCryptoSignature_Algorithm_RSA_PKCS1) ?
-                     SeosCryptoKey_writeRSAPub(self->pubKey,
-                                               &self->mbedtls.rsa) : SEOS_ERROR_ABORTED;
+            retval = (self->algorithm != SeosCryptoSignature_Algorithm_RSA_PKCS1) ?
+                     SEOS_ERROR_ABORTED :
+                     SeosCryptoKey_writeRSAPub(self->pubKey, &self->mbedtls.rsa);
             break;
         default:
             retval = SEOS_ERROR_NOT_SUPPORTED;
@@ -77,9 +77,9 @@ setKeyImpl(SeosCryptoSignature*     self)
         switch (self->prvKey->type)
         {
         case SeosCryptoKey_Type_RSA_PRV:
-            retval = (self->algorithm == SeosCryptoSignature_Algorithm_RSA_PKCS1) ?
-                     SeosCryptoKey_writeRSAPrv(self->prvKey,
-                                               &self->mbedtls.rsa) : SEOS_ERROR_ABORTED;
+            retval = (self->algorithm != SeosCryptoSignature_Algorithm_RSA_PKCS1) ?
+                     SEOS_ERROR_ABORTED :
+                     SeosCryptoKey_writeRSAPrv(self->prvKey, &self->mbedtls.rsa);
             break;
         default:
             retval = SEOS_ERROR_NOT_SUPPORTED;
@@ -139,12 +139,11 @@ signHashImpl(SeosCryptoSignature*       self,
     case SeosCryptoSignature_Algorithm_RSA_PKCS1:
         if (self->mbedtls.rsa.len > *signatureSize)
         {
-            Debug_PRINTF("%s: %i, %i\n", __func__, self->mbedtls.rsa.len, *signatureSize);
             retval = SEOS_ERROR_BUFFER_TOO_SMALL;
         }
         else
         {
-            retval = (self->pubKey->type != SeosCryptoKey_Type_RSA_PUB)
+            retval = (self->prvKey->type != SeosCryptoKey_Type_RSA_PRV)
                      ||  mbedtls_rsa_pkcs1_sign(&self->mbedtls.rsa, rngFunc, rng,
                                                 MBEDTLS_RSA_PRIVATE, MBEDTLS_MD_NONE, hashSize,
                                                 hash, signature) != 0 ?
@@ -175,7 +174,7 @@ SeosCryptoSignature_init(SeosCrypto_MemIf*              memIf,
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
     // We can have one of those keys be empty, but not both
-    if (NULL == memIf || NULL == self || ( NULL == prvKey && NULL == pubKey))
+    if (NULL == memIf || NULL == self || (NULL == prvKey && NULL == pubKey))
     {
         retval = SEOS_ERROR_INVALID_PARAMETER;
         goto exit;
@@ -258,7 +257,8 @@ SeosCryptoSignature_verify(SeosCryptoSignature*         self,
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
-    if (NULL == self || NULL == hash || 0 == hashSize)
+    if (NULL == self || NULL == hash || 0 == hashSize || NULL == signature
+        || 0 == signatureSize)
     {
         retval = SEOS_ERROR_INVALID_PARAMETER;
     }
