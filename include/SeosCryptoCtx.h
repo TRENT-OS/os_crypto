@@ -32,9 +32,7 @@ typedef seos_err_t
 typedef seos_err_t
 (*SeosCryptoCtx_digestInitT)(SeosCryptoCtx*                 self,
                              SeosCrypto_DigestHandle*       pDigestHandle,
-                             unsigned int                   algorithm,
-                             void*                          iv,
-                             size_t                         ivLen);
+                             unsigned int                   algorithm);
 
 typedef seos_err_t
 (*SeosCryptoCtx_digestCloseT)(SeosCryptoCtx*                self,
@@ -49,9 +47,7 @@ typedef seos_err_t
 typedef seos_err_t
 (*SeosCryptoCtx_digestFinalizeT)(SeosCryptoCtx*             self,
                                  SeosCrypto_DigestHandle    digestHandle,
-                                 const void*                data,
-                                 size_t                     dataLen,
-                                 void**                     digest,
+                                 void*                      digest,
                                  size_t*                    digestSize);
 
 typedef seos_err_t

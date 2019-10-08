@@ -11,59 +11,115 @@
 // Private Functions -----------------------------------------------------------
 
 static seos_err_t
-finalize(SeosCryptoDigest* self,
-         void const* data,
-         size_t len,
-         void* digest)
+initImpl(SeosCrypto_MemIf*   memIf,
+         SeosCryptoDigest*   self)
+{
+    UNUSED_VAR(memIf);
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    switch (self->algorithm)
+    {
+    case SeosCryptoDigest_Algorithm_MD5:
+        mbedtls_md5_init(&self->mbedtls.md5);
+        retval = mbedtls_md5_starts_ret(&self->mbedtls.md5) ?
+                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+        break;
+    case SeosCryptoDigest_Algorithm_SHA256:
+        mbedtls_sha256_init(&self->mbedtls.sha256);
+        retval = mbedtls_sha256_starts_ret(&self->mbedtls.sha256, 0) ?
+                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+        break;
+    default:
+        retval = SEOS_ERROR_NOT_SUPPORTED;
+    }
+
+    return retval;
+}
+
+static seos_err_t
+deInitImpl(SeosCrypto_MemIf*   memIf,
+           SeosCryptoDigest*   self)
+{
+    UNUSED_VAR(memIf);
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    switch (self->algorithm)
+    {
+    case SeosCryptoDigest_Algorithm_MD5:
+        mbedtls_md5_free(&self->mbedtls.md5);
+        retval = SEOS_SUCCESS;
+        break;
+    case SeosCryptoDigest_Algorithm_SHA256:
+        mbedtls_sha256_free(&self->mbedtls.sha256);
+        retval = SEOS_SUCCESS;
+        break;
+    default:
+        retval = SEOS_ERROR_NOT_SUPPORTED;
+    }
+
+    return retval;
+}
+
+static seos_err_t
+finalizeImpl(SeosCryptoDigest*  self,
+             void*              digest,
+             size_t*            digestSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
     case SeosCryptoDigest_Algorithm_MD5:
-        retval = (data != NULL &&
-                  mbedtls_md5_update_ret(&self->agorithmCtx.md5,
-                                         data,
-                                         len))
-                 || mbedtls_md5_finish_ret(&self->agorithmCtx.md5,
-                                           digest) ?
-                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+        if (*digestSize < SeosCryptoDigest_SIZE_MD5)
+        {
+            retval = SEOS_ERROR_BUFFER_TOO_SMALL;
+        }
+        else
+        {
+            retval = !self->updated || self->finalized ||
+                     mbedtls_md5_finish_ret(&self->mbedtls.md5, digest) ?
+                     SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+            *digestSize = SeosCryptoDigest_SIZE_MD5;
+        }
         break;
     case SeosCryptoDigest_Algorithm_SHA256:
-        retval = (data != NULL &&
-                  mbedtls_sha256_update_ret(&self->agorithmCtx.sha256,
-                                            data,
-                                            len))
-                 || mbedtls_sha256_finish_ret(&self->agorithmCtx.sha256,
-                                              digest) ?
-                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+        if (*digestSize < SeosCryptoDigest_SIZE_SHA256)
+        {
+            retval = SEOS_ERROR_BUFFER_TOO_SMALL;
+        }
+        else
+        {
+            retval = !self->updated || self->finalized ||
+                     mbedtls_sha256_finish_ret(&self->mbedtls.sha256, digest) ?
+                     SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+            *digestSize = SeosCryptoDigest_SIZE_SHA256;
+        }
         break;
     default:
         retval = SEOS_ERROR_NOT_SUPPORTED;
         break;
     }
+
     return retval;
 }
 
-seos_err_t
-update(SeosCryptoDigest* self,
-       const void* data,
-       size_t len)
+static seos_err_t
+updateImpl(SeosCryptoDigest*        self,
+           const void*              data,
+           size_t                   len)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
     case SeosCryptoDigest_Algorithm_MD5:
-        retval = mbedtls_md5_update_ret(&self->agorithmCtx.md5,
-                                        data,
-                                        len) ?
+        retval = self->finalized ||
+                 mbedtls_md5_update_ret(&self->mbedtls.md5, data, len) ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
     case SeosCryptoDigest_Algorithm_SHA256:
-        retval = mbedtls_sha256_update_ret(&self->agorithmCtx.sha256,
-                                           data,
-                                           len) ?
+        retval = self->finalized ||
+                 mbedtls_sha256_update_ret(&self->mbedtls.sha256, data, len) ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
     default:
@@ -76,159 +132,74 @@ update(SeosCryptoDigest* self,
 // Public Functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoDigest_init(SeosCrypto_MemIf*             memIf,
-                      SeosCryptoDigest*             self,
-                      SeosCryptoDigest_Algorithm    algorithm,
-                      void*                         iv,
-                      size_t                        ivLen)
+SeosCryptoDigest_init(SeosCrypto_MemIf*              memIf,
+                      SeosCryptoDigest*              self,
+                      SeosCryptoDigest_Algorithm    algorithm)
 {
-    Debug_ASSERT_SELF(self);
-
-    seos_err_t retval = SEOS_ERROR_GENERIC;
-
-    switch (algorithm)
+    if (NULL == memIf || NULL == self)
     {
-    case SeosCryptoDigest_Algorithm_MD5:
-        mbedtls_md5_init(&self->agorithmCtx.md5);
-        retval = mbedtls_md5_starts_ret(&self->agorithmCtx.md5) ?
-                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
-        break;
-    case SeosCryptoDigest_Algorithm_SHA256:
-        mbedtls_sha256_init(&self->agorithmCtx.sha256);
-        retval = mbedtls_sha256_starts_ret(&self->agorithmCtx.sha256, 0) ?
-                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
-        break;
-    default:
-        retval = SEOS_ERROR_NOT_SUPPORTED;
-        break;
+        return SEOS_ERROR_INVALID_PARAMETER;
     }
+
+    memset(self, 0, sizeof(*self));
+
     self->algorithm = algorithm;
-    return retval;
-}
+    self->updated   = false;
+    self->finalized = false;
 
-void
-SeosCryptoDigest_deInit(SeosCrypto_MemIf*   memIf,
-                        SeosCryptoDigest*   self)
-{
-    Debug_ASSERT_SELF(self);
-
-    switch (self->algorithm)
-    {
-    case SeosCryptoDigest_Algorithm_MD5:
-        mbedtls_md5_free(&self->agorithmCtx.md5);
-        break;
-    case SeosCryptoDigest_Algorithm_SHA256:
-        mbedtls_sha256_free(&self->agorithmCtx.sha256);
-        break;
-    default:
-        break;
-    }
+    return initImpl(memIf, self);
 }
 
 seos_err_t
-SeosCryptoDigest_update(SeosCryptoDigest*   self,
+SeosCryptoDigest_deInit(SeosCrypto_MemIf*    memIf,
+                        SeosCryptoDigest*    self)
+{
+    if (NULL == memIf || NULL == self)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    return deInitImpl(memIf, self);
+}
+
+seos_err_t
+SeosCryptoDigest_update(SeosCryptoDigest*    self,
                         const void*         data,
                         size_t              len)
 {
-    Debug_ASSERT_SELF(self);
-
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
-    if (NULL == data)
+    if (NULL == self || NULL == data || 0 == len)
     {
-        retval = SEOS_ERROR_INVALID_PARAMETER;
+        return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else
+
+    retval = updateImpl(self, data, len);
+    if (!self->updated)
     {
-        retval = update(self, data, len);
+        self->updated = (SEOS_SUCCESS == retval);
     }
+
     return retval;
 }
 
 seos_err_t
 SeosCryptoDigest_finalize(SeosCryptoDigest* self,
-                          const void*       data,
-                          size_t            len,
-                          void**            digest,
+                          void*             digest,
                           size_t*           digestSize)
 {
-    Debug_ASSERT_SELF(self);
-
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
-    if (NULL == digest || NULL == digestSize)
+    if (NULL == self || NULL == digest || NULL == digestSize || 0 == *digestSize)
     {
-        retval = SEOS_ERROR_INVALID_PARAMETER;
+        return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else
+
+    retval = finalizeImpl(self, digest, digestSize);
+    if (!self->finalized)
     {
-        size_t algoDigestSize = SeosCryptoDigest_getDigestSize(self);
-
-        /* Check Buffer (either provided or internal) and Size*/
-        if (NULL == *digest)
-        {
-            *digest = self->digest;
-        }
-        else if (*digestSize < algoDigestSize)
-        {
-            retval = SEOS_ERROR_BUFFER_TOO_SMALL;
-        }
-        else
-        { /* do nothing, writing is safe */ }
-
-        if (retval != SEOS_ERROR_BUFFER_TOO_SMALL)
-        {
-            *digestSize = algoDigestSize;
-            retval      = finalize(self, data, len, *digest);
-        }
+        self->finalized = (SEOS_SUCCESS == retval);
     }
+
     return retval;
-}
-
-seos_err_t
-SeosCryptoDigest_verify(SeosCryptoDigest*   self,
-                        const void*         data,
-                        size_t              len,
-                        void*               expectedDigest)
-{
-    Debug_ASSERT_SELF(self);
-
-    seos_err_t retval = SEOS_ERROR_GENERIC;
-
-    if (NULL == data || NULL == expectedDigest)
-    {
-        retval = SEOS_ERROR_INVALID_PARAMETER;
-    }
-    else
-    {
-        void* digest = NULL;
-        size_t digestSize = 0;
-        seos_err_t retval = SeosCryptoDigest_finalize(self,
-                                                      data,
-                                                      len,
-                                                      &digest,
-                                                      &digestSize);
-
-        if (SEOS_SUCCESS == retval
-            && memcmp(digest, expectedDigest, digestSize))
-        {
-            retval = SEOS_ERROR_GENERIC;
-        }
-    }
-    return retval;
-}
-
-size_t
-SeosCryptoDigest_getDigestSize(SeosCryptoDigest* self)
-{
-    switch (self->algorithm)
-    {
-    case SeosCryptoDigest_Algorithm_MD5:
-        return SeosCryptoDigest_SIZE_MD5;
-    case SeosCryptoDigest_Algorithm_SHA256:
-        return SeosCryptoDigest_SIZE_SHA256;
-    default:
-        Debug_ASSERT(false);
-        return 0;
-    }
 }

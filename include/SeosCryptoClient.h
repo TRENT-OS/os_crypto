@@ -76,9 +76,8 @@ SeosCryptoClient_rngReSeed(SeosCryptoCtx*       self,
 seos_err_t
 SeosCryptoClient_digestInit(SeosCryptoCtx*              api,
                             SeosCrypto_DigestHandle*    pDigestHandle,
-                            unsigned int                algorithm,
-                            void*                       iv,
-                            size_t                      ivLen);
+                            unsigned int                algorithm);
+
 /**
  * @brief implements SeosCryptoApi_digestClose() in a rpc connection
  *
@@ -86,6 +85,7 @@ SeosCryptoClient_digestInit(SeosCryptoCtx*              api,
 seos_err_t
 SeosCryptoClient_digestClose(SeosCryptoCtx*             api,
                              SeosCrypto_DigestHandle    digestHandle);
+
 /**
  * @brief implements SeosCryptoApi_digestUpdate() in a rpc connection
  *
@@ -102,54 +102,8 @@ SeosCryptoClient_digestUpdate(SeosCryptoCtx*                api,
 seos_err_t
 SeosCryptoClient_digestFinalize(SeosCryptoCtx*              api,
                                 SeosCrypto_DigestHandle     digestHandle,
-                                const void*                 data,
-                                size_t                      dataLen,
-                                void**                      digest,
+                                void*                       digest,
                                 size_t*                     digestSize);
-
-INLINE seos_err_t
-SeosCryptoClient_digestFinalize2(SeosCryptoClient*          self,
-                                 SeosCrypto_DigestHandle    digestHandle,
-                                 const void*                data,
-                                 size_t                     len,
-                                 void*                      digest,
-                                 size_t                     digestSize)
-{
-    void* pDigest = digest;
-    return SeosCryptoClient_digestFinalize(SeosCryptoClient_TO_SEOS_CRYPTO_CTX(
-                                               self),
-                                           digestHandle,
-                                           data,
-                                           len,
-                                           &pDigest,
-                                           &digestSize);
-}
-
-INLINE seos_err_t
-SeosCryptoClient_digestFinalizeNoData(SeosCryptoClient*         self,
-                                      SeosCrypto_DigestHandle   digestHandle,
-                                      void**                    digest,
-                                      size_t*                   digestSize)
-{
-    return SeosCryptoClient_digestFinalize(SeosCryptoClient_TO_SEOS_CRYPTO_CTX(
-                                               self),
-                                           digestHandle,
-                                           NULL, 0,
-                                           digest, digestSize);
-}
-
-INLINE seos_err_t
-SeosCryptoClient_digestFinalizeNoData2(SeosCryptoClient*        self,
-                                       SeosCrypto_DigestHandle  digestHandle,
-                                       void*                    digest,
-                                       size_t                   digestSize)
-{
-    void* pDigest = digest;
-    return SeosCryptoClient_digestFinalizeNoData(self,
-                                                 digestHandle,
-                                                 &pDigest,
-                                                 &digestSize);
-}
 
 seos_err_t
 SeosCryptoClient_signatureInit(SeosCryptoCtx*                api,

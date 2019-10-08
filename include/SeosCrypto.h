@@ -88,9 +88,7 @@ SeosCrypto_rngReSeed(SeosCryptoCtx*     api,
 seos_err_t
 SeosCrypto_digestInit(SeosCryptoCtx*                api,
                       SeosCrypto_DigestHandle*      pDigestHandle,
-                      unsigned                      algorithm,
-                      void*                         iv,
-                      size_t                        ivLen);
+                      unsigned                      algorithm);
 /**
  * @brief implements SeosCryptoApi_digestInit() in a local connection
  * (function call, no rpc)
@@ -117,9 +115,7 @@ SeosCrypto_digestUpdate(SeosCryptoCtx*              api,
 seos_err_t
 SeosCrypto_digestFinalize(SeosCryptoCtx*                api,
                           SeosCrypto_DigestHandle       digestHandle,
-                          const void*                   data,
-                          size_t                        len,
-                          void**                        digest,
+                          void*                         digest,
                           size_t*                       digestSize);
 
 // -------------------------------- Key API ------------------------------------

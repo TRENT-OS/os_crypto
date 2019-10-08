@@ -157,38 +157,24 @@ SeosCryptoClient_rngReSeed(SeosCryptoCtx*       api,
     }
 
     memcpy(self->clientDataport, seed, seedLen);
+
     return SeosCryptoRpc_rngReSeed(self->rpcHandle, seedLen);
 }
 
 seos_err_t
 SeosCryptoClient_digestInit(SeosCryptoCtx*                  api,
                             SeosCrypto_DigestHandle*        pDigestHandle,
-                            SeosCryptoDigest_Algorithm      algorithm,
-                            void*                           iv,
-                            size_t                          ivLen)
+                            SeosCryptoDigest_Algorithm      algorithm)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
-    Debug_ASSERT_SELF(self);
-    Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
 
-    seos_err_t retval = SEOS_ERROR_GENERIC;
+    if (NULL == api || self->parent.vtable != &SeosCryptoClient_vtable
+        || NULL == pDigestHandle)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
 
-    if (ivLen > PAGE_SIZE)
-    {
-        retval = SEOS_ERROR_INVALID_PARAMETER;
-    }
-    else
-    {
-        if (iv != NULL)
-        {
-            memcpy(self->clientDataport, iv, ivLen);
-        }
-        retval = SeosCryptoRpc_digestInit(self->rpcHandle,
-                                          pDigestHandle,
-                                          algorithm,
-                                          ivLen);
-    }
-    return retval;
+    return SeosCryptoRpc_digestInit(self->rpcHandle, pDigestHandle, algorithm);
 }
 
 seos_err_t
@@ -196,8 +182,11 @@ SeosCryptoClient_digestClose(SeosCryptoCtx*             api,
                              SeosCrypto_DigestHandle digestHandle)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
-    Debug_ASSERT_SELF(self);
-    Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
+
+    if (NULL == api || self->parent.vtable != &SeosCryptoClient_vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
 
     return SeosCryptoRpc_digestClose(self->rpcHandle, digestHandle);
 }
@@ -209,80 +198,43 @@ SeosCryptoClient_digestUpdate(SeosCryptoCtx*                api,
                               size_t                        dataLen)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
-    Debug_ASSERT_SELF(self);
-    Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
 
-    seos_err_t retval = SEOS_ERROR_GENERIC;
+    if (NULL == api || self->parent.vtable != &SeosCryptoClient_vtable
+        || NULL == data || 0 == dataLen)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else if (dataLen > PAGE_SIZE)
+    {
+        return SEOS_ERROR_BUFFER_TOO_SMALL;
+    }
 
-    if (NULL == data || dataLen > PAGE_SIZE)
-    {
-        retval = SEOS_ERROR_INVALID_PARAMETER;
-    }
-    else
-    {
-        memcpy(self->clientDataport, data, dataLen);
-        retval = SeosCryptoRpc_digestUpdate(self->rpcHandle,
-                                            digestHandle,
-                                            dataLen);
-    }
-    return retval;
+    memcpy(self->clientDataport, data, dataLen);
+
+    return SeosCryptoRpc_digestUpdate(self->rpcHandle, digestHandle, dataLen);
 }
 
 seos_err_t
 SeosCryptoClient_digestFinalize(SeosCryptoCtx*              api,
                                 SeosCrypto_DigestHandle     digestHandle,
-                                const void*                 data,
-                                size_t                      dataLen,
-                                void**                      digest,
+                                void*                       digest,
                                 size_t*                     digestSize)
 {
-    SeosCryptoClient* self = (SeosCryptoClient*) api;
-    Debug_ASSERT_SELF(self);
-    Debug_ASSERT(self->parent.vtable == &SeosCryptoClient_vtable);
-
     seos_err_t retval = SEOS_ERROR_GENERIC;
+    SeosCryptoClient* self = (SeosCryptoClient*) api;
 
-    if (dataLen > PAGE_SIZE || NULL == digest || NULL == digestSize)
+    if (NULL == api || self->parent.vtable != &SeosCryptoClient_vtable
+        || NULL == digest || NULL == digestSize)
     {
-        retval = SEOS_ERROR_INVALID_PARAMETER;
+        return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else
+
+    if ((retval = SeosCryptoRpc_digestFinalize(self->rpcHandle, digestHandle,
+                                               *digestSize)) == SEOS_SUCCESS)
     {
-        if (data != NULL)
-        {
-            memcpy(self->clientDataport, data, dataLen);
-        }
-        retval = SeosCryptoRpc_digestFinalize(self->rpcHandle,
-                                              digestHandle,
-                                              dataLen);
-
-        if (SEOS_SUCCESS == retval)
-        {
-            size_t* serverDigestLen = (size_t*) self->clientDataport;
-            char*   serverDigest    = &(((char*) self->clientDataport)
-                                        [sizeof(*serverDigestLen)]);
-
-            if (*digest != NULL)
-            {
-                if (*digestSize < *serverDigestLen)
-                {
-                    retval = SEOS_ERROR_BUFFER_TOO_SMALL;
-                }
-                else
-                {
-                    *digestSize = *serverDigestLen;
-                    memcpy(*digest, serverDigest, *serverDigestLen);
-                    retval = SEOS_SUCCESS;
-                }
-            }
-            else
-            {
-                *digestSize = *serverDigestLen;
-                *digest     = serverDigest;
-                retval      = SEOS_SUCCESS;
-            }
-        }
+        retval = parseRpcOutput(self, &digest, digestSize);
     }
+
     return retval;
 }
 

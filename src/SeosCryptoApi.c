@@ -29,25 +29,20 @@ SeosCryptoApi_rngReSeed(SeosCryptoCtx*      cryptoCtx,
 seos_err_t
 SeosCryptoApi_digestInit(SeosCryptoCtx*              cryptoCtx,
                          SeosCrypto_DigestHandle*    pDigestHandle,
-                         unsigned int                algorithm,
-                         void*                       iv,
-                         size_t                      ivLen)
+                         unsigned int                algorithm)
 {
-    Debug_ASSERT_SELF(cryptoCtx);
-    return cryptoCtx->vtable->digestInit(cryptoCtx,
-                                         pDigestHandle,
-                                         algorithm,
-                                         iv,
-                                         ivLen);
+    return (NULL == cryptoCtx) ?
+           SEOS_ERROR_INVALID_PARAMETER :
+           cryptoCtx->vtable->digestInit(cryptoCtx, pDigestHandle, algorithm);
 }
 
 seos_err_t
 SeosCryptoApi_digestClose(SeosCryptoCtx*             cryptoCtx,
                           SeosCrypto_DigestHandle    digestHandle)
 {
-    Debug_ASSERT_SELF(cryptoCtx);
-    return cryptoCtx->vtable->digestClose(cryptoCtx,
-                                          digestHandle);
+    return (NULL == cryptoCtx) ?
+           SEOS_ERROR_INVALID_PARAMETER :
+           cryptoCtx->vtable->digestClose(cryptoCtx, digestHandle);
 }
 
 seos_err_t
@@ -56,28 +51,20 @@ SeosCryptoApi_digestUpdate(SeosCryptoCtx*            cryptoCtx,
                            const void*               data,
                            size_t                    dataLen)
 {
-    Debug_ASSERT_SELF(cryptoCtx);
-    return cryptoCtx->vtable->digestUpdate(cryptoCtx,
-                                           digestHandle,
-                                           data,
-                                           dataLen);
+    return (NULL == cryptoCtx) ?
+           SEOS_ERROR_INVALID_PARAMETER :
+           cryptoCtx->vtable->digestUpdate(cryptoCtx, digestHandle, data, dataLen);
 }
 
 seos_err_t
 SeosCryptoApi_digestFinalize(SeosCryptoCtx*              cryptoCtx,
                              SeosCrypto_DigestHandle     digestHandle,
-                             const void*                 data,
-                             size_t                      dataLen,
-                             void**                      digest,
+                             void*                       digest,
                              size_t*                     digestSize)
 {
-    Debug_ASSERT_SELF(cryptoCtx);
-    return cryptoCtx->vtable->digestFinalize(cryptoCtx,
-                                             digestHandle,
-                                             data,
-                                             dataLen,
-                                             digest,
-                                             digestSize);
+    return (NULL == cryptoCtx) ?
+           SEOS_ERROR_INVALID_PARAMETER :
+           cryptoCtx->vtable->digestFinalize(cryptoCtx, digestHandle, digest, digestSize);
 }
 
 seos_err_t

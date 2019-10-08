@@ -71,8 +71,8 @@ SeosCryptoRpc_rngReSeed(SeosCryptoRpc*      self,
 seos_err_t
 SeosCryptoRpc_digestInit(SeosCryptoRpc*                 self,
                          SeosCrypto_DigestHandle*       pDigestHandle,
-                         SeosCryptoDigest_Algorithm     algorithm,
-                         size_t                         ivLen);
+                         SeosCryptoDigest_Algorithm     algorithm);
+
 /**
  * @brief rpc management of SeosCrypto_digestClose()
  *
@@ -80,6 +80,7 @@ SeosCryptoRpc_digestInit(SeosCryptoRpc*                 self,
 seos_err_t
 SeosCryptoRpc_digestClose(SeosCryptoRpc*            self,
                           SeosCrypto_DigestHandle   digestHandle);
+
 /**
  * @brief rpc management of SeosCrypto_digestUpdate() using the server dataport
  *  as input
@@ -88,7 +89,8 @@ SeosCryptoRpc_digestClose(SeosCryptoRpc*            self,
 seos_err_t
 SeosCryptoRpc_digestUpdate(SeosCryptoRpc*           self,
                            SeosCrypto_DigestHandle  digestHandle,
-                           size_t                   len);
+                           size_t                   inLen);
+
 /**
  * @brief rpc management of SeosCrypto_digestFinalize(). It uses the server
  *  dataport as input buffer if len > 0 (otherwise padding happens). The result
@@ -101,7 +103,7 @@ SeosCryptoRpc_digestUpdate(SeosCryptoRpc*           self,
 seos_err_t
 SeosCryptoRpc_digestFinalize(SeosCryptoRpc*             self,
                              SeosCrypto_DigestHandle    digestHandle,
-                             size_t                     len);
+                             size_t                     outSize);
 
 /**
  * @brief rpc management of SeosCryptoRpc_keyInit()
