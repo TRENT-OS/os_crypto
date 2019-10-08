@@ -166,11 +166,11 @@ SeosCrypto_deInit(SeosCryptoCtx* api)
     PointerVector_dtor(&self->digestHandleVector);
 }
 
-//-------------------------- Crpyto API functions ------------------------------
+// -------------------------------- RNG API ------------------------------------
 
 seos_err_t
 SeosCrypto_rngGetBytes(SeosCryptoCtx*   api,
-                       void**           buf,
+                       void*            buf,
                        size_t           bufLen)
 {
     SeosCrypto* self = (SeosCrypto*) api;
@@ -197,6 +197,8 @@ SeosCrypto_rngReSeed(SeosCryptoCtx*     api,
 
     return SeosCryptoRng_reSeed(&self->cryptoRng, seed, seedLen);
 }
+
+// ------------------------------ Digest API -----------------------------------
 
 seos_err_t
 SeosCrypto_digestInit(SeosCryptoCtx*                api,
@@ -304,6 +306,8 @@ SeosCrypto_digestFinalize(SeosCryptoCtx*          api,
            SEOS_ERROR_INVALID_HANDLE :
            SeosCryptoDigest_finalize(digestHandle, digest, digestSize);
 }
+
+// ----------------------------- Signature API ---------------------------------
 
 seos_err_t
 SeosCrypto_signatureInit(SeosCryptoCtx*                api,
@@ -418,6 +422,8 @@ SeosCrypto_signatureVerify(SeosCryptoCtx*                 api,
                                       signature, signatureSize) : SEOS_ERROR_INVALID_HANDLE;
 }
 
+// ----------------------------- Agreement API ---------------------------------
+
 seos_err_t
 SeosCrypto_agreementInit(SeosCryptoCtx*                api,
                          SeosCrypto_AgreementHandle*   pAgrHandle,
@@ -509,6 +515,8 @@ SeosCrypto_agreementComputeShared(SeosCryptoCtx*                 api,
            SeosCryptoAgreement_computeShared(agrHandle, &self->cryptoRng, pubHandle,
                                              shared, sharedSize) : SEOS_ERROR_INVALID_HANDLE;
 }
+
+// -------------------------------- Key API ------------------------------------
 
 seos_err_t
 SeosCrypto_keyInit(SeosCryptoCtx*                   api,
@@ -677,6 +685,8 @@ SeosCrypto_keyDeInit(SeosCryptoCtx*                 api,
 
     return retval;
 }
+
+// ------------------------------ Cipher API -----------------------------------
 
 seos_err_t
 SeosCrypto_cipherInit(SeosCryptoCtx*                api,

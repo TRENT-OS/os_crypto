@@ -14,9 +14,13 @@ SeosCryptoRng_init(SeosCrypto_MemIf*        memIf,
                    SeosCrypto_EntropyFunc   entropyFunc,
                    void*                    entropyCtx)
 {
-    Debug_ASSERT_SELF(self);
-
+    UNUSED_VAR(memIf);
     seos_err_t retval = SEOS_SUCCESS;
+
+    if (NULL == memIf || NULL == self || NULL == entropyFunc)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
 
     memset(self, 0, sizeof(*self));
 
@@ -40,30 +44,16 @@ err0:
 
 seos_err_t
 SeosCryptoRng_getBytes(SeosCryptoRng*  self,
-                       void**          buf,
-                       size_t          bufSize)
+                       void*           buf,
+                       size_t          bufLen)
 {
-    Debug_ASSERT_SELF(self);
-
-    if (NULL == buf || 0 == bufSize)
+    if (NULL == self || NULL == buf || 0 == bufLen)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    if (NULL == *buf)
-    {
-        if (bufSize > PAGE_SIZE)
-        {
-            return SEOS_ERROR_INVALID_PARAMETER;
-        }
-        *buf = self->rnd;
-    }
 
-    if (mbedtls_ctr_drbg_random(&self->drbg, *buf, bufSize) != 0)
-    {
-        return SEOS_ERROR_ABORTED;
-    }
-
-    return SEOS_SUCCESS;
+    return (mbedtls_ctr_drbg_random(&self->drbg, buf, bufLen) != 0) ?
+           SEOS_ERROR_ABORTED : SEOS_SUCCESS;
 }
 
 seos_err_t
@@ -85,15 +75,19 @@ SeosCryptoRng_reSeed(SeosCryptoRng*  self,
     return SEOS_SUCCESS;
 }
 
-void
+seos_err_t
 SeosCryptoRng_deInit(SeosCrypto_MemIf*              memIf,
                      SeosCryptoRng*                 self)
 {
-    Debug_ASSERT_SELF(self);
+    UNUSED_VAR(memIf);
+    if (NULL == memIf || NULL == self)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
 
     mbedtls_ctr_drbg_free(&self->drbg);
 
-    return;
+    return SEOS_SUCCESS;
 }
 
 /** @} */

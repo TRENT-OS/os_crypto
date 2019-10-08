@@ -106,35 +106,30 @@ SeosCryptoClient_deInit(SeosCryptoCtx* api)
     return;
 }
 
+// -------------------------------- RNG API ------------------------------------
+
 seos_err_t
 SeosCryptoClient_rngGetBytes(SeosCryptoCtx*       api,
-                             void**               buffer,
-                             size_t               dataLen)
+                             void*                buf,
+                             size_t               bufLen)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoClient* self = (SeosCryptoClient*) api;
 
-    if (NULL == api || NULL == buffer
+    if (NULL == api || NULL == buf
         || self->parent.vtable != &SeosCryptoClient_vtable)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if (dataLen > PAGE_SIZE)
+    else if (bufLen > PAGE_SIZE)
     {
         return SEOS_ERROR_BUFFER_TOO_SMALL;
     }
 
     if ((retval = SeosCryptoRpc_rngGetBytes(self->rpcHandle,
-                                            dataLen)) == SEOS_SUCCESS)
+                                            bufLen)) == SEOS_SUCCESS)
     {
-        if (*buffer != NULL)
-        {
-            memcpy(*buffer, self->clientDataport, dataLen);
-        }
-        else
-        {
-            *buffer = self->clientDataport;
-        }
+        memcpy(buf, self->clientDataport, bufLen);
     }
 
     return retval;
@@ -161,6 +156,8 @@ SeosCryptoClient_rngReSeed(SeosCryptoCtx*       api,
 
     return SeosCryptoRpc_rngReSeed(self->rpcHandle, seedLen);
 }
+
+// ------------------------------ Digest API -----------------------------------
 
 seos_err_t
 SeosCryptoClient_digestInit(SeosCryptoCtx*                  api,
@@ -238,6 +235,8 @@ SeosCryptoClient_digestFinalize(SeosCryptoCtx*              api,
 
     return retval;
 }
+
+// ----------------------------- Signature API ---------------------------------
 
 seos_err_t
 SeosCryptoClient_signatureInit(SeosCryptoCtx*                api,
@@ -331,6 +330,8 @@ SeosCryptoClient_signatureVerify(SeosCryptoCtx*                 api,
                                          signatureSize);
 }
 
+// ----------------------------- Agreement API ---------------------------------
+
 seos_err_t
 SeosCryptoClient_agreementInit(SeosCryptoCtx*                api,
                                SeosCrypto_AgreementHandle*   pAgrHandle,
@@ -387,6 +388,8 @@ SeosCryptoClient_agreementComputeShared(SeosCryptoCtx*                 api,
 
     return retval;
 }
+
+// -------------------------------- Key API ------------------------------------
 
 seos_err_t
 SeosCryptoClient_keyInit(SeosCryptoCtx*                   api,
@@ -500,6 +503,8 @@ SeosCryptoClient_keyDeInit(SeosCryptoCtx*                 api,
 
     return SeosCryptoRpc_keyDeInit(self->rpcHandle, keyHandle);
 }
+
+// ------------------------------ Cipher API -----------------------------------
 
 seos_err_t
 SeosCryptoClient_cipherInit(SeosCryptoCtx*                  api,

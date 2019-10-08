@@ -47,23 +47,20 @@ SeosCryptoClient_init(SeosCryptoClient*     self,
  */
 void
 SeosCryptoClient_deInit(SeosCryptoCtx* api);
+
 /**
- * @brief calls the remote seos crypto API. See SeosCryptoRpc_rngGetBytes()
- * and SeosCrypto_rngGetBytes()
- *
- * @param self (required) pointer to the seos crypto client object to be
- *  used
-  * @param buffer pointer to the memory where the return data is
- * @param dataLen data length
- *
- * @return an error code. See SeosCrypto_rngGetBytes()
+ * @brief implements SeosCryptoApi_rngGetBytes() in a rpc connection
  *
  */
 seos_err_t
 SeosCryptoClient_rngGetBytes(SeosCryptoCtx*       self,
-                             void**               buffer,
-                             size_t               dataLen);
+                             void*                buf,
+                             size_t               bufLen);
 
+/**
+ * @brief implements SeosCryptoApi_rngReSeed() in a rpc connection
+ *
+ */
 seos_err_t
 SeosCryptoClient_rngReSeed(SeosCryptoCtx*       self,
                            const void*          seed,
@@ -105,6 +102,10 @@ SeosCryptoClient_digestFinalize(SeosCryptoCtx*              api,
                                 void*                       digest,
                                 size_t*                     digestSize);
 
+/**
+ * @brief implements SeosCryptoApi_signatureInit() in a rpc connection
+ *
+ */
 seos_err_t
 SeosCryptoClient_signatureInit(SeosCryptoCtx*                api,
                                SeosCrypto_SignatureHandle*   pSigHandle,
@@ -112,10 +113,18 @@ SeosCryptoClient_signatureInit(SeosCryptoCtx*                api,
                                SeosCrypto_KeyHandle          prvHandle,
                                SeosCrypto_KeyHandle          pubHandle);
 
+/**
+ * @brief implements SeosCryptoApi_signatureDeInit() in a rpc connection
+ *
+ */
 seos_err_t
 SeosCryptoClient_signatureDeInit(SeosCryptoCtx*               api,
                                  SeosCrypto_SignatureHandle   sigHandle);
 
+/**
+ * @brief implements SeosCryptoApi_signatureSign() in a rpc connection
+ *
+ */
 seos_err_t
 SeosCryptoClient_signatureSign(SeosCryptoCtx*                 api,
                                SeosCrypto_SignatureHandle     sigHandle,
@@ -124,6 +133,10 @@ SeosCryptoClient_signatureSign(SeosCryptoCtx*                 api,
                                void**                         signature,
                                size_t*                        signatureSize);
 
+/**
+ * @brief implements SeosCryptoApi_signatureVerify() in a rpc connection
+ *
+ */
 seos_err_t
 SeosCryptoClient_signatureVerify(SeosCryptoCtx*                 api,
                                  SeosCrypto_SignatureHandle     sigHandle,
@@ -132,16 +145,28 @@ SeosCryptoClient_signatureVerify(SeosCryptoCtx*                 api,
                                  const void*                    signature,
                                  size_t                         signatureSize);
 
+/**
+ * @brief implements SeosCryptoApi_agreementInit() in a rpc connection
+ *
+ */
 seos_err_t
 SeosCryptoClient_agreementInit(SeosCryptoCtx*                api,
                                SeosCrypto_AgreementHandle*   pAgrHandle,
                                unsigned int                  algorithm,
                                SeosCrypto_KeyHandle          prvHandle);
 
+/**
+ * @brief implements SeosCryptoApi_agreementDeInit() in a rpc connection
+ *
+ */
 seos_err_t
 SeosCryptoClient_agreementDeInit(SeosCryptoCtx*               api,
                                  SeosCrypto_AgreementHandle   agrHandle);
 
+/**
+ * @brief implements SeosCryptoApi_agreemenComputeShared() in a rpc connection
+ *
+ */
 seos_err_t
 SeosCryptoClient_agreementComputeShared(SeosCryptoCtx*                 api,
                                         SeosCrypto_AgreementHandle     agrHandle,
@@ -149,6 +174,10 @@ SeosCryptoClient_agreementComputeShared(SeosCryptoCtx*                 api,
                                         void**                         shared,
                                         size_t*                        sharedSize);
 
+/**
+ * @brief implements SeosCryptoApi_keyInit() in a rpc connection
+ *
+ */
 seos_err_t
 SeosCryptoClient_keyInit(SeosCryptoCtx*                   ctx,
                          SeosCrypto_KeyHandle*            keyHandle,
@@ -156,15 +185,27 @@ SeosCryptoClient_keyInit(SeosCryptoCtx*                   ctx,
                          unsigned int                     flags,
                          size_t                           keySize);
 
+/**
+ * @brief implements SeosCryptoApi_keyGenerate() in a rpc connection
+ *
+ */
 seos_err_t
 SeosCryptoClient_keyGenerate(SeosCryptoCtx*               ctx,
                              SeosCrypto_KeyHandle         keyHandle);
 
+/**
+ * @brief implements SeosCryptoApi_keyGeneratePair() in a rpc connection
+ *
+ */
 seos_err_t
 SeosCryptoClient_keyGeneratePair(SeosCryptoCtx*           ctx,
                                  SeosCrypto_KeyHandle     prvKeyHandle,
                                  SeosCrypto_KeyHandle     pubKeyHandle);
 
+/**
+ * @brief implements SeosCryptoApi_keyImport() in a rpc connection
+ *
+ */
 seos_err_t
 SeosCryptoClient_keyImport(SeosCryptoCtx*                 ctx,
                            SeosCrypto_KeyHandle           keyHandle,
@@ -172,6 +213,10 @@ SeosCryptoClient_keyImport(SeosCryptoCtx*                 ctx,
                            const void*                    key,
                            size_t                         keyLen);
 
+/**
+ * @brief implements SeosCryptoApi_keyExport() in a rpc connection
+ *
+ */
 seos_err_t
 SeosCryptoClient_keyExport(SeosCryptoCtx*                 ctx,
                            SeosCrypto_KeyHandle           keyHandle,
@@ -179,6 +224,10 @@ SeosCryptoClient_keyExport(SeosCryptoCtx*                 ctx,
                            void*                          key,
                            size_t*                        keySize);
 
+/**
+ * @brief implements SeosCryptoApi_keyDeInit() in a rpc connection
+ *
+ */
 seos_err_t
 SeosCryptoClient_keyDeInit(SeosCryptoCtx*                 ctx,
                            SeosCrypto_KeyHandle           keyHandle);

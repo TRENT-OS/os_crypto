@@ -5,15 +5,23 @@
 #include "SeosCryptoCtx.h"
 #include "SeosCryptoApi.h"
 
-/***************************** Crypto functions *******************************/
+void
+SeosCryptoApi_deInit(SeosCryptoCtx* cryptoCtx)
+{
+    Debug_ASSERT_SELF(cryptoCtx);
+    cryptoCtx->vtable->deInit(cryptoCtx);
+}
+
+// -------------------------------- RNG API ------------------------------------
+
 seos_err_t
 SeosCryptoApi_rngGetBytes(SeosCryptoCtx*    cryptoCtx,
-                          void**            buffer,
-                          size_t            dataLen)
+                          void*             buf,
+                          size_t            bufSize)
 {
     return (NULL == cryptoCtx) ?
            SEOS_ERROR_INVALID_PARAMETER :
-           cryptoCtx->vtable->rngGetBytes(cryptoCtx, buffer, dataLen);
+           cryptoCtx->vtable->rngGetBytes(cryptoCtx, buf, bufSize);
 }
 
 seos_err_t
@@ -25,6 +33,8 @@ SeosCryptoApi_rngReSeed(SeosCryptoCtx*      cryptoCtx,
            SEOS_ERROR_INVALID_PARAMETER :
            cryptoCtx->vtable->rngReSeed(cryptoCtx, seed, seedLen);
 }
+
+// ------------------------------ Digest API -----------------------------------
 
 seos_err_t
 SeosCryptoApi_digestInit(SeosCryptoCtx*              cryptoCtx,
@@ -66,6 +76,8 @@ SeosCryptoApi_digestFinalize(SeosCryptoCtx*              cryptoCtx,
            SEOS_ERROR_INVALID_PARAMETER :
            cryptoCtx->vtable->digestFinalize(cryptoCtx, digestHandle, digest, digestSize);
 }
+
+// ----------------------------- Signature API ---------------------------------
 
 seos_err_t
 SeosCryptoApi_signatureInit(SeosCryptoCtx*                cryptoCtx,
@@ -119,6 +131,8 @@ SeosCryptoApi_signatureVerify(SeosCryptoCtx*                 cryptoCtx,
                                               signature, signatureSize);
 }
 
+// ----------------------------- Agreement API ---------------------------------
+
 seos_err_t
 SeosCryptoApi_agreementInit(SeosCryptoCtx*                cryptoCtx,
                             SeosCrypto_AgreementHandle*   pAgrHandle,
@@ -154,6 +168,8 @@ SeosCryptoApi_agreementComputeShared(SeosCryptoCtx*                 cryptoCtx,
            cryptoCtx->vtable->agreementComputeShared(cryptoCtx, agrHandle,
                                                      pubHandle, &pShared, sharedSize);
 }
+
+// -------------------------------- Key API ------------------------------------
 
 seos_err_t
 SeosCryptoApi_keyInit(SeosCryptoCtx*                   ctx,
@@ -213,6 +229,8 @@ SeosCryptoApi_keyDeInit(SeosCryptoCtx*                 ctx,
            ctx->vtable->keyDeInit(ctx, keyHandle);
 }
 
+// ------------------------------ Cipher API -----------------------------------
+
 seos_err_t
 SeosCryptoApi_cipherInit(SeosCryptoCtx*             cryptoCtx,
                          SeosCrypto_CipherHandle*   pCipherHandle,
@@ -265,11 +283,4 @@ SeosCryptoApi_cipherFinalize(SeosCryptoCtx*           cryptoCtx,
 {
     return (NULL == cryptoCtx) ? SEOS_ERROR_INVALID_PARAMETER :
            cryptoCtx->vtable->cipherFinalize(cryptoCtx, cipherHandle, output, outputSize);
-}
-
-void
-SeosCryptoApi_deInit(SeosCryptoCtx* cryptoCtx)
-{
-    Debug_ASSERT_SELF(cryptoCtx);
-    cryptoCtx->vtable->deInit(cryptoCtx);
 }

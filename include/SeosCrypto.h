@@ -72,8 +72,8 @@ SeosCrypto_deInit(SeosCryptoCtx* api);
  */
 seos_err_t
 SeosCrypto_rngGetBytes(SeosCryptoCtx*   api,
-                       void**           buffer,
-                       size_t           bufferLen);
+                       void*            buf,
+                       size_t           bufLen);
 
 /**
  * @brief implements SeosCryptoApi_rngReSeed() in a local connection

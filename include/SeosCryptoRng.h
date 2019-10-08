@@ -18,15 +18,17 @@
 #include "compiler.h"
 
 /**
- * @brief initializes an rng context
+ * @brief Initializes an rng context
  *
+ * @param memIf (required) pointer to context to initialize
  * @param self (required) pointer to context to initialize
- * @param imlp pointer to the implementation context that will be used by the
- * rngFunc
- * @param rngFunc function pointer to a SeosCryptoRng_ImplRngFunc
- *
+ * @param entropyFunc (required) entropy callback provided by platform
+ * @param entropyCtx (optional) pointer passed to entropy function
+   *
  * @return an error code
  * @retval SEOS_SUCCESS if all right
+ * @retval SEOS_ERROR_ABORTED if drbg could not be seeded
+ * @retval SEOS_ERROR_INVALID_PARAMETER if a parameter is invalid (e.g. NULL)
  *
  */
 seos_err_t
@@ -36,7 +38,7 @@ SeosCryptoRng_init(SeosCrypto_MemIf*        memIf,
                    void*                    entropyCtx);
 
 /**
- * @brief get random bytes
+ * @brief Get random bytes
  *
  * @param self (required) pointer to context
  * @param buf (required) pointer to the destination buffer
@@ -48,11 +50,11 @@ SeosCryptoRng_init(SeosCrypto_MemIf*        memIf,
  */
 seos_err_t
 SeosCryptoRng_getBytes(SeosCryptoRng*  self,
-                       void**          buf,
+                       void*           buf,
                        size_t          bufSize);
 
 /**
- * @brief reseed the RNG with additional bytes
+ * @brief Reseed the RNG with additional bytes
  *
  * @param self (required) pointer to context
  * @param seed (required) pointer to additional seed data
@@ -68,7 +70,7 @@ SeosCryptoRng_reSeed(SeosCryptoRng*  self,
                      size_t          seedLen);
 
 /**
- * @brief get random bytes for mbedTLS wrapper
+ * @brief Get random bytes for mbedTLS wrapper
  *
  * @param self (required) pointer to context
  * @param buf (required) pointer to the destination buffer
@@ -85,17 +87,19 @@ SeosCryptoRng_getBytesMbedtls(void*            self,
 {
     // Simple wrapper for mbedTLS, to allow the buffered use of the getRandomData()
     // function as is common, but also to directly pass a function to mbedTLS
-    void* p = buf;
-    return SeosCryptoRng_getBytes(self, &p, bufSize) == SEOS_SUCCESS ? 0 : 1;
+    return SeosCryptoRng_getBytes(self, buf, bufSize) == SEOS_SUCCESS ? 0 : 1;
 }
 
 /**
- * @brief deinitializes an rng context
+ * @brief Deinitializes an rng context
  *
+ * @param memIf (required) pointer to memory interface
  * @param self (required) pointer to context to initialize
  *
- */
-void
+ * @return an error code
+ * @retval SEOS_SUCCESS if all right
+  */
+seos_err_t
 SeosCryptoRng_deInit(SeosCrypto_MemIf*           memIf,
                      SeosCryptoRng*              self);
 

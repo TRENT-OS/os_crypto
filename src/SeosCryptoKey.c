@@ -234,15 +234,7 @@ genImpl(SeosCryptoKey*      self,
     {
         SeosCryptoKey_AES* key = (SeosCryptoKey_AES*) self->keyBytes;
         key->len = self->bits >> 3;
-        /*todo: remove void* cast since it is fixed in the newer version
-                of the library*/
-        void* ptr = self->keyBytes;
-        retval = SeosCryptoRng_getBytes(rng, &ptr, key->len);
-
-        if (retval == SEOS_SUCCESS)
-        {
-            self->empty = false;
-        }
+        retval = SeosCryptoRng_getBytes(rng, 0, key->bytes, key->len);
         break;
     }
     default:

@@ -21,8 +21,8 @@ typedef struct SeosCryptoCtx SeosCryptoCtx;
 
 typedef seos_err_t
 (*SeosCryptoCtx_rngGetBytesT)(SeosCryptoCtx*  self,
-                              void**          buffer,
-                              size_t          dataLen);
+                              void*           buf,
+                              size_t          bufLen);
 
 typedef seos_err_t
 (*SeosCryptoCtx_rngReSeedT)(SeosCryptoCtx*  self,
