@@ -17,8 +17,11 @@
 #include "LibUtil/PointerVector.h"
 
 #include <stddef.h>
+#include <sys/user.h>
 
 #define SeosCrypto_TO_SEOS_CRYPTO_CTX(self) (&(self)->parent)
+
+#define INPUT_BUFFER_SIZE PAGE_SIZE
 
 typedef void* (SeosCrypto_MallocFunc)(size_t size);
 typedef void  (SeosCrypto_FreeFunc)(void* ptr);
@@ -40,6 +43,16 @@ typedef struct
     PointerVector       cipherHandleVector;
     PointerVector       signatureHandleVector;
     PointerVector       agreementHandleVector;
+    /**
+     * Buffer for outputs produced by crypto
+     */
+    unsigned char       inputBuffer[INPUT_BUFFER_SIZE];
 } SeosCrypto;
+
+INLINE void*
+get_input_buf_ptr(SeosCrypto* self)
+{
+    return self->inputBuffer;
+}
 
 /** @} */

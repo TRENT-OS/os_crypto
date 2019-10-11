@@ -571,7 +571,7 @@ SeosCryptoKey_export(SeosCryptoKey*         self,
                      size_t*                bufSize)
 {
     if (NULL == self || NULL == self->keyBytes || 0 == self->keySize || NULL == buf
-        || NULL == bufSize || 0 == bufSize)
+        || NULL == bufSize || 0 == *bufSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }

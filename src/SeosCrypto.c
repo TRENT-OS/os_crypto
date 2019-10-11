@@ -392,14 +392,21 @@ SeosCrypto_signatureSign(SeosCryptoCtx*                     api,
 {
     SeosCrypto* self = (SeosCrypto*) api;
 
-    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable)
+    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable || NULL == hash)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
+    else if (hashSize > INPUT_BUFFER_SIZE)
+    {
+        return SEOS_ERROR_BUFFER_TOO_SMALL;
+    }
 
-    return SeosCrypto_findHandle(&self->signatureHandleVector, sigHandle) != -1 ?
-           SeosCryptoSignature_sign(sigHandle, &self->cryptoRng, hash, hashSize, signature,
-                                    signatureSize) : SEOS_ERROR_INVALID_HANDLE;
+    // Make local copy of input buffer, to allow overlapping hash/signature buffers
+    memcpy(get_input_buf_ptr(self), hash, hashSize);
+    return SeosCrypto_findHandle(&self->signatureHandleVector, sigHandle) == -1 ?
+           SEOS_ERROR_INVALID_HANDLE :
+           SeosCryptoSignature_sign(sigHandle, &self->cryptoRng, get_input_buf_ptr(self),
+                                    hashSize, signature, signatureSize);
 }
 
 seos_err_t
@@ -417,9 +424,10 @@ SeosCrypto_signatureVerify(SeosCryptoCtx*                   api,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCrypto_findHandle(&self->signatureHandleVector, sigHandle) != -1 ?
+    return SeosCrypto_findHandle(&self->signatureHandleVector, sigHandle) == -1 ?
+           SEOS_ERROR_INVALID_HANDLE :
            SeosCryptoSignature_verify(sigHandle, &self->cryptoRng, hash, hashSize,
-                                      signature, signatureSize) : SEOS_ERROR_INVALID_HANDLE;
+                                      signature, signatureSize);
 }
 
 // ----------------------------- Agreement API ---------------------------------
@@ -510,10 +518,11 @@ SeosCrypto_agreementAgree(SeosCryptoCtx*                    api,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCrypto_findHandle(&self->agreementHandleVector, agrHandle) != -1
-           && SeosCrypto_findHandle(&self->keyHandleVector, pubHandle) != -1 ?
+    return (SeosCrypto_findHandle(&self->agreementHandleVector, agrHandle) == -1)
+           || (SeosCrypto_findHandle(&self->keyHandleVector, pubHandle) == -1) ?
+           SEOS_ERROR_INVALID_HANDLE :
            SeosCryptoAgreement_agree(agrHandle, &self->cryptoRng, pubHandle,
-                                     shared, sharedSize) : SEOS_ERROR_INVALID_HANDLE;
+                                     shared, sharedSize);
 }
 
 // -------------------------------- Key API ------------------------------------
@@ -574,9 +583,9 @@ SeosCrypto_keyGenerate(SeosCryptoCtx*               api,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCrypto_findHandle(&self->keyHandleVector, keyHandle) != -1 ?
-           SeosCryptoKey_generate(keyHandle, &self->cryptoRng) :
-           SEOS_ERROR_INVALID_HANDLE;
+    return SeosCrypto_findHandle(&self->keyHandleVector, keyHandle) == -1 ?
+           SEOS_ERROR_INVALID_HANDLE :
+           SeosCryptoKey_generate(keyHandle, &self->cryptoRng);
 }
 
 seos_err_t
@@ -591,10 +600,10 @@ SeosCrypto_keyGeneratePair(SeosCryptoCtx*               api,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return ((SeosCrypto_findHandle(&self->keyHandleVector, prvKeyHandle) != -1) &&
-            (SeosCrypto_findHandle(&self->keyHandleVector, pubKeyHandle) != -1)) ?
-           SeosCryptoKey_generatePair(prvKeyHandle, pubKeyHandle, &self->cryptoRng) :
-           SEOS_ERROR_INVALID_HANDLE;
+    return ((SeosCrypto_findHandle(&self->keyHandleVector, prvKeyHandle) == -1)
+            || (SeosCrypto_findHandle(&self->keyHandleVector, pubKeyHandle) == -1)) ?
+           SEOS_ERROR_INVALID_HANDLE :
+           SeosCryptoKey_generatePair(prvKeyHandle, pubKeyHandle, &self->cryptoRng);
 }
 
 seos_err_t
@@ -613,16 +622,16 @@ SeosCrypto_keyImport(SeosCryptoCtx*             api,
 
     if (NULL == wrapKeyHandle)
     {
-        return (SeosCrypto_findHandle(&self->keyHandleVector, keyHandle) != -1) ?
-               SeosCryptoKey_import(keyHandle, wrapKeyHandle, keyBytes, keySize) :
-               SEOS_ERROR_INVALID_HANDLE;
+        return (SeosCrypto_findHandle(&self->keyHandleVector, keyHandle) == -1) ?
+               SEOS_ERROR_INVALID_HANDLE :
+               SeosCryptoKey_import(keyHandle, wrapKeyHandle, keyBytes, keySize);
     }
     else
     {
-        return ((SeosCrypto_findHandle(&self->keyHandleVector, keyHandle) != -1) &&
-                (SeosCrypto_findHandle(&self->keyHandleVector, wrapKeyHandle) != -1)) ?
-               SeosCryptoKey_import(keyHandle, wrapKeyHandle, keyBytes, keySize) :
-               SEOS_ERROR_INVALID_HANDLE;
+        return ((SeosCrypto_findHandle(&self->keyHandleVector, keyHandle) == -1)
+                || (SeosCrypto_findHandle(&self->keyHandleVector, wrapKeyHandle) == -1)) ?
+               SEOS_ERROR_INVALID_HANDLE :
+               SeosCryptoKey_import(keyHandle, wrapKeyHandle, keyBytes, keySize);
     }
 }
 
@@ -642,16 +651,16 @@ SeosCrypto_keyExport(SeosCryptoCtx*             api,
 
     if (NULL == wrapKeyHandle)
     {
-        return (SeosCrypto_findHandle(&self->keyHandleVector, keyHandle) != -1) ?
-               SeosCryptoKey_export(keyHandle, wrapKeyHandle, buf, bufSize) :
-               SEOS_ERROR_INVALID_HANDLE;
+        return (SeosCrypto_findHandle(&self->keyHandleVector, keyHandle) == -1) ?
+               SEOS_ERROR_INVALID_HANDLE :
+               SeosCryptoKey_export(keyHandle, wrapKeyHandle, buf, bufSize);
     }
     else
     {
-        return ((SeosCrypto_findHandle(&self->keyHandleVector, keyHandle) != -1) &&
-                (SeosCrypto_findHandle(&self->keyHandleVector, wrapKeyHandle) != -1)) ?
-               SeosCryptoKey_export(keyHandle, wrapKeyHandle, buf, bufSize) :
-               SEOS_ERROR_INVALID_HANDLE;
+        return ((SeosCrypto_findHandle(&self->keyHandleVector, keyHandle) == -1)
+                || (SeosCrypto_findHandle(&self->keyHandleVector, wrapKeyHandle) == -1)) ?
+               SEOS_ERROR_INVALID_HANDLE :
+               SeosCryptoKey_export(keyHandle, wrapKeyHandle, buf, bufSize);
     }
 }
 
@@ -779,14 +788,21 @@ SeosCrypto_cipherProcess(SeosCryptoCtx*                  api,
 {
     SeosCrypto* self = (SeosCrypto*) api;
 
-    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable)
+    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable || NULL == input)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
+    else if (inputSize > INPUT_BUFFER_SIZE)
+    {
+        return SEOS_ERROR_BUFFER_TOO_SMALL;
+    }
 
+    // Make local copy of input buffer, to allow overlapping input/output buffers
+    memcpy(get_input_buf_ptr(self), input, inputSize);
     return (SeosCrypto_findHandle(&self->cipherHandleVector, cipherHandle) == -1) ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoCipher_process(cipherHandle, input, inputSize, output, outputSize);
+           SeosCryptoCipher_process(cipherHandle, get_input_buf_ptr(self), inputSize,
+                                    output, outputSize);
 }
 
 seos_err_t
