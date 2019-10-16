@@ -25,6 +25,15 @@
 
 typedef void* (SeosCrypto_MallocFunc)(size_t size);
 typedef void  (SeosCrypto_FreeFunc)(void* ptr);
+typedef int   (SeosCrypto_EntropyFunc)(void* ctx, unsigned char* buf,
+                                       size_t len);
+
+typedef struct
+{
+    SeosCrypto_MallocFunc*   malloc;
+    SeosCrypto_FreeFunc*     free;
+    SeosCrypto_EntropyFunc*  entropy;
+} SeosCrypto_Callbacks;
 
 typedef struct
 {

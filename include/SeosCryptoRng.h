@@ -22,10 +22,10 @@
  *
  */
 seos_err_t
-SeosCryptoRng_init(SeosCryptoRng*               self,
-                   const SeosCrypto_MemIf*      memIf,
-                   const SeosCrypto_EntropyFunc entropyFunc,
-                   void*                        entropyCtx);
+SeosCryptoRng_init(SeosCryptoRng*                self,
+                   const SeosCrypto_MemIf*       memIf,
+                   const SeosCrypto_EntropyFunc* entropyFunc,
+                   void*                         entropyCtx);
 
 /**
  * @brief Get random bytes

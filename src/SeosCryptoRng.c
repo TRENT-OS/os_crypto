@@ -9,10 +9,10 @@
 #include <string.h>
 
 seos_err_t
-SeosCryptoRng_init(SeosCryptoRng*               self,
-                   const SeosCrypto_MemIf*      memIf,
-                   const SeosCrypto_EntropyFunc entropyFunc,
-                   void*                        entropyCtx)
+SeosCryptoRng_init(SeosCryptoRng*                self,
+                   const SeosCrypto_MemIf*       memIf,
+                   const SeosCrypto_EntropyFunc* entropyFunc,
+                   void*                         entropyCtx)
 {
     UNUSED_VAR(memIf);
     seos_err_t retval = SEOS_SUCCESS;

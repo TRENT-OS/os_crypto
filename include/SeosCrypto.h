@@ -32,11 +32,8 @@
  *  call will also initialize the internal RNG of the API.
  *
  * @param self (required) pointer to the seos_crypto context to initialize
- * @param mallocFunc (required) provided malloc function
- * @param freeFunc (required) provided free function
- * @param entropyFunc (required) provided entropy function for feeding the
- *  internal RNG
- * @param entropyCtx (optional) context for entropy function
+ * @param cbFuncs (required) Callback functions for malloc, free, entropy
+ * @param entropyCtx (optional) context for entropy callback
  *
  * @return an error code
  * @retval SEOS_SUCCESS if all right
@@ -46,11 +43,9 @@
  *
  */
 seos_err_t
-SeosCrypto_init(SeosCrypto*             self,
-                SeosCrypto_MallocFunc   mallocFunc,
-                SeosCrypto_FreeFunc     freeFunc,
-                SeosCrypto_EntropyFunc  entropyFunc,
-                void*                   entropyCtx);
+SeosCrypto_init(SeosCrypto*                 self,
+                const SeosCrypto_Callbacks* cbFuncs,
+                void*                       entropyCtx);
 
 /**
  * @brief closes the initialized crypto context and releases all the allocated

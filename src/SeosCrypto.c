@@ -68,72 +68,56 @@ SeosCrypto_removeHandle(PointerVector* v, size_t pos)
 // Public functions ------------------------------------------------------------
 
 seos_err_t
-SeosCrypto_init(SeosCrypto*             self,
-                SeosCrypto_MallocFunc   mallocFunc,
-                SeosCrypto_FreeFunc     freeFunc,
-                SeosCrypto_EntropyFunc  entropyFunc,
-                void*                   entropyCtx)
+SeosCrypto_init(SeosCrypto*                 self,
+                const SeosCrypto_Callbacks* cbFuncs,
+                void*                       entropyCtx)
 {
-    Debug_ASSERT_SELF(self);
-
     seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    if (NULL == self || NULL == cbFuncs || NULL == cbFuncs->free
+        || NULL == cbFuncs->malloc || NULL == cbFuncs->entropy)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
 
     memset(self, 0, sizeof(*self));
 
-    if (NULL != mallocFunc && NULL != freeFunc)
-    {
-        self->memIf.malloc = mallocFunc;
-        self->memIf.free   = freeFunc;
+    self->parent.vtable = &SeosCrypto_vtable;
+    self->memIf.malloc  = cbFuncs->malloc;
+    self->memIf.free    = cbFuncs->free;
 
-        if (!PointerVector_ctor(&self->digestHandleVector, 1))
-        {
-            retval = SEOS_ERROR_ABORTED;
-            goto exit;
-        }
-        else if (!PointerVector_ctor(&self->keyHandleVector, 1))
-        {
-            retval = SEOS_ERROR_ABORTED;
-            goto err0;
-        }
-        else if (!PointerVector_ctor(&self->cipherHandleVector, 1))
-        {
-            retval = SEOS_ERROR_ABORTED;
-            goto err1;
-        }
-        else if (!PointerVector_ctor(&self->signatureHandleVector, 1))
-        {
-            retval = SEOS_ERROR_ABORTED;
-            goto err2;
-        }
-        else if (!PointerVector_ctor(&self->agreementHandleVector, 1))
-        {
-            retval = SEOS_ERROR_ABORTED;
-            goto err3;
-        }
-    }
-    else
+    if (!PointerVector_ctor(&self->digestHandleVector, 1))
     {
-        retval = SEOS_ERROR_INVALID_PARAMETER;
-        goto exit;
+        return SEOS_ERROR_ABORTED;
+    }
+    else if (!PointerVector_ctor(&self->keyHandleVector, 1))
+    {
+        retval = SEOS_ERROR_ABORTED;
+        goto err0;
+    }
+    else if (!PointerVector_ctor(&self->cipherHandleVector, 1))
+    {
+        retval = SEOS_ERROR_ABORTED;
+        goto err1;
+    }
+    else if (!PointerVector_ctor(&self->signatureHandleVector, 1))
+    {
+        retval = SEOS_ERROR_ABORTED;
+        goto err2;
+    }
+    else if (!PointerVector_ctor(&self->agreementHandleVector, 1))
+    {
+        retval = SEOS_ERROR_ABORTED;
+        goto err3;
     }
 
-    if (NULL != entropyFunc)
+    if ((retval = SeosCryptoRng_init(&self->cryptoRng, &self->memIf,
+                                     (const SeosCrypto_EntropyFunc*) cbFuncs->entropy, entropyCtx)) != SEOS_SUCCESS)
     {
-        if ((retval = SeosCryptoRng_init(&self->cryptoRng, &self->memIf,
-                                         (const SeosCrypto_EntropyFunc*) entropyFunc, entropyCtx)) != SEOS_SUCCESS)
-        {
-            goto err4;
-        }
-    }
-    else
-    {
-        retval = SEOS_ERROR_INVALID_PARAMETER;
         goto err4;
     }
 
-    self->parent.vtable = &SeosCrypto_vtable;
-    retval = SEOS_SUCCESS;
-    goto exit;
+    return retval;
 
 err4:
     PointerVector_dtor(&self->agreementHandleVector);
@@ -145,7 +129,6 @@ err1:
     PointerVector_dtor(&self->keyHandleVector);
 err0:
     PointerVector_dtor(&self->digestHandleVector);
-exit:
     return retval;
 }
 
@@ -153,7 +136,6 @@ void
 SeosCrypto_free(SeosCryptoCtx* api)
 {
     SeosCrypto* self = (SeosCrypto*) api;
-    Debug_ASSERT_SELF(self);
 
     SeosCryptoRng_free(&self->cryptoRng, &self->memIf);
 
