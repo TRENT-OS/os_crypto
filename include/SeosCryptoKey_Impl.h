@@ -49,10 +49,10 @@ SeosCryptoKey_Type;
 
 typedef enum
 {
-    SeosCryptoKey_PairType_NONE,
-    SeosCryptoKey_PairType_RSA,
-    SeosCryptoKey_PairType_DH,
-    SeosCryptoKey_PairType_SECP256R1
+    SeosCryptoKey_PairType_NONE         = SeosCryptoKey_Type_NONE,
+    SeosCryptoKey_PairType_RSA          = SeosCryptoKey_Type_RSA_PRV,
+    SeosCryptoKey_PairType_DH           = SeosCryptoKey_Type_DH_PRV,
+    SeosCryptoKey_PairType_SECP256R1    = SeosCryptoKey_Type_SECP256R1_PRV
 }
 SeosCryptoKey_PairType;
 
