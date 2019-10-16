@@ -110,52 +110,52 @@ SeosCryptoRpc_digestFinalize(SeosCryptoRpc*             self,
 // -------------------------------- Key API ------------------------------------
 
 /**
- * @brief rpc management of SeosCryptoRpc_keyInit()
- *
- */
-seos_err_t
-SeosCryptoRpc_keyInit(SeosCryptoRpc*                   self,
-                      SeosCrypto_KeyHandle*            keyHandle,
-                      unsigned int                     type,
-                      SeosCryptoKey_Flags               flags,
-                      size_t                           bits);
-
-/**
  * @brief rpc management of SeosCryptoRpc_keyGenerate()
  *
  */
 seos_err_t
-SeosCryptoRpc_keyGenerate(SeosCryptoRpc*               self,
-                          SeosCrypto_KeyHandle         keyHandle);
+SeosCryptoRpc_keyGenerate(SeosCryptoRpc*         self,
+                          SeosCrypto_KeyHandle*  pKeyHandle,
+                          SeosCryptoKey_Type     type,
+                          SeosCryptoKey_Flags    flags,
+                          size_t                 bits);
 
 /**
  * @brief rpc management of SeosCryptoRpc_keyGeneratePair()
  *
  */
 seos_err_t
-SeosCryptoRpc_keyGeneratePair(SeosCryptoRpc*           self,
-                              SeosCrypto_KeyHandle     prvKeyHandle,
-                              SeosCrypto_KeyHandle     pubKeyHandle);
+SeosCryptoRpc_keyGeneratePair(SeosCryptoRpc*            self,
+                              SeosCrypto_KeyHandle*     pPrvKeyHandle,
+                              SeosCrypto_KeyHandle*     pPubKeyHandle,
+                              SeosCryptoKey_PairType    type,
+                              SeosCryptoKey_Flags       prvFlags,
+                              SeosCryptoKey_Flags       pubFlags,
+                              size_t                    bits);
 
 /**
  * @brief rpc management of SeosCryptoRpc_keyImport()
  *
  */
 seos_err_t
-SeosCryptoRpc_keyImport(SeosCryptoRpc*                 self,
-                        SeosCrypto_KeyHandle           keyHandle,
-                        SeosCrypto_KeyHandle           wrapkeyHandle,
-                        size_t                         keySize);
+SeosCryptoRpc_keyImport(SeosCryptoRpc*          self,
+                        SeosCrypto_KeyHandle*   pKeyHandle,
+                        SeosCrypto_KeyHandle    wrapkeyHandle,
+                        SeosCryptoKey_Type      type,
+                        SeosCryptoKey_Flags     flags,
+                        size_t                  keySize);
 
 /**
  * @brief rpc management of SeosCryptoRpc_keyExport()
  *
  */
 seos_err_t
-SeosCryptoRpc_keyExport(SeosCryptoRpc*                 self,
-                        SeosCrypto_KeyHandle           keyHandle,
-                        SeosCrypto_KeyHandle           wrapKeyHandle,
-                        size_t                         bufSize);
+SeosCryptoRpc_keyExport(SeosCryptoRpc*          self,
+                        SeosCrypto_KeyHandle    keyHandle,
+                        SeosCrypto_KeyHandle    wrapKeyHandle,
+                        SeosCryptoKey_Type*     type,
+                        SeosCryptoKey_Flags*    flags,
+                        size_t                  bufSize);
 
 /**
  * @brief rpc management of SeosCryptoRpc_keyFree()
@@ -174,7 +174,7 @@ SeosCryptoRpc_keyFree(SeosCryptoRpc*                 self,
 seos_err_t
 SeosCryptoRpc_signatureInit(SeosCryptoRpc*                   self,
                             SeosCrypto_SignatureHandle*      pSigHandle,
-                            unsigned int                     algorithm,
+                            SeosCryptoSignature_Algorithm    algorithm,
                             SeosCrypto_KeyHandle             prvHandle,
                             SeosCrypto_KeyHandle             pubHandle);
 
@@ -216,7 +216,7 @@ SeosCryptoRpc_signatureFree(SeosCryptoRpc*                  self,
 seos_err_t
 SeosCryptoRpc_agreementInit(SeosCryptoRpc*                   self,
                             SeosCrypto_AgreementHandle*      pAgrHandle,
-                            unsigned int                     algorithm,
+                            SeosCryptoAgreement_Algorithm    algorithm,
                             SeosCrypto_KeyHandle             prvHandle);
 
 /**

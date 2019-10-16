@@ -24,42 +24,43 @@
 #include <stddef.h>
 
 /**
- * @brief Initializes a SeosCryptoKey context
- *
- */
-seos_err_t
-SeosCryptoKey_init(SeosCryptoKey*               self,
-                   const SeosCrypto_MemIf*      memIf,
-                   const SeosCryptoKey_Type     type,
-                   const SeosCryptoKey_Flags    flags,
-                   const size_t                 bits);
-
-/**
  * @brief Fills a key context with randomly generated data
  *
  */
 seos_err_t
-SeosCryptoKey_generate(SeosCryptoKey*           self,
-                       SeosCryptoRng*           rng);
+SeosCryptoKey_generate(SeosCryptoKey*            self,
+                       SeosCryptoRng*            rng,
+                       const SeosCrypto_MemIf*   memIf,
+                       const SeosCryptoKey_Type  type,
+                       const SeosCryptoKey_Flags flags,
+                       const size_t              bits);
 
 /**
  * @brief Fills two key contexts with randomly generated data
  *
  */
 seos_err_t
-SeosCryptoKey_generatePair(SeosCryptoKey*       prvKey,
-                           SeosCryptoKey*       pubKey,
-                           SeosCryptoRng*       rng);
+SeosCryptoKey_generatePair(SeosCryptoKey*               prvKey,
+                           SeosCryptoKey*               pubKey,
+                           SeosCryptoRng*               rng,
+                           const SeosCrypto_MemIf*      memIf,
+                           const SeosCryptoKey_PairType type,
+                           const SeosCryptoKey_Flags    prvFlags,
+                           const SeosCryptoKey_Flags    pubFlags,
+                           const size_t                 bits);
 
 /**
  * @brief Imports key data into key context
  *
  */
 seos_err_t
-SeosCryptoKey_import(SeosCryptoKey*         self,
-                     const SeosCryptoKey*   wrapKey,
-                     const void*            keyBytes,
-                     size_t                 keySize);
+SeosCryptoKey_import(SeosCryptoKey*             self,
+                     const SeosCrypto_MemIf*    memIf,
+                     const SeosCryptoKey*       wrapKey,
+                     const SeosCryptoKey_Type   type,
+                     const SeosCryptoKey_Flags  flags,
+                     const void*                keyBytes,
+                     const size_t               keySize);
 
 /**
  * @brief Exports key context into buffer
@@ -68,6 +69,8 @@ SeosCryptoKey_import(SeosCryptoKey*         self,
 seos_err_t
 SeosCryptoKey_export(SeosCryptoKey*         self,
                      const SeosCryptoKey*   wrapKey,
+                     SeosCryptoKey_Type*    type,
+                     SeosCryptoKey_Flags*   flags,
                      void*                  buf,
                      size_t*                bufSize);
 
@@ -86,7 +89,7 @@ SeosCryptoKey_free(SeosCryptoKey*           self,
 INLINE SeosCryptoKey_RSAPub*
 SeosCryptoKey_getRSAPub(const SeosCryptoKey* key)
 {
-    return key->empty ? NULL : (SeosCryptoKey_RSAPub*) key->keyBytes;
+    return (SeosCryptoKey_RSAPub*) key->keyBytes;
 }
 
 /**
@@ -96,7 +99,7 @@ SeosCryptoKey_getRSAPub(const SeosCryptoKey* key)
 INLINE SeosCryptoKey_RSAPrv*
 SeosCryptoKey_getRSAPrv(const SeosCryptoKey* key)
 {
-    return key->empty ? NULL : (SeosCryptoKey_RSAPrv*) key->keyBytes;
+    return (SeosCryptoKey_RSAPrv*) key->keyBytes;
 }
 
 /**
@@ -106,7 +109,7 @@ SeosCryptoKey_getRSAPrv(const SeosCryptoKey* key)
 INLINE SeosCryptoKey_SECP256r1Pub*
 SeosCryptoKey_getSECP256r1Pub(const SeosCryptoKey* key)
 {
-    return key->empty ? NULL : (SeosCryptoKey_SECP256r1Pub*) key->keyBytes;
+    return (SeosCryptoKey_SECP256r1Pub*) key->keyBytes;
 }
 
 /**
@@ -116,7 +119,7 @@ SeosCryptoKey_getSECP256r1Pub(const SeosCryptoKey* key)
 INLINE SeosCryptoKey_SECP256r1Prv*
 SeosCryptoKey_getSECP256r1Prv(const SeosCryptoKey* key)
 {
-    return key->empty ? NULL : (SeosCryptoKey_SECP256r1Prv*) key->keyBytes;
+    return (SeosCryptoKey_SECP256r1Prv*) key->keyBytes;
 }
 
 /**
@@ -126,7 +129,7 @@ SeosCryptoKey_getSECP256r1Prv(const SeosCryptoKey* key)
 INLINE SeosCryptoKey_DHPub*
 SeosCryptoKey_getDHPub(const SeosCryptoKey* key)
 {
-    return key->empty ? NULL : (SeosCryptoKey_DHPub*) key->keyBytes;
+    return (SeosCryptoKey_DHPub*) key->keyBytes;
 }
 
 /**
@@ -136,7 +139,7 @@ SeosCryptoKey_getDHPub(const SeosCryptoKey* key)
 INLINE SeosCryptoKey_DHPrv*
 SeosCryptoKey_getDHPrv(const SeosCryptoKey* key)
 {
-    return key->empty ? NULL : (SeosCryptoKey_DHPrv*) key->keyBytes;
+    return (SeosCryptoKey_DHPrv*) key->keyBytes;
 }
 
 /**
@@ -146,7 +149,7 @@ SeosCryptoKey_getDHPrv(const SeosCryptoKey* key)
 INLINE SeosCryptoKey_AES*
 SeosCryptoKey_getAES(const SeosCryptoKey* key)
 {
-    return key->empty ? NULL : (SeosCryptoKey_AES*) key->keyBytes;
+    return (SeosCryptoKey_AES*) key->keyBytes;
 }
 
 /**

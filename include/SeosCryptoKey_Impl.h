@@ -47,13 +47,21 @@ typedef enum
 }
 SeosCryptoKey_Type;
 
+typedef enum
+{
+    SeosCryptoKey_PairType_NONE,
+    SeosCryptoKey_PairType_RSA,
+    SeosCryptoKey_PairType_DH,
+    SeosCryptoKey_PairType_SECP256R1
+}
+SeosCryptoKey_PairType;
+
 typedef struct
 {
-    SeosCryptoKey_Flags  flags;      ///< flags, see above
+    SeosCryptoKey_Flags  flags;     ///< flags, see above
     SeosCryptoKey_Type  type;       ///< type of key, see above
     uint32_t            bits;       ///< the security parameter (e.g., key size)
     void*               keyBytes;   ///< pointer to raw key material
-    bool                empty;      ///< indicate if key material is there
     size_t              keySize;    ///< amount of bytes stored
 }
 SeosCryptoKey;

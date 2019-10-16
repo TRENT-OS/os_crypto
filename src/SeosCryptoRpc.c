@@ -150,49 +150,51 @@ SeosCryptoRpc_digestFinalize(SeosCryptoRpc*             self,
 // -------------------------------- Key API ------------------------------------
 
 seos_err_t
-SeosCryptoRpc_keyInit(SeosCryptoRpc*                   self,
-                      SeosCrypto_KeyHandle*            keyHandle,
-                      unsigned int                     type,
-                      SeosCryptoKey_Flags               flags,
-                      size_t                           bits)
+SeosCryptoRpc_keyGenerate(SeosCryptoRpc*        self,
+                          SeosCrypto_KeyHandle* pKeyHandle,
+                          SeosCryptoKey_Type    type,
+                          SeosCryptoKey_Flags   flags,
+                          size_t                bits)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCrypto_keyInit(self->seosCryptoApi, keyHandle, type, flags, bits);
+           SeosCrypto_keyGenerate(self->seosCryptoApi, pKeyHandle, type, flags, bits);
 }
 
 seos_err_t
-SeosCryptoRpc_keyGenerate(SeosCryptoRpc*               self,
-                          SeosCrypto_KeyHandle         keyHandle)
+SeosCryptoRpc_keyGeneratePair(SeosCryptoRpc*            self,
+                              SeosCrypto_KeyHandle*     pPrvKeyHandle,
+                              SeosCrypto_KeyHandle*     pPubKeyHandle,
+                              SeosCryptoKey_PairType    type,
+                              SeosCryptoKey_Flags       prvFlags,
+                              SeosCryptoKey_Flags       pubFlags,
+                              size_t                    bits)
+
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCrypto_keyGenerate(self->seosCryptoApi, keyHandle);
+           SeosCrypto_keyGeneratePair(self->seosCryptoApi, pPrvKeyHandle, pPubKeyHandle,
+                                      type, prvFlags, pubFlags, bits);
 }
 
 seos_err_t
-SeosCryptoRpc_keyGeneratePair(SeosCryptoRpc*           self,
-                              SeosCrypto_KeyHandle     prvKeyHandle,
-                              SeosCrypto_KeyHandle     pubKeyHandle)
+SeosCryptoRpc_keyImport(SeosCryptoRpc*          self,
+                        SeosCrypto_KeyHandle*   pKeyHandle,
+                        SeosCrypto_KeyHandle    wrapKeyHandle,
+                        SeosCryptoKey_Type      type,
+                        SeosCryptoKey_Flags     flags,
+                        size_t                  keyLen)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCrypto_keyGeneratePair(self->seosCryptoApi, prvKeyHandle, pubKeyHandle);
+           SeosCrypto_keyImport(self->seosCryptoApi, pKeyHandle, wrapKeyHandle, type,
+                                flags, self->serverDataport, keyLen);
 }
 
 seos_err_t
-SeosCryptoRpc_keyImport(SeosCryptoRpc*                 self,
-                        SeosCrypto_KeyHandle           keyHandle,
-                        SeosCrypto_KeyHandle           wrapKeyHandle,
-                        size_t                         keyLen)
-{
-    return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCrypto_keyImport(self->seosCryptoApi, keyHandle, wrapKeyHandle,
-                                self->serverDataport, keyLen);
-}
-
-seos_err_t
-SeosCryptoRpc_keyExport(SeosCryptoRpc*                 self,
-                        SeosCrypto_KeyHandle           keyHandle,
-                        SeosCrypto_KeyHandle           wrapKeyHandle,
-                        size_t                         bufSize)
+SeosCryptoRpc_keyExport(SeosCryptoRpc*          self,
+                        SeosCrypto_KeyHandle    keyHandle,
+                        SeosCrypto_KeyHandle    wrapKeyHandle,
+                        SeosCryptoKey_Type*     type,
+                        SeosCryptoKey_Flags*    flags,
+                        size_t                  bufSize)
 {
     if (!isValidHandle(self))
     {
@@ -204,8 +206,8 @@ SeosCryptoRpc_keyExport(SeosCryptoRpc*                 self,
     }
 
     memcpy(get_dataport_len_ptr(self), &bufSize, sizeof(size_t));
-    return SeosCrypto_keyExport(self->seosCryptoApi, keyHandle,
-                                wrapKeyHandle, get_dataport_buf_ptr(self), get_dataport_len_ptr(self));
+    return SeosCrypto_keyExport(self->seosCryptoApi, keyHandle, wrapKeyHandle, type,
+                                flags, get_dataport_buf_ptr(self), get_dataport_len_ptr(self));
 }
 
 seos_err_t

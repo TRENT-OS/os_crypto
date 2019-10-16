@@ -127,25 +127,16 @@ SeosCrypto_digestFinalize(SeosCryptoCtx*                api,
 // -------------------------------- Key API ------------------------------------
 
 /**
- * @brief implements SeosCryptoApi_keyInit() in a local connection
- * (function call, no rpc)
- *
- */
-seos_err_t
-SeosCrypto_keyInit(SeosCryptoCtx*               api,
-                   SeosCrypto_KeyHandle*        pKeyHandle,
-                   const SeosCryptoKey_Type     type,
-                   const SeosCryptoKey_Flags    flags,
-                   const size_t                 bits);
-
-/**
  * @brief implements SeosCryptoApi_keyGenerate() in a local connection
  * (function call, no rpc)
  *
  */
 seos_err_t
 SeosCrypto_keyGenerate(SeosCryptoCtx*               api,
-                       const SeosCrypto_KeyHandle   keyHandle);
+                       SeosCrypto_KeyHandle*        pKeyHandle,
+                       const SeosCryptoKey_Type     type,
+                       const SeosCryptoKey_Flags    flags,
+                       const size_t                 bits);
 
 /**
  * @brief implements SeosCryptoApi_keyGeneratePair() in a local connection
@@ -154,8 +145,12 @@ SeosCrypto_keyGenerate(SeosCryptoCtx*               api,
  */
 seos_err_t
 SeosCrypto_keyGeneratePair(SeosCryptoCtx*               api,
-                           const SeosCrypto_KeyHandle   prvKeyHandle,
-                           const SeosCrypto_KeyHandle   pubKeyHandle);
+                           SeosCrypto_KeyHandle*        pPrvKeyHandle,
+                           SeosCrypto_KeyHandle*        pPubKeyHandle,
+                           const SeosCryptoKey_PairType type,
+                           const SeosCryptoKey_Flags    prvFlags,
+                           const SeosCryptoKey_Flags    pubFlags,
+                           const size_t                 bits);
 
 /**
  * @brief implements SeosCryptoApi_keyImport() in a local connection
@@ -164,8 +159,10 @@ SeosCrypto_keyGeneratePair(SeosCryptoCtx*               api,
  */
 seos_err_t
 SeosCrypto_keyImport(SeosCryptoCtx*             api,
-                     const SeosCrypto_KeyHandle keyHandle,
+                     SeosCrypto_KeyHandle*      pKeyHandle,
                      const SeosCrypto_KeyHandle wrapKeyHandle,
+                     const SeosCryptoKey_Type   type,
+                     const SeosCryptoKey_Flags  flags,
                      const void*                keyBytes,
                      const size_t               keySize);
 
@@ -178,6 +175,8 @@ seos_err_t
 SeosCrypto_keyExport(SeosCryptoCtx*             api,
                      const SeosCrypto_KeyHandle keyHandle,
                      const SeosCrypto_KeyHandle wrapKeyHandle,
+                     SeosCryptoKey_Type*        type,
+                     SeosCryptoKey_Flags*       flags,
                      void*                      buf,
                      size_t*                    bufSize);
 

@@ -153,53 +153,56 @@ SeosCryptoApi_agreementAgree(SeosCryptoCtx*                     ctx,
 // -------------------------------- Key API ------------------------------------
 
 seos_err_t
-SeosCryptoApi_keyInit(SeosCryptoCtx*            ctx,
-                      SeosCrypto_KeyHandle*     keyHandle,
-                      const SeosCryptoKey_Type  type,
-                      const SeosCryptoKey_Flags flags,
-                      const size_t              bits)
+SeosCryptoApi_keyGenerate(SeosCryptoCtx*            ctx,
+                          SeosCrypto_KeyHandle*     pKeyHandle,
+                          const SeosCryptoKey_Type  type,
+                          const SeosCryptoKey_Flags flags,
+                          const size_t              bits)
 {
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->keyInit(ctx, keyHandle, type, flags, bits);
-}
-
-seos_err_t
-SeosCryptoApi_keyGenerate(SeosCryptoCtx*               ctx,
-                          const SeosCrypto_KeyHandle   keyHandle)
-{
-    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->keyGenerate(ctx, keyHandle);
+           ctx->vtable->keyGenerate(ctx, pKeyHandle, type, flags, bits);
 }
 
 seos_err_t
 SeosCryptoApi_keyGeneratePair(SeosCryptoCtx*                ctx,
-                              const SeosCrypto_KeyHandle    prvKeyHandle,
-                              const SeosCrypto_KeyHandle    pubKeyHandle)
+                              SeosCrypto_KeyHandle*         pPrvKeyHandle,
+                              SeosCrypto_KeyHandle*         pPubKeyHandle,
+                              const SeosCryptoKey_PairType  type,
+                              const SeosCryptoKey_Flags     prvFlags,
+                              const SeosCryptoKey_Flags     pubFlags,
+                              const size_t                  bits)
 {
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->keyGeneratePair(ctx, prvKeyHandle, pubKeyHandle);
+           ctx->vtable->keyGeneratePair(ctx, pPrvKeyHandle, pPubKeyHandle, type, prvFlags,
+                                        pubFlags, bits);
 }
 
 seos_err_t
-SeosCryptoApi_keyImport(SeosCryptoCtx*                 ctx,
-                        const SeosCrypto_KeyHandle     keyHandle,
-                        const SeosCrypto_KeyHandle     wrapKeyHandle,
-                        const void*                    key,
-                        const size_t                   keyLen)
+SeosCryptoApi_keyImport(SeosCryptoCtx*              ctx,
+                        SeosCrypto_KeyHandle*       pKeyHandle,
+                        const SeosCrypto_KeyHandle  wrapKeyHandle,
+                        const SeosCryptoKey_Type    type,
+                        const SeosCryptoKey_Flags   flags,
+                        const void*                 keyData,
+                        const size_t                keyLen)
 {
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->keyImport(ctx, keyHandle, wrapKeyHandle, key, keyLen);
+           ctx->vtable->keyImport(ctx, pKeyHandle, wrapKeyHandle, type, flags, keyData,
+                                  keyLen);
 }
 
 seos_err_t
-SeosCryptoApi_keyExport(SeosCryptoCtx*                 ctx,
-                        const SeosCrypto_KeyHandle     keyHandle,
-                        const SeosCrypto_KeyHandle     wrapKeyHandle,
-                        void*                          key,
-                        size_t*                        keySize)
+SeosCryptoApi_keyExport(SeosCryptoCtx*              ctx,
+                        const SeosCrypto_KeyHandle  keyHandle,
+                        const SeosCrypto_KeyHandle  wrapKeyHandle,
+                        SeosCryptoKey_Type*         type,
+                        SeosCryptoKey_Flags*        flags,
+                        void*                       buf,
+                        size_t*                     bufSize)
 {
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->keyExport(ctx, keyHandle, wrapKeyHandle, key, keySize);
+           ctx->vtable->keyExport(ctx, keyHandle, wrapKeyHandle, type, flags, buf,
+                                  bufSize);
 }
 
 seos_err_t
