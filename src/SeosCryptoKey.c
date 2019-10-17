@@ -308,63 +308,99 @@ genDHPairImpl(SeosCryptoKey*  prvKey,
     SeosCryptoKey_DHPrv* prvDh = (SeosCryptoKey_DHPrv*) prvKey->keyBytes;
     SeosCryptoKey_DHPub* pubDh = (SeosCryptoKey_DHPub*) pubKey->keyBytes;
     mbedtls_dhm_context dh;
-    mbedtls_mpi X, GX;
+    mbedtls_mpi X, GX, Q, T;
     void* rngFunc = SeosCryptoRng_getBytesMbedtls;
     size_t retries;
 
     mbedtls_dhm_init(&dh);
+    // Generator is fixed
+    mbedtls_mpi_lset(&dh.G, SeosCryptoKey_DH_GENERATOR);
+
     mbedtls_mpi_init(&X);
+    mbedtls_mpi_init(&T);
+    mbedtls_mpi_init(&Q);
     mbedtls_mpi_init(&GX);
 
-    // Generate a "safe prime" P such that Q=(P-1)/2 is also prime
-    retval = SEOS_ERROR_ABORTED;
-    if (0 == mbedtls_mpi_gen_prime(&dh.P, prvKey->bits,
-                                   MBEDTLS_MPI_GEN_PRIME_FLAG_DH, rngFunc, rng))
+    for (retries = SeosCryptoKey_DH_GEN_RETRIES; retries > 0; retries--)
     {
-        // Generate an X as large as possible
-        retries = 10;
-        while (retries > 0)
+        // Generate a "safe prime" P such that Q=(P-1)/2 is also prime. Then make
+        // sure that for this prime P our generator generates the full group and
+        // not just a sub-group. We only need to check in two steps.
+        if (!mbedtls_mpi_gen_prime(&dh.P, prvKey->bits, MBEDTLS_MPI_GEN_PRIME_FLAG_DH,
+                                   rngFunc, rng))
         {
-            if (mbedtls_mpi_fill_random(&X, mbedtls_mpi_size(&dh.P), rngFunc, rng) != 0)
+            // Check 1: g^2 != 1 mod P
+            mbedtls_mpi_lset(&T, 2);
+            mbedtls_mpi_exp_mod(&T, &dh.G, &T, &dh.P, &dh.RP);
+            if (mbedtls_mpi_cmp_int(&T, 1) == 0)
             {
-                break;
+                continue;
             }
-            while (mbedtls_mpi_cmp_mpi(&X, &dh.P) >= 0)
-            {
-                mbedtls_mpi_shift_r(&X, 1);
-            }
-            if (checkDhRange(&X, &dh.P) == 0)
-            {
-                retval = SEOS_SUCCESS;
-                break;
-            }
-            retries--;
-        }
 
-        // Generate GX = G^X mod P and store it all
-        if (SEOS_SUCCESS == retval
-            && mbedtls_mpi_lset(&dh.G, SeosCryptoKey_DH_GENERATOR) == 0
-            && mbedtls_mpi_exp_mod(&GX, &dh.G, &X, &dh.P, &dh.RP) == 0
-            && checkDhRange(&GX, &dh.P) == 0)
-        {
-            prvDh->pLen  = mbedtls_mpi_size(&dh.P);
-            prvDh->gLen  = mbedtls_mpi_size(&dh.G);
-            prvDh->xLen  = mbedtls_mpi_size(&X);
-            pubDh->pLen  = mbedtls_mpi_size(&dh.P);
-            pubDh->gLen  = mbedtls_mpi_size(&dh.G);
-            pubDh->gxLen = mbedtls_mpi_size(&GX);
-            retval = mbedtls_mpi_write_binary(&X,    prvDh->xBytes,  prvDh->xLen) != 0 ||
-                     mbedtls_mpi_write_binary(&GX,   pubDh->gxBytes, pubDh->gxLen) != 0 ||
-                     mbedtls_mpi_write_binary(&dh.P, prvDh->pBytes,  prvDh->pLen) != 0 ||
-                     mbedtls_mpi_write_binary(&dh.G, prvDh->gBytes,  prvDh->gLen) != 0 ||
-                     mbedtls_mpi_write_binary(&dh.G, pubDh->gBytes,  pubDh->gLen) != 0 ||
-                     mbedtls_mpi_write_binary(&dh.P, pubDh->pBytes,  pubDh->pLen) != 0 ?
-                     SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+            // Compute Q=(P-1)/2
+            mbedtls_mpi_copy(&Q, &dh.P);
+            mbedtls_mpi_shift_r(&Q, 1);
+            // Check 2: g^Q != 1 mod P
+            mbedtls_mpi_exp_mod(&T, &dh.G, &T, &Q, &dh.RP);
+            if (mbedtls_mpi_cmp_int(&T, 1) == 0)
+            {
+                continue;
+            }
+            break;
         }
     }
+    if (!retries)
+    {
+        retval = SEOS_ERROR_ABORTED;
+        goto exit;
+    }
 
+    // Generate an X as large as possible as private scalar
+    for (retries = SeosCryptoKey_DH_GEN_RETRIES; retries > 0; retries--)
+    {
+        if (mbedtls_mpi_fill_random(&X, mbedtls_mpi_size(&dh.P), rngFunc, rng) != 0)
+        {
+            continue;
+        }
+        while (mbedtls_mpi_cmp_mpi(&X, &dh.P) >= 0)
+        {
+            mbedtls_mpi_shift_r(&X, 1);
+        }
+        // Check X is in range, generate GX = G^X mod P and check that, too
+        if ((checkDhRange(&X, &dh.P) != 0) ||
+            (mbedtls_mpi_exp_mod(&GX, &dh.G, &X, &dh.P, &dh.RP) != 0) ||
+            (checkDhRange(&GX, &dh.P) != 0))
+        {
+            continue;
+        }
+        break;
+    }
+    if (!retries)
+    {
+        retval = SEOS_ERROR_ABORTED;
+        goto exit;
+    }
+
+    // We should generated all the structures, now just fill them in
+    prvDh->pLen  = mbedtls_mpi_size(&dh.P);
+    prvDh->gLen  = mbedtls_mpi_size(&dh.G);
+    prvDh->xLen  = mbedtls_mpi_size(&X);
+    pubDh->pLen  = mbedtls_mpi_size(&dh.P);
+    pubDh->gLen  = mbedtls_mpi_size(&dh.G);
+    pubDh->gxLen = mbedtls_mpi_size(&GX);
+    retval = mbedtls_mpi_write_binary(&X,    prvDh->xBytes,  prvDh->xLen)  != 0 ||
+             mbedtls_mpi_write_binary(&dh.P, prvDh->pBytes,  prvDh->pLen)  != 0 ||
+             mbedtls_mpi_write_binary(&dh.G, prvDh->gBytes,  prvDh->gLen)  != 0 ||
+             mbedtls_mpi_write_binary(&GX,   pubDh->gxBytes, pubDh->gxLen) != 0 ||
+             mbedtls_mpi_write_binary(&dh.G, pubDh->gBytes,  pubDh->gLen)  != 0 ||
+             mbedtls_mpi_write_binary(&dh.P, pubDh->pBytes,  pubDh->pLen)  != 0 ?
+             SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+
+exit:
     mbedtls_mpi_free(&GX);
     mbedtls_mpi_free(&X);
+    mbedtls_mpi_free(&Q);
+    mbedtls_mpi_free(&T);
     mbedtls_dhm_free(&dh);
 
     return retval;
@@ -677,7 +713,9 @@ SeosCryptoKey_writeDHPub(const SeosCryptoKey* key,
 {
     SeosCryptoKey_DHPub* dhKey;
     return (dhKey = SeosCryptoKey_getDHPub(key)) == NULL
+           || mbedtls_mpi_read_binary(&dh->P,  dhKey->pBytes,  dhKey->pLen) != 0
            || mbedtls_mpi_read_binary(&dh->GY, dhKey->gxBytes, dhKey->gxLen) != 0
+           || mbedtls_mpi_read_binary(&dh->G,  dhKey->gBytes,  dhKey->gLen) != 0
            || checkDhRange(&dh->GY, &dh->P) != 0 ?
            SEOS_ERROR_INVALID_PARAMETER : SEOS_SUCCESS;
 }

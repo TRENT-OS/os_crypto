@@ -15,6 +15,12 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+/**
+ * How often do we want to retry finding a suitable prime P and also
+ * a suitable X with 2 <= X <= P-2?
+ */
+#define SeosCryptoKey_DH_GEN_RETRIES        10
+
 #define SeosCryptoKey_DH_GENERATOR          2       ///< Generator for DH
 #define SeosCryptoKey_RSA_EXPONENT          65537   ///< Public exp. 2^16+1
 
@@ -58,9 +64,9 @@ SeosCryptoKey_PairType;
 
 typedef struct
 {
-    SeosCryptoKey_Flags  flags;     ///< flags, see above
+    SeosCryptoKey_Flags flags;     ///< flags, see above
     SeosCryptoKey_Type  type;       ///< type of key, see above
-    uint32_t            bits;       ///< the security parameter (e.g., key size)
+    size_t              bits;       ///< the security parameter (e.g., key size)
     void*               keyBytes;   ///< pointer to raw key material
     size_t              keySize;    ///< amount of bytes stored
 }
