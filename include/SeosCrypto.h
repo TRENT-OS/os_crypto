@@ -13,6 +13,7 @@
 
 #include "SeosCryptoRng_Impl.h"
 #include "SeosCryptoKey_Impl.h"
+#include "SeosCryptoKey_Impl_v5.h"
 #include "SeosCryptoDigest_Impl.h"
 #include "SeosCryptoCipher_Impl.h"
 #include "SeosCrypto_Impl.h"

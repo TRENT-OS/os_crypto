@@ -39,7 +39,7 @@ SeosCryptoKey_Flags;
 
 typedef enum
 {
-    SeosCryptoKey_Type_NONE,
+    SeosCryptoKey_Type_NONE = 0,
     SeosCryptoKey_Type_AES,
     SeosCryptoKey_Type_RSA_PRV,
     SeosCryptoKey_Type_RSA_PUB,

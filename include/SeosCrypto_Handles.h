@@ -11,12 +11,14 @@
  */
 
 #include "SeosCryptoKey_Impl.h"
+#include "SeosCryptoKey_Impl_v5.h"
 #include "SeosCryptoDigest_Impl.h"
 #include "SeosCryptoCipher_Impl.h"
 #include "SeosCryptoAgreement_Impl.h"
 #include "SeosCryptoSignature_Impl.h"
 
 typedef SeosCryptoKey*          SeosCrypto_KeyHandle;
+typedef SeosCryptoKey_v5*       SeosCrypto_KeyHandle_v5;
 typedef SeosCryptoDigest*       SeosCrypto_DigestHandle;
 typedef SeosCryptoCipher*       SeosCrypto_CipherHandle;
 typedef SeosCryptoSignature*    SeosCrypto_SignatureHandle;
