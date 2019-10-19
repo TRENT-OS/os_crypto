@@ -15,29 +15,38 @@
 
 typedef enum
 {
-    SeosCryptoKey_Param_NONE = 0,
-    SeosCryptoKey_Param_ECC_SECP256R1
-} SeosCryptoKey_Param;
+    SeosCryptoKey_ParamName_NONE = 0,
+    SeosCryptoKey_ParamName_ECC_SECP256R1
+} SeosCryptoKey_ParamName;
+
+typedef enum
+{
+    SeosCryptoKey_SpecType_NONE = 0,
+    SeosCryptoKey_SpecType_BITS,
+    SeosCryptoKey_SpecType_DH_PARAMS,
+    SeosCryptoKey_SpecType_ECC_PARAMS,
+} SeosCryptoKey_SpecType;
 
 typedef struct
 {
     SeosCryptoKey_Flags flags;
 } SeosCryptoKey_Attribs;
 
-typedef struct {
-    SeosCryptoKey_Type      type;
-    SeosCryptoKey_Attribs   attribs;
-    size_t                  bits;
-} SeosCryptoKey_BitSpec;
-
-typedef struct {
-    SeosCryptoKey_Type      type;
-    SeosCryptoKey_Attribs   attribs;
-    union params {
-        SeosCryptoKey_ECCParams ecc;
-        SeosCryptoKey_DHParams  dh;
-    } params;
-} SeosCryptoKey_ParamSpec;
+typedef struct
+{
+    SeosCryptoKey_SpecType  type;
+    struct spec
+    {
+        SeosCryptoKey_Type      type;
+        SeosCryptoKey_Attribs   attribs;
+        union params
+        {
+            size_t                  bits;
+            SeosCryptoKey_ECCParams ecc;
+            SeosCryptoKey_DHParams  dh;
+        } params;
+    } spec;
+} SeosCryptoKey_Spec;
 
 typedef struct
 {

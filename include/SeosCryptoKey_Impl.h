@@ -46,7 +46,9 @@ typedef enum
     SeosCryptoKey_Type_DH_PRV,
     SeosCryptoKey_Type_DH_PUB,
     SeosCryptoKey_Type_SECP256R1_PRV,
-    SeosCryptoKey_Type_SECP256R1_PUB
+    SeosCryptoKey_Type_SECP256R1_PUB,
+    SeosCryptoKey_Type_ECC_PRV,
+    SeosCryptoKey_Type_ECC_PUB
 }
 SeosCryptoKey_Type;
 

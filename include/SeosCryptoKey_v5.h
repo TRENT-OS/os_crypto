@@ -23,13 +23,11 @@ seos_err_t
 SeosCryptoKey_generate_v5(SeosCryptoKey_v5*         self,
                           const SeosCrypto_MemIf*   memIf,
                           SeosCryptoRng*            rng,
-                          const void*               keySpec,
-                          const size_t              specSize);
+                          const SeosCryptoKey_Spec* spec);
 
 seos_err_t
 SeosCryptoKey_makePublic_v5(SeosCryptoKey_v5*               self,
                             const SeosCrypto_MemIf*         memIf,
-                            SeosCryptoRng*                  rng,
                             const SeosCryptoKey_v5*         prvKey,
                             const SeosCryptoKey_Attribs*    attribs);
 
@@ -50,9 +48,9 @@ SeosCryptoKey_getParams_v5(SeosCryptoKey_v5*    self,
                            size_t*              paramSize);
 
 seos_err_t
-SeosCryptoKey_loadParams_v5(const SeosCryptoKey_Param type,
-                            void*                     keyParams,
-                            size_t*                   paramSize);
+SeosCryptoKey_loadParams_v5(const SeosCryptoKey_ParamName   name,
+                            void*                           keyParams,
+                            size_t*                         paramSize);
 
 seos_err_t
 SeosCryptoKey_free_v5(SeosCryptoKey_v5*        self,
