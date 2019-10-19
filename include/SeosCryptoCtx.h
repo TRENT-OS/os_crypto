@@ -65,6 +65,20 @@ typedef seos_err_t
                               const size_t              bits);
 
 typedef seos_err_t
+(*SeosCryptoCtx_keyGenerateFromParamsT)(SeosCryptoCtx*            self,
+                                        SeosCrypto_KeyHandle*     pKeyHandle,
+                                        const SeosCryptoKey_Type  type,
+                                        const SeosCryptoKey_Flags flags,
+                                        const void*               keyParams,
+                                        const size_t              paramLen);
+
+typedef seos_err_t
+(*SeosCryptoCtx_keyDerivePublicT)(SeosCryptoCtx*                self,
+                                  SeosCrypto_KeyHandle*         pPubKeyHandle,
+                                  const SeosCrypto_KeyHandle    prvKeyHandle,
+                                  const SeosCryptoKey_Flags     flags);
+
+typedef seos_err_t
 (*SeosCryptoCtx_keyGeneratePairT)(SeosCryptoCtx*                self,
                                   SeosCrypto_KeyHandle*         pPrvKeyHandle,
                                   SeosCrypto_KeyHandle*         pPubKeyHandle,
@@ -90,6 +104,12 @@ typedef seos_err_t
                             SeosCryptoKey_Flags*        flags,
                             void*                       buf,
                             size_t*                     bufSize);
+
+typedef seos_err_t
+(*SeosCryptoCtx_keyExtractParamsT)(SeosCryptoCtx*              self,
+                                   const SeosCrypto_KeyHandle  keyHandle,
+                                   void*                       buf,
+                                   size_t*                     bufSize);
 
 typedef seos_err_t
 (*SeosCryptoCtx_keyFreeT)(SeosCryptoCtx*                 self,
@@ -191,9 +211,12 @@ typedef struct
     SeosCryptoCtx_digestProcessT            digestProcess;
     SeosCryptoCtx_digestFinalizeT           digestFinalize;
     SeosCryptoCtx_keyGenerateT              keyGenerate;
+    SeosCryptoCtx_keyGenerateFromParamsT    keyGenerateFromParams;
+    SeosCryptoCtx_keyDerivePublicT          keyDerivePublic;
     SeosCryptoCtx_keyGeneratePairT          keyGeneratePair;
     SeosCryptoCtx_keyImportT                keyImport;
     SeosCryptoCtx_keyExportT                keyExport;
+    SeosCryptoCtx_keyExtractParamsT         keyExtractParams;
     SeosCryptoCtx_keyFreeT                  keyFree;
     SeosCryptoCtx_signatureInitT            signatureInit;
     SeosCryptoCtx_signatureFreeT            signatureFree;

@@ -161,6 +161,29 @@ SeosCryptoRpc_keyGenerate(SeosCryptoRpc*        self,
 }
 
 seos_err_t
+SeosCryptoRpc_keyGenerateFromParams(SeosCryptoRpc*        self,
+                                    SeosCrypto_KeyHandle* pKeyHandle,
+                                    SeosCryptoKey_Type    type,
+                                    SeosCryptoKey_Flags   flags,
+                                    size_t                paramLen)
+{
+    return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_keyGenerateFromParams(self->seosCryptoApi, pKeyHandle, type, flags,
+                                            self->serverDataport, paramLen);
+}
+
+seos_err_t
+SeosCryptoRpc_keyDerivePublic(SeosCryptoRpc*        self,
+                              SeosCrypto_KeyHandle* pPubKeyHandle,
+                              SeosCrypto_KeyHandle  prvKeyHandle,
+                              SeosCryptoKey_Flags   flags)
+{
+    return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_keyDerivePublic(self->seosCryptoApi, pPubKeyHandle,
+                                      prvKeyHandle, flags);
+}
+
+seos_err_t
 SeosCryptoRpc_keyGeneratePair(SeosCryptoRpc*            self,
                               SeosCrypto_KeyHandle*     pPrvKeyHandle,
                               SeosCrypto_KeyHandle*     pPubKeyHandle,
@@ -208,6 +231,26 @@ SeosCryptoRpc_keyExport(SeosCryptoRpc*          self,
     memcpy(get_dataport_len_ptr(self), &bufSize, sizeof(size_t));
     return SeosCrypto_keyExport(self->seosCryptoApi, keyHandle, wrapKeyHandle, type,
                                 flags, get_dataport_buf_ptr(self), get_dataport_len_ptr(self));
+}
+
+seos_err_t
+SeosCryptoRpc_keyExtractParams(SeosCryptoRpc*          self,
+                               SeosCrypto_KeyHandle    keyHandle,
+                               size_t                  bufSize)
+{
+    if (!isValidHandle(self))
+    {
+        return SEOS_ERROR_INVALID_HANDLE;
+    }
+    else if (bufSize > DATAPORT_BUFFER_SIZE)
+    {
+        return SEOS_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    memcpy(get_dataport_len_ptr(self), &bufSize, sizeof(size_t));
+    return SeosCrypto_keyExtractParams(self->seosCryptoApi, keyHandle,
+                                       get_dataport_buf_ptr(self),
+                                       get_dataport_len_ptr(self));
 }
 
 seos_err_t

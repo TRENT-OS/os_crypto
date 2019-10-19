@@ -196,6 +196,20 @@ SeosCryptoClient_keyGenerate(SeosCryptoCtx*             ctx,
                              const SeosCryptoKey_Flags  flags,
                              const size_t               bits);
 
+seos_err_t
+SeosCryptoClient_keyGenerateFromParams(SeosCryptoCtx*             api,
+                                       SeosCrypto_KeyHandle*      pKeyHandle,
+                                       const SeosCryptoKey_Type   type,
+                                       const SeosCryptoKey_Flags  flags,
+                                       const void*                keyParams,
+                                       const size_t               paramLen);
+
+seos_err_t
+SeosCryptoClient_keyDerivePublic(SeosCryptoCtx*             api,
+                                 SeosCrypto_KeyHandle*      pPubKeyHandle,
+                                 const SeosCrypto_KeyHandle prvKeyHandle,
+                                 const SeosCryptoKey_Flags  flags);
+
 /**
  * @brief implements SeosCryptoApi_keyGeneratePair() in a rpc connection
  *
@@ -234,6 +248,16 @@ SeosCryptoClient_keyExport(SeosCryptoCtx*               ctx,
                            SeosCryptoKey_Flags*         flags,
                            void*                        keyData,
                            size_t*                      keySize);
+
+/**
+ * @brief implements SeosCryptoApi_keyExtractParams() in a rpc connection
+ *
+ */
+seos_err_t
+SeosCryptoClient_keyExtractParams(SeosCryptoCtx*               api,
+                                  const SeosCrypto_KeyHandle   keyHandle,
+                                  void*                        buf,
+                                  size_t*                      bufSize);
 
 /**
  * @brief implements SeosCryptoApi_keyFree() in a rpc connection

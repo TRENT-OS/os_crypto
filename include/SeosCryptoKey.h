@@ -35,6 +35,22 @@ SeosCryptoKey_generate(SeosCryptoKey*            self,
                        const SeosCryptoKey_Flags flags,
                        const size_t              bits);
 
+seos_err_t
+SeosCryptoKey_generateFromParams(SeosCryptoKey*            self,
+                                 SeosCryptoRng*            rng,
+                                 const SeosCrypto_MemIf*   memIf,
+                                 const SeosCryptoKey_Type  type,
+                                 const SeosCryptoKey_Flags flags,
+                                 const void*               keyParams,
+                                 const size_t              paramLen);
+
+seos_err_t
+SeosCryptoKey_derivePublic(SeosCryptoKey*            self,
+                           SeosCryptoRng*            rng,
+                           const SeosCrypto_MemIf*   memIf,
+                           const SeosCryptoKey*      prvKey,
+                           const SeosCryptoKey_Flags flags);
+
 /**
  * @brief Fills two key contexts with randomly generated data
  *
@@ -73,6 +89,15 @@ SeosCryptoKey_export(SeosCryptoKey*         self,
                      SeosCryptoKey_Flags*   flags,
                      void*                  buf,
                      size_t*                bufSize);
+
+/**
+ * @brief Extract public params from a keypair key
+ *
+ */
+seos_err_t
+SeosCryptoKey_extractParams(SeosCryptoKey*  self,
+                            void*           buf,
+                            size_t*         bufSize);
 
 /**
  * @brief Finishes a key context

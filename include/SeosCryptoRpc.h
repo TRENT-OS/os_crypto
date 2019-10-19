@@ -120,6 +120,19 @@ SeosCryptoRpc_keyGenerate(SeosCryptoRpc*         self,
                           SeosCryptoKey_Flags    flags,
                           size_t                 bits);
 
+seos_err_t
+SeosCryptoRpc_keyDerivePublic(SeosCryptoRpc*        self,
+                              SeosCrypto_KeyHandle* pPubKeyHandle,
+                              SeosCrypto_KeyHandle  prvKeyHandle,
+                              SeosCryptoKey_Flags   flags);
+
+seos_err_t
+SeosCryptoRpc_keyGenerateFromParams(SeosCryptoRpc*        self,
+                                    SeosCrypto_KeyHandle* pKeyHandle,
+                                    SeosCryptoKey_Type    type,
+                                    SeosCryptoKey_Flags   flags,
+                                    size_t                paramLen);
+
 /**
  * @brief rpc management of SeosCryptoRpc_keyGeneratePair()
  *
@@ -156,6 +169,15 @@ SeosCryptoRpc_keyExport(SeosCryptoRpc*          self,
                         SeosCryptoKey_Type*     type,
                         SeosCryptoKey_Flags*    flags,
                         size_t                  bufSize);
+
+/**
+ * @brief rpc management of SeosCryptoRpc_keyExport()
+ *
+ */
+seos_err_t
+SeosCryptoRpc_keyExtractParams(SeosCryptoRpc*          self,
+                               SeosCrypto_KeyHandle    keyHandle,
+                               size_t                  bufSize);
 
 /**
  * @brief rpc management of SeosCryptoRpc_keyFree()

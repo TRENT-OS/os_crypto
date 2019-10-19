@@ -21,9 +21,12 @@ static const SeosCryptoCtx_Vtable SeosCrypto_vtable =
     .digestProcess          = SeosCrypto_digestProcess,
     .digestFinalize         = SeosCrypto_digestFinalize,
     .keyGenerate            = SeosCrypto_keyGenerate,
+    .keyGenerateFromParams  = SeosCrypto_keyGenerateFromParams,
+    .keyDerivePublic        = SeosCrypto_keyDerivePublic,
     .keyGeneratePair        = SeosCrypto_keyGeneratePair,
     .keyImport              = SeosCrypto_keyImport,
     .keyExport              = SeosCrypto_keyExport,
+    .keyExtractParams       = SeosCrypto_keyExtractParams,
     .keyFree                = SeosCrypto_keyFree,
     .signatureInit          = SeosCrypto_signatureInit,
     .signatureFree          = SeosCrypto_signatureFree,
@@ -551,6 +554,94 @@ err0:
 }
 
 seos_err_t
+SeosCrypto_keyGenerateFromParams(SeosCryptoCtx*               api,
+                                 SeosCrypto_KeyHandle*        pKeyHandle,
+                                 const SeosCryptoKey_Type     type,
+                                 const SeosCryptoKey_Flags    flags,
+                                 const void*                  keyParams,
+                                 const size_t                 paramLen)
+{
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+    SeosCrypto* self = (SeosCrypto*) api;
+
+    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable
+        || NULL == pKeyHandle)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    if ((*pKeyHandle = self->memIf.malloc(sizeof(SeosCryptoKey))) == NULL)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
+
+    retval = SeosCryptoKey_generateFromParams(*pKeyHandle, &self->cryptoRng,
+                                              &self->memIf, type, flags, keyParams, paramLen);
+    if (retval != SEOS_SUCCESS)
+    {
+        goto err0;
+    }
+    else if (!PointerVector_pushBack(&self->keyHandleVector, *pKeyHandle))
+    {
+        retval = SEOS_ERROR_INSUFFICIENT_SPACE;
+        goto err1;
+    }
+
+    return retval;
+
+err1:
+    SeosCryptoKey_free(*pKeyHandle, &self->memIf);
+err0:
+    self->memIf.free(*pKeyHandle);
+    return retval;
+}
+
+seos_err_t
+SeosCrypto_keyDerivePublic(SeosCryptoCtx*               api,
+                           SeosCrypto_KeyHandle*        pPubKeyHandle,
+                           const SeosCrypto_KeyHandle   prvKeyHandle,
+                           const SeosCryptoKey_Flags    flags)
+{
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+    SeosCrypto* self = (SeosCrypto*) api;
+
+    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable
+        || NULL == pPubKeyHandle)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else if (SeosCrypto_findHandle(&self->keyHandleVector, prvKeyHandle) == -1)
+    {
+        return SEOS_ERROR_INVALID_HANDLE;
+    }
+
+    if ((*pPubKeyHandle = self->memIf.malloc(sizeof(SeosCryptoKey))) == NULL)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
+
+    retval = SeosCryptoKey_derivePublic(*pPubKeyHandle, &self->cryptoRng,
+                                        &self->memIf, prvKeyHandle, flags);
+    if (retval != SEOS_SUCCESS)
+    {
+        goto err0;
+    }
+    else if (!PointerVector_pushBack(&self->keyHandleVector, *pPubKeyHandle))
+    {
+        retval = SEOS_ERROR_INSUFFICIENT_SPACE;
+        goto err1;
+    }
+
+    return retval;
+
+err1:
+    SeosCryptoKey_free(*pPubKeyHandle, &self->memIf);
+err0:
+    self->memIf.free(*pPubKeyHandle);
+    return retval;
+}
+
+seos_err_t
 SeosCrypto_keyGeneratePair(SeosCryptoCtx*               api,
                            SeosCrypto_KeyHandle*        pPrvKeyHandle,
                            SeosCrypto_KeyHandle*        pPubKeyHandle,
@@ -686,6 +777,24 @@ SeosCrypto_keyExport(SeosCryptoCtx*             api,
                SEOS_ERROR_INVALID_HANDLE :
                SeosCryptoKey_export(keyHandle, wrapKeyHandle, type, flags, buf, bufSize);
     }
+}
+
+seos_err_t
+SeosCrypto_keyExtractParams(SeosCryptoCtx*             api,
+                            const SeosCrypto_KeyHandle keyHandle,
+                            void*                      buf,
+                            size_t*                    bufSize)
+{
+    SeosCrypto* self = (SeosCrypto*) api;
+
+    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    return (SeosCrypto_findHandle(&self->keyHandleVector, keyHandle) == -1) ?
+           SEOS_ERROR_INVALID_HANDLE :
+           SeosCryptoKey_extractParams(keyHandle, buf, bufSize);
 }
 
 seos_err_t
