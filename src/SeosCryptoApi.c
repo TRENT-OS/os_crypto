@@ -153,6 +153,75 @@ SeosCryptoApi_agreementAgree(SeosCryptoCtx*                     ctx,
 // -------------------------------- Key API ------------------------------------
 
 seos_err_t
+SeosCryptoApi_keyGenerate_v5(SeosCryptoCtx*            ctx,
+                             SeosCrypto_KeyHandle_v5*  pKeyHandle,
+                             const SeosCryptoKey_Spec* spec)
+{
+    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
+           ctx->vtable->keyGenerate_v5(ctx, pKeyHandle, spec);
+}
+
+seos_err_t
+SeosCryptoApi_keyMakePublic_v5(SeosCryptoCtx*                  ctx,
+                               SeosCrypto_KeyHandle_v5*        pPubHandle,
+                               const SeosCrypto_KeyHandle_v5   prvKeyHandle,
+                               const SeosCryptoKey_Attribs*    attribs)
+{
+    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
+           ctx->vtable->keyMakePublic_v5(ctx, pPubHandle, prvKeyHandle, attribs);
+}
+
+seos_err_t
+SeosCryptoApi_keyImport_v5(SeosCryptoCtx*                   ctx,
+                           SeosCrypto_KeyHandle_v5*         pKeyHandle,
+                           const SeosCrypto_KeyHandle_v5    wrapKeyHandle,
+                           const SeosCryptoKey_Data*        keyData)
+{
+    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
+           ctx->vtable->keyImport_v5(ctx, pKeyHandle, wrapKeyHandle, keyData);
+}
+
+seos_err_t
+SeosCryptoApi_keyExport_v5(SeosCryptoCtx*                   ctx,
+                           const SeosCrypto_KeyHandle_v5    keyHandle,
+                           const SeosCrypto_KeyHandle_v5    wrapKeyHandle,
+                           SeosCryptoKey_Data*              keyData)
+{
+    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
+           ctx->vtable->keyExport_v5(ctx, keyHandle, wrapKeyHandle, keyData);
+}
+
+seos_err_t
+SeosCryptoApi_keyGetParams_v5(SeosCryptoCtx*                ctx,
+                              const SeosCrypto_KeyHandle_v5 keyHandle,
+                              void*                         keyParams,
+                              size_t*                       paramSize)
+{
+    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
+           ctx->vtable->keyGetParams_v5(ctx, keyHandle, keyParams, paramSize);
+}
+
+seos_err_t
+SeosCryptoApi_keyLoadParams_v5(SeosCryptoCtx*               ctx,
+                               const SeosCryptoKey_Param    name,
+                               void*                        keyParams,
+                               size_t*                      paramSize)
+{
+    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
+           ctx->vtable->keyLoadParams_v5(ctx, name, keyParams, paramSize);
+}
+
+seos_err_t
+SeosCryptoApi_keyFree_v5(SeosCryptoCtx*                ctx,
+                         const SeosCrypto_KeyHandle_v5 keyHandle)
+{
+    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
+           ctx->vtable->keyFree_v5(ctx, keyHandle);
+}
+
+// -------------------------------- Key API ------------------------------------
+
+seos_err_t
 SeosCryptoApi_keyGenerate(SeosCryptoCtx*            ctx,
                           SeosCrypto_KeyHandle*     pKeyHandle,
                           const SeosCryptoKey_Type  type,

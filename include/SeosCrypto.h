@@ -122,6 +122,47 @@ SeosCrypto_digestFinalize(SeosCryptoCtx*                api,
 
 // -------------------------------- Key API ------------------------------------
 
+seos_err_t
+SeosCrypto_keyGenerate_v5(SeosCryptoCtx*                api,
+                          SeosCrypto_KeyHandle_v5*      pKeyHandle,
+                          const SeosCryptoKey_Spec*     spec);
+
+seos_err_t
+SeosCrypto_keyMakePublic_v5(SeosCryptoCtx*                api,
+                            SeosCrypto_KeyHandle_v5*      pPubKeyHandle,
+                            const SeosCrypto_KeyHandle_v5 prvKeyHandle,
+                            const SeosCryptoKey_Attribs*  attribs);
+
+
+
+seos_err_t
+SeosCrypto_keyImport_v5(SeosCryptoCtx*                  api,
+                        SeosCrypto_KeyHandle_v5*        pKeyHandle,
+                        const SeosCrypto_KeyHandle_v5   wrapKeyHandle,
+                        const SeosCryptoKey_Data*       keyData);
+
+seos_err_t
+SeosCrypto_keyExport_v5(SeosCryptoCtx*                  api,
+                        const SeosCrypto_KeyHandle_v5   keyHandle,
+                        const SeosCrypto_KeyHandle_v5   wrapKeyHandle,
+                        SeosCryptoKey_Data*             keyData);
+
+seos_err_t
+SeosCrypto_keyGetParams_v5(SeosCryptoCtx*                   api,
+                           const SeosCrypto_KeyHandle_v5    keyHandle,
+                           void*                            keyParams,
+                           size_t*                          paramSize);
+
+seos_err_t
+SeosCrypto_keyLoadParams_v5(SeosCryptoCtx*                  api,
+                            const SeosCryptoKey_Param       name,
+                            void*                           keyParams,
+                            size_t*                         paramSize);
+
+seos_err_t
+SeosCrypto_keyFree_v5(SeosCryptoCtx*                api,
+                      const SeosCrypto_KeyHandle_v5 keyHandle);
+
 /**
  * @brief implements SeosCryptoApi_keyGenerate() in a local connection
  * (function call, no rpc)

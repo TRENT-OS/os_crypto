@@ -150,6 +150,94 @@ SeosCryptoRpc_digestFinalize(SeosCryptoRpc*             self,
 // -------------------------------- Key API ------------------------------------
 
 seos_err_t
+SeosCryptoRpc_keyGenerate_v5(SeosCryptoRpc*             self,
+                             SeosCrypto_KeyHandle_v5*   pKeyHandle)
+{
+    return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_keyGenerate_v5(self->seosCryptoApi, pKeyHandle,
+                                     self->serverDataport);
+}
+
+seos_err_t
+SeosCryptoRpc_keyMakePublic_v5(SeosCryptoRpc*           self,
+                               SeosCrypto_KeyHandle_v5* pPubKeyHandle,
+                               SeosCrypto_KeyHandle_v5  prvKeyHandle)
+{
+    return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_keyMakePublic_v5(self->seosCryptoApi, pPubKeyHandle, prvKeyHandle,
+                                       self->serverDataport);
+}
+
+seos_err_t
+SeosCryptoRpc_keyImport_v5(SeosCryptoRpc*           self,
+                           SeosCrypto_KeyHandle_v5* pKeyHandle,
+                           SeosCrypto_KeyHandle_v5  wrapKeyHandle)
+{
+    return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_keyImport_v5(self->seosCryptoApi, pKeyHandle, wrapKeyHandle,
+                                   self->serverDataport);
+}
+
+seos_err_t
+SeosCryptoRpc_keyExport_v5(SeosCryptoRpc*           self,
+                           SeosCrypto_KeyHandle_v5  keyHandle,
+                           SeosCrypto_KeyHandle_v5  wrapKeyHandle)
+{
+    return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_keyExport_v5(self->seosCryptoApi, keyHandle, wrapKeyHandle,
+                                   self->serverDataport);
+}
+
+
+seos_err_t
+SeosCryptoRpc_keyGetParams_v5(SeosCryptoRpc*            self,
+                              SeosCrypto_KeyHandle_v5   keyHandle,
+                              size_t                    paramSize)
+{
+    if (!isValidHandle(self))
+    {
+        return SEOS_ERROR_INVALID_HANDLE;
+    }
+    else if (paramSize > DATAPORT_BUFFER_SIZE)
+    {
+        return SEOS_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    memcpy(get_dataport_len_ptr(self), &paramSize, sizeof(size_t));
+    return SeosCrypto_keyGetParams_v5(self->seosCryptoApi, keyHandle,
+                                      get_dataport_buf_ptr(self), get_dataport_len_ptr(self));
+}
+
+seos_err_t
+SeosCryptoRpc_keyLoadParams_v5(SeosCryptoRpc*       self,
+                               SeosCryptoKey_Param  name,
+                               size_t               paramSize)
+{
+    if (!isValidHandle(self))
+    {
+        return SEOS_ERROR_INVALID_HANDLE;
+    }
+    else if (paramSize > DATAPORT_BUFFER_SIZE)
+    {
+        return SEOS_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    memcpy(get_dataport_len_ptr(self), &paramSize, sizeof(size_t));
+    return SeosCrypto_keyLoadParams_v5(self->seosCryptoApi, name,
+                                       get_dataport_buf_ptr(self), get_dataport_len_ptr(self));
+}
+
+seos_err_t
+SeosCryptoRpc_keyFree_v5(SeosCryptoRpc*            self,
+                         SeosCrypto_KeyHandle_v5   keyHandle)
+{
+    return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_keyFree_v5(self->seosCryptoApi, keyHandle);
+}
+
+// -------------------------------- Key API ------------------------------------
+
+seos_err_t
 SeosCryptoRpc_keyGenerate(SeosCryptoRpc*        self,
                           SeosCrypto_KeyHandle* pKeyHandle,
                           SeosCryptoKey_Type    type,

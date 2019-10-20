@@ -16,6 +16,7 @@
 #include "SeosCryptoDigest_Impl.h"
 #include "SeosCryptoCipher_Impl.h"
 #include "SeosCryptoKey_Impl.h"
+#include "SeosCryptoKey_Impl_v5.h"
 #include "SeosCryptoRpc_Impl.h"
 #include "SeosCrypto_Handles.h"
 
@@ -108,6 +109,39 @@ SeosCryptoRpc_digestFinalize(SeosCryptoRpc*             self,
                              size_t                     outSize);
 
 // -------------------------------- Key API ------------------------------------
+
+seos_err_t
+SeosCryptoRpc_keyGenerate_v5(SeosCryptoRpc*             self,
+                             SeosCrypto_KeyHandle_v5*   pKeyHandle);
+
+seos_err_t
+SeosCryptoRpc_keyMakePublic_v5(SeosCryptoRpc*           self,
+                               SeosCrypto_KeyHandle_v5* pPubKeyHandle,
+                               SeosCrypto_KeyHandle_v5  prvKeyHandle);
+
+seos_err_t
+SeosCryptoRpc_keyImport_v5(SeosCryptoRpc*           self,
+                           SeosCrypto_KeyHandle_v5* pKeyHandle,
+                           SeosCrypto_KeyHandle_v5  wrapKeyHandle);
+
+seos_err_t
+SeosCryptoRpc_keyExport_v5(SeosCryptoRpc*           self,
+                           SeosCrypto_KeyHandle_v5  keyHandle,
+                           SeosCrypto_KeyHandle_v5  wrapKeyHandle);
+
+seos_err_t
+SeosCryptoRpc_keyGetParams_v5(SeosCryptoRpc*            self,
+                              SeosCrypto_KeyHandle_v5   keyHandle,
+                              size_t                    paramSize);
+
+seos_err_t
+SeosCryptoRpc_keyLoadParams_v5(SeosCryptoRpc*       self,
+                               SeosCryptoKey_Param  name,
+                               size_t               paramSize);
+
+seos_err_t
+SeosCryptoRpc_keyFree_v5(SeosCryptoRpc*            self,
+                         SeosCrypto_KeyHandle_v5   keyHandle);
 
 /**
  * @brief rpc management of SeosCryptoRpc_keyGenerate()

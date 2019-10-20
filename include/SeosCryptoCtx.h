@@ -58,6 +58,49 @@ typedef seos_err_t
 // -------------------------------- Key API ------------------------------------
 
 typedef seos_err_t
+(*SeosCryptoCtx_keyGenerateT_v5)(SeosCryptoCtx*            self,
+                                 SeosCrypto_KeyHandle_v5*  pKeyHandle,
+                                 const SeosCryptoKey_Spec* spec);
+
+typedef seos_err_t
+(*SeosCryptoCtx_keyMakePublicT_v5)(SeosCryptoCtx*                  self,
+                                   SeosCrypto_KeyHandle_v5*        pPubKeyHandle,
+                                   const SeosCrypto_KeyHandle_v5   prvKeyHandle,
+                                   const SeosCryptoKey_Attribs*    attribs);
+
+typedef seos_err_t
+(*SeosCryptoCtx_keyImportT_v5)(SeosCryptoCtx*                   self,
+                               SeosCrypto_KeyHandle_v5*         pKeyHandle,
+                               const SeosCrypto_KeyHandle_v5    wrapKeyHandle,
+                               const SeosCryptoKey_Data*        keyData);
+
+typedef seos_err_t
+(*SeosCryptoCtx_keyExportT_v5)(SeosCryptoCtx*                   self,
+                               const SeosCrypto_KeyHandle_v5    keyHandle,
+                               const SeosCrypto_KeyHandle_v5    wrapKeyHandle,
+                               SeosCryptoKey_Data*              keyData);
+
+
+typedef seos_err_t
+(*SeosCryptoCtx_keyGetParamsT_v5)(SeosCryptoCtx*                self,
+                                  const SeosCrypto_KeyHandle_v5 keyHandle,
+                                  void*                         keyParams,
+                                  size_t*                       paramSize);
+
+typedef seos_err_t
+(*SeosCryptoCtx_keyLoadParamsT_v5)(SeosCryptoCtx*               self,
+                                   const SeosCryptoKey_Param    name,
+                                   void*                        keyParams,
+                                   size_t*                      paramSize);
+
+typedef seos_err_t
+(*SeosCryptoCtx_keyFreeT_v5)(SeosCryptoCtx*                self,
+                             const SeosCrypto_KeyHandle_v5 keyHandle);
+
+// -------------------------------- Key API ------------------------------------
+
+
+typedef seos_err_t
 (*SeosCryptoCtx_keyGenerateT)(SeosCryptoCtx*            self,
                               SeosCrypto_KeyHandle*     pKeyHandle,
                               const SeosCryptoKey_Type  type,
@@ -210,6 +253,13 @@ typedef struct
     SeosCryptoCtx_digestFreeT               digestFree;
     SeosCryptoCtx_digestProcessT            digestProcess;
     SeosCryptoCtx_digestFinalizeT           digestFinalize;
+    SeosCryptoCtx_keyGenerateT_v5           keyGenerate_v5;
+    SeosCryptoCtx_keyMakePublicT_v5         keyMakePublic_v5;
+    SeosCryptoCtx_keyImportT_v5             keyImport_v5;
+    SeosCryptoCtx_keyExportT_v5             keyExport_v5;
+    SeosCryptoCtx_keyGetParamsT_v5          keyGetParams_v5;
+    SeosCryptoCtx_keyLoadParamsT_v5         keyLoadParams_v5;
+    SeosCryptoCtx_keyFreeT_v5               keyFree_v5;
     SeosCryptoCtx_keyGenerateT              keyGenerate;
     SeosCryptoCtx_keyGenerateFromParamsT    keyGenerateFromParams;
     SeosCryptoCtx_keyDerivePublicT          keyDerivePublic;
