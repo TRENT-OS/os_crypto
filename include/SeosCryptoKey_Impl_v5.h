@@ -11,20 +11,27 @@
 
 #pragma once
 
+#include "mbedtls/ecp.h"
+
 #include "SeosCryptoKey_Impl.h"
 
+/**
+ * We map the params we can load here to the constants to mbedTLS, because that
+ * is effectively where we get those parameters from.
+ */
 typedef enum
 {
-    SeosCryptoKey_ParamName_NONE = 0,
-    SeosCryptoKey_ParamName_ECC_SECP256R1
-} SeosCryptoKey_ParamName;
+    SeosCryptoKey_Param_NONE = 0,
+    SeosCryptoKey_Param_ECC_SECP192R1 = MBEDTLS_ECP_DP_SECP192R1,
+    SeosCryptoKey_Param_ECC_SECP224R1 = MBEDTLS_ECP_DP_SECP224R1,
+    SeosCryptoKey_Param_ECC_SECP256R1 = MBEDTLS_ECP_DP_SECP256R1,
+} SeosCryptoKey_Param;
 
 typedef enum
 {
     SeosCryptoKey_SpecType_NONE = 0,
     SeosCryptoKey_SpecType_BITS,
-    SeosCryptoKey_SpecType_DH_PARAMS,
-    SeosCryptoKey_SpecType_ECC_PARAMS,
+    SeosCryptoKey_SpecType_PARAMS,
 } SeosCryptoKey_SpecType;
 
 typedef struct
@@ -32,10 +39,10 @@ typedef struct
     SeosCryptoKey_Flags flags;
 } SeosCryptoKey_Attribs;
 
-typedef struct
+typedef struct __attribute__((__packed__))
 {
     SeosCryptoKey_SpecType  type;
-    struct spec
+    struct key
     {
         SeosCryptoKey_Type      type;
         SeosCryptoKey_Attribs   attribs;
@@ -45,26 +52,40 @@ typedef struct
             SeosCryptoKey_ECCParams ecc;
             SeosCryptoKey_DHParams  dh;
         } params;
-    } spec;
-} SeosCryptoKey_Spec;
+    } key;
+}
+SeosCryptoKey_Spec;
 
-typedef struct
+typedef struct __attribute__((__packed__))
 {
     SeosCryptoKey_Type      type;
     SeosCryptoKey_Attribs   attribs;
-    union key
+    union data
     {
-        SeosCryptoKey_ECCPrv        eccPrv;
-        SeosCryptoKey_ECCPub        eccPub;
-        SeosCryptoKey_SECP256r1Prv  secp256r1Prv;
-        SeosCryptoKey_SECP256r1Pub  secp256r1Pub;
-        SeosCryptoKey_DHPrv         dhPrv;
-        SeosCryptoKey_DHPub         dhPub;
-        SeosCryptoKey_RSAPrv        rsaPrv;
-        SeosCryptoKey_RSAPub        rsaPub;
-        SeosCryptoKey_AES           aes;
-    } key;
-} SeosCryptoKey_Data;
+        union ecc
+        {
+            SeosCryptoKey_ECCPrv prv;
+            SeosCryptoKey_ECCPub pub;
+        } ecc;
+        union secp256r1
+        {
+            SeosCryptoKey_SECP256r1Prv prv;
+            SeosCryptoKey_SECP256r1Pub pub;
+        } secp256r1;
+        union dh
+        {
+            SeosCryptoKey_DHPrv prv;
+            SeosCryptoKey_DHPub pub;
+        } dh;
+        union rsa
+        {
+            SeosCryptoKey_RSAPrv prv;
+            SeosCryptoKey_RSAPub pub;
+        } rsa;
+        SeosCryptoKey_AES aes;
+    } data;
+}
+SeosCryptoKey_Data;
 
 typedef struct
 {

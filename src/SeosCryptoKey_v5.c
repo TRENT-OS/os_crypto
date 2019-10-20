@@ -450,30 +450,30 @@ generateImpl(SeosCryptoKey_v5*         self,
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
-    switch (spec->spec.type)
+    switch (spec->key.type)
     {
     case SeosCryptoKey_Type_AES:
     {
         SeosCryptoKey_AES* key = (SeosCryptoKey_AES*) self->data;
         if ((SeosCryptoKey_SpecType_BITS != spec->type)
-            || ((128 != spec->spec.params.bits)
-                && (192 != spec->spec.params.bits)
-                && (256 != spec->spec.params.bits)))
+            || ((128 != spec->key.params.bits)
+                && (192 != spec->key.params.bits)
+                && (256 != spec->key.params.bits)))
         {
             return SEOS_ERROR_INVALID_PARAMETER;
         }
-        key->len = spec->spec.params.bits >> 3;
+        key->len = spec->key.params.bits >> 3;
         return SeosCryptoRng_getBytes(rng, 0, key->bytes, key->len);
     }
 
     case SeosCryptoKey_Type_RSA_PRV:
         if ((SeosCryptoKey_SpecType_BITS != spec->type)
-            || (spec->spec.params.bits < 128)
-            || (spec->spec.params.bits > (SeosCryptoKey_Size_RSA * 8)))
+            || (spec->key.params.bits < 128)
+            || (spec->key.params.bits > (SeosCryptoKey_Size_RSA * 8)))
         {
             return SEOS_ERROR_INVALID_PARAMETER;
         }
-        return generate_RSAPrv(self->data, rng, spec->spec.params.bits);
+        return generate_RSAPrv(self->data, rng, spec->key.params.bits);
 
     case SeosCryptoKey_Type_SECP256R1_PRV:
         // We can ignore all of the spec params, because the keytype defines
@@ -487,11 +487,11 @@ generateImpl(SeosCryptoKey_v5*         self,
 
         switch (spec->type)
         {
-        case SeosCryptoKey_SpecType_DH_PARAMS:
-            bits = getMpiLen(spec->spec.params.dh.pBytes, spec->spec.params.dh.pLen);
+        case SeosCryptoKey_SpecType_PARAMS:
+            bits = getMpiLen(spec->key.params.dh.pBytes, spec->key.params.dh.pLen);
             break;
         case SeosCryptoKey_SpecType_BITS:
-            bits = spec->spec.params.bits;
+            bits = spec->key.params.bits;
             break;
         default:
             return SEOS_ERROR_NOT_SUPPORTED;
@@ -500,9 +500,9 @@ generateImpl(SeosCryptoKey_v5*         self,
         {
             return SEOS_ERROR_NOT_SUPPORTED;
         }
-        if (SeosCryptoKey_SpecType_DH_PARAMS == spec->type)
+        if (SeosCryptoKey_SpecType_PARAMS == spec->type)
         {
-            memcpy(&key->params, &spec->spec.params, sizeof(SeosCryptoKey_DHParams));
+            memcpy(&key->params, &spec->key.params, sizeof(SeosCryptoKey_DHParams));
             retval = SEOS_SUCCESS;
         }
         else
@@ -538,6 +538,109 @@ makeImpl(SeosCryptoKey_v5*          self,
 }
 
 static seos_err_t
+importImpl(SeosCryptoKey_v5*          self,
+           const SeosCryptoKey_v5*    wrapKey,
+           const SeosCryptoKey_Data*  keyData)
+{
+    // Type and attribs have been set during key init
+    memcpy(self->data, &keyData->data, self->size);
+
+    return SEOS_SUCCESS;
+}
+
+static seos_err_t
+exportImpl(SeosCryptoKey_v5*          self,
+           const SeosCryptoKey_v5*    wrapKey,
+           SeosCryptoKey_Data*        keyData)
+{
+    memcpy(&keyData->data, self->data, self->size);
+    memcpy(&keyData->attribs, &self->attribs, sizeof(SeosCryptoKey_Attribs));
+    keyData->type = self->type;
+
+    return SEOS_SUCCESS;
+}
+
+static seos_err_t
+getParamsImpl(SeosCryptoKey_v5*    self,
+              void*                keyParams,
+              size_t*              paramSize)
+{
+    size_t size;
+    void* params = NULL;
+
+    switch (self->type)
+    {
+    case SeosCryptoKey_Type_DH_PUB:
+    case SeosCryptoKey_Type_DH_PRV:
+        size = sizeof(SeosCryptoKey_DHParams);
+        params = (self->type == SeosCryptoKey_Type_DH_PUB) ?
+                 &SeosCryptoKey_getDHPub_v5(self)->params :
+                 &SeosCryptoKey_getDHPrv_v5(self)->params;
+        break;
+    default:
+        return SEOS_ERROR_NOT_SUPPORTED;
+    }
+
+    if (*paramSize < size)
+    {
+        return SEOS_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    memcpy(keyParams, params, size);
+    *paramSize = size;
+
+    return SEOS_SUCCESS;
+}
+
+static seos_err_t
+loadParamsImpl(const SeosCryptoKey_Param   name,
+               void*                       keyParams,
+               size_t*                     paramSize)
+{
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    switch (name)
+    {
+    case SeosCryptoKey_Param_ECC_SECP192R1:
+    case SeosCryptoKey_Param_ECC_SECP224R1:
+    case SeosCryptoKey_Param_ECC_SECP256R1:
+    {
+        SeosCryptoKey_ECCParams* params = (SeosCryptoKey_ECCParams*) keyParams;
+        mbedtls_ecp_group grp;
+
+        if (*paramSize < sizeof(SeosCryptoKey_ECCParams))
+        {
+            return SEOS_ERROR_BUFFER_TOO_SMALL;
+        }
+
+        // Just extract the full range of params from mbedTLS.
+        mbedtls_ecp_group_init(&grp);
+        mbedtls_ecp_group_load(&grp, name);
+        params->aLen = mbedtls_mpi_size(&grp.A);
+        params->bLen = mbedtls_mpi_size(&grp.B);
+        params->pLen = mbedtls_mpi_size(&grp.P);
+        params->nLen = mbedtls_mpi_size(&grp.N);
+        params->gxLen = mbedtls_mpi_size(&grp.G.X);
+        params->gyLen = mbedtls_mpi_size(&grp.G.Y);
+        retval = mbedtls_mpi_write_binary(&grp.A, params->aBytes, params->aLen) != 0 ||
+                 mbedtls_mpi_write_binary(&grp.B, params->bBytes, params->bLen) != 0 ||
+                 mbedtls_mpi_write_binary(&grp.P, params->pBytes, params->pLen) != 0 ||
+                 mbedtls_mpi_write_binary(&grp.N, params->nBytes, params->nLen) != 0 ||
+                 mbedtls_mpi_write_binary(&grp.G.X, params->gxBytes, params->gxLen) != 0 ||
+                 mbedtls_mpi_write_binary(&grp.G.Y, params->gyBytes, params->gyLen) ?
+                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+        *paramSize = sizeof(SeosCryptoKey_ECCParams);
+        mbedtls_ecp_group_free(&grp);
+        break;
+    }
+    default:
+        return SEOS_ERROR_NOT_SUPPORTED;
+    }
+
+    return retval;
+}
+
+static seos_err_t
 freeImpl(SeosCryptoKey_v5*          self,
          const SeosCrypto_MemIf*    memIf)
 {
@@ -563,8 +666,8 @@ SeosCryptoKey_generate_v5(SeosCryptoKey_v5*         self,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((retval = initImpl(self, memIf, spec->spec.type,
-                           &spec->spec.attribs)) == SEOS_SUCCESS)
+    if ((retval = initImpl(self, memIf, spec->key.type,
+                           &spec->key.attribs)) == SEOS_SUCCESS)
     {
         if ((retval = generateImpl(self, rng, spec)) != SEOS_SUCCESS)
         {
@@ -621,7 +724,28 @@ SeosCryptoKey_import_v5(SeosCryptoKey_v5*          self,
                         const SeosCryptoKey_v5*    wrapKey,
                         const SeosCryptoKey_Data*  keyData)
 {
-    return SEOS_ERROR_NOT_SUPPORTED;
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+
+    if (NULL == self || NULL == memIf || NULL == keyData)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else if (NULL != wrapKey)
+    {
+        // Wrapping is not yet supported
+        return SEOS_ERROR_NOT_SUPPORTED;
+    }
+
+    if ((retval = initImpl(self, memIf, keyData->type,
+                           &keyData->attribs)) == SEOS_SUCCESS)
+    {
+        if ((retval = importImpl(self, wrapKey, keyData)) != SEOS_SUCCESS)
+        {
+            freeImpl(self, memIf);
+        }
+    }
+
+    return retval;
 }
 
 seos_err_t
@@ -629,7 +753,22 @@ SeosCryptoKey_export_v5(SeosCryptoKey_v5*       self,
                         const SeosCryptoKey_v5* wrapKey,
                         SeosCryptoKey_Data*     keyData)
 {
-    return SEOS_ERROR_NOT_SUPPORTED;
+    if (NULL == self || NULL == keyData)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else if (NULL != wrapKey)
+    {
+        // Wrapping is not yet supported
+        return SEOS_ERROR_NOT_SUPPORTED;
+    }
+
+    if (!(self->attribs.flags & SeosCryptoKey_Flags_EXPORTABLE_RAW))
+    {
+        return SEOS_ERROR_ACCESS_DENIED;
+    }
+
+    return exportImpl(self, wrapKey, keyData);
 }
 
 seos_err_t
@@ -637,15 +776,25 @@ SeosCryptoKey_getParams_v5(SeosCryptoKey_v5*    self,
                            void*                keyParams,
                            size_t*              paramSize)
 {
-    return SEOS_ERROR_NOT_SUPPORTED;
+    if (NULL == self || NULL == keyParams || NULL == paramSize)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    return getParamsImpl(self, keyParams, paramSize);
 }
 
 seos_err_t
-SeosCryptoKey_loadParams_v5(const SeosCryptoKey_ParamName   name,
-                            void*                           keyParams,
-                            size_t*                         paramSize)
+SeosCryptoKey_loadParams_v5(const SeosCryptoKey_Param   name,
+                            void*                       keyParams,
+                            size_t*                     paramSize)
 {
-    return SEOS_ERROR_NOT_SUPPORTED;
+    if (NULL == keyParams || NULL == paramSize)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    return loadParamsImpl(name, keyParams, paramSize);
 }
 
 seos_err_t

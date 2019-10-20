@@ -48,12 +48,75 @@ SeosCryptoKey_getParams_v5(SeosCryptoKey_v5*    self,
                            size_t*              paramSize);
 
 seos_err_t
-SeosCryptoKey_loadParams_v5(const SeosCryptoKey_ParamName   name,
-                            void*                           keyParams,
-                            size_t*                         paramSize);
+SeosCryptoKey_loadParams_v5(const SeosCryptoKey_Param   name,
+                            void*                       keyParams,
+                            size_t*                     paramSize);
 
 seos_err_t
 SeosCryptoKey_free_v5(SeosCryptoKey_v5*        self,
                       const SeosCrypto_MemIf*  memIf);
+
+/**
+ * @brief Translates key data into RSA public key
+ */
+INLINE SeosCryptoKey_RSAPub*
+SeosCryptoKey_getRSAPub_v5(const SeosCryptoKey_v5* key)
+{
+    return (SeosCryptoKey_RSAPub*) key->data;
+}
+
+/**
+ * @brief Translates key data into RSA private key
+ */
+INLINE SeosCryptoKey_RSAPrv*
+SeosCryptoKey_getRSAPrv_v5(const SeosCryptoKey_v5* key)
+{
+    return (SeosCryptoKey_RSAPrv*) key->data;
+}
+
+/**
+ * @brief Translates key data into SECP256r1 public key
+ */
+INLINE SeosCryptoKey_SECP256r1Pub*
+SeosCryptoKey_getSECP256r1Pub_v5(const SeosCryptoKey_v5* key)
+{
+    return (SeosCryptoKey_SECP256r1Pub*) key->data;
+}
+
+/**
+ * @brief Translates key data into SECP256r1 private key
+  */
+INLINE SeosCryptoKey_SECP256r1Prv*
+SeosCryptoKey_getSECP256r1Prv_v5(const SeosCryptoKey_v5* key)
+{
+    return (SeosCryptoKey_SECP256r1Prv*) key->data;
+}
+
+/**
+ * @brief Translates key data into DH public key
+ */
+INLINE SeosCryptoKey_DHPub*
+SeosCryptoKey_getDHPub_v5(const SeosCryptoKey_v5* key)
+{
+    return (SeosCryptoKey_DHPub*) key->data;
+}
+
+/**
+ * @brief Translates key data into DH private key
+ */
+INLINE SeosCryptoKey_DHPrv*
+SeosCryptoKey_getDHPrv_v5(const SeosCryptoKey_v5* key)
+{
+    return (SeosCryptoKey_DHPrv*) key->data;
+}
+
+/**
+ * @brief Translates key data into AES key
+ */
+INLINE SeosCryptoKey_AES*
+SeosCryptoKey_getAES_v5(const SeosCryptoKey_v5* key)
+{
+    return (SeosCryptoKey_AES*) key->data;
+}
 
 ///@}
