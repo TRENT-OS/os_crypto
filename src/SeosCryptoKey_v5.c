@@ -540,10 +540,102 @@ makeImpl(SeosCryptoKey_v5*          self,
 static seos_err_t
 importImpl(SeosCryptoKey_v5*          self,
            const SeosCryptoKey_v5*    wrapKey,
-           const SeosCryptoKey_Data*  keyData)
+           const SeosCryptoKey_Data*  key)
 {
+    size_t bits;
+
+    switch (key->type)
+    {
+    case SeosCryptoKey_Type_RSA_PUB:
+        if ((key->data.rsa.pub.eLen > sizeof(key->data.rsa.pub.eBytes))
+            || (key->data.rsa.pub.nLen > sizeof(key->data.rsa.pub.nBytes)))
+        {
+            return SEOS_ERROR_INVALID_PARAMETER;
+        }
+        bits = getMpiLen(key->data.rsa.pub.nBytes, key->data.rsa.pub.nLen);
+        if (bits < 128 || bits > SeosCryptoKey_Size_RSA * 8)
+        {
+            return SEOS_ERROR_INVALID_PARAMETER;
+        }
+        break;
+
+    case SeosCryptoKey_Type_RSA_PRV:
+        if ((key->data.rsa.pub.eLen > sizeof(key->data.rsa.pub.eBytes))
+            || (key->data.rsa.prv.pLen > sizeof(key->data.rsa.prv.pBytes))
+            || (key->data.rsa.prv.qLen > sizeof(key->data.rsa.prv.qBytes))
+            || (key->data.rsa.prv.dLen > sizeof(key->data.rsa.prv.dBytes)))
+        {
+            return SEOS_ERROR_INVALID_PARAMETER;
+        }
+        bits = getMpiLen(key->data.rsa.prv.pBytes, key->data.rsa.prv.pLen)
+               + getMpiLen(key->data.rsa.prv.qBytes, key->data.rsa.prv.qLen);
+        if (bits < 128 || bits > SeosCryptoKey_Size_RSA * 8)
+        {
+            return SEOS_ERROR_INVALID_PARAMETER;
+        }
+        break;
+
+    case SeosCryptoKey_Type_SECP256R1_PUB:
+        if ((key->data.secp256r1.pub.qxLen > sizeof(key->data.secp256r1.pub.qxBytes))
+            || (key->data.secp256r1.pub.qyLen > sizeof(key->data.secp256r1.pub.qyBytes)))
+        {
+            return SEOS_ERROR_INVALID_PARAMETER;
+        }
+        break;
+
+    case SeosCryptoKey_Type_SECP256R1_PRV:
+        if ((key->data.secp256r1.prv.dLen > sizeof(key->data.secp256r1.prv.dBytes)))
+        {
+            return SEOS_ERROR_INVALID_PARAMETER;
+        }
+        break;
+
+    case SeosCryptoKey_Type_DH_PUB:
+        if ((key->data.dh.pub.gxLen > sizeof(key->data.dh.pub.gxBytes))
+            || (key->data.dh.pub.params.gLen > sizeof(key->data.dh.pub.params.gBytes))
+            || (key->data.dh.pub.params.pLen > sizeof(key->data.dh.pub.params.pBytes)))
+        {
+            return SEOS_ERROR_INVALID_PARAMETER;
+        }
+        bits = getMpiLen(key->data.dh.pub.params.pBytes, key->data.dh.pub.params.pLen);
+        if (bits < 64 || bits > SeosCryptoKey_Size_DH * 8)
+        {
+            return SEOS_ERROR_INVALID_PARAMETER;
+        }
+        break;
+
+    case SeosCryptoKey_Type_DH_PRV:
+        if ((key->data.dh.prv.xLen > sizeof(key->data.dh.prv.xBytes))
+            || (key->data.dh.prv.params.gLen > sizeof(key->data.dh.prv.params.gBytes))
+            || (key->data.dh.prv.params.pLen > sizeof(key->data.dh.prv.params.pBytes)))
+        {
+            return SEOS_ERROR_INVALID_PARAMETER;
+        }
+        bits = getMpiLen(key->data.dh.prv.params.pBytes, key->data.dh.prv.params.pLen);
+        if (bits < 64 || bits > SeosCryptoKey_Size_DH * 8)
+        {
+            return SEOS_ERROR_INVALID_PARAMETER;
+        }
+        break;
+
+    case SeosCryptoKey_Type_AES:
+        if (key->data.aes.len > sizeof(key->data.aes.bytes))
+        {
+            return SEOS_ERROR_INVALID_PARAMETER;
+        }
+        bits = key->data.aes.len * 8;
+        if (bits != 128 && bits != 192 && bits != 256)
+        {
+            return SEOS_ERROR_INVALID_PARAMETER;
+        }
+        break;
+
+    default:
+        return SEOS_ERROR_NOT_SUPPORTED;
+    }
+
     // Type and attribs have been set during key init
-    memcpy(self->data, &keyData->data, self->size);
+    memcpy(self->data, &key->data, self->size);
 
     return SEOS_SUCCESS;
 }
