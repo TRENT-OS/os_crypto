@@ -12,7 +12,7 @@
 #pragma once
 
 #include "SeosCrypto_Impl.h"
-#include "SeosCryptoKey_Impl.h"
+#include "SeosCryptoKey_Impl_v5.h"
 #include "SeosCryptoCipher_Impl.h"
 
 #include "compiler.h"

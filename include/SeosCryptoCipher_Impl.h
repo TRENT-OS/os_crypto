@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "SeosCryptoKey_Impl.h"
+#include "SeosCryptoKey_Impl_v5.h"
 
 #include "mbedtls/rsa.h"
 #include "mbedtls/aes.h"

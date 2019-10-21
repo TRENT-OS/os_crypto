@@ -12,7 +12,6 @@
 #pragma once
 
 #include "SeosCryptoRng_Impl.h"
-#include "SeosCryptoKey_Impl.h"
 #include "SeosCryptoKey_Impl_v5.h"
 #include "SeosCryptoDigest_Impl.h"
 #include "SeosCryptoCipher_Impl.h"
@@ -133,8 +132,6 @@ SeosCrypto_keyMakePublic_v5(SeosCryptoCtx*                api,
                             const SeosCrypto_KeyHandle_v5 prvKeyHandle,
                             const SeosCryptoKey_Attribs*  attribs);
 
-
-
 seos_err_t
 SeosCrypto_keyImport_v5(SeosCryptoCtx*                  api,
                         SeosCrypto_KeyHandle_v5*        pKeyHandle,
@@ -162,94 +159,6 @@ SeosCrypto_keyLoadParams_v5(SeosCryptoCtx*                  api,
 seos_err_t
 SeosCrypto_keyFree_v5(SeosCryptoCtx*                api,
                       const SeosCrypto_KeyHandle_v5 keyHandle);
-
-/**
- * @brief implements SeosCryptoApi_keyGenerate() in a local connection
- * (function call, no rpc)
- *
- */
-seos_err_t
-SeosCrypto_keyGenerate(SeosCryptoCtx*               api,
-                       SeosCrypto_KeyHandle*        pKeyHandle,
-                       const SeosCryptoKey_Type     type,
-                       const SeosCryptoKey_Flags    flags,
-                       const size_t                 bits);
-
-seos_err_t
-SeosCrypto_keyDerivePublic(SeosCryptoCtx*               api,
-                           SeosCrypto_KeyHandle*        pPubKeyHandle,
-                           const SeosCrypto_KeyHandle   prvKeyHandle,
-                           const SeosCryptoKey_Flags    flags);
-
-seos_err_t
-SeosCrypto_keyGenerateFromParams(SeosCryptoCtx*               api,
-                                 SeosCrypto_KeyHandle*        pKeyHandle,
-                                 const SeosCryptoKey_Type     type,
-                                 const SeosCryptoKey_Flags    flags,
-                                 const void*                  keyParams,
-                                 const size_t                 paramLen);
-
-/**
- * @brief implements SeosCryptoApi_keyGeneratePair() in a local connection
- * (function call, no rpc)
- *
- */
-seos_err_t
-SeosCrypto_keyGeneratePair(SeosCryptoCtx*               api,
-                           SeosCrypto_KeyHandle*        pPrvKeyHandle,
-                           SeosCrypto_KeyHandle*        pPubKeyHandle,
-                           const SeosCryptoKey_PairType type,
-                           const SeosCryptoKey_Flags    prvFlags,
-                           const SeosCryptoKey_Flags    pubFlags,
-                           const size_t                 bits);
-
-/**
- * @brief implements SeosCryptoApi_keyImport() in a local connection
- * (function call, no rpc)
- *
- */
-seos_err_t
-SeosCrypto_keyImport(SeosCryptoCtx*             api,
-                     SeosCrypto_KeyHandle*      pKeyHandle,
-                     const SeosCrypto_KeyHandle wrapKeyHandle,
-                     const SeosCryptoKey_Type   type,
-                     const SeosCryptoKey_Flags  flags,
-                     const void*                keyBytes,
-                     const size_t               keySize);
-
-/**
- * @brief implements SeosCryptoApi_keyExport() in a local connection
- * (function call, no rpc)
- *
- */
-seos_err_t
-SeosCrypto_keyExport(SeosCryptoCtx*             api,
-                     const SeosCrypto_KeyHandle keyHandle,
-                     const SeosCrypto_KeyHandle wrapKeyHandle,
-                     SeosCryptoKey_Type*        type,
-                     SeosCryptoKey_Flags*       flags,
-                     void*                      buf,
-                     size_t*                    bufSize);
-
-/**
- * @brief implements SeosCryptoApi_keyExtractParams() in a local connection
- * (function call, no rpc)
- *
- */
-seos_err_t
-SeosCrypto_keyExtractParams(SeosCryptoCtx*             api,
-                            const SeosCrypto_KeyHandle keyHandle,
-                            void*                      buf,
-                            size_t*                    bufSize);
-
-/**
- * @brief implements SeosCryptoApi_keyFree() in a local connection
- * (function call, no rpc)
- *
- */
-seos_err_t
-SeosCrypto_keyFree(SeosCryptoCtx*               api,
-                   const SeosCrypto_KeyHandle   keyHandle);
 
 // ------------------------------ Cipher API -----------------------------------
 

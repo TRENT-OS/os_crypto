@@ -15,7 +15,6 @@
 #include "SeosCrypto_Impl.h"
 #include "SeosCryptoDigest_Impl.h"
 #include "SeosCryptoCipher_Impl.h"
-#include "SeosCryptoKey_Impl.h"
 #include "SeosCryptoKey_Impl_v5.h"
 #include "SeosCryptoRpc_Impl.h"
 #include "SeosCrypto_Handles.h"
@@ -142,84 +141,6 @@ SeosCryptoRpc_keyLoadParams_v5(SeosCryptoRpc*       self,
 seos_err_t
 SeosCryptoRpc_keyFree_v5(SeosCryptoRpc*            self,
                          SeosCrypto_KeyHandle_v5   keyHandle);
-
-/**
- * @brief rpc management of SeosCryptoRpc_keyGenerate()
- *
- */
-seos_err_t
-SeosCryptoRpc_keyGenerate(SeosCryptoRpc*         self,
-                          SeosCrypto_KeyHandle*  pKeyHandle,
-                          SeosCryptoKey_Type     type,
-                          SeosCryptoKey_Flags    flags,
-                          size_t                 bits);
-
-seos_err_t
-SeosCryptoRpc_keyDerivePublic(SeosCryptoRpc*        self,
-                              SeosCrypto_KeyHandle* pPubKeyHandle,
-                              SeosCrypto_KeyHandle  prvKeyHandle,
-                              SeosCryptoKey_Flags   flags);
-
-seos_err_t
-SeosCryptoRpc_keyGenerateFromParams(SeosCryptoRpc*        self,
-                                    SeosCrypto_KeyHandle* pKeyHandle,
-                                    SeosCryptoKey_Type    type,
-                                    SeosCryptoKey_Flags   flags,
-                                    size_t                paramLen);
-
-/**
- * @brief rpc management of SeosCryptoRpc_keyGeneratePair()
- *
- */
-seos_err_t
-SeosCryptoRpc_keyGeneratePair(SeosCryptoRpc*            self,
-                              SeosCrypto_KeyHandle*     pPrvKeyHandle,
-                              SeosCrypto_KeyHandle*     pPubKeyHandle,
-                              SeosCryptoKey_PairType    type,
-                              SeosCryptoKey_Flags       prvFlags,
-                              SeosCryptoKey_Flags       pubFlags,
-                              size_t                    bits);
-
-/**
- * @brief rpc management of SeosCryptoRpc_keyImport()
- *
- */
-seos_err_t
-SeosCryptoRpc_keyImport(SeosCryptoRpc*          self,
-                        SeosCrypto_KeyHandle*   pKeyHandle,
-                        SeosCrypto_KeyHandle    wrapkeyHandle,
-                        SeosCryptoKey_Type      type,
-                        SeosCryptoKey_Flags     flags,
-                        size_t                  keySize);
-
-/**
- * @brief rpc management of SeosCryptoRpc_keyExport()
- *
- */
-seos_err_t
-SeosCryptoRpc_keyExport(SeosCryptoRpc*          self,
-                        SeosCrypto_KeyHandle    keyHandle,
-                        SeosCrypto_KeyHandle    wrapKeyHandle,
-                        SeosCryptoKey_Type*     type,
-                        SeosCryptoKey_Flags*    flags,
-                        size_t                  bufSize);
-
-/**
- * @brief rpc management of SeosCryptoRpc_keyExport()
- *
- */
-seos_err_t
-SeosCryptoRpc_keyExtractParams(SeosCryptoRpc*          self,
-                               SeosCrypto_KeyHandle    keyHandle,
-                               size_t                  bufSize);
-
-/**
- * @brief rpc management of SeosCryptoRpc_keyFree()
- *
- */
-seos_err_t
-SeosCryptoRpc_keyFree(SeosCryptoRpc*                 self,
-                      SeosCrypto_KeyHandle           keyHandle);
 
 // ----------------------------- Signature API ---------------------------------
 
