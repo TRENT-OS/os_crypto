@@ -303,7 +303,7 @@ seos_err_t
 SeosCryptoRpc_cipherInit(SeosCryptoRpc*                 self,
                          SeosCrypto_CipherHandle*       pCipherHandle,
                          SeosCryptoCipher_Algorithm     algorithm,
-                         SeosCrypto_KeyHandle           keyHandle,
+                         SeosCrypto_KeyHandle_v5           keyHandle,
                          size_t                         ivLen);
 /**
  * @brief rpc management of SeosCrypto_cipherFree()

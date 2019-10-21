@@ -48,7 +48,7 @@ typedef struct
     mbedtls;
 
     SeosCryptoCipher_Algorithm  algorithm;
-    const SeosCryptoKey*        key;
+    const SeosCryptoKey_v5*        key;
     unsigned char               iv[SeosCryptoCipher_AES_BLOCK_SIZE];
     size_t                      ivLen;
     size_t                      inputLen;

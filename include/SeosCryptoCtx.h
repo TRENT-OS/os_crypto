@@ -212,8 +212,8 @@ typedef seos_err_t
 typedef seos_err_t
 (*SeosCryptoCtx_cipherInitT)(SeosCryptoCtx*                 self,
                              SeosCrypto_CipherHandle*       pCipherHandle,
-                             unsigned int                   algorithm,
-                             SeosCrypto_KeyHandle           keyHandle,
+                             SeosCryptoCipher_Algorithm     algorithm,
+                             SeosCrypto_KeyHandle_v5           keyHandle,
                              const void*                    iv,
                              size_t                         ivLen);
 

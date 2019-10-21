@@ -3,7 +3,7 @@
  */
 
 #include "SeosCryptoCipher.h"
-#include "SeosCryptoKey.h"
+#include "SeosCryptoKey_v5.h"
 
 #include "LibDebug/Debug.h"
 
@@ -87,7 +87,7 @@ setKeyImpl(SeosCryptoCipher* self)
     case SeosCryptoCipher_Algorithm_AES_GCM_ENC:
     case SeosCryptoCipher_Algorithm_AES_GCM_DEC:
         if (SeosCryptoKey_Type_AES != self->key->type ||
-            (aesKey = SeosCryptoKey_getAES(self->key)) == NULL)
+            (aesKey = SeosCryptoKey_getAES_v5(self->key)) == NULL)
         {
             return SEOS_ERROR_INVALID_PARAMETER;
         }
@@ -101,20 +101,20 @@ setKeyImpl(SeosCryptoCipher* self)
     case SeosCryptoCipher_Algorithm_AES_ECB_ENC:
     case SeosCryptoCipher_Algorithm_AES_CBC_ENC:
         retval = mbedtls_aes_setkey_enc(&self->mbedtls.aes,
-                                        aesKey->bytes, self->key->bits) ?
+                                        aesKey->bytes, aesKey->len * 8) ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
     case SeosCryptoCipher_Algorithm_AES_ECB_DEC:
     case SeosCryptoCipher_Algorithm_AES_CBC_DEC:
         retval = mbedtls_aes_setkey_dec(&self->mbedtls.aes,
-                                        aesKey->bytes, self->key->bits) ?
+                                        aesKey->bytes, aesKey->len * 8) ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
     case SeosCryptoCipher_Algorithm_AES_GCM_ENC:
     case SeosCryptoCipher_Algorithm_AES_GCM_DEC:
         retval = mbedtls_gcm_setkey(&self->mbedtls.gcm,
                                     MBEDTLS_CIPHER_ID_AES,
-                                    aesKey->bytes, self->key->bits) ?
+                                    aesKey->bytes, aesKey->len * 8) ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
     default:
@@ -336,7 +336,7 @@ seos_err_t
 SeosCryptoCipher_init(SeosCryptoCipher*                 self,
                       const SeosCrypto_MemIf*           memIf,
                       const SeosCryptoCipher_Algorithm  algorithm,
-                      const SeosCryptoKey*              key,
+                      const SeosCryptoKey_v5*              key,
                       const void*                       iv,
                       const size_t                      ivLen)
 {

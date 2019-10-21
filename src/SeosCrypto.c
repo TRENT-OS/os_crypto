@@ -1076,7 +1076,7 @@ seos_err_t
 SeosCrypto_cipherInit(SeosCryptoCtx*                    api,
                       SeosCrypto_CipherHandle*          pCipherHandle,
                       const SeosCryptoCipher_Algorithm  algorithm,
-                      const SeosCrypto_KeyHandle        key,
+                      const SeosCrypto_KeyHandle_v5        key,
                       const void*                       iv,
                       const size_t                      ivLen)
 {
