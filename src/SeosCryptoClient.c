@@ -265,8 +265,8 @@ seos_err_t
 SeosCryptoClient_signatureInit(SeosCryptoCtx*                       api,
                                SeosCrypto_SignatureHandle*          pSigHandle,
                                const SeosCryptoSignature_Algorithm  algorithm,
-                               const SeosCrypto_KeyHandle           prvHandle,
-                               const SeosCrypto_KeyHandle           pubHandle)
+                               const SeosCrypto_KeyHandle_v5           prvHandle,
+                               const SeosCrypto_KeyHandle_v5           pubHandle)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
 

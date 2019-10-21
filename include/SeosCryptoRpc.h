@@ -231,8 +231,8 @@ seos_err_t
 SeosCryptoRpc_signatureInit(SeosCryptoRpc*                   self,
                             SeosCrypto_SignatureHandle*      pSigHandle,
                             SeosCryptoSignature_Algorithm    algorithm,
-                            SeosCrypto_KeyHandle             prvHandle,
-                            SeosCrypto_KeyHandle             pubHandle);
+                            SeosCrypto_KeyHandle_v5             prvHandle,
+                            SeosCrypto_KeyHandle_v5             pubHandle);
 
 /**
  * @brief rpc management of SeosCrypto_signatureVerify()

@@ -3,7 +3,6 @@
  */
 
 #include "SeosCryptoSignature.h"
-#include "SeosCryptoKey.h"
 #include "SeosCryptoRng.h"
 
 #include "LibDebug/Debug.h"
@@ -68,7 +67,7 @@ setKeyImpl(SeosCryptoSignature* self)
             {
                 return SEOS_ERROR_INVALID_PARAMETER;
             }
-            retval = SeosCryptoKey_writeRSAPub(self->pubKey, &self->mbedtls.rsa);
+            retval = SeosCryptoKey_writeRSAPub_v5(self->pubKey, &self->mbedtls.rsa);
         }
         if (SEOS_SUCCESS == retval && NULL != self->prvKey)
         {
@@ -76,7 +75,7 @@ setKeyImpl(SeosCryptoSignature* self)
             {
                 return SEOS_ERROR_INVALID_PARAMETER;
             }
-            retval = SeosCryptoKey_writeRSAPrv(self->prvKey, &self->mbedtls.rsa);
+            retval = SeosCryptoKey_writeRSAPrv_v5(self->prvKey, &self->mbedtls.rsa);
         }
         break;
     default:
@@ -162,8 +161,8 @@ seos_err_t
 SeosCryptoSignature_init(SeosCryptoSignature*                   self,
                          const SeosCrypto_MemIf*                memIf,
                          const SeosCryptoSignature_Algorithm    algorithm,
-                         const SeosCryptoKey*                   prvKey,
-                         const SeosCryptoKey*                   pubKey)
+                         const SeosCryptoKey_v5*                   prvKey,
+                         const SeosCryptoKey_v5*                   pubKey)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 

@@ -395,8 +395,8 @@ seos_err_t
 SeosCryptoRpc_signatureInit(SeosCryptoRpc*                   self,
                             SeosCrypto_SignatureHandle*      pSigHandle,
                             unsigned int                     algorithm,
-                            SeosCrypto_KeyHandle             prvHandle,
-                            SeosCrypto_KeyHandle             pubHandle)
+                            SeosCrypto_KeyHandle_v5             prvHandle,
+                            SeosCrypto_KeyHandle_v5             pubHandle)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
            SeosCrypto_signatureInit(self->seosCryptoApi, pSigHandle, algorithm, prvHandle,

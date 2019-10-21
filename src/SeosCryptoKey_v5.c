@@ -900,3 +900,35 @@ SeosCryptoKey_free_v5(SeosCryptoKey_v5*        self,
 
     return freeImpl(self, memIf);
 }
+
+// Conversion functions --------------------------------------------------------
+
+seos_err_t
+SeosCryptoKey_writeRSAPub_v5(const SeosCryptoKey_v5* key,
+                             mbedtls_rsa_context* rsa)
+{
+    SeosCryptoKey_RSAPub* pubKey = SeosCryptoKey_getRSAPub_v5(key);
+    return (mbedtls_rsa_import_raw(rsa,
+                                   pubKey->nBytes, pubKey->nLen,
+                                   NULL, 0, NULL, 0, NULL, 0,
+                                   pubKey->eBytes, pubKey->eLen) != 0)
+           || (mbedtls_rsa_complete(rsa) != 0)
+           || (mbedtls_rsa_check_pubkey(rsa) != 0) ?
+           SEOS_ERROR_INVALID_PARAMETER : SEOS_SUCCESS;
+}
+
+seos_err_t
+SeosCryptoKey_writeRSAPrv_v5(const SeosCryptoKey_v5* key,
+                             mbedtls_rsa_context* rsa)
+{
+    SeosCryptoKey_RSAPrv* prvKey = SeosCryptoKey_getRSAPrv_v5(key);
+    return (mbedtls_rsa_import_raw(rsa,
+                                   NULL, 0,
+                                   prvKey->pBytes, prvKey->pLen,
+                                   prvKey->qBytes, prvKey->qLen,
+                                   prvKey->dBytes, prvKey->dLen,
+                                   prvKey->eBytes, prvKey->eLen) != 0)
+           || (mbedtls_rsa_complete(rsa) != 0)
+           || (mbedtls_rsa_check_privkey(rsa) != 0) ?
+           SEOS_ERROR_INVALID_PARAMETER : SEOS_SUCCESS;
+}

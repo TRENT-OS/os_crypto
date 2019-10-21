@@ -165,8 +165,8 @@ typedef seos_err_t
 (*SeosCryptoCtx_signatureInitT)(SeosCryptoCtx*                self,
                                 SeosCrypto_SignatureHandle*   pSigHandle,
                                 unsigned int                  algorithm,
-                                SeosCrypto_KeyHandle          prvHandle,
-                                SeosCrypto_KeyHandle          pubHandle);
+                                SeosCrypto_KeyHandle_v5          prvHandle,
+                                SeosCrypto_KeyHandle_v5          pubHandle);
 
 typedef seos_err_t
 (*SeosCryptoCtx_signatureFreeT)(SeosCryptoCtx*               self,

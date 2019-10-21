@@ -33,8 +33,8 @@ typedef struct
     mbedtls;
 
     SeosCryptoSignature_Algorithm   algorithm;
-    const SeosCryptoKey*                  prvKey;
-    const SeosCryptoKey*                  pubKey;
+    const SeosCryptoKey_v5*                  prvKey;
+    const SeosCryptoKey_v5*                  pubKey;
 }
 SeosCryptoSignature;
 

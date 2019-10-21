@@ -317,8 +317,8 @@ seos_err_t
 SeosCrypto_signatureInit(SeosCryptoCtx*                         api,
                          SeosCrypto_SignatureHandle*            pSigHandle,
                          const SeosCryptoSignature_Algorithm    algorithm,
-                         const SeosCrypto_KeyHandle             prvHandle,
-                         const SeosCrypto_KeyHandle             pubHandle);
+                         const SeosCrypto_KeyHandle_v5             prvHandle,
+                         const SeosCrypto_KeyHandle_v5             pubHandle);
 
 /**
  * @brief implements SeosCryptoApi_signatureFree() in a local connection

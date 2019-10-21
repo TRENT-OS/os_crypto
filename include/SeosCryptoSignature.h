@@ -14,6 +14,7 @@
 #include "SeosCrypto_Impl.h"
 #include "SeosCryptoSignature_Impl.h"
 #include "SeosCryptoRng_Impl.h"
+#include "SeosCryptoKey_v5.h"
 
 #include "seos_err.h"
 #include "compiler.h"
@@ -26,8 +27,8 @@ seos_err_t
 SeosCryptoSignature_init(SeosCryptoSignature*                   self,
                          const SeosCrypto_MemIf*                memIf,
                          const SeosCryptoSignature_Algorithm    algorithm,
-                         const SeosCryptoKey*                   prvKey,
-                         const SeosCryptoKey*                   pubKey);
+                         const SeosCryptoKey_v5*                   prvKey,
+                         const SeosCryptoKey_v5*                   pubKey);
 
 /**
  * @brief closes a signature context.
