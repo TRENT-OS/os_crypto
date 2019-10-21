@@ -1,11 +1,12 @@
-/* Copyright (C) 2019, Hensoldt Cyber GmbH
+/**
+ * Copyright (C) 2019, Hensoldt Cyber GmbH
  *
- * @addtogroup SEOS
+ * @addtogroup API
  * @{
  *
  * @file SeosCryptoAgreement_Impl.h
  *
- * @brief Underlying implementation related definitions of SeosCryptoAgreement
+ * @brief Agreement data structures and constants
  *
  */
 
@@ -18,7 +19,7 @@
 
 typedef enum
 {
-    SeosCryptoAgreement_Algorithm_NONE,
+    SeosCryptoAgreement_Algorithm_NONE = 0,
     SeosCryptoAgreement_Algorithm_DH,
     SeosCryptoAgreement_Algorithm_ECDH
 }

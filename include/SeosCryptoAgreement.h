@@ -6,9 +6,10 @@
  *
  * @file SeosCryptoAgreement.h
  *
- * @brief KeyAgreement functions and context
+ * @brief Agreement functions
  *
  */
+
 #pragma once
 
 #include "SeosCrypto_Impl.h"
@@ -18,20 +19,12 @@
 #include "compiler.h"
 #include "seos_err.h"
 
-/**
- * @brief Initializes a key agreement context
- *
- */
 seos_err_t
 SeosCryptoAgreement_init(SeosCryptoAgreement*                   self,
                          const SeosCrypto_MemIf*                memIf,
                          const SeosCryptoAgreement_Algorithm    algorithm,
                          const SeosCryptoKey*                   privateKey);
 
-/**
- * @brief Computes a shared secret
- *
- */
 seos_err_t
 SeosCryptoAgreement_agree(SeosCryptoAgreement*  self,
                           SeosCryptoRng*        rng,
@@ -39,10 +32,6 @@ SeosCryptoAgreement_agree(SeosCryptoAgreement*  self,
                           void*                 shared,
                           size_t*               sharedSize);
 
-/**
- * @brief Closes a key agreement context.
- *
- */
 seos_err_t
 SeosCryptoAgreement_free(SeosCryptoAgreement*       self,
                          const SeosCrypto_MemIf*    memIf);

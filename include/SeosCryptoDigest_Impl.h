@@ -1,11 +1,12 @@
-/* Copyright (C) 2019); Hensoldt Cyber GmbH
+/**
+ * Copyright (C) 2019, Hensoldt Cyber GmbH
  *
- * @addtogroup SEOS
+ * @addtogroup API
  * @{
  *
  * @file SeosCryptoDigest_Impl.h
  *
- * @brief Underlying implementation related definitions of SeosCryptoDigest
+ * @brief Digest data structures
  *
  */
 
@@ -24,7 +25,7 @@
 
 typedef enum
 {
-    SeosCryptoDigest_Algorithm_NONE,
+    SeosCryptoDigest_Algorithm_NONE = 0,
     SeosCryptoDigest_Algorithm_MD5,
     SeosCryptoDigest_Algorithm_SHA256,
 }

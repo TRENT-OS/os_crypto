@@ -6,7 +6,7 @@
  *
  * @file SeosCrypto_Handles.h
  *
- * @brief SEOS Crypto handles definition
+ * @brief Crypto handles definition
  *
  */
 
@@ -16,7 +16,7 @@
 #include "SeosCryptoAgreement_Impl.h"
 #include "SeosCryptoSignature_Impl.h"
 
-typedef SeosCryptoKey*       SeosCrypto_KeyHandle;
+typedef SeosCryptoKey*          SeosCrypto_KeyHandle;
 typedef SeosCryptoDigest*       SeosCrypto_DigestHandle;
 typedef SeosCryptoCipher*       SeosCrypto_CipherHandle;
 typedef SeosCryptoSignature*    SeosCrypto_SignatureHandle;

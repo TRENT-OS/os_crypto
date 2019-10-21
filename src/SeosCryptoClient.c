@@ -114,10 +114,10 @@ exit:
     return retval;
 }
 
-void
+seos_err_t
 SeosCryptoClient_free(SeosCryptoCtx* api)
 {
-    return;
+    return SEOS_SUCCESS;
 }
 
 // -------------------------------- RNG API ------------------------------------

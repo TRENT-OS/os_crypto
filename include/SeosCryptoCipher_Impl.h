@@ -1,11 +1,12 @@
-/* Copyright (C) 2019, Hensoldt Cyber GmbH
+/**
+ * Copyright (C) 2019, Hensoldt Cyber GmbH
  *
- * @addtogroup SEOS
+ * @addtogroup API
  * @{
  *
  * @file SeosCryptoCipher_Impl.h
  *
- * @brief Underlying implementation related definitions of SeosCryptoCipher
+ * @brief Cipher data structures and constants
  *
  */
 
@@ -25,7 +26,7 @@
 
 typedef enum
 {
-    SeosCryptoCipher_Algorithm_NONE,
+    SeosCryptoCipher_Algorithm_NONE = 0,
     SeosCryptoCipher_Algorithm_AES_ECB_ENC,
     SeosCryptoCipher_Algorithm_AES_ECB_DEC,
     SeosCryptoCipher_Algorithm_AES_CBC_ENC,

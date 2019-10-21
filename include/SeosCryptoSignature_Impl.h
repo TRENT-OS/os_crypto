@@ -1,11 +1,12 @@
-/* Copyright (C) 2019, Hensoldt Cyber GmbH
+/**
+ * Copyright (C) 2019, Hensoldt Cyber GmbH
  *
- * @addtogroup SEOS
+ * @addtogroup API
  * @{
  *
  * @file SeosCryptoSignature_Impl.h
  *
- * @brief Underlying implementation related definitions of SeosCryptoSignature
+ * @brief Signature data structures and constants
  *
  */
 
@@ -19,7 +20,7 @@
 
 typedef enum
 {
-    SeosCryptoSignature_Algorithm_NONE,
+    SeosCryptoSignature_Algorithm_NONE = 0,
     SeosCryptoSignature_Algorithm_RSA_PKCS1
 }
 SeosCryptoSignature_Algorithm;
@@ -33,8 +34,8 @@ typedef struct
     mbedtls;
 
     SeosCryptoSignature_Algorithm   algorithm;
-    const SeosCryptoKey*                  prvKey;
-    const SeosCryptoKey*                  pubKey;
+    const SeosCryptoKey*            prvKey;
+    const SeosCryptoKey*            pubKey;
 }
 SeosCryptoSignature;
 

@@ -6,9 +6,10 @@
  *
  * @file SeosCryptoRng.h
  *
- * @brief SEOS Crypto Random Number generator context and functions
+ * @brief RNG functions
  *
  */
+
 #pragma once
 
 #include "SeosCrypto_Impl.h"
@@ -17,30 +18,18 @@
 #include "seos_err.h"
 #include "compiler.h"
 
-/**
- * @brief Initializes an rng context
- *
- */
 seos_err_t
 SeosCryptoRng_init(SeosCryptoRng*                self,
                    const SeosCrypto_MemIf*       memIf,
                    const SeosCrypto_EntropyFunc* entropyFunc,
                    void*                         entropyCtx);
 
-/**
- * @brief Get random bytes
- *
- */
 seos_err_t
 SeosCryptoRng_getBytes(SeosCryptoRng*               self,
                        const SeosCryptoRng_Flags    flags,
                        void*                        buf,
                        const size_t                 bufSize);
 
-/**
- * @brief Reseed the RNG with additional bytes
- *
- */
 seos_err_t
 SeosCryptoRng_reSeed(SeosCryptoRng* self,
                      const void*    seed,
@@ -67,10 +56,6 @@ SeosCryptoRng_getBytesMbedtls(void*             self,
     return SeosCryptoRng_getBytes(self, 0, buf, bufSize) == SEOS_SUCCESS ? 0 : 1;
 }
 
-/**
- * @brief Deinitializes an rng context
- *
- */
 seos_err_t
 SeosCryptoRng_free(SeosCryptoRng*           self,
                    const SeosCrypto_MemIf*  memIf);

@@ -1,11 +1,12 @@
-/* Copyright (C) 2019, Hensoldt Cyber GmbH
+/**
+ * Copyright (C) 2019, Hensoldt Cyber GmbH
  *
- * @addtogroup SEOS
+ * @addtogroup API
  * @{
  *
  * @file SeosCryptoKey_Impl.h
  *
- * @brief Underlying implementation related definitions of SeosCryptoKey
+ * @brief Key data structures and constants
  *
  */
 
@@ -17,15 +18,15 @@
  * How often do we want to retry finding a suitable prime P and also
  * a suitable X with 2 <= X <= P-2?
  */
-#define SeosCryptoKey_DH_GEN_RETRIES 10
+#define SeosCryptoKey_DH_GEN_RETRIES    10
 
-#define SeosCryptoKey_DH_GENERATOR   2       ///< Generator for DH
-#define SeosCryptoKey_RSA_EXPONENT   65537   ///< Public exp. 2^16+1
+#define SeosCryptoKey_DH_GENERATOR      2       ///< Generator for DH
+#define SeosCryptoKey_RSA_EXPONENT      65537   ///< Public exp. 2^16+1
 
-#define SeosCryptoKey_Size_AES      32      ///< max 256 bit
-#define SeosCryptoKey_Size_RSA      512     ///< max 4096 bit
-#define SeosCryptoKey_Size_DH       512     ///< max 4096 bit
-#define SeosCryptoKey_Size_ECC      32      ///< always 256 bit
+#define SeosCryptoKey_Size_AES          32      ///< max 256 bit
+#define SeosCryptoKey_Size_RSA          512     ///< max 4096 bit
+#define SeosCryptoKey_Size_DH           512     ///< max 4096 bit
+#define SeosCryptoKey_Size_ECC          32      ///< always 256 bit
 
 // -----------------------------------------------------------------------------
 
@@ -81,7 +82,7 @@ typedef struct
     SeosCryptoKey_Type      type;
     SeosCryptoKey_Attribs   attribs;
     void*                   data;
-    size_t                  size;
+    uint32_t                size;
 }
 SeosCryptoKey;
 
@@ -217,7 +218,7 @@ typedef struct __attribute__((__packed__))
         SeosCryptoKey_Attribs   attribs;
         union params
         {
-            size_t                  bits;
+            uint32_t                bits;
             SeosCryptoKey_ECCParams ecc;
             SeosCryptoKey_DHParams  dh;
         } params;

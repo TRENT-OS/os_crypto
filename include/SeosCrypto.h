@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  *
- * @addtogroup API
+ * @addtogroup Wrappers
  * @{
  *
  * @file SeosCrypto.h
  *
- * @brief SEOS Crypto context and functions
+ * @brief Crypto core functions
  *
  */
 #pragma once
@@ -47,72 +47,39 @@ SeosCrypto_init(SeosCrypto*                 self,
                 const SeosCrypto_Callbacks* cbFuncs,
                 void*                       entropyCtx);
 
-/**
- * @brief closes the initialized crypto context and releases all the allocated
- *  resources
- *
- * @param self (required) pointer to the seos_crypto context
- *
- */
-void
+seos_err_t
 SeosCrypto_free(SeosCryptoCtx* api);
 
 // -------------------------------- RNG API ------------------------------------
 
-/**
- * @brief implements SeosCryptoApi_rngGetBytes() in a local connection
- *  (function call, no rpc)
- *
- */
 seos_err_t
 SeosCrypto_rngGetBytes(SeosCryptoCtx*               api,
                        const SeosCryptoRng_Flags    flags,
                        void*                        buf,
                        const size_t                 bufLen);
 
-/**
- * @brief implements SeosCryptoApi_rngReSeed() in a local connection
- *  (function call, no rpc)
- *
- */
 seos_err_t
 SeosCrypto_rngReSeed(SeosCryptoCtx*     api,
                      const void*        seed,
                      const size_t       seedLen);
 
 // ------------------------------ Digest API -----------------------------------
-/**
- * @brief implements SeosCryptoApi_digestInit() in a local connection
- * (function call, no rpc)
- *
- */
+
 seos_err_t
 SeosCrypto_digestInit(SeosCryptoCtx*                    api,
                       SeosCrypto_DigestHandle*          pDigestHandle,
                       const SeosCryptoDigest_Algorithm  algorithm);
-/**
- * @brief implements SeosCryptoApi_digestInit() in a local connection
- * (function call, no rpc)
- *
- */
+
 seos_err_t
 SeosCrypto_digestFree(SeosCryptoCtx*                api,
                       const SeosCrypto_DigestHandle digestHandle);
-/**
- * @brief implements SeosCryptoApi_digestProcess() in a local connection
- * (function call, no rpc)
- *
- */
+
 seos_err_t
 SeosCrypto_digestProcess(SeosCryptoCtx*                  api,
                          const SeosCrypto_DigestHandle   digestHandle,
                          const void*                     data,
                          const size_t                    len);
-/**
- * @brief implements SeosCryptoApi_digestFinalize() in a local connection
- * (function call, no rpc)
- *
- */
+
 seos_err_t
 SeosCrypto_digestFinalize(SeosCryptoCtx*                api,
                           const SeosCrypto_DigestHandle digestHandle,
@@ -162,11 +129,6 @@ SeosCrypto_keyFree(SeosCryptoCtx*                api,
 
 // ------------------------------ Cipher API -----------------------------------
 
-/**
- * @brief implements SeosCryptoApi_cipherInit() in a local connection
- * (function call, no rpc)
- *
- */
 seos_err_t
 SeosCrypto_cipherInit(SeosCryptoCtx*                    api,
                       SeosCrypto_CipherHandle*          pCipherHandle,
@@ -174,19 +136,11 @@ SeosCrypto_cipherInit(SeosCryptoCtx*                    api,
                       const SeosCrypto_KeyHandle        keyHandle,
                       const void*                       iv,
                       const size_t                      ivLen);
-/**
- * @brief implements SeosCryptoApi_cipherFree() in a local connection
- * (function call, no rpc)
- *
- */
+
 seos_err_t
 SeosCrypto_cipherFree(SeosCryptoCtx*                api,
                       const SeosCrypto_CipherHandle cipherHandle);
-/**
- * @brief implements SeosCryptoApi_cipherProcess() in a local connection
- * (function call, no rpc)
- *
- */
+
 seos_err_t
 SeosCrypto_cipherProcess(SeosCryptoCtx*                  api,
                          const SeosCrypto_CipherHandle   cipherHandle,
@@ -194,21 +148,13 @@ SeosCrypto_cipherProcess(SeosCryptoCtx*                  api,
                          const size_t                    inputSize,
                          void*                           output,
                          size_t*                         outputSize);
-/**
- * @brief implements SeosCryptoApi_cipherStart() in a local connection
- * (function call, no rpc)
- *
- */
+
 seos_err_t
 SeosCrypto_cipherStart(SeosCryptoCtx*                   api,
                        const SeosCrypto_CipherHandle    cipherHandle,
                        const void*                      input,
                        const size_t                     inputSize);
-/**
- * @brief implements SeosCryptoApi_cipherFinalize() in a local connection
- * (function call, no rpc)
- *
- */
+
 seos_err_t
 SeosCrypto_cipherFinalize(SeosCryptoCtx*                api,
                           const SeosCrypto_CipherHandle cipherHandle,
@@ -217,11 +163,6 @@ SeosCrypto_cipherFinalize(SeosCryptoCtx*                api,
 
 // ----------------------------- Signature API ---------------------------------
 
-/**
- * @brief implements SeosCryptoApi_signatureInit() in a local connection
- * (function call, no rpc)
- *
- */
 seos_err_t
 SeosCrypto_signatureInit(SeosCryptoCtx*                         api,
                          SeosCrypto_SignatureHandle*            pSigHandle,
@@ -229,20 +170,11 @@ SeosCrypto_signatureInit(SeosCryptoCtx*                         api,
                          const SeosCrypto_KeyHandle             prvHandle,
                          const SeosCrypto_KeyHandle             pubHandle);
 
-/**
- * @brief implements SeosCryptoApi_signatureFree() in a local connection
- * (function call, no rpc)
- *
- */
 seos_err_t
 SeosCrypto_signatureFree(SeosCryptoCtx*                     api,
                          const SeosCrypto_SignatureHandle   sigHandle);
 
-/**
- * @brief implements SeosCryptoApi_signatureSign() in a local connection
- * (function call, no rpc)
- *
- */
+
 seos_err_t
 SeosCrypto_signatureSign(SeosCryptoCtx*                     api,
                          const SeosCrypto_SignatureHandle   sigHandle,
@@ -251,11 +183,6 @@ SeosCrypto_signatureSign(SeosCryptoCtx*                     api,
                          void*                              signature,
                          size_t*                            signatureSize);
 
-/**
- * @brief implements SeosCryptoApi_signatureVerify() in a local connection
- * (function call, no rpc)
- *
- */
 seos_err_t
 SeosCrypto_signatureVerify(SeosCryptoCtx*                   api,
                            const SeosCrypto_SignatureHandle sigHandle,
@@ -266,31 +193,16 @@ SeosCrypto_signatureVerify(SeosCryptoCtx*                   api,
 
 // ----------------------------- Agreement API ---------------------------------
 
-/**
- * @brief implements SeosCryptoApi_agreementInit() in a local connection
- * (function call, no rpc)
- *
- */
 seos_err_t
 SeosCrypto_agreementInit(SeosCryptoCtx*                         api,
                          SeosCrypto_AgreementHandle*            pAgrHandle,
                          const SeosCryptoAgreement_Algorithm    algorithm,
                          const SeosCrypto_KeyHandle             prvHandle);
 
-/**
- * @brief implements SeosCryptoApi_agreementFree() in a local connection
- * (function call, no rpc)
- *
- */
 seos_err_t
 SeosCrypto_agreementFree(SeosCryptoCtx*                     api,
                          const SeosCrypto_AgreementHandle   agrHandle);
 
-/**
- * @brief implements SeosCryptoApi_agreementAgree() in a local connection
- * (function call, no rpc)
- *
- */
 seos_err_t
 SeosCrypto_agreementAgree(SeosCryptoCtx*                    api,
                           const SeosCrypto_AgreementHandle  agrHandle,

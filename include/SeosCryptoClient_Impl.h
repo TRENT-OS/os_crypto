@@ -4,11 +4,12 @@
  * @addtogroup API
  * @{
  *
- * @file SeosCrypto_Impl.h
+ * @file SeosCryptoClient_Impl.h
  *
- * @brief Underlying implementation related definitions of SeosCrypto
+ * @brief RPC client data structures and constants
  *
  */
+
 #pragma once
 
 #include "SeosCryptoRpc_Impl.h"
@@ -30,4 +31,5 @@ typedef struct
     void*                   clientDataport;
 }
 SeosCryptoClient;
+
 /** @} */

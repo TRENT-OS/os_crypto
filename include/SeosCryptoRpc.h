@@ -6,10 +6,11 @@
  *
  * @file SeosCryptoRpc.h
  *
- * @brief RPC object and functions to handle the requests of a SEOS crypto
- *  client on the server's side
+ * @brief RPC functions to handle the requests of a SEOS crypto client on the
+ * server's side
  *
  */
+
 #pragma once
 
 #include "SeosCrypto_Impl.h"
@@ -53,55 +54,31 @@ SeosCryptoRpc_free(SeosCryptoRpc* self);
 
 // -------------------------------- RNG API ------------------------------------
 
-/**
- * @brief rpc management of SeosCrypto_rngGetBytes()
- *
- */
 seos_err_t
 SeosCryptoRpc_rngGetBytes(SeosCryptoRpc*    self,
                           unsigned int      flags,
                           size_t            dataLen);
 
-/**
- * @brief rpc management of SeosCrypto_rngReSeed()
- *
- */
 seos_err_t
 SeosCryptoRpc_rngReSeed(SeosCryptoRpc*      self,
                         size_t              seedLen);
 
 // ------------------------------ Digest API -----------------------------------
 
-/**
- * @brief rpc management of SeosCrypto_digestInit()
- *
- */
 seos_err_t
 SeosCryptoRpc_digestInit(SeosCryptoRpc*                 self,
                          SeosCrypto_DigestHandle*       pDigestHandle,
                          SeosCryptoDigest_Algorithm     algorithm);
 
-/**
- * @brief rpc management of SeosCrypto_digestFree()
- *
- */
 seos_err_t
 SeosCryptoRpc_digestFree(SeosCryptoRpc*            self,
                          SeosCrypto_DigestHandle   digestHandle);
 
-/**
- * @brief rpc management of SeosCrypto_digestProcess()
- *
- */
 seos_err_t
 SeosCryptoRpc_digestProcess(SeosCryptoRpc*           self,
                             SeosCrypto_DigestHandle  digestHandle,
                             size_t                   inLen);
 
-/**
- * @brief rpc management of SeosCrypto_digestFinalize()
- *
- */
 seos_err_t
 SeosCryptoRpc_digestFinalize(SeosCryptoRpc*             self,
                              SeosCrypto_DigestHandle    digestHandle,
@@ -144,10 +121,6 @@ SeosCryptoRpc_keyFree(SeosCryptoRpc*        self,
 
 // ----------------------------- Signature API ---------------------------------
 
-/**
- * @brief rpc management of SeosCrypto_signatureInit()
- *
- */
 seos_err_t
 SeosCryptoRpc_signatureInit(SeosCryptoRpc*                   self,
                             SeosCrypto_SignatureHandle*      pSigHandle,
@@ -155,30 +128,18 @@ SeosCryptoRpc_signatureInit(SeosCryptoRpc*                   self,
                             SeosCrypto_KeyHandle             prvHandle,
                             SeosCrypto_KeyHandle             pubHandle);
 
-/**
- * @brief rpc management of SeosCrypto_signatureVerify()
- *
- */
 seos_err_t
 SeosCryptoRpc_signatureVerify(SeosCryptoRpc*                self,
                               SeosCrypto_SignatureHandle    sigHandle,
                               size_t                        hashSize,
                               size_t                        signatureSize);
 
-/**
- * @brief rpc management of SeosCrypto_signatureSign()
- *
- */
 seos_err_t
 SeosCryptoRpc_signatureSign(SeosCryptoRpc*                self,
                             SeosCrypto_SignatureHandle    sigHandle,
                             size_t                        hashSize,
                             size_t                        signatureSize);
 
-/**
- * @brief rpc management of SeosCrypto_signatureFree()
- *
- */
 seos_err_t
 SeosCryptoRpc_signatureFree(SeosCryptoRpc*                  self,
                             SeosCrypto_SignatureHandle      sigHandle);
@@ -186,79 +147,49 @@ SeosCryptoRpc_signatureFree(SeosCryptoRpc*                  self,
 
 // ----------------------------- Agreement API ---------------------------------
 
-/**
- * @brief rpc management of SeosCrypto_agreementInit()
- *
- */
 seos_err_t
 SeosCryptoRpc_agreementInit(SeosCryptoRpc*                   self,
                             SeosCrypto_AgreementHandle*      pAgrHandle,
                             SeosCryptoAgreement_Algorithm    algorithm,
                             SeosCrypto_KeyHandle             prvHandle);
 
-/**
- * @brief rpc management of SeosCrypto_agreementAgree()
- *
- */
 seos_err_t
 SeosCryptoRpc_agreementAgree(SeosCryptoRpc*                self,
                              SeosCrypto_AgreementHandle    agrHandle,
                              SeosCrypto_KeyHandle          pubHandle,
                              size_t                        sharedSize);
 
-/**
- * @brief rpc management of SeosCrypto_agreementFree()
- *
- */
 seos_err_t
 SeosCryptoRpc_agreementFree(SeosCryptoRpc*                self,
                             SeosCrypto_AgreementHandle    agrHandle);
 
 // ------------------------------- Cipher API ----------------------------------
 
-/**
- * @brief rpc management of SeosCrypto_cipherInit()
- *
- */
 seos_err_t
 SeosCryptoRpc_cipherInit(SeosCryptoRpc*                 self,
                          SeosCrypto_CipherHandle*       pCipherHandle,
                          SeosCryptoCipher_Algorithm     algorithm,
                          SeosCrypto_KeyHandle           keyHandle,
                          size_t                         ivLen);
-/**
- * @brief rpc management of SeosCrypto_cipherFree()
- *
- */
+
 seos_err_t
 SeosCryptoRpc_cipherFree(SeosCryptoRpc*                self,
                          SeosCrypto_CipherHandle       cipherHandle);
-/**
- * @brief rpc management of SeosCrypto_cipherProcess()
- *
- */
+
 seos_err_t
 SeosCryptoRpc_cipherProcess(SeosCryptoRpc*               self,
                             SeosCrypto_CipherHandle      cipherHandle,
                             size_t                       inputLen,
                             size_t                       outputSize);
-/**
- * @brief rpc management of SeosCrypto_cipherStart()
- *
- */
+
 seos_err_t
 SeosCryptoRpc_cipherStart(SeosCryptoRpc*             self,
                           SeosCrypto_CipherHandle    cipherHandle,
                           size_t                     len);
 
-/**
- * @brief rpc management of SeosCrypto_cipherFinalize()
- *
- */
 seos_err_t
 SeosCryptoRpc_cipherFinalize(SeosCryptoRpc*             self,
                              SeosCrypto_CipherHandle    cipherHandle,
                              size_t                     len);
-
 
 /** @} */

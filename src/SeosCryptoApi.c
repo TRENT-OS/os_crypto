@@ -5,11 +5,10 @@
 #include "SeosCryptoCtx.h"
 #include "SeosCryptoApi.h"
 
-void
+seos_err_t
 SeosCryptoApi_free(SeosCryptoCtx* ctx)
 {
-    Debug_ASSERT_SELF(ctx);
-    ctx->vtable->free(ctx);
+    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER : ctx->vtable->free(ctx);
 }
 
 // -------------------------------- RNG API ------------------------------------

@@ -9,6 +9,7 @@
  * @brief Signature functions and context
  *
  */
+
 #pragma once
 
 #include "SeosCrypto_Impl.h"
@@ -19,10 +20,7 @@
 #include "seos_err.h"
 #include "compiler.h"
 
-/**
- * @brief initializes a signature context
- *
- */
+
 seos_err_t
 SeosCryptoSignature_init(SeosCryptoSignature*                   self,
                          const SeosCrypto_MemIf*                memIf,
@@ -30,18 +28,10 @@ SeosCryptoSignature_init(SeosCryptoSignature*                   self,
                          const SeosCryptoKey*                   prvKey,
                          const SeosCryptoKey*                   pubKey);
 
-/**
- * @brief closes a signature context.
- *
- */
 seos_err_t
 SeosCryptoSignature_free(SeosCryptoSignature*       self,
                          const SeosCrypto_MemIf*    memIf);
 
-/**
- * @brief Sign a hash value
- *
- */
 seos_err_t
 SeosCryptoSignature_sign(SeosCryptoSignature*   self,
                          SeosCryptoRng*         rng,
@@ -50,10 +40,6 @@ SeosCryptoSignature_sign(SeosCryptoSignature*   self,
                          void*                  signature,
                          size_t*                signatureSize);
 
-/**
- * @brief Verify a hash value
- *
- */
 seos_err_t
 SeosCryptoSignature_verify(SeosCryptoSignature* self,
                            SeosCryptoRng*       rng,
@@ -62,4 +48,4 @@ SeosCryptoSignature_verify(SeosCryptoSignature* self,
                            const void*          signature,
                            const size_t         signatureSize);
 
-///@}
+/** @} */

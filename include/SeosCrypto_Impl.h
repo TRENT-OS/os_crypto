@@ -6,9 +6,10 @@
  *
  * @file SeosCrypto_Impl.h
  *
- * @brief Underlying implementation related definitions of SeosCrypto
+ * @brief Crypto core data structures and constants
  *
  */
+
 #pragma once
 
 #include "SeosCryptoRng_Impl.h"

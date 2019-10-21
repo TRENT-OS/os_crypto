@@ -1,11 +1,12 @@
-/* Copyright (C) 2019, Hensoldt Cyber GmbH
+/**
+ * Copyright (C) 2019, Hensoldt Cyber GmbH
  *
- * @addtogroup SEOS
+ * @addtogroup API
  * @{
  *
  * @file SeosCryptoRpc_Impl.h
  *
- * @brief Underlying implementation related definitions of SeosCryptoRpc
+ * @brief RPC server data structures and constants
  *
  */
 

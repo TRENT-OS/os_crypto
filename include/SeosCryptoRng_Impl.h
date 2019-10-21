@@ -1,11 +1,12 @@
-/* Copyright (C) 2019, Hensoldt Cyber GmbH
+/**
+ * Copyright (C) 2019, Hensoldt Cyber GmbH
  *
- * @addtogroup SEOS
+ * @addtogroup API
  * @{
  *
  * @file SeosCryptoRng_Impl.h
  *
- * @brief Underlying implementation related definitions of SeosCryptoRng
+ * @brief RNG data structures and constants
  *
  */
 
@@ -17,7 +18,7 @@
 
 typedef enum
 {
-    SeosCryptoRng_Flags_NONE                = 0x0000,
+    SeosCryptoRng_Flags_NONE = 0x0000,
 } SeosCryptoRng_Flags;
 
 typedef struct

@@ -14,12 +14,12 @@
 
 static const SeosCryptoCtx_Vtable SeosCrypto_vtable =
 {
-    .rngGetBytes            = SeosCrypto_rngGetBytes,
-    .rngReSeed              = SeosCrypto_rngReSeed,
-    .digestInit             = SeosCrypto_digestInit,
-    .digestFree             = SeosCrypto_digestFree,
-    .digestProcess          = SeosCrypto_digestProcess,
-    .digestFinalize         = SeosCrypto_digestFinalize,
+    .rngGetBytes         = SeosCrypto_rngGetBytes,
+    .rngReSeed           = SeosCrypto_rngReSeed,
+    .digestInit          = SeosCrypto_digestInit,
+    .digestFree          = SeosCrypto_digestFree,
+    .digestProcess       = SeosCrypto_digestProcess,
+    .digestFinalize      = SeosCrypto_digestFinalize,
     .keyGenerate         = SeosCrypto_keyGenerate,
     .keyMakePublic       = SeosCrypto_keyMakePublic,
     .keyImport           = SeosCrypto_keyImport,
@@ -27,19 +27,19 @@ static const SeosCryptoCtx_Vtable SeosCrypto_vtable =
     .keyGetParams        = SeosCrypto_keyGetParams,
     .keyLoadParams       = SeosCrypto_keyLoadParams,
     .keyFree             = SeosCrypto_keyFree,
-    .signatureInit          = SeosCrypto_signatureInit,
-    .signatureFree          = SeosCrypto_signatureFree,
-    .signatureSign          = SeosCrypto_signatureSign,
-    .signatureVerify        = SeosCrypto_signatureVerify,
-    .agreementInit          = SeosCrypto_agreementInit,
-    .agreementFree          = SeosCrypto_agreementFree,
-    .agreementAgree         = SeosCrypto_agreementAgree,
-    .cipherInit             = SeosCrypto_cipherInit,
-    .cipherFree             = SeosCrypto_cipherFree,
-    .cipherProcess          = SeosCrypto_cipherProcess,
-    .cipherStart            = SeosCrypto_cipherStart,
-    .cipherFinalize         = SeosCrypto_cipherFinalize,
-    .free                   = SeosCrypto_free
+    .signatureInit       = SeosCrypto_signatureInit,
+    .signatureFree       = SeosCrypto_signatureFree,
+    .signatureSign       = SeosCrypto_signatureSign,
+    .signatureVerify     = SeosCrypto_signatureVerify,
+    .agreementInit       = SeosCrypto_agreementInit,
+    .agreementFree       = SeosCrypto_agreementFree,
+    .agreementAgree      = SeosCrypto_agreementAgree,
+    .cipherInit          = SeosCrypto_cipherInit,
+    .cipherFree          = SeosCrypto_cipherFree,
+    .cipherProcess       = SeosCrypto_cipherProcess,
+    .cipherStart         = SeosCrypto_cipherStart,
+    .cipherFinalize      = SeosCrypto_cipherFinalize,
+    .free                = SeosCrypto_free
 };
 
 // Private static functions ----------------------------------------------------
@@ -134,7 +134,7 @@ err0:
     return retval;
 }
 
-void
+seos_err_t
 SeosCrypto_free(SeosCryptoCtx* api)
 {
     SeosCrypto* self = (SeosCrypto*) api;
@@ -146,6 +146,8 @@ SeosCrypto_free(SeosCryptoCtx* api)
     PointerVector_dtor(&self->cipherHandleVector);
     PointerVector_dtor(&self->keyHandleVector);
     PointerVector_dtor(&self->digestHandleVector);
+
+    return SEOS_SUCCESS;
 }
 
 // -------------------------------- RNG API ------------------------------------

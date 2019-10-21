@@ -6,9 +6,10 @@
  *
  * @file SeosCryptoKey.h
  *
- * @brief Key functions and context
+ * @brief Key functions
  *
  */
+
 #pragma once
 
 #include "SeosCrypto_Impl.h"
