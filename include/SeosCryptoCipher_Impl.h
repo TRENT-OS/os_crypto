@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "SeosCryptoKey_Impl_v5.h"
+#include "SeosCryptoKey_Impl.h"
 
 #include "mbedtls/rsa.h"
 #include "mbedtls/aes.h"
@@ -48,7 +48,7 @@ typedef struct
     mbedtls;
 
     SeosCryptoCipher_Algorithm  algorithm;
-    const SeosCryptoKey_v5*        key;
+    const SeosCryptoKey*        key;
     unsigned char               iv[SeosCryptoCipher_AES_BLOCK_SIZE];
     size_t                      ivLen;
     size_t                      inputLen;

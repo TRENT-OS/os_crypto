@@ -3,7 +3,7 @@
  */
 
 #include "SeosCryptoCipher.h"
-#include "SeosCryptoKey_v5.h"
+#include "SeosCryptoKey.h"
 
 #include "LibDebug/Debug.h"
 
@@ -87,7 +87,7 @@ setKeyImpl(SeosCryptoCipher* self)
     case SeosCryptoCipher_Algorithm_AES_GCM_ENC:
     case SeosCryptoCipher_Algorithm_AES_GCM_DEC:
         if (SeosCryptoKey_Type_AES != self->key->type ||
-            (aesKey = SeosCryptoKey_getAES_v5(self->key)) == NULL)
+            (aesKey = SeosCryptoKey_getAES(self->key)) == NULL)
         {
             return SEOS_ERROR_INVALID_PARAMETER;
         }
@@ -336,7 +336,7 @@ seos_err_t
 SeosCryptoCipher_init(SeosCryptoCipher*                 self,
                       const SeosCrypto_MemIf*           memIf,
                       const SeosCryptoCipher_Algorithm  algorithm,
-                      const SeosCryptoKey_v5*              key,
+                      const SeosCryptoKey*              key,
                       const void*                       iv,
                       const size_t                      ivLen)
 {

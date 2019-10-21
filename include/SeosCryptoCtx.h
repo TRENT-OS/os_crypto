@@ -37,7 +37,7 @@ typedef seos_err_t
 typedef seos_err_t
 (*SeosCryptoCtx_digestInitT)(SeosCryptoCtx*                 self,
                              SeosCrypto_DigestHandle*       pDigestHandle,
-                             unsigned int                   algorithm);
+                             SeosCryptoDigest_Algorithm     algorithm);
 
 typedef seos_err_t
 (*SeosCryptoCtx_digestFreeT)(SeosCryptoCtx*                self,
@@ -58,44 +58,43 @@ typedef seos_err_t
 // -------------------------------- Key API ------------------------------------
 
 typedef seos_err_t
-(*SeosCryptoCtx_keyGenerateT_v5)(SeosCryptoCtx*            self,
-                                 SeosCrypto_KeyHandle_v5*  pKeyHandle,
-                                 const SeosCryptoKey_Spec* spec);
+(*SeosCryptoCtx_keyGenerateT)(SeosCryptoCtx*             self,
+                              SeosCrypto_KeyHandle*      pKeyHandle,
+                              const SeosCryptoKey_Spec*  spec);
 
 typedef seos_err_t
-(*SeosCryptoCtx_keyMakePublicT_v5)(SeosCryptoCtx*                  self,
-                                   SeosCrypto_KeyHandle_v5*        pPubKeyHandle,
-                                   const SeosCrypto_KeyHandle_v5   prvKeyHandle,
-                                   const SeosCryptoKey_Attribs*    attribs);
+(*SeosCryptoCtx_keyMakePublicT)(SeosCryptoCtx*               self,
+                                SeosCrypto_KeyHandle*        pPubKeyHandle,
+                                const SeosCrypto_KeyHandle   prvKeyHandle,
+                                const SeosCryptoKey_Attribs* attribs);
 
 typedef seos_err_t
-(*SeosCryptoCtx_keyImportT_v5)(SeosCryptoCtx*                   self,
-                               SeosCrypto_KeyHandle_v5*         pKeyHandle,
-                               const SeosCrypto_KeyHandle_v5    wrapKeyHandle,
-                               const SeosCryptoKey_Data*        keyData);
+(*SeosCryptoCtx_keyImportT)(SeosCryptoCtx*                  self,
+                            SeosCrypto_KeyHandle*        pKeyHandle,
+                            const SeosCrypto_KeyHandle   wrapKeyHandle,
+                            const SeosCryptoKey_Data*    keyData);
 
 typedef seos_err_t
-(*SeosCryptoCtx_keyExportT_v5)(SeosCryptoCtx*                   self,
-                               const SeosCrypto_KeyHandle_v5    keyHandle,
-                               const SeosCrypto_KeyHandle_v5    wrapKeyHandle,
-                               SeosCryptoKey_Data*              keyData);
-
-
-typedef seos_err_t
-(*SeosCryptoCtx_keyGetParamsT_v5)(SeosCryptoCtx*                self,
-                                  const SeosCrypto_KeyHandle_v5 keyHandle,
-                                  void*                         keyParams,
-                                  size_t*                       paramSize);
+(*SeosCryptoCtx_keyExportT)(SeosCryptoCtx*               self,
+                            const SeosCrypto_KeyHandle   keyHandle,
+                            const SeosCrypto_KeyHandle   wrapKeyHandle,
+                            SeosCryptoKey_Data*          keyData);
 
 typedef seos_err_t
-(*SeosCryptoCtx_keyLoadParamsT_v5)(SeosCryptoCtx*               self,
-                                   const SeosCryptoKey_Param    name,
-                                   void*                        keyParams,
-                                   size_t*                      paramSize);
+(*SeosCryptoCtx_keyGetParamsT)(SeosCryptoCtx*                self,
+                               const SeosCrypto_KeyHandle    keyHandle,
+                               void*                         keyParams,
+                               size_t*                       paramSize);
 
 typedef seos_err_t
-(*SeosCryptoCtx_keyFreeT_v5)(SeosCryptoCtx*                self,
-                             const SeosCrypto_KeyHandle_v5 keyHandle);
+(*SeosCryptoCtx_keyLoadParamsT)(SeosCryptoCtx*               self,
+                                const SeosCryptoKey_Param    name,
+                                void*                        keyParams,
+                                size_t*                      paramSize);
+
+typedef seos_err_t
+(*SeosCryptoCtx_keyFreeT)(SeosCryptoCtx*             self,
+                          const SeosCrypto_KeyHandle keyHandle);
 
 // ----------------------------- Signature API ---------------------------------
 
@@ -103,8 +102,8 @@ typedef seos_err_t
 (*SeosCryptoCtx_signatureInitT)(SeosCryptoCtx*                self,
                                 SeosCrypto_SignatureHandle*   pSigHandle,
                                 unsigned int                  algorithm,
-                                SeosCrypto_KeyHandle_v5          prvHandle,
-                                SeosCrypto_KeyHandle_v5          pubHandle);
+                                SeosCrypto_KeyHandle          prvHandle,
+                                SeosCrypto_KeyHandle          pubHandle);
 
 typedef seos_err_t
 (*SeosCryptoCtx_signatureFreeT)(SeosCryptoCtx*               self,
@@ -132,7 +131,7 @@ typedef seos_err_t
 (*SeosCryptoCtx_agreementInitT)(SeosCryptoCtx*                self,
                                 SeosCrypto_AgreementHandle*   pAgrHandle,
                                 SeosCryptoAgreement_Algorithm algorithm,
-                                SeosCrypto_KeyHandle_v5          prvHandle);
+                                SeosCrypto_KeyHandle          prvHandle);
 
 typedef seos_err_t
 (*SeosCryptoCtx_agreementFreeT)(SeosCryptoCtx*               self,
@@ -141,7 +140,7 @@ typedef seos_err_t
 typedef seos_err_t
 (*SeosCryptoCtx_agreementAgreeT)(SeosCryptoCtx*                 self,
                                  SeosCrypto_AgreementHandle     agrHandle,
-                                 SeosCrypto_KeyHandle_v5           pubHandle,
+                                 SeosCrypto_KeyHandle           pubHandle,
                                  void*                          shared,
                                  size_t*                        sharedSize);
 
@@ -151,7 +150,7 @@ typedef seos_err_t
 (*SeosCryptoCtx_cipherInitT)(SeosCryptoCtx*                 self,
                              SeosCrypto_CipherHandle*       pCipherHandle,
                              SeosCryptoCipher_Algorithm     algorithm,
-                             SeosCrypto_KeyHandle_v5           keyHandle,
+                             SeosCrypto_KeyHandle           keyHandle,
                              const void*                    iv,
                              size_t                         ivLen);
 
@@ -185,32 +184,32 @@ typedef void (*SeosCryptoCtx_freeT)(SeosCryptoCtx* self);
 
 typedef struct
 {
-    SeosCryptoCtx_rngGetBytesT              rngGetBytes;
-    SeosCryptoCtx_rngReSeedT                rngReSeed;
-    SeosCryptoCtx_digestInitT               digestInit;
-    SeosCryptoCtx_digestFreeT               digestFree;
-    SeosCryptoCtx_digestProcessT            digestProcess;
-    SeosCryptoCtx_digestFinalizeT           digestFinalize;
-    SeosCryptoCtx_keyGenerateT_v5           keyGenerate_v5;
-    SeosCryptoCtx_keyMakePublicT_v5         keyMakePublic_v5;
-    SeosCryptoCtx_keyImportT_v5             keyImport_v5;
-    SeosCryptoCtx_keyExportT_v5             keyExport_v5;
-    SeosCryptoCtx_keyGetParamsT_v5          keyGetParams_v5;
-    SeosCryptoCtx_keyLoadParamsT_v5         keyLoadParams_v5;
-    SeosCryptoCtx_keyFreeT_v5               keyFree_v5;
-    SeosCryptoCtx_signatureInitT            signatureInit;
-    SeosCryptoCtx_signatureFreeT            signatureFree;
-    SeosCryptoCtx_signatureSignT            signatureSign;
-    SeosCryptoCtx_signatureVerifyT          signatureVerify;
-    SeosCryptoCtx_agreementInitT            agreementInit;
-    SeosCryptoCtx_agreementFreeT            agreementFree;
-    SeosCryptoCtx_agreementAgreeT           agreementAgree;
-    SeosCryptoCtx_cipherInitT               cipherInit;
-    SeosCryptoCtx_cipherFreeT               cipherFree;
-    SeosCryptoCtx_cipherProcessT            cipherProcess;
-    SeosCryptoCtx_cipherStartT              cipherStart;
-    SeosCryptoCtx_cipherFinalizeT           cipherFinalize;
-    SeosCryptoCtx_freeT                     free;
+    SeosCryptoCtx_rngGetBytesT           rngGetBytes;
+    SeosCryptoCtx_rngReSeedT             rngReSeed;
+    SeosCryptoCtx_digestInitT            digestInit;
+    SeosCryptoCtx_digestFreeT            digestFree;
+    SeosCryptoCtx_digestProcessT         digestProcess;
+    SeosCryptoCtx_digestFinalizeT        digestFinalize;
+    SeosCryptoCtx_keyGenerateT           keyGenerate;
+    SeosCryptoCtx_keyMakePublicT         keyMakePublic;
+    SeosCryptoCtx_keyImportT             keyImport;
+    SeosCryptoCtx_keyExportT             keyExport;
+    SeosCryptoCtx_keyGetParamsT          keyGetParams;
+    SeosCryptoCtx_keyLoadParamsT         keyLoadParams;
+    SeosCryptoCtx_keyFreeT               keyFree;
+    SeosCryptoCtx_signatureInitT         signatureInit;
+    SeosCryptoCtx_signatureFreeT         signatureFree;
+    SeosCryptoCtx_signatureSignT         signatureSign;
+    SeosCryptoCtx_signatureVerifyT       signatureVerify;
+    SeosCryptoCtx_agreementInitT         agreementInit;
+    SeosCryptoCtx_agreementFreeT         agreementFree;
+    SeosCryptoCtx_agreementAgreeT        agreementAgree;
+    SeosCryptoCtx_cipherInitT            cipherInit;
+    SeosCryptoCtx_cipherFreeT            cipherFree;
+    SeosCryptoCtx_cipherProcessT         cipherProcess;
+    SeosCryptoCtx_cipherStartT           cipherStart;
+    SeosCryptoCtx_cipherFinalizeT        cipherFinalize;
+    SeosCryptoCtx_freeT                  free;
 }
 SeosCryptoCtx_Vtable;
 

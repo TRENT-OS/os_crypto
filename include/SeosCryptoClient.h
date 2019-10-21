@@ -117,8 +117,8 @@ seos_err_t
 SeosCryptoClient_signatureInit(SeosCryptoCtx*                       api,
                                SeosCrypto_SignatureHandle*          pSigHandle,
                                const SeosCryptoSignature_Algorithm  algorithm,
-                               const SeosCrypto_KeyHandle_v5           prvHandle,
-                               const SeosCrypto_KeyHandle_v5           pubHandle);
+                               const SeosCrypto_KeyHandle           prvHandle,
+                               const SeosCrypto_KeyHandle           pubHandle);
 
 /**
  * @brief implements SeosCryptoApi_signatureFree() in a rpc connection
@@ -162,7 +162,7 @@ seos_err_t
 SeosCryptoClient_agreementInit(SeosCryptoCtx*                       api,
                                SeosCrypto_AgreementHandle*          pAgrHandle,
                                const SeosCryptoAgreement_Algorithm  algorithm,
-                               const SeosCrypto_KeyHandle_v5           prvHandle);
+                               const SeosCrypto_KeyHandle           prvHandle);
 
 /**
  * @brief implements SeosCryptoApi_agreementFree() in a rpc connection
@@ -179,50 +179,50 @@ SeosCryptoClient_agreementFree(SeosCryptoCtx*                       api,
 seos_err_t
 SeosCryptoClient_agreementAgree(SeosCryptoCtx*                      api,
                                 const SeosCrypto_AgreementHandle    agrHandle,
-                                const SeosCrypto_KeyHandle_v5          pubHandle,
+                                const SeosCrypto_KeyHandle          pubHandle,
                                 void*                               shared,
                                 size_t*                             sharedSize);
 
 // -------------------------------- Key API ------------------------------------
 
 seos_err_t
-SeosCryptoClient_keyGenerate_v5(SeosCryptoCtx*              api,
-                                SeosCrypto_KeyHandle_v5*    pKeyHandle,
-                                const SeosCryptoKey_Spec*   spec);
+SeosCryptoClient_keyGenerate(SeosCryptoCtx*             api,
+                             SeosCrypto_KeyHandle*      pKeyHandle,
+                             const SeosCryptoKey_Spec*  spec);
 
 seos_err_t
-SeosCryptoClient_keyMakePublic_v5(SeosCryptoCtx*                api,
-                                  SeosCrypto_KeyHandle_v5*      pPubKeyHandle,
-                                  const SeosCrypto_KeyHandle_v5 prvKeyHandle,
-                                  const SeosCryptoKey_Attribs*  attribs);
+SeosCryptoClient_keyMakePublic(SeosCryptoCtx*               api,
+                               SeosCrypto_KeyHandle*        pPubKeyHandle,
+                               const SeosCrypto_KeyHandle   prvKeyHandle,
+                               const SeosCryptoKey_Attribs* attribs);
 
 seos_err_t
-SeosCryptoClient_keyImport_v5(SeosCryptoCtx*                    api,
-                              SeosCrypto_KeyHandle_v5*          pKeyHandle,
-                              const SeosCrypto_KeyHandle_v5     wrapKeyHandle,
-                              const SeosCryptoKey_Data*         keyData);
+SeosCryptoClient_keyImport(SeosCryptoCtx*               api,
+                           SeosCrypto_KeyHandle*        pKeyHandle,
+                           const SeosCrypto_KeyHandle   wrapKeyHandle,
+                           const SeosCryptoKey_Data*    keyData);
 
 seos_err_t
-SeosCryptoClient_keyExport_v5(SeosCryptoCtx*                    api,
-                              const SeosCrypto_KeyHandle_v5     keyHandle,
-                              const SeosCrypto_KeyHandle_v5     wrapKeyHandle,
-                              SeosCryptoKey_Data*               keyData);
+SeosCryptoClient_keyExport(SeosCryptoCtx*               api,
+                           const SeosCrypto_KeyHandle   keyHandle,
+                           const SeosCrypto_KeyHandle   wrapKeyHandle,
+                           SeosCryptoKey_Data*          keyData);
 
 seos_err_t
-SeosCryptoClient_keyGetParams_v5(SeosCryptoCtx*                 api,
-                                 const SeosCrypto_KeyHandle_v5  keyHandle,
-                                 void*                          keyParams,
-                                 size_t*                        paramSize);
+SeosCryptoClient_keyGetParams(SeosCryptoCtx*                api,
+                              const SeosCrypto_KeyHandle    keyHandle,
+                              void*                         keyParams,
+                              size_t*                       paramSize);
 
 seos_err_t
-SeosCryptoClient_keyLoadParams_v5(SeosCryptoCtx*            api,
-                                  const SeosCryptoKey_Param name,
-                                  void*                     keyParams,
-                                  size_t*                   paramSize);
+SeosCryptoClient_keyLoadParams(SeosCryptoCtx*               api,
+                               const SeosCryptoKey_Param    name,
+                               void*                        keyParams,
+                               size_t*                      paramSize);
 
 seos_err_t
-SeosCryptoClient_keyFree_v5(SeosCryptoCtx*                  api,
-                            const SeosCrypto_KeyHandle_v5   keyHandle);
+SeosCryptoClient_keyFree(SeosCryptoCtx*             api,
+                         const SeosCrypto_KeyHandle keyHandle);
 
 // ------------------------------- Cipher API ----------------------------------
 
@@ -234,7 +234,7 @@ seos_err_t
 SeosCryptoClient_cipherInit(SeosCryptoCtx*                      api,
                             SeosCrypto_CipherHandle*            pCipherHandle,
                             const SeosCryptoCipher_Algorithm    algorithm,
-                            const SeosCrypto_KeyHandle_v5          key,
+                            const SeosCrypto_KeyHandle          key,
                             const void*                         iv,
                             const size_t                        ivLen);
 /**

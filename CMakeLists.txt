@@ -11,7 +11,7 @@ add_library(
     "src/SeosCryptoDigest.c"
     "src/SeosCryptoCipher.c"
     "src/SeosCryptoSignature.c"
-    "src/SeosCryptoKey_v5.c"
+    "src/SeosCryptoKey.c"
     "src/SeosCryptoApi.c"
     "src/SeosCryptoClient.c"
 )

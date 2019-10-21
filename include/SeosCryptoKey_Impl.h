@@ -83,7 +83,7 @@ typedef struct
     void*                   data;
     size_t                  size;
 }
-SeosCryptoKey_v5;
+SeosCryptoKey;
 
 // ----------------------------- Symmetric Keys --------------------------------
 

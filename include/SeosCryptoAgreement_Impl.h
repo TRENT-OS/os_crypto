@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "SeosCryptoKey_Impl_v5.h"
+#include "SeosCryptoKey_Impl.h"
 
 #include "mbedtls/dhm.h"
 #include "mbedtls/ecdh.h"
@@ -34,7 +34,7 @@ typedef struct
     mbedtls;
 
     SeosCryptoAgreement_Algorithm   algorithm;
-    const SeosCryptoKey_v5*            prvKey;
+    const SeosCryptoKey*            prvKey;
 }
 SeosCryptoAgreement;
 

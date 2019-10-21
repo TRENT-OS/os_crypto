@@ -11,32 +11,32 @@
 
 static const SeosCryptoCtx_Vtable SeosCryptoClient_vtable =
 {
-    .rngGetBytes             = SeosCryptoClient_rngGetBytes,
-    .rngReSeed               = SeosCryptoClient_rngReSeed,
-    .digestInit              = SeosCryptoClient_digestInit,
-    .digestFree              = SeosCryptoClient_digestFree,
-    .digestProcess           = SeosCryptoClient_digestProcess,
-    .digestFinalize          = SeosCryptoClient_digestFinalize,
-    .keyGenerate_v5          = SeosCryptoClient_keyGenerate_v5,
-    .keyMakePublic_v5        = SeosCryptoClient_keyMakePublic_v5,
-    .keyImport_v5            = SeosCryptoClient_keyImport_v5,
-    .keyExport_v5            = SeosCryptoClient_keyExport_v5,
-    .keyGetParams_v5         = SeosCryptoClient_keyGetParams_v5,
-    .keyLoadParams_v5        = SeosCryptoClient_keyLoadParams_v5,
-    .keyFree_v5              = SeosCryptoClient_keyFree_v5,
-    .signatureInit           = SeosCryptoClient_signatureInit,
-    .signatureFree           = SeosCryptoClient_signatureFree,
-    .signatureSign           = SeosCryptoClient_signatureSign,
-    .signatureVerify         = SeosCryptoClient_signatureVerify,
-    .agreementInit           = SeosCryptoClient_agreementInit,
-    .agreementFree           = SeosCryptoClient_agreementFree,
-    .agreementAgree          = SeosCryptoClient_agreementAgree,
-    .cipherInit              = SeosCryptoClient_cipherInit,
-    .cipherFree              = SeosCryptoClient_cipherFree,
-    .cipherProcess           = SeosCryptoClient_cipherProcess,
-    .cipherStart             = SeosCryptoClient_cipherStart,
-    .cipherFinalize          = SeosCryptoClient_cipherFinalize,
-    .free                    = SeosCryptoClient_free
+    .rngGetBytes          = SeosCryptoClient_rngGetBytes,
+    .rngReSeed            = SeosCryptoClient_rngReSeed,
+    .digestInit           = SeosCryptoClient_digestInit,
+    .digestFree           = SeosCryptoClient_digestFree,
+    .digestProcess        = SeosCryptoClient_digestProcess,
+    .digestFinalize       = SeosCryptoClient_digestFinalize,
+    .keyGenerate          = SeosCryptoClient_keyGenerate,
+    .keyMakePublic        = SeosCryptoClient_keyMakePublic,
+    .keyImport            = SeosCryptoClient_keyImport,
+    .keyExport            = SeosCryptoClient_keyExport,
+    .keyGetParams         = SeosCryptoClient_keyGetParams,
+    .keyLoadParams        = SeosCryptoClient_keyLoadParams,
+    .keyFree              = SeosCryptoClient_keyFree,
+    .signatureInit        = SeosCryptoClient_signatureInit,
+    .signatureFree        = SeosCryptoClient_signatureFree,
+    .signatureSign        = SeosCryptoClient_signatureSign,
+    .signatureVerify      = SeosCryptoClient_signatureVerify,
+    .agreementInit        = SeosCryptoClient_agreementInit,
+    .agreementFree        = SeosCryptoClient_agreementFree,
+    .agreementAgree       = SeosCryptoClient_agreementAgree,
+    .cipherInit           = SeosCryptoClient_cipherInit,
+    .cipherFree           = SeosCryptoClient_cipherFree,
+    .cipherProcess        = SeosCryptoClient_cipherProcess,
+    .cipherStart          = SeosCryptoClient_cipherStart,
+    .cipherFinalize       = SeosCryptoClient_cipherFinalize,
+    .free                 = SeosCryptoClient_free
 };
 
 // Private functions -----------------------------------------------------------
@@ -257,8 +257,8 @@ seos_err_t
 SeosCryptoClient_signatureInit(SeosCryptoCtx*                       api,
                                SeosCrypto_SignatureHandle*          pSigHandle,
                                const SeosCryptoSignature_Algorithm  algorithm,
-                               const SeosCrypto_KeyHandle_v5           prvHandle,
-                               const SeosCrypto_KeyHandle_v5           pubHandle)
+                               const SeosCrypto_KeyHandle           prvHandle,
+                               const SeosCrypto_KeyHandle           pubHandle)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
 
@@ -348,7 +348,7 @@ seos_err_t
 SeosCryptoClient_agreementInit(SeosCryptoCtx*                       api,
                                SeosCrypto_AgreementHandle*          pAgrHandle,
                                const SeosCryptoAgreement_Algorithm  algorithm,
-                               const SeosCrypto_KeyHandle_v5           prvHandle)
+                               const SeosCrypto_KeyHandle           prvHandle)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
 
@@ -379,7 +379,7 @@ SeosCryptoClient_agreementFree(SeosCryptoCtx*                   api,
 seos_err_t
 SeosCryptoClient_agreementAgree(SeosCryptoCtx*                      api,
                                 const SeosCrypto_AgreementHandle    agrHandle,
-                                const SeosCrypto_KeyHandle_v5          pubHandle,
+                                const SeosCrypto_KeyHandle          pubHandle,
                                 void*                               shared,
                                 size_t*                             sharedSize)
 {
@@ -404,9 +404,9 @@ SeosCryptoClient_agreementAgree(SeosCryptoCtx*                      api,
 // -------------------------------- Key API ------------------------------------
 
 seos_err_t
-SeosCryptoClient_keyGenerate_v5(SeosCryptoCtx*              api,
-                                SeosCrypto_KeyHandle_v5*    pKeyHandle,
-                                const SeosCryptoKey_Spec*   spec)
+SeosCryptoClient_keyGenerate(SeosCryptoCtx*             api,
+                             SeosCrypto_KeyHandle*      pKeyHandle,
+                             const SeosCryptoKey_Spec*  spec)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoClient* self = (SeosCryptoClient*) api;
@@ -420,17 +420,17 @@ SeosCryptoClient_keyGenerate_v5(SeosCryptoCtx*              api,
     if ((retval = writeRpcArguments(self, spec, sizeof(SeosCryptoKey_Spec), NULL,
                                     0)) == SEOS_SUCCESS)
     {
-        retval = SeosCryptoRpc_keyGenerate_v5(self->rpcHandle, pKeyHandle);
+        retval = SeosCryptoRpc_keyGenerate(self->rpcHandle, pKeyHandle);
     }
 
     return retval;
 }
 
 seos_err_t
-SeosCryptoClient_keyMakePublic_v5(SeosCryptoCtx*                api,
-                                  SeosCrypto_KeyHandle_v5*      pPubKeyHandle,
-                                  const SeosCrypto_KeyHandle_v5 prvKeyHandle,
-                                  const SeosCryptoKey_Attribs*  attribs)
+SeosCryptoClient_keyMakePublic(SeosCryptoCtx*               api,
+                               SeosCrypto_KeyHandle*        pPubKeyHandle,
+                               const SeosCrypto_KeyHandle   prvKeyHandle,
+                               const SeosCryptoKey_Attribs* attribs)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoClient* self = (SeosCryptoClient*) api;
@@ -444,18 +444,18 @@ SeosCryptoClient_keyMakePublic_v5(SeosCryptoCtx*                api,
     if ((retval = writeRpcArguments(self, attribs, sizeof(SeosCryptoKey_Attribs),
                                     NULL, 0)) == SEOS_SUCCESS)
     {
-        retval = SeosCryptoRpc_keyMakePublic_v5(self->rpcHandle, pPubKeyHandle,
-                                                prvKeyHandle);
+        retval = SeosCryptoRpc_keyMakePublic(self->rpcHandle, pPubKeyHandle,
+                                             prvKeyHandle);
     }
 
     return retval;
 }
 
 seos_err_t
-SeosCryptoClient_keyImport_v5(SeosCryptoCtx*                    api,
-                              SeosCrypto_KeyHandle_v5*          pKeyHandle,
-                              const SeosCrypto_KeyHandle_v5     wrapKeyHandle,
-                              const SeosCryptoKey_Data*         keyData)
+SeosCryptoClient_keyImport(SeosCryptoCtx*               api,
+                           SeosCrypto_KeyHandle*        pKeyHandle,
+                           const SeosCrypto_KeyHandle   wrapKeyHandle,
+                           const SeosCryptoKey_Data*    keyData)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoClient* self = (SeosCryptoClient*) api;
@@ -469,17 +469,17 @@ SeosCryptoClient_keyImport_v5(SeosCryptoCtx*                    api,
     if ((retval = writeRpcArguments(self, keyData, sizeof(SeosCryptoKey_Data), NULL,
                                     0)) == SEOS_SUCCESS)
     {
-        retval = SeosCryptoRpc_keyImport_v5(self->rpcHandle, pKeyHandle, wrapKeyHandle);
+        retval = SeosCryptoRpc_keyImport(self->rpcHandle, pKeyHandle, wrapKeyHandle);
     }
 
     return retval;
 }
 
 seos_err_t
-SeosCryptoClient_keyExport_v5(SeosCryptoCtx*                    api,
-                              const SeosCrypto_KeyHandle_v5     keyHandle,
-                              const SeosCrypto_KeyHandle_v5     wrapKeyHandle,
-                              SeosCryptoKey_Data*               keyData)
+SeosCryptoClient_keyExport(SeosCryptoCtx*               api,
+                           const SeosCrypto_KeyHandle   keyHandle,
+                           const SeosCrypto_KeyHandle   wrapKeyHandle,
+                           SeosCryptoKey_Data*          keyData)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -490,8 +490,8 @@ SeosCryptoClient_keyExport_v5(SeosCryptoCtx*                    api,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((retval = SeosCryptoRpc_keyExport_v5(self->rpcHandle, keyHandle,
-                                             wrapKeyHandle)) == SEOS_SUCCESS)
+    if ((retval = SeosCryptoRpc_keyExport(self->rpcHandle, keyHandle,
+                                          wrapKeyHandle)) == SEOS_SUCCESS)
     {
         memcpy(keyData, self->clientDataport, sizeof(SeosCryptoKey_Data));
     }
@@ -500,10 +500,10 @@ SeosCryptoClient_keyExport_v5(SeosCryptoCtx*                    api,
 }
 
 seos_err_t
-SeosCryptoClient_keyGetParams_v5(SeosCryptoCtx*                   api,
-                                 const SeosCrypto_KeyHandle_v5    keyHandle,
-                                 void*                            keyParams,
-                                 size_t*                          paramSize)
+SeosCryptoClient_keyGetParams(SeosCryptoCtx*                api,
+                              const SeosCrypto_KeyHandle    keyHandle,
+                              void*                         keyParams,
+                              size_t*                       paramSize)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -514,8 +514,8 @@ SeosCryptoClient_keyGetParams_v5(SeosCryptoCtx*                   api,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((retval = SeosCryptoRpc_keyGetParams_v5(self->rpcHandle, keyHandle,
-                                                *paramSize)) == SEOS_SUCCESS)
+    if ((retval = SeosCryptoRpc_keyGetParams(self->rpcHandle, keyHandle,
+                                             *paramSize)) == SEOS_SUCCESS)
     {
         retval = readRpcResult(self, keyParams, paramSize);
     }
@@ -524,10 +524,10 @@ SeosCryptoClient_keyGetParams_v5(SeosCryptoCtx*                   api,
 }
 
 seos_err_t
-SeosCryptoClient_keyLoadParams_v5(SeosCryptoCtx*              api,
-                                  const SeosCryptoKey_Param   name,
-                                  void*                       keyParams,
-                                  size_t*                     paramSize)
+SeosCryptoClient_keyLoadParams(SeosCryptoCtx*              api,
+                               const SeosCryptoKey_Param   name,
+                               void*                       keyParams,
+                               size_t*                     paramSize)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -538,8 +538,8 @@ SeosCryptoClient_keyLoadParams_v5(SeosCryptoCtx*              api,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((retval = SeosCryptoRpc_keyLoadParams_v5(self->rpcHandle, name,
-                                                 *paramSize)) == SEOS_SUCCESS)
+    if ((retval = SeosCryptoRpc_keyLoadParams(self->rpcHandle, name,
+                                              *paramSize)) == SEOS_SUCCESS)
     {
         retval = readRpcResult(self, keyParams, paramSize);
     }
@@ -548,8 +548,8 @@ SeosCryptoClient_keyLoadParams_v5(SeosCryptoCtx*              api,
 }
 
 seos_err_t
-SeosCryptoClient_keyFree_v5(SeosCryptoCtx*                  api,
-                            const SeosCrypto_KeyHandle_v5   keyHandle)
+SeosCryptoClient_keyFree(SeosCryptoCtx*             api,
+                         const SeosCrypto_KeyHandle keyHandle)
 {
     SeosCryptoClient* self = (SeosCryptoClient*) api;
 
@@ -558,7 +558,7 @@ SeosCryptoClient_keyFree_v5(SeosCryptoCtx*                  api,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoRpc_keyFree_v5(self->rpcHandle, keyHandle);
+    return SeosCryptoRpc_keyFree(self->rpcHandle, keyHandle);
 }
 
 // ------------------------------ Cipher API -----------------------------------
@@ -567,7 +567,7 @@ seos_err_t
 SeosCryptoClient_cipherInit(SeosCryptoCtx*                      api,
                             SeosCrypto_CipherHandle*            pCipherHandle,
                             const SeosCryptoCipher_Algorithm    algorithm,
-                            const SeosCrypto_KeyHandle_v5          key,
+                            const SeosCrypto_KeyHandle          key,
                             const void*                         iv,
                             const size_t                        ivLen)
 {

@@ -15,7 +15,7 @@
 #include "SeosCrypto_Impl.h"
 #include "SeosCryptoDigest_Impl.h"
 #include "SeosCryptoCipher_Impl.h"
-#include "SeosCryptoKey_Impl_v5.h"
+#include "SeosCryptoKey_Impl.h"
 #include "SeosCryptoRpc_Impl.h"
 #include "SeosCrypto_Handles.h"
 
@@ -110,37 +110,37 @@ SeosCryptoRpc_digestFinalize(SeosCryptoRpc*             self,
 // -------------------------------- Key API ------------------------------------
 
 seos_err_t
-SeosCryptoRpc_keyGenerate_v5(SeosCryptoRpc*             self,
-                             SeosCrypto_KeyHandle_v5*   pKeyHandle);
+SeosCryptoRpc_keyGenerate(SeosCryptoRpc*        self,
+                          SeosCrypto_KeyHandle* pKeyHandle);
 
 seos_err_t
-SeosCryptoRpc_keyMakePublic_v5(SeosCryptoRpc*           self,
-                               SeosCrypto_KeyHandle_v5* pPubKeyHandle,
-                               SeosCrypto_KeyHandle_v5  prvKeyHandle);
+SeosCryptoRpc_keyMakePublic(SeosCryptoRpc*          self,
+                            SeosCrypto_KeyHandle*   pPubKeyHandle,
+                            SeosCrypto_KeyHandle    prvKeyHandle);
 
 seos_err_t
-SeosCryptoRpc_keyImport_v5(SeosCryptoRpc*           self,
-                           SeosCrypto_KeyHandle_v5* pKeyHandle,
-                           SeosCrypto_KeyHandle_v5  wrapKeyHandle);
+SeosCryptoRpc_keyImport(SeosCryptoRpc*          self,
+                        SeosCrypto_KeyHandle*   pKeyHandle,
+                        SeosCrypto_KeyHandle    wrapKeyHandle);
 
 seos_err_t
-SeosCryptoRpc_keyExport_v5(SeosCryptoRpc*           self,
-                           SeosCrypto_KeyHandle_v5  keyHandle,
-                           SeosCrypto_KeyHandle_v5  wrapKeyHandle);
+SeosCryptoRpc_keyExport(SeosCryptoRpc*          self,
+                        SeosCrypto_KeyHandle    keyHandle,
+                        SeosCrypto_KeyHandle    wrapKeyHandle);
 
 seos_err_t
-SeosCryptoRpc_keyGetParams_v5(SeosCryptoRpc*            self,
-                              SeosCrypto_KeyHandle_v5   keyHandle,
-                              size_t                    paramSize);
+SeosCryptoRpc_keyGetParams(SeosCryptoRpc*       self,
+                           SeosCrypto_KeyHandle keyHandle,
+                           size_t               paramSize);
 
 seos_err_t
-SeosCryptoRpc_keyLoadParams_v5(SeosCryptoRpc*       self,
-                               SeosCryptoKey_Param  name,
-                               size_t               paramSize);
+SeosCryptoRpc_keyLoadParams(SeosCryptoRpc*          self,
+                            SeosCryptoKey_Param     name,
+                            size_t                  paramSize);
 
 seos_err_t
-SeosCryptoRpc_keyFree_v5(SeosCryptoRpc*            self,
-                         SeosCrypto_KeyHandle_v5   keyHandle);
+SeosCryptoRpc_keyFree(SeosCryptoRpc*        self,
+                      SeosCrypto_KeyHandle  keyHandle);
 
 // ----------------------------- Signature API ---------------------------------
 
@@ -152,8 +152,8 @@ seos_err_t
 SeosCryptoRpc_signatureInit(SeosCryptoRpc*                   self,
                             SeosCrypto_SignatureHandle*      pSigHandle,
                             SeosCryptoSignature_Algorithm    algorithm,
-                            SeosCrypto_KeyHandle_v5             prvHandle,
-                            SeosCrypto_KeyHandle_v5             pubHandle);
+                            SeosCrypto_KeyHandle             prvHandle,
+                            SeosCrypto_KeyHandle             pubHandle);
 
 /**
  * @brief rpc management of SeosCrypto_signatureVerify()
@@ -194,7 +194,7 @@ seos_err_t
 SeosCryptoRpc_agreementInit(SeosCryptoRpc*                   self,
                             SeosCrypto_AgreementHandle*      pAgrHandle,
                             SeosCryptoAgreement_Algorithm    algorithm,
-                            SeosCrypto_KeyHandle_v5             prvHandle);
+                            SeosCrypto_KeyHandle             prvHandle);
 
 /**
  * @brief rpc management of SeosCrypto_agreementAgree()
@@ -203,7 +203,7 @@ SeosCryptoRpc_agreementInit(SeosCryptoRpc*                   self,
 seos_err_t
 SeosCryptoRpc_agreementAgree(SeosCryptoRpc*                self,
                              SeosCrypto_AgreementHandle    agrHandle,
-                             SeosCrypto_KeyHandle_v5          pubHandle,
+                             SeosCrypto_KeyHandle          pubHandle,
                              size_t                        sharedSize);
 
 /**
@@ -224,7 +224,7 @@ seos_err_t
 SeosCryptoRpc_cipherInit(SeosCryptoRpc*                 self,
                          SeosCrypto_CipherHandle*       pCipherHandle,
                          SeosCryptoCipher_Algorithm     algorithm,
-                         SeosCrypto_KeyHandle_v5           keyHandle,
+                         SeosCrypto_KeyHandle           keyHandle,
                          size_t                         ivLen);
 /**
  * @brief rpc management of SeosCrypto_cipherFree()

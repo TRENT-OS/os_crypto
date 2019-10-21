@@ -12,7 +12,7 @@
 #pragma once
 
 #include "SeosCrypto_Impl.h"
-#include "SeosCryptoKey_Impl_v5.h"
+#include "SeosCryptoKey_Impl.h"
 #include "SeosCryptoCipher_Impl.h"
 
 #include "compiler.h"
@@ -26,7 +26,7 @@ seos_err_t
 SeosCryptoCipher_init(SeosCryptoCipher*                 self,
                       const SeosCrypto_MemIf*           memIf,
                       const SeosCryptoCipher_Algorithm  algorithm,
-                      const SeosCryptoKey_v5*              key,
+                      const SeosCryptoKey*              key,
                       const void*                       iv,
                       size_t                            ivLen);
 
