@@ -193,8 +193,8 @@ typedef seos_err_t
 typedef seos_err_t
 (*SeosCryptoCtx_agreementInitT)(SeosCryptoCtx*                self,
                                 SeosCrypto_AgreementHandle*   pAgrHandle,
-                                unsigned int                  algorithm,
-                                SeosCrypto_KeyHandle          prvHandle);
+                                SeosCryptoAgreement_Algorithm algorithm,
+                                SeosCrypto_KeyHandle_v5          prvHandle);
 
 typedef seos_err_t
 (*SeosCryptoCtx_agreementFreeT)(SeosCryptoCtx*               self,
@@ -203,7 +203,7 @@ typedef seos_err_t
 typedef seos_err_t
 (*SeosCryptoCtx_agreementAgreeT)(SeosCryptoCtx*                 self,
                                  SeosCrypto_AgreementHandle     agrHandle,
-                                 SeosCrypto_KeyHandle           pubHandle,
+                                 SeosCrypto_KeyHandle_v5           pubHandle,
                                  void*                          shared,
                                  size_t*                        sharedSize);
 

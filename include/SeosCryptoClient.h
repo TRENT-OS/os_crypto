@@ -162,7 +162,7 @@ seos_err_t
 SeosCryptoClient_agreementInit(SeosCryptoCtx*                       api,
                                SeosCrypto_AgreementHandle*          pAgrHandle,
                                const SeosCryptoAgreement_Algorithm  algorithm,
-                               const SeosCrypto_KeyHandle           prvHandle);
+                               const SeosCrypto_KeyHandle_v5           prvHandle);
 
 /**
  * @brief implements SeosCryptoApi_agreementFree() in a rpc connection
@@ -179,7 +179,7 @@ SeosCryptoClient_agreementFree(SeosCryptoCtx*                       api,
 seos_err_t
 SeosCryptoClient_agreementAgree(SeosCryptoCtx*                      api,
                                 const SeosCrypto_AgreementHandle    agrHandle,
-                                const SeosCrypto_KeyHandle          pubHandle,
+                                const SeosCrypto_KeyHandle_v5          pubHandle,
                                 void*                               shared,
                                 size_t*                             sharedSize);
 

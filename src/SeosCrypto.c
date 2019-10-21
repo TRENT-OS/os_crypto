@@ -428,7 +428,7 @@ seos_err_t
 SeosCrypto_agreementInit(SeosCryptoCtx*                         api,
                          SeosCrypto_AgreementHandle*            pAgrHandle,
                          const SeosCryptoAgreement_Algorithm    algorithm,
-                         const SeosCrypto_KeyHandle             prvHandle)
+                         const SeosCrypto_KeyHandle_v5             prvHandle)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCrypto* self = (SeosCrypto*) api;
@@ -499,7 +499,7 @@ SeosCrypto_agreementFree(SeosCryptoCtx*                     api,
 seos_err_t
 SeosCrypto_agreementAgree(SeosCryptoCtx*                    api,
                           const SeosCrypto_AgreementHandle  agrHandle,
-                          const SeosCrypto_KeyHandle        pubHandle,
+                          const SeosCrypto_KeyHandle_v5        pubHandle,
                           void*                             shared,
                           size_t*                           sharedSize)
 {

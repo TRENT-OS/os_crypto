@@ -354,8 +354,8 @@ SeosCryptoRpc_keyFree(SeosCryptoRpc*                  self,
 seos_err_t
 SeosCryptoRpc_agreementInit(SeosCryptoRpc*                   self,
                             SeosCrypto_AgreementHandle*      pAgrHandle,
-                            unsigned int                     algorithm,
-                            SeosCrypto_KeyHandle             prvHandle)
+                            SeosCryptoAgreement_Algorithm    algorithm,
+                            SeosCrypto_KeyHandle_v5             prvHandle)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
            SeosCrypto_agreementInit(self->seosCryptoApi, pAgrHandle, algorithm, prvHandle);
@@ -364,7 +364,7 @@ SeosCryptoRpc_agreementInit(SeosCryptoRpc*                   self,
 seos_err_t
 SeosCryptoRpc_agreementAgree(SeosCryptoRpc*                self,
                              SeosCrypto_AgreementHandle    agrHandle,
-                             SeosCrypto_KeyHandle          pubHandle,
+                             SeosCrypto_KeyHandle_v5          pubHandle,
                              size_t                        bufSize)
 {
     if (!isValidHandle(self))

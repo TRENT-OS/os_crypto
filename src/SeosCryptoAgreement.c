@@ -4,7 +4,7 @@
 
 #include "SeosCryptoAgreement.h"
 #include "SeosCryptoRng.h"
-#include "SeosCryptoKey.h"
+#include "SeosCryptoKey_v5.h"
 
 #include "LibDebug/Debug.h"
 
@@ -70,12 +70,12 @@ setKeyImpl(SeosCryptoAgreement*            self)
     case SeosCryptoAgreement_Algorithm_DH:
         retval = (self->prvKey->type != SeosCryptoKey_Type_DH_PRV) ?
                  SEOS_ERROR_INVALID_PARAMETER :
-                 SeosCryptoKey_writeDHPrv(self->prvKey, &self->mbedtls.dh);
+                 SeosCryptoKey_writeDHPrv_v5(self->prvKey, &self->mbedtls.dh);
         break;
     case SeosCryptoAgreement_Algorithm_ECDH:
         retval = (self->prvKey->type != SeosCryptoKey_Type_SECP256R1_PRV) ?
                  SEOS_ERROR_INVALID_PARAMETER :
-                 SeosCryptoKey_writeSECP256r1Prv(self->prvKey, &self->mbedtls.ecdh);
+                 SeosCryptoKey_writeSECP256r1Prv_v5(self->prvKey, &self->mbedtls.ecdh);
         break;
     default:
         retval = SEOS_ERROR_NOT_SUPPORTED;
@@ -87,7 +87,7 @@ setKeyImpl(SeosCryptoAgreement*            self)
 static seos_err_t
 agreeImpl(SeosCryptoAgreement*    self,
           SeosCryptoRng*          rng,
-          const SeosCryptoKey*    pubKey,
+          const SeosCryptoKey_v5*    pubKey,
           void*                   buf,
           size_t*                 bufSize)
 {
@@ -99,7 +99,7 @@ agreeImpl(SeosCryptoAgreement*    self,
     {
     case SeosCryptoAgreement_Algorithm_DH:
         if ((pubKey->type != SeosCryptoKey_Type_DH_PUB)
-            || SeosCryptoKey_writeDHPub(pubKey, &self->mbedtls.dh) != SEOS_SUCCESS)
+            || SeosCryptoKey_writeDHPub_v5(pubKey, &self->mbedtls.dh) != SEOS_SUCCESS)
         {
             retval = SEOS_ERROR_INVALID_PARAMETER;
         }
@@ -114,7 +114,8 @@ agreeImpl(SeosCryptoAgreement*    self,
         break;
     case SeosCryptoAgreement_Algorithm_ECDH:
         if ((pubKey->type != SeosCryptoKey_Type_SECP256R1_PUB)
-            || SeosCryptoKey_writeSECP256r1Pub(pubKey, &self->mbedtls.ecdh) != SEOS_SUCCESS)
+            || SeosCryptoKey_writeSECP256r1Pub_v5(pubKey,
+                                                  &self->mbedtls.ecdh) != SEOS_SUCCESS)
         {
             retval = SEOS_ERROR_INVALID_PARAMETER;
         }
@@ -142,7 +143,7 @@ seos_err_t
 SeosCryptoAgreement_init(SeosCryptoAgreement*                   self,
                          const SeosCrypto_MemIf*                memIf,
                          const SeosCryptoAgreement_Algorithm    algorithm,
-                         const SeosCryptoKey*                   prvKey)
+                         const SeosCryptoKey_v5*                   prvKey)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -178,8 +179,8 @@ exit:
 
 seos_err_t
 SeosCryptoAgreement_agree(SeosCryptoAgreement*  self,
-                          SeosCryptoRng*  rng,
-                          const SeosCryptoKey*  pubKey,
+                          SeosCryptoRng*        rng,
+                          const SeosCryptoKey_v5*  pubKey,
                           void*                 shared,
                           size_t*               sharedSize)
 {

@@ -57,18 +57,34 @@ SeosCryptoKey_free_v5(SeosCryptoKey_v5*        self,
                       const SeosCrypto_MemIf*  memIf);
 
 /**
- * @brief Writes public key data into mbedTLS RSA object
+ * @brief Writes key data into mbedTLS RSA object
  */
 seos_err_t
 SeosCryptoKey_writeRSAPub_v5(const SeosCryptoKey_v5* key,
                              mbedtls_rsa_context* rsa);
-
-/**
- * @brief Writes private key data into mbedTLS RSA object
- */
 seos_err_t
 SeosCryptoKey_writeRSAPrv_v5(const SeosCryptoKey_v5* key,
                              mbedtls_rsa_context* rsa);
+
+/**
+ * @brief Writes key data into mbedTLS DH object
+ */
+seos_err_t
+SeosCryptoKey_writeDHPub_v5(const SeosCryptoKey_v5* key,
+                            mbedtls_dhm_context* dh);
+seos_err_t
+SeosCryptoKey_writeDHPrv_v5(const SeosCryptoKey_v5* key,
+                            mbedtls_dhm_context* dh);
+
+/**
+ * @brief Writes key data into mbedTLS ECDH object
+ */
+seos_err_t
+SeosCryptoKey_writeSECP256r1Pub_v5(const SeosCryptoKey_v5*    key,
+                                   mbedtls_ecdh_context* ecdh);
+seos_err_t
+SeosCryptoKey_writeSECP256r1Prv_v5(const SeosCryptoKey_v5*    key,
+                                   mbedtls_ecdh_context* ecdh);
 
 /**
  * @brief Translates key data into RSA public key

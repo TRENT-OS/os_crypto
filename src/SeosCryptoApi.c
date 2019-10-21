@@ -125,7 +125,7 @@ seos_err_t
 SeosCryptoApi_agreementInit(SeosCryptoCtx*                          ctx,
                             SeosCrypto_AgreementHandle*             pAgrHandle,
                             const SeosCryptoAgreement_Algorithm     algorithm,
-                            const SeosCrypto_KeyHandle              prvHandle)
+                            const SeosCrypto_KeyHandle_v5              prvHandle)
 {
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
            ctx->vtable->agreementInit(ctx, pAgrHandle, algorithm, prvHandle);
@@ -142,7 +142,7 @@ SeosCryptoApi_agreementFree(SeosCryptoCtx*                      ctx,
 seos_err_t
 SeosCryptoApi_agreementAgree(SeosCryptoCtx*                     ctx,
                              const SeosCrypto_AgreementHandle   agrHandle,
-                             const SeosCrypto_KeyHandle         pubHandle,
+                             const SeosCrypto_KeyHandle_v5         pubHandle,
                              void*                              shared,
                              size_t*                            sharedSize)
 {

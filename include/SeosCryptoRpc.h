@@ -273,7 +273,7 @@ seos_err_t
 SeosCryptoRpc_agreementInit(SeosCryptoRpc*                   self,
                             SeosCrypto_AgreementHandle*      pAgrHandle,
                             SeosCryptoAgreement_Algorithm    algorithm,
-                            SeosCrypto_KeyHandle             prvHandle);
+                            SeosCrypto_KeyHandle_v5             prvHandle);
 
 /**
  * @brief rpc management of SeosCrypto_agreementAgree()
@@ -282,7 +282,7 @@ SeosCryptoRpc_agreementInit(SeosCryptoRpc*                   self,
 seos_err_t
 SeosCryptoRpc_agreementAgree(SeosCryptoRpc*                self,
                              SeosCrypto_AgreementHandle    agrHandle,
-                             SeosCrypto_KeyHandle          pubHandle,
+                             SeosCrypto_KeyHandle_v5          pubHandle,
                              size_t                        sharedSize);
 
 /**
