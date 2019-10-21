@@ -531,6 +531,10 @@ SeosCrypto_keyGenerate_v5(SeosCryptoCtx*                api,
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
+    else if (SeosCrypto_findHandle(&self->keyHandleVector, *pKeyHandle) != -1)
+    {
+        return SEOS_ERROR_INVALID_HANDLE;
+    }
 
     if ((*pKeyHandle = self->memIf.malloc(sizeof(SeosCryptoKey))) == NULL)
     {

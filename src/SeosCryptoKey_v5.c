@@ -471,7 +471,7 @@ generateImpl(SeosCryptoKey_v5*         self,
             || (spec->key.params.bits < 128)
             || (spec->key.params.bits > (SeosCryptoKey_Size_RSA * 8)))
         {
-            return SEOS_ERROR_INVALID_PARAMETER;
+            return SEOS_ERROR_NOT_SUPPORTED;
         }
         return generate_RSAPrv(self->data, rng, spec->key.params.bits);
 
@@ -555,7 +555,7 @@ importImpl(SeosCryptoKey_v5*          self,
         bits = getMpiLen(key->data.rsa.pub.nBytes, key->data.rsa.pub.nLen);
         if (bits < 128 || bits > SeosCryptoKey_Size_RSA * 8)
         {
-            return SEOS_ERROR_INVALID_PARAMETER;
+            return SEOS_ERROR_NOT_SUPPORTED;
         }
         break;
 
@@ -571,7 +571,7 @@ importImpl(SeosCryptoKey_v5*          self,
                + getMpiLen(key->data.rsa.prv.qBytes, key->data.rsa.prv.qLen);
         if (bits < 128 || bits > SeosCryptoKey_Size_RSA * 8)
         {
-            return SEOS_ERROR_INVALID_PARAMETER;
+            return SEOS_ERROR_NOT_SUPPORTED;
         }
         break;
 
@@ -600,7 +600,7 @@ importImpl(SeosCryptoKey_v5*          self,
         bits = getMpiLen(key->data.dh.pub.params.pBytes, key->data.dh.pub.params.pLen);
         if (bits < 64 || bits > SeosCryptoKey_Size_DH * 8)
         {
-            return SEOS_ERROR_INVALID_PARAMETER;
+            return SEOS_ERROR_NOT_SUPPORTED;
         }
         break;
 
@@ -614,7 +614,7 @@ importImpl(SeosCryptoKey_v5*          self,
         bits = getMpiLen(key->data.dh.prv.params.pBytes, key->data.dh.prv.params.pLen);
         if (bits < 64 || bits > SeosCryptoKey_Size_DH * 8)
         {
-            return SEOS_ERROR_INVALID_PARAMETER;
+            return SEOS_ERROR_NOT_SUPPORTED;
         }
         break;
 
@@ -857,7 +857,7 @@ SeosCryptoKey_export_v5(SeosCryptoKey_v5*       self,
 
     if (!(self->attribs.flags & SeosCryptoKey_Flags_EXPORTABLE_RAW))
     {
-        return SEOS_ERROR_ACCESS_DENIED;
+        return SEOS_ERROR_OPERATION_DENIED;
     }
 
     return exportImpl(self, wrapKey, keyData);
