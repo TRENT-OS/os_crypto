@@ -49,7 +49,7 @@ SeosCryptoRpc_init(SeosCryptoRpc* self,
  *  destructed
  *
  */
-void
+seos_err_t
 SeosCryptoRpc_free(SeosCryptoRpc* self);
 
 // -------------------------------- RNG API ------------------------------------
@@ -82,7 +82,7 @@ SeosCryptoRpc_digestProcess(SeosCryptoRpc*           self,
 seos_err_t
 SeosCryptoRpc_digestFinalize(SeosCryptoRpc*             self,
                              SeosCrypto_DigestHandle    digestHandle,
-                             size_t                     outSize);
+                             size_t*                    digestSize);
 
 // -------------------------------- Key API ------------------------------------
 
@@ -108,12 +108,12 @@ SeosCryptoRpc_keyExport(SeosCryptoRpc*          self,
 seos_err_t
 SeosCryptoRpc_keyGetParams(SeosCryptoRpc*       self,
                            SeosCrypto_KeyHandle keyHandle,
-                           size_t               paramSize);
+                           size_t*              paramSize);
 
 seos_err_t
 SeosCryptoRpc_keyLoadParams(SeosCryptoRpc*          self,
                             SeosCryptoKey_Param     name,
-                            size_t                  paramSize);
+                            size_t*                 paramSize);
 
 seos_err_t
 SeosCryptoRpc_keyFree(SeosCryptoRpc*        self,
@@ -138,7 +138,7 @@ seos_err_t
 SeosCryptoRpc_signatureSign(SeosCryptoRpc*                self,
                             SeosCrypto_SignatureHandle    sigHandle,
                             size_t                        hashSize,
-                            size_t                        signatureSize);
+                            size_t*                       signatureSize);
 
 seos_err_t
 SeosCryptoRpc_signatureFree(SeosCryptoRpc*                  self,
@@ -157,7 +157,7 @@ seos_err_t
 SeosCryptoRpc_agreementAgree(SeosCryptoRpc*                self,
                              SeosCrypto_AgreementHandle    agrHandle,
                              SeosCrypto_KeyHandle          pubHandle,
-                             size_t                        sharedSize);
+                             size_t*                       sharedSize);
 
 seos_err_t
 SeosCryptoRpc_agreementFree(SeosCryptoRpc*                self,
@@ -180,7 +180,7 @@ seos_err_t
 SeosCryptoRpc_cipherProcess(SeosCryptoRpc*               self,
                             SeosCrypto_CipherHandle      cipherHandle,
                             size_t                       inputLen,
-                            size_t                       outputSize);
+                            size_t*                      outputSize);
 
 seos_err_t
 SeosCryptoRpc_cipherStart(SeosCryptoRpc*             self,
@@ -190,6 +190,6 @@ SeosCryptoRpc_cipherStart(SeosCryptoRpc*             self,
 seos_err_t
 SeosCryptoRpc_cipherFinalize(SeosCryptoRpc*             self,
                              SeosCrypto_CipherHandle    cipherHandle,
-                             size_t                     len);
+                             size_t*                    len);
 
 /** @} */

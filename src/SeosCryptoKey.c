@@ -657,6 +657,7 @@ getParamsImpl(SeosCryptoKey*    self,
               void*             keyParams,
               size_t*           paramSize)
 {
+    seos_err_t retval = SEOS_ERROR_GENERIC;
     size_t size;
     void* params = NULL;
 
@@ -675,13 +676,17 @@ getParamsImpl(SeosCryptoKey*    self,
 
     if (*paramSize < size)
     {
-        return SEOS_ERROR_BUFFER_TOO_SMALL;
+        retval = SEOS_ERROR_BUFFER_TOO_SMALL;
+    }
+    else
+    {
+        memcpy(keyParams, params, size);
+        retval = SEOS_SUCCESS;
     }
 
-    memcpy(keyParams, params, size);
     *paramSize = size;
 
-    return SEOS_SUCCESS;
+    return retval;
 }
 
 static seos_err_t
@@ -690,6 +695,7 @@ loadParamsImpl(const SeosCryptoKey_Param    name,
                size_t*                      paramSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
+    size_t size;
 
     switch (name)
     {
@@ -700,34 +706,38 @@ loadParamsImpl(const SeosCryptoKey_Param    name,
         SeosCryptoKey_ECCParams* params = (SeosCryptoKey_ECCParams*) keyParams;
         mbedtls_ecp_group grp;
 
-        if (*paramSize < sizeof(SeosCryptoKey_ECCParams))
+        size = sizeof(SeosCryptoKey_ECCParams);
+        if (*paramSize < size)
         {
-            return SEOS_ERROR_BUFFER_TOO_SMALL;
+            retval = SEOS_ERROR_BUFFER_TOO_SMALL;
         }
-
-        // Just extract the full range of params from mbedTLS.
-        mbedtls_ecp_group_init(&grp);
-        mbedtls_ecp_group_load(&grp, name);
-        params->aLen = mbedtls_mpi_size(&grp.A);
-        params->bLen = mbedtls_mpi_size(&grp.B);
-        params->pLen = mbedtls_mpi_size(&grp.P);
-        params->nLen = mbedtls_mpi_size(&grp.N);
-        params->gxLen = mbedtls_mpi_size(&grp.G.X);
-        params->gyLen = mbedtls_mpi_size(&grp.G.Y);
-        retval = mbedtls_mpi_write_binary(&grp.A, params->aBytes, params->aLen) != 0 ||
-                 mbedtls_mpi_write_binary(&grp.B, params->bBytes, params->bLen) != 0 ||
-                 mbedtls_mpi_write_binary(&grp.P, params->pBytes, params->pLen) != 0 ||
-                 mbedtls_mpi_write_binary(&grp.N, params->nBytes, params->nLen) != 0 ||
-                 mbedtls_mpi_write_binary(&grp.G.X, params->gxBytes, params->gxLen) != 0 ||
-                 mbedtls_mpi_write_binary(&grp.G.Y, params->gyBytes, params->gyLen) ?
-                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
-        *paramSize = sizeof(SeosCryptoKey_ECCParams);
-        mbedtls_ecp_group_free(&grp);
+        else
+        {
+            // Just extract the full range of params from mbedTLS.
+            mbedtls_ecp_group_init(&grp);
+            mbedtls_ecp_group_load(&grp, name);
+            params->aLen = mbedtls_mpi_size(&grp.A);
+            params->bLen = mbedtls_mpi_size(&grp.B);
+            params->pLen = mbedtls_mpi_size(&grp.P);
+            params->nLen = mbedtls_mpi_size(&grp.N);
+            params->gxLen = mbedtls_mpi_size(&grp.G.X);
+            params->gyLen = mbedtls_mpi_size(&grp.G.Y);
+            retval = mbedtls_mpi_write_binary(&grp.A, params->aBytes, params->aLen) != 0 ||
+                     mbedtls_mpi_write_binary(&grp.B, params->bBytes, params->bLen) != 0 ||
+                     mbedtls_mpi_write_binary(&grp.P, params->pBytes, params->pLen) != 0 ||
+                     mbedtls_mpi_write_binary(&grp.N, params->nBytes, params->nLen) != 0 ||
+                     mbedtls_mpi_write_binary(&grp.G.X, params->gxBytes, params->gxLen) != 0 ||
+                     mbedtls_mpi_write_binary(&grp.G.Y, params->gyBytes, params->gyLen) ?
+                     SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+            mbedtls_ecp_group_free(&grp);
+        }
         break;
     }
     default:
         return SEOS_ERROR_NOT_SUPPORTED;
     }
+
+    *paramSize = size;
 
     return retval;
 }

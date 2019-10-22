@@ -78,8 +78,8 @@ finalizeImpl(SeosCryptoDigest*  self,
         {
             retval = mbedtls_md5_finish_ret(&self->mbedtls.md5, digest) ?
                      SEOS_ERROR_ABORTED : SEOS_SUCCESS;
-            *digestSize = SeosCryptoDigest_SIZE_MD5;
         }
+        *digestSize = SeosCryptoDigest_SIZE_MD5;
         break;
     case SeosCryptoDigest_Algorithm_SHA256:
         if (*digestSize < SeosCryptoDigest_SIZE_SHA256)
@@ -90,8 +90,8 @@ finalizeImpl(SeosCryptoDigest*  self,
         {
             retval = mbedtls_sha256_finish_ret(&self->mbedtls.sha256, digest) ?
                      SEOS_ERROR_ABORTED : SEOS_SUCCESS;
-            *digestSize = SeosCryptoDigest_SIZE_SHA256;
         }
+        *digestSize = SeosCryptoDigest_SIZE_SHA256;
         break;
     default:
         retval = SEOS_ERROR_NOT_SUPPORTED;

@@ -314,6 +314,12 @@ finalizeImpl(SeosCryptoCipher* self,
     }
     case SeosCryptoCipher_Algorithm_AES_GCM_ENC:
     {
+        if (*bufSize < 4)
+        {
+            // Tag length must be at least 4!
+            *bufSize = 4;
+            return SEOS_ERROR_BUFFER_TOO_SMALL;
+        }
         // For GCM the last buf block is the authentication tag; the maximum
         // size of which is determined by the AES blocksize
         *bufSize = (*bufSize > SeosCryptoCipher_AES_BLOCK_SIZE) ?

@@ -22,7 +22,8 @@
 
 #define SeosCrypto_TO_SEOS_CRYPTO_CTX(self) (&(self)->parent)
 
-#define INPUT_BUFFER_SIZE PAGE_SIZE
+#define SeosCrypto_DATAPORT_SIZE    PAGE_SIZE
+#define SeosCrypto_BUFFER_SIZE      SeosCrypto_DATAPORT_SIZE
 
 typedef void* (SeosCrypto_MallocFunc)(size_t size);
 typedef void  (SeosCrypto_FreeFunc)(void* ptr);
@@ -56,13 +57,7 @@ typedef struct
     /**
      * Buffer for outputs produced by crypto
      */
-    unsigned char       inputBuffer[INPUT_BUFFER_SIZE];
+    unsigned char       buffer[SeosCrypto_BUFFER_SIZE];
 } SeosCrypto;
-
-INLINE void*
-get_input_buf_ptr(SeosCrypto* self)
-{
-    return self->inputBuffer;
-}
 
 /** @} */

@@ -73,10 +73,10 @@ exit:
     return retval;
 }
 
-void
+seos_err_t
 SeosCryptoRpc_free(SeosCryptoRpc* self)
 {
-    return;
+    return SEOS_SUCCESS;
 }
 
 // -------------------------------- RNG API ------------------------------------
@@ -131,20 +131,13 @@ SeosCryptoRpc_digestProcess(SeosCryptoRpc*           self,
 seos_err_t
 SeosCryptoRpc_digestFinalize(SeosCryptoRpc*             self,
                              SeosCrypto_DigestHandle    digestHandle,
-                             size_t                     bufSize)
+                             size_t*                    digestSize)
 {
-    if (!isValidHandle(self))
-    {
-        return SEOS_ERROR_INVALID_HANDLE;
-    }
-    else if (bufSize > DATAPORT_BUFFER_SIZE)
-    {
-        return SEOS_ERROR_BUFFER_TOO_SMALL;
-    }
-
-    memcpy(get_dataport_len_ptr(self), &bufSize, sizeof(size_t));
-    return SeosCrypto_digestFinalize(self->seosCryptoApi, digestHandle,
-                                     get_dataport_buf_ptr(self), get_dataport_len_ptr(self));
+    *digestSize = (*digestSize <= SeosCrypto_BUFFER_SIZE) ? *digestSize :
+                  SeosCrypto_BUFFER_SIZE;
+    return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_digestFinalize(self->seosCryptoApi, digestHandle,
+                                     self->serverDataport, digestSize);
 }
 
 // -------------------------------- Key API ------------------------------------
@@ -188,43 +181,28 @@ SeosCryptoRpc_keyExport(SeosCryptoRpc*        self,
                                 self->serverDataport);
 }
 
-
 seos_err_t
 SeosCryptoRpc_keyGetParams(SeosCryptoRpc*       self,
                            SeosCrypto_KeyHandle keyHandle,
-                           size_t               paramSize)
+                           size_t*              paramSize)
 {
-    if (!isValidHandle(self))
-    {
-        return SEOS_ERROR_INVALID_HANDLE;
-    }
-    else if (paramSize > DATAPORT_BUFFER_SIZE)
-    {
-        return SEOS_ERROR_BUFFER_TOO_SMALL;
-    }
-
-    memcpy(get_dataport_len_ptr(self), &paramSize, sizeof(size_t));
-    return SeosCrypto_keyGetParams(self->seosCryptoApi, keyHandle,
-                                   get_dataport_buf_ptr(self), get_dataport_len_ptr(self));
+    *paramSize = (*paramSize <= SeosCrypto_BUFFER_SIZE) ? *paramSize :
+                 SeosCrypto_BUFFER_SIZE;
+    return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_keyGetParams(self->seosCryptoApi, keyHandle,
+                                   self->serverDataport, paramSize);
 }
 
 seos_err_t
 SeosCryptoRpc_keyLoadParams(SeosCryptoRpc*       self,
                             SeosCryptoKey_Param  name,
-                            size_t               paramSize)
+                            size_t*              paramSize)
 {
-    if (!isValidHandle(self))
-    {
-        return SEOS_ERROR_INVALID_HANDLE;
-    }
-    else if (paramSize > DATAPORT_BUFFER_SIZE)
-    {
-        return SEOS_ERROR_BUFFER_TOO_SMALL;
-    }
-
-    memcpy(get_dataport_len_ptr(self), &paramSize, sizeof(size_t));
-    return SeosCrypto_keyLoadParams(self->seosCryptoApi, name,
-                                    get_dataport_buf_ptr(self), get_dataport_len_ptr(self));
+    *paramSize = (*paramSize <= SeosCrypto_BUFFER_SIZE) ? *paramSize :
+                 SeosCrypto_BUFFER_SIZE;
+    return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_keyLoadParams(self->seosCryptoApi, name,
+                                    self->serverDataport, paramSize);
 }
 
 seos_err_t
@@ -251,20 +229,13 @@ seos_err_t
 SeosCryptoRpc_agreementAgree(SeosCryptoRpc*                self,
                              SeosCrypto_AgreementHandle    agrHandle,
                              SeosCrypto_KeyHandle          pubHandle,
-                             size_t                        bufSize)
+                             size_t*                       sharedSize)
 {
-    if (!isValidHandle(self))
-    {
-        return SEOS_ERROR_INVALID_HANDLE;
-    }
-    else if (bufSize > DATAPORT_BUFFER_SIZE)
-    {
-        return SEOS_ERROR_BUFFER_TOO_SMALL;
-    }
-
-    memcpy(get_dataport_len_ptr(self), &bufSize, sizeof(size_t));
-    return SeosCrypto_agreementAgree(self->seosCryptoApi, agrHandle,
-                                     pubHandle, get_dataport_buf_ptr(self), get_dataport_len_ptr(self));
+    *sharedSize = (*sharedSize <= SeosCrypto_BUFFER_SIZE) ? *sharedSize :
+                  SeosCrypto_BUFFER_SIZE;
+    return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_agreementAgree(self->seosCryptoApi, agrHandle,
+                                     pubHandle, self->serverDataport, sharedSize);
 }
 
 seos_err_t
@@ -304,29 +275,15 @@ seos_err_t
 SeosCryptoRpc_signatureSign(SeosCryptoRpc*                self,
                             SeosCrypto_SignatureHandle    sigHandle,
                             size_t                        hashSize,
-                            size_t                        bufSize)
+                            size_t*                       signatureSize)
 {
-    size_t outSize;
-    seos_err_t retval;
-
-    if (!isValidHandle(self))
-    {
-        return SEOS_ERROR_INVALID_HANDLE;
-    }
-    else if (bufSize > DATAPORT_BUFFER_SIZE)
-    {
-        return SEOS_ERROR_BUFFER_TOO_SMALL;
-    }
-
-    outSize = bufSize;
-    if ((retval = SeosCrypto_signatureSign(self->seosCryptoApi, sigHandle,
-                                           self->serverDataport, hashSize,
-                                           get_dataport_buf_ptr(self), &outSize)) == SEOS_SUCCESS)
-    {
-        memcpy(get_dataport_len_ptr(self), &outSize, sizeof(size_t));
-    }
-
-    return retval;
+    *signatureSize = (*signatureSize <= SeosCrypto_BUFFER_SIZE) ? *signatureSize :
+                     SeosCrypto_BUFFER_SIZE ;
+    return !isValidHandle(self) ?
+           SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_signatureSign(self->seosCryptoApi, sigHandle,
+                                    self->serverDataport, hashSize,
+                                    self->serverDataport, signatureSize);
 }
 
 seos_err_t
@@ -363,29 +320,15 @@ seos_err_t
 SeosCryptoRpc_cipherProcess(SeosCryptoRpc*           self,
                             SeosCrypto_CipherHandle  cipherHandle,
                             size_t                   inputLen,
-                            size_t                   bufSize)
+                            size_t*                  outputSize)
 {
-    size_t outSize;
-    seos_err_t retval;
-
-    if (!isValidHandle(self))
-    {
-        return SEOS_ERROR_INVALID_HANDLE;
-    }
-    else if (bufSize > DATAPORT_BUFFER_SIZE)
-    {
-        return SEOS_ERROR_BUFFER_TOO_SMALL;
-    }
-
-    outSize = bufSize;
-    if ((retval = SeosCrypto_cipherProcess(self->seosCryptoApi, cipherHandle,
-                                           self->serverDataport, inputLen,
-                                           get_dataport_buf_ptr(self), &outSize)) == SEOS_SUCCESS)
-    {
-        memcpy(get_dataport_len_ptr(self), &outSize, sizeof(size_t));
-    }
-
-    return retval;
+    *outputSize = (*outputSize <= SeosCrypto_BUFFER_SIZE) ? *outputSize :
+                  SeosCrypto_BUFFER_SIZE;
+    return !isValidHandle(self) ?
+           SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_cipherProcess(self->seosCryptoApi, cipherHandle,
+                                    self->serverDataport, inputLen,
+                                    self->serverDataport, outputSize);
 }
 
 seos_err_t
@@ -401,21 +344,11 @@ SeosCryptoRpc_cipherStart(SeosCryptoRpc*            self,
 seos_err_t
 SeosCryptoRpc_cipherFinalize(SeosCryptoRpc*             self,
                              SeosCrypto_CipherHandle    cipherHandle,
-                             size_t                     bufSize)
+                             size_t*                    tagSize)
 {
-    if (!isValidHandle(self))
-    {
-        return SEOS_ERROR_INVALID_HANDLE;
-    }
-    else if (bufSize > DATAPORT_BUFFER_SIZE)
-    {
-        return SEOS_ERROR_BUFFER_TOO_SMALL;
-    }
-
-    // Dataport may already hold a value (e.g. in case we want to validate a
-    // tag), so we must move that to the appropriate place
-    memmove(get_dataport_buf_ptr(self), self->serverDataport, bufSize);
-    memcpy(get_dataport_len_ptr(self), &bufSize, sizeof(size_t));
-    return SeosCrypto_cipherFinalize(self->seosCryptoApi, cipherHandle,
-                                     get_dataport_buf_ptr(self), get_dataport_len_ptr(self));
+    *tagSize = (*tagSize <= SeosCrypto_BUFFER_SIZE) ? *tagSize :
+               SeosCrypto_BUFFER_SIZE;
+    return !isValidHandle(self) ?  SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_cipherFinalize(self->seosCryptoApi, cipherHandle,
+                                     self->serverDataport, tagSize);
 }

@@ -18,7 +18,6 @@
 #include "mbedtls/aes.h"
 #include "mbedtls/gcm.h"
 
-#define SeosCryptoCipher_OUTPUT_BUFFER_SIZE     PAGE_SIZE
 #define SeosCryptoCipher_AES_BLOCK_SIZE         16
 #define SeosCryptoCipher_AES_CBC_IV_SIZE        16
 #define SeosCryptoCipher_AES_GCM_IV_SIZE        12

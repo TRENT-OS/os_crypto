@@ -260,7 +260,7 @@ seos_err_t
 SeosCrypto_digestProcess(SeosCryptoCtx*                  api,
                          const SeosCrypto_DigestHandle   digestHandle,
                          const void*                     data,
-                         const size_t                    len)
+                         const size_t                    dataLen)
 {
     SeosCrypto* self = (SeosCrypto*) api;
 
@@ -271,7 +271,7 @@ SeosCrypto_digestProcess(SeosCryptoCtx*                  api,
 
     return SeosCrypto_findHandle(&self->digestHandleVector, digestHandle) == -1 ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoDigest_process(digestHandle, data, len);
+           SeosCryptoDigest_process(digestHandle, data, dataLen);
 }
 
 seos_err_t
@@ -381,16 +381,16 @@ SeosCrypto_signatureSign(SeosCryptoCtx*                     api,
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if (hashSize > INPUT_BUFFER_SIZE)
+    else if (hashSize > SeosCrypto_BUFFER_SIZE)
     {
-        return SEOS_ERROR_BUFFER_TOO_SMALL;
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
     // Make local copy of input buffer, to allow overlapping hash/signature buffers
-    memcpy(get_input_buf_ptr(self), hash, hashSize);
+    memcpy(self->buffer, hash, hashSize);
     return SeosCrypto_findHandle(&self->signatureHandleVector, sigHandle) == -1 ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoSignature_sign(sigHandle, &self->cryptoRng, get_input_buf_ptr(self),
+           SeosCryptoSignature_sign(sigHandle, &self->cryptoRng, self->buffer,
                                     hashSize, signature, signatureSize);
 }
 
@@ -841,16 +841,16 @@ SeosCrypto_cipherProcess(SeosCryptoCtx*                  api,
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if (inputSize > INPUT_BUFFER_SIZE)
+    else if (inputSize > SeosCrypto_BUFFER_SIZE)
     {
-        return SEOS_ERROR_BUFFER_TOO_SMALL;
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
     // Make local copy of input buffer, to allow overlapping input/output buffers
-    memcpy(get_input_buf_ptr(self), input, inputSize);
+    memcpy(self->buffer, input, inputSize);
     return (SeosCrypto_findHandle(&self->cipherHandleVector, cipherHandle) == -1) ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoCipher_process(cipherHandle, get_input_buf_ptr(self), inputSize,
+           SeosCryptoCipher_process(cipherHandle, self->buffer, inputSize,
                                     output, outputSize);
 }
 

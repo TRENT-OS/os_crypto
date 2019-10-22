@@ -54,7 +54,7 @@ SeosCryptoKey_loadParams(const SeosCryptoKey_Param  name,
                          size_t*                    paramSize);
 
 seos_err_t
-SeosCryptoKey_free(SeosCryptoKey*        self,
+SeosCryptoKey_free(SeosCryptoKey*           self,
                    const SeosCrypto_MemIf*  memIf);
 
 /**

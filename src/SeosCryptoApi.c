@@ -4,6 +4,7 @@
  */
 #include "SeosCryptoCtx.h"
 #include "SeosCryptoApi.h"
+#include "SeosCrypto_Impl.h"
 
 seos_err_t
 SeosCryptoApi_free(SeosCryptoCtx* ctx)
@@ -19,6 +20,10 @@ SeosCryptoApi_rngGetBytes(SeosCryptoCtx*            ctx,
                           void*                     buf,
                           const size_t              bufSize)
 {
+    if (bufSize > SeosCrypto_BUFFER_SIZE)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
            ctx->vtable->rngGetBytes(ctx, flags, buf, bufSize);
 }
@@ -28,6 +33,10 @@ SeosCryptoApi_rngReSeed(SeosCryptoCtx*      ctx,
                         const void*         seed,
                         const size_t        seedLen)
 {
+    if (seedLen > SeosCrypto_BUFFER_SIZE)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
            ctx->vtable->rngReSeed(ctx, seed, seedLen);
 }
@@ -57,6 +66,10 @@ SeosCryptoApi_digestProcess(SeosCryptoCtx*                   ctx,
                             const void*                      data,
                             const size_t                     dataLen)
 {
+    if (dataLen > SeosCrypto_BUFFER_SIZE)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
            ctx->vtable->digestProcess(ctx, digestHandle, data, dataLen);
 }
@@ -67,6 +80,10 @@ SeosCryptoApi_digestFinalize(SeosCryptoCtx*                 ctx,
                              void*                          digest,
                              size_t*                        digestSize)
 {
+    if (NULL != digestSize && *digestSize > SeosCrypto_BUFFER_SIZE)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
            ctx->vtable->digestFinalize(ctx, digestHandle, digest, digestSize);
 }
@@ -100,7 +117,13 @@ SeosCryptoApi_signatureSign(SeosCryptoCtx*                      ctx,
                             void*                               signature,
                             size_t*                             signatureSize)
 {
-    return (NULL == ctx || NULL == signature) ? SEOS_ERROR_INVALID_PARAMETER :
+    // They use the same buffer, but sequentially
+    if (hashSize > SeosCrypto_BUFFER_SIZE
+        || (NULL != signatureSize && *signatureSize > SeosCrypto_BUFFER_SIZE))
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
+    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
            ctx->vtable->signatureSign(ctx, sigHandle, hash, hashSize, signature,
                                       signatureSize);
 }
@@ -113,6 +136,11 @@ SeosCryptoApi_signatureVerify(SeosCryptoCtx*                    ctx,
                               const void*                       signature,
                               const size_t                      signatureSize)
 {
+    // They use the same buffer, but in parallel
+    if (hashSize + signatureSize > SeosCrypto_BUFFER_SIZE)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
            ctx->vtable->signatureVerify(ctx, sigHandle, hash, hashSize, signature,
                                         signatureSize);
@@ -145,7 +173,11 @@ SeosCryptoApi_agreementAgree(SeosCryptoCtx*                     ctx,
                              void*                              shared,
                              size_t*                            sharedSize)
 {
-    return (NULL == ctx || NULL == shared) ? SEOS_ERROR_INVALID_PARAMETER :
+    if (NULL != sharedSize && *sharedSize > SeosCrypto_BUFFER_SIZE)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
+    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
            ctx->vtable->agreementAgree(ctx, agrHandle, pubHandle, shared, sharedSize);
 }
 
@@ -196,6 +228,10 @@ SeosCryptoApi_keyGetParams(SeosCryptoCtx*               ctx,
                            void*                        keyParams,
                            size_t*                      paramSize)
 {
+    if (NULL != paramSize && *paramSize > SeosCrypto_BUFFER_SIZE)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
            ctx->vtable->keyGetParams(ctx, keyHandle, keyParams, paramSize);
 }
@@ -206,6 +242,10 @@ SeosCryptoApi_keyLoadParams(SeosCryptoCtx*              ctx,
                             void*                       keyParams,
                             size_t*                     paramSize)
 {
+    if (NULL != paramSize && *paramSize > SeosCrypto_BUFFER_SIZE)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
            ctx->vtable->keyLoadParams(ctx, name, keyParams, paramSize);
 }
@@ -228,6 +268,10 @@ SeosCryptoApi_cipherInit(SeosCryptoCtx*                     ctx,
                          const void*                        iv,
                          const size_t                       ivLen)
 {
+    if (ivLen > SeosCrypto_BUFFER_SIZE)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
            ctx->vtable->cipherInit(ctx, pCipherHandle, algorithm, keyHandle, iv, ivLen);
 }
@@ -244,12 +288,18 @@ seos_err_t
 SeosCryptoApi_cipherProcess(SeosCryptoCtx*                   ctx,
                             const SeosCrypto_CipherHandle    cipherHandle,
                             const void*                      data,
-                            const size_t                     dataLen,
+                            const size_t                     dataSize,
                             void*                            output,
                             size_t*                          outputSize)
 {
+    // They use the same buffer, but sequentially
+    if (dataSize > SeosCrypto_BUFFER_SIZE ||
+        (NULL != outputSize && *outputSize > SeosCrypto_BUFFER_SIZE))
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->cipherProcess(ctx, cipherHandle, data, dataLen, output,
+           ctx->vtable->cipherProcess(ctx, cipherHandle, data, dataSize, output,
                                       outputSize);
 }
 
@@ -259,6 +309,10 @@ SeosCryptoApi_cipherStart(SeosCryptoCtx*                ctx,
                           const void*                   ad,
                           const size_t                  adLen)
 {
+    if (adLen > SeosCrypto_BUFFER_SIZE)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
            ctx->vtable->cipherStart(ctx, cipherHandle, ad, adLen);
 }
@@ -269,6 +323,10 @@ SeosCryptoApi_cipherFinalize(SeosCryptoCtx*                 ctx,
                              void*                          output,
                              size_t*                        outputSize)
 {
+    if (NULL != outputSize && *outputSize > SeosCrypto_BUFFER_SIZE)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
            ctx->vtable->cipherFinalize(ctx, cipherHandle, output, outputSize);
 }

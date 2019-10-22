@@ -93,7 +93,6 @@ agreeImpl(SeosCryptoAgreement*    self,
 {
     void* rngFunc = (NULL != rng) ? SeosCryptoRng_getBytesMbedtls : NULL;
     seos_err_t retval = SEOS_ERROR_GENERIC;
-    size_t rc, outLen = 0;
 
     switch (self->algorithm)
     {
@@ -103,13 +102,16 @@ agreeImpl(SeosCryptoAgreement*    self,
         {
             retval = SEOS_ERROR_INVALID_PARAMETER;
         }
+        else if (*bufSize < mbedtls_mpi_size(&self->mbedtls.dh.P))
+        {
+            retval = SEOS_ERROR_BUFFER_TOO_SMALL;
+            *bufSize = mbedtls_mpi_size(&self->mbedtls.dh.P);
+        }
         else
         {
-            rc = mbedtls_dhm_calc_secret(&self->mbedtls.dh, buf, *bufSize, &outLen,
-                                         rngFunc, rng);
-            retval = (rc == 0) ? SEOS_SUCCESS :
-                     (rc == MBEDTLS_ERR_DHM_BAD_INPUT_DATA) ?
-                     SEOS_ERROR_BUFFER_TOO_SMALL : SEOS_ERROR_ABORTED;
+            retval = mbedtls_dhm_calc_secret(&self->mbedtls.dh, buf, *bufSize, bufSize,
+                                             rngFunc, rng) != 0 ?
+                     SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         }
         break;
     case SeosCryptoAgreement_Algorithm_ECDH:
@@ -119,20 +121,21 @@ agreeImpl(SeosCryptoAgreement*    self,
         {
             retval = SEOS_ERROR_INVALID_PARAMETER;
         }
+        else if (*bufSize < mbedtls_mpi_size(&self->mbedtls.ecdh.grp.P))
+        {
+            retval = SEOS_ERROR_BUFFER_TOO_SMALL;
+            *bufSize = mbedtls_mpi_size(&self->mbedtls.ecdh.grp.P);
+        }
         else
         {
-            rc = mbedtls_ecdh_calc_secret(&self->mbedtls.ecdh, &outLen, buf, *bufSize,
-                                          rngFunc, rng);
-            retval = (rc == 0) ? SEOS_SUCCESS :
-                     (rc == MBEDTLS_ERR_ECP_BAD_INPUT_DATA) ?
-                     SEOS_ERROR_BUFFER_TOO_SMALL : SEOS_ERROR_ABORTED;
+            retval = mbedtls_ecdh_calc_secret(&self->mbedtls.ecdh, bufSize, buf, *bufSize,
+                                              rngFunc, rng) != 0 ?
+                     SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         }
         break;
     default:
-        retval = SEOS_ERROR_NOT_SUPPORTED;
+        return SEOS_ERROR_NOT_SUPPORTED;
     }
-
-    *bufSize = outLen;
 
     return retval;
 }

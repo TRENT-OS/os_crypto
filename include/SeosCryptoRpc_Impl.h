@@ -17,11 +17,6 @@
 
 #include <sys/user.h>
 
-// Data is returned via the dataport buffer of the RPC server. For now, we
-// only return one array (at most), so the size of the returned array is written
-// to the dataport buffer, followed by the actual data.
-#define DATAPORT_BUFFER_SIZE  (PAGE_SIZE - sizeof(size_t))
-
 typedef struct
 {
     /**
@@ -36,17 +31,5 @@ typedef struct
 SeosCryptoRpc;
 
 typedef SeosCryptoRpc* SeosCryptoRpc_Handle;
-
-INLINE void*
-get_dataport_buf_ptr(SeosCryptoRpc* self)
-{
-    return self->serverDataport + sizeof(size_t);
-}
-
-INLINE void*
-get_dataport_len_ptr(SeosCryptoRpc* self)
-{
-    return self->serverDataport;
-}
 
 /** @} */

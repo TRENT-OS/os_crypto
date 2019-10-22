@@ -142,15 +142,13 @@ signHashImpl(SeosCryptoSignature*   self,
                                             MBEDTLS_RSA_PRIVATE, MBEDTLS_MD_NONE, hashSize,
                                             hash, signature) != 0 ?
                      SEOS_ERROR_ABORTED : SEOS_SUCCESS;
-            if (retval == SEOS_SUCCESS)
-            {
-                *signatureSize = self->mbedtls.rsa.len;
-            }
         }
         break;
     default:
         retval = SEOS_ERROR_NOT_SUPPORTED;
     }
+
+    *signatureSize = self->mbedtls.rsa.len;
 
     return retval;
 }
