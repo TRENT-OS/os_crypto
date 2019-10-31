@@ -135,10 +135,10 @@ generate_DHParams(SeosCryptoRng*          rng,
         retval = SEOS_ERROR_ABORTED;
     }
 
-    mbedtls_mpi_init(&T);
-    mbedtls_mpi_init(&Q);
-    mbedtls_mpi_init(&P);
-    mbedtls_mpi_init(&G);
+    mbedtls_mpi_free(&T);
+    mbedtls_mpi_free(&Q);
+    mbedtls_mpi_free(&P);
+    mbedtls_mpi_free(&G);
 
     return retval;
 }
@@ -266,6 +266,7 @@ generate_RSAPrv(SeosCryptoKey_RSAPrv* key,
     mbedtls_rsa_context rsa;
 
     mbedtls_rsa_init(&rsa, MBEDTLS_RSA_PKCS_V15, MBEDTLS_MD_NONE);
+
     if (mbedtls_rsa_gen_key(&rsa, SeosCryptoRng_getBytesMbedtls, rng, bits,
                             SeosCryptoKey_RSA_EXPONENT) != 0)
     {
@@ -319,9 +320,9 @@ make_RSAPub(SeosCryptoKey_RSAPub*       pubKey,
              SEOS_ERROR_ABORTED : SEOS_SUCCESS;
 
 exit:
-    mbedtls_mpi_init(&P);
-    mbedtls_mpi_init(&Q);
-    mbedtls_mpi_init(&N);
+    mbedtls_mpi_free(&P);
+    mbedtls_mpi_free(&Q);
+    mbedtls_mpi_free(&N);
 
     return retval;
 }
