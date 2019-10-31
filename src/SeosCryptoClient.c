@@ -46,23 +46,18 @@ SeosCryptoClient_init(SeosCryptoClient* self,
                       SeosCryptoRpc_Handle rpcHandle,
                       void* dataport)
 {
-    Debug_ASSERT_SELF(self);
-    seos_err_t retval = SEOS_ERROR_GENERIC;
+    if (NULL == self || NULL == rpcHandle || NULL == dataport)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
 
     memset(self, 0, sizeof(*self));
 
-    if (NULL == rpcHandle || NULL == dataport)
-    {
-        retval = SEOS_ERROR_INVALID_PARAMETER;
-        goto exit;
-    }
     self->clientDataport = dataport;
     self->rpcHandle      = rpcHandle;
     self->parent.vtable  = &SeosCryptoClient_vtable;
 
-    retval = SEOS_SUCCESS;
-exit:
-    return retval;
+    return SEOS_SUCCESS;
 }
 
 seos_err_t
@@ -91,6 +86,10 @@ SeosCryptoClient_rngGetBytes(SeosCryptoCtx*             api,
     if ((retval = SeosCryptoRpc_rngGetBytes(self->rpcHandle, flags,
                                             bufLen)) == SEOS_SUCCESS)
     {
+        if (bufLen > SeosCrypto_DATAPORT_SIZE)
+        {
+            return SEOS_ERROR_INSUFFICIENT_SPACE;
+        }
         memcpy(buf, self->clientDataport, bufLen);
     }
 
@@ -156,7 +155,6 @@ SeosCryptoClient_digestProcess(SeosCryptoCtx*                   api,
                                const void*                      data,
                                const size_t                     dataLen)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoClient* self = (SeosCryptoClient*) api;
 
     if (NULL == api || self->parent.vtable != &SeosCryptoClient_vtable
@@ -170,9 +168,7 @@ SeosCryptoClient_digestProcess(SeosCryptoCtx*                   api,
     }
 
     memcpy(self->clientDataport, data, dataLen);
-    retval = SeosCryptoRpc_digestProcess(self->rpcHandle, digestHandle, dataLen);
-
-    return retval;
+    return SeosCryptoRpc_digestProcess(self->rpcHandle, digestHandle, dataLen);
 }
 
 seos_err_t
@@ -193,6 +189,10 @@ SeosCryptoClient_digestFinalize(SeosCryptoCtx*                  api,
     if ((retval = SeosCryptoRpc_digestFinalize(self->rpcHandle, digestHandle,
                                                digestSize)) == SEOS_SUCCESS)
     {
+        if (*digestSize > SeosCrypto_DATAPORT_SIZE)
+        {
+            return SEOS_ERROR_INSUFFICIENT_SPACE;
+        }
         memcpy(digest, self->clientDataport, *digestSize);
     }
 
@@ -259,6 +259,10 @@ SeosCryptoClient_signatureSign(SeosCryptoCtx*                   api,
     if ((retval = SeosCryptoRpc_signatureSign(self->rpcHandle, sigHandle,
                                               hashSize, signatureSize)) == SEOS_SUCCESS)
     {
+        if (*signatureSize > SeosCrypto_DATAPORT_SIZE)
+        {
+            return SEOS_ERROR_INSUFFICIENT_SPACE;
+        }
         memcpy(signature, self->clientDataport, *signatureSize);
     }
 
@@ -344,6 +348,10 @@ SeosCryptoClient_agreementAgree(SeosCryptoCtx*                      api,
     if ((retval = SeosCryptoRpc_agreementAgree(self->rpcHandle, agrHandle,
                                                pubHandle, sharedSize)) == SEOS_SUCCESS)
     {
+        if (*sharedSize > SeosCrypto_DATAPORT_SIZE)
+        {
+            return SEOS_ERROR_INSUFFICIENT_SPACE;
+        }
         memcpy(shared, self->clientDataport, *sharedSize);
     }
 
@@ -365,6 +373,7 @@ SeosCryptoClient_keyGenerate(SeosCryptoCtx*             api,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
+    Debug_ASSERT(sizeof(SeosCryptoKey_Spec) <= SeosCrypto_DATAPORT_SIZE);
     memcpy(self->clientDataport, spec, sizeof(SeosCryptoKey_Spec));
     return SeosCryptoRpc_keyGenerate(self->rpcHandle, pKeyHandle);
 }
@@ -383,6 +392,7 @@ SeosCryptoClient_keyMakePublic(SeosCryptoCtx*               api,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
+    Debug_ASSERT(sizeof(SeosCryptoKey_Attribs) <= SeosCrypto_DATAPORT_SIZE);
     memcpy(self->clientDataport, attribs, sizeof(SeosCryptoKey_Attribs));
     return SeosCryptoRpc_keyMakePublic(self->rpcHandle, pPubKeyHandle,
                                        prvKeyHandle);
@@ -402,6 +412,7 @@ SeosCryptoClient_keyImport(SeosCryptoCtx*               api,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
+    Debug_ASSERT(sizeof(SeosCryptoKey_Data) <= SeosCrypto_DATAPORT_SIZE);
     memcpy(self->clientDataport, keyData, sizeof(SeosCryptoKey_Data));
     return SeosCryptoRpc_keyImport(self->rpcHandle, pKeyHandle, wrapKeyHandle);
 }
@@ -424,6 +435,7 @@ SeosCryptoClient_keyExport(SeosCryptoCtx*               api,
     if ((retval = SeosCryptoRpc_keyExport(self->rpcHandle, keyHandle,
                                           wrapKeyHandle)) == SEOS_SUCCESS)
     {
+        Debug_ASSERT(sizeof(SeosCryptoKey_Data) <= SeosCrypto_DATAPORT_SIZE);
         memcpy(keyData, self->clientDataport, sizeof(SeosCryptoKey_Data));
     }
 
@@ -448,6 +460,10 @@ SeosCryptoClient_keyGetParams(SeosCryptoCtx*                api,
     if ((retval = SeosCryptoRpc_keyGetParams(self->rpcHandle, keyHandle,
                                              paramSize)) == SEOS_SUCCESS)
     {
+        if (*paramSize > SeosCrypto_DATAPORT_SIZE)
+        {
+            return SEOS_ERROR_INSUFFICIENT_SPACE;
+        }
         memcpy(keyParams, self->clientDataport, *paramSize);
     }
 
@@ -472,6 +488,10 @@ SeosCryptoClient_keyLoadParams(SeosCryptoCtx*              api,
     if ((retval = SeosCryptoRpc_keyLoadParams(self->rpcHandle, name,
                                               paramSize)) == SEOS_SUCCESS)
     {
+        if (*paramSize > SeosCrypto_DATAPORT_SIZE)
+        {
+            return SEOS_ERROR_INSUFFICIENT_SPACE;
+        }
         memcpy(keyParams, self->clientDataport, *paramSize);
     }
 
@@ -553,7 +573,7 @@ SeosCryptoClient_cipherProcess(SeosCryptoCtx*                   api,
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    if (inputSize > SeosCrypto_DATAPORT_SIZE)
+    else if (inputSize > SeosCrypto_DATAPORT_SIZE)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -562,6 +582,10 @@ SeosCryptoClient_cipherProcess(SeosCryptoCtx*                   api,
     if ((retval = SeosCryptoRpc_cipherProcess(self->rpcHandle, cipherHandle,
                                               inputSize, outputSize)) == SEOS_SUCCESS)
     {
+        if (*outputSize > SeosCrypto_DATAPORT_SIZE)
+        {
+            return SEOS_ERROR_INSUFFICIENT_SPACE;
+        }
         memcpy(output, self->clientDataport, *outputSize);
     }
 
@@ -596,27 +620,31 @@ SeosCryptoClient_cipherStart(SeosCryptoCtx*                 api,
 seos_err_t
 SeosCryptoClient_cipherFinalize(SeosCryptoCtx*                  api,
                                 const SeosCrypto_CipherHandle   cipherHandle,
-                                void*                           buf,
-                                size_t*                         bufSize)
+                                void*                           tag,
+                                size_t*                         tagSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoClient* self = (SeosCryptoClient*) api;
 
     if (NULL == self || &SeosCryptoClient_vtable != self->parent.vtable
-        || NULL == buf || NULL == bufSize)
+        || NULL == tag || NULL == tagSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if (*bufSize > SeosCrypto_DATAPORT_SIZE)
+    else if (*tagSize > SeosCrypto_DATAPORT_SIZE)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    memcpy(self->clientDataport, buf, *bufSize);
+    memcpy(self->clientDataport, tag, *tagSize);
     if ((retval = SeosCryptoRpc_cipherFinalize(self->rpcHandle, cipherHandle,
-                                               bufSize)) == SEOS_SUCCESS)
+                                               tagSize)) == SEOS_SUCCESS)
     {
-        memcpy(buf, self->clientDataport, *bufSize);
+        if (*tagSize > SeosCrypto_DATAPORT_SIZE)
+        {
+            return SEOS_ERROR_INSUFFICIENT_SPACE;
+        }
+        memcpy(tag, self->clientDataport, *tagSize);
     }
 
     return retval;
