@@ -42,7 +42,6 @@ typedef struct
 
     SeosCryptoDigest_Algorithm algorithm;
     bool                       processed;
-    bool                       finalized;
 } SeosCryptoDigest;
 
 /** @} */

@@ -76,7 +76,8 @@ finalizeImpl(SeosCryptoDigest*  self,
         }
         else
         {
-            retval = mbedtls_md5_finish_ret(&self->mbedtls.md5, digest) ?
+            retval = mbedtls_md5_finish_ret(&self->mbedtls.md5, digest) ||
+                     mbedtls_md5_starts_ret(&self->mbedtls.md5) ?
                      SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         }
         *digestSize = SeosCryptoDigest_Size_MD5;
@@ -88,7 +89,8 @@ finalizeImpl(SeosCryptoDigest*  self,
         }
         else
         {
-            retval = mbedtls_sha256_finish_ret(&self->mbedtls.sha256, digest) ?
+            retval = mbedtls_sha256_finish_ret(&self->mbedtls.sha256, digest) ||
+                     mbedtls_sha256_starts_ret(&self->mbedtls.sha256, 0) ?
                      SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         }
         *digestSize = SeosCryptoDigest_Size_SHA256;
@@ -138,8 +140,7 @@ SeosCryptoDigest_init(SeosCryptoDigest*                 self,
     memset(self, 0, sizeof(*self));
 
     self->algorithm = algorithm;
-    self->processed   = false;
-    self->finalized = false;
+    self->processed = false;
 
     return initImpl(self, memIf);
 }
@@ -168,8 +169,7 @@ SeosCryptoDigest_process(SeosCryptoDigest*   self,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    retval = self->finalized ?
-             SEOS_ERROR_ABORTED : processImpl(self, data, len);
+    retval = processImpl(self, data, len);
     self->processed |= (SEOS_SUCCESS == retval);
 
     return retval;
@@ -187,9 +187,14 @@ SeosCryptoDigest_finalize(SeosCryptoDigest* self,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    retval = !self->processed || self->finalized ?
+    retval = !self->processed ?
              SEOS_ERROR_ABORTED : finalizeImpl(self, digest, digestSize);
-    self->finalized |= (SEOS_SUCCESS == retval);
+
+    // We want to be able to re-use the digest object after finalizing it
+    if (SEOS_SUCCESS == retval)
+    {
+        self->processed = false;
+    }
 
     return retval;
 }

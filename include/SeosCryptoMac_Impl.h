@@ -40,7 +40,6 @@ typedef struct
     SeosCryptoMac_Algorithm algorithm;
     bool                    started;
     bool                    processed;
-    bool                    finalized;
 } SeosCryptoMac;
 
 /** @} */

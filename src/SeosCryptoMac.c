@@ -98,11 +98,11 @@ processImpl(SeosCryptoMac*  self,
 }
 
 static seos_err_t
-finalizeImpl(SeosCryptoMac*  self,
-             void*           mac,
-             size_t*         macSize)
+finalizeImpl(SeosCryptoMac*     self,
+             void*              mac,
+             size_t*            macSize)
 {
-    seos_err_t retval;
+    seos_err_t retval = SEOS_ERROR_GENERIC;
 
     retval = SEOS_SUCCESS;
     switch (self->algorithm)
@@ -127,6 +127,9 @@ finalizeImpl(SeosCryptoMac*  self,
 
     if (SEOS_SUCCESS == retval)
     {
+        // We do not need to reset anything here, as the internal state machine
+        // will force the user to call start() again first, which re-sets the
+        // hmac and the underlying digest context.
         retval = mbedtls_md_hmac_finish(&self->mbedtls.md, mac) ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
     }
@@ -137,9 +140,9 @@ finalizeImpl(SeosCryptoMac*  self,
 // Public Functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoMac_init(SeosCryptoMac*                 self,
-                   const SeosCrypto_MemIf*        memIf,
-                   const SeosCryptoMac_Algorithm  algorithm)
+SeosCryptoMac_init(SeosCryptoMac*                   self,
+                   const SeosCrypto_MemIf*          memIf,
+                   const SeosCryptoMac_Algorithm    algorithm)
 {
     if (NULL == memIf || NULL == self)
     {
@@ -151,14 +154,13 @@ SeosCryptoMac_init(SeosCryptoMac*                 self,
     self->algorithm = algorithm;
     self->started   = false;
     self->processed = false;
-    self->finalized = false;
 
     return initImpl(self, memIf);
 }
 
 seos_err_t
-SeosCryptoMac_free(SeosCryptoMac*           self,
-                   const SeosCrypto_MemIf*  memIf)
+SeosCryptoMac_free(SeosCryptoMac*            self,
+                   const SeosCrypto_MemIf*   memIf)
 {
     if (NULL == memIf || NULL == self)
     {
@@ -169,9 +171,9 @@ SeosCryptoMac_free(SeosCryptoMac*           self,
 }
 
 seos_err_t
-SeosCryptoMac_start(SeosCryptoMac*    self,
-                    const void*       secret,
-                    const size_t      secretSize)
+SeosCryptoMac_start(SeosCryptoMac*      self,
+                    const void*         secret,
+                    const size_t        secretSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -180,7 +182,7 @@ SeosCryptoMac_start(SeosCryptoMac*    self,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    retval = self->started || self->processed || self->finalized ?
+    retval = self->started || self->processed ?
              SEOS_ERROR_ABORTED : startImpl(self, secret, secretSize);
     self->started |= (SEOS_SUCCESS == retval);
 
@@ -199,7 +201,7 @@ SeosCryptoMac_process(SeosCryptoMac*    self,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    retval = !self->started || self->finalized ?
+    retval = !self->started ?
              SEOS_ERROR_ABORTED : processImpl(self, data, dataSize);
     self->processed |= (SEOS_SUCCESS == retval);
 
@@ -218,9 +220,16 @@ SeosCryptoMac_finalize(SeosCryptoMac*   self,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    retval = !self->started || !self->processed || self->finalized ?
+    retval = !self->started || !self->processed ?
              SEOS_ERROR_ABORTED : finalizeImpl(self, mac, macSize);
-    self->finalized |= (SEOS_SUCCESS == retval);
+
+    // Finalize also resets the underlying algorithms, so that we can re-use the
+    // MAC object again
+    if (retval == SEOS_SUCCESS)
+    {
+        self->started = false;
+        self->processed = false;
+    }
 
     return retval;
 }
