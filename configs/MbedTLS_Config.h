@@ -1,5 +1,4 @@
-#ifndef MBEDTLS_CONFIG_H
-#define MBEDTLS_CONFIG_H
+#pragma once
 
 /*
  * For now, the config for seos_crypto_api and seos_tls_api need to be identical
@@ -54,5 +53,3 @@
 #define MBEDTLS_ASN1_PARSE_C
 
 #include "mbedtls/check_config.h"
-
-#endif /* MBEDTLS_CONFIG_H */
