@@ -62,37 +62,40 @@ if (SEOS_CRYPTO_IMPL_MBEDTLS)
         MBEDTLS_CONFIG_FILE="${CMAKE_CURRENT_SOURCE_DIR}/configs/MbedTLS_Config.h"
     )
     target_include_directories(${PROJECT_NAME}
+        # TODO: Should be made PRIVATE in the future, currently we need the
+        # includes from mbedTLS for their data structures
         PUBLIC
         "3rdParty/mbedtls/include"
     )
     target_sources(${PROJECT_NAME}
         PRIVATE
-        "3rdParty/mbedtls/library/md5.c"
+        # UTILS ----------------------------------------------------------------
         "3rdParty/mbedtls/library/platform_util.c"
-        "3rdParty/mbedtls/library/entropy.c"
-        "3rdParty/mbedtls/library/ctr_drbg.c"
+        "3rdParty/mbedtls/library/bignum.c"
+        # DIGEST ---------------------------------------------------------------
+        "3rdParty/mbedtls/library/md.c"
+        "3rdParty/mbedtls/library/md_wrap.c"
+        "3rdParty/mbedtls/library/md5.c"
         "3rdParty/mbedtls/library/sha1.c"
         "3rdParty/mbedtls/library/sha256.c"
-        "3rdParty/mbedtls/library/sha512.c"
-        "3rdParty/mbedtls/library/sha256.c"
-        "3rdParty/mbedtls/library/aes.c"
-        # GCM
-        "3rdParty/mbedtls/library/gcm.c"
+        # RNG ------------------------------------------------------------------
+        "3rdParty/mbedtls/library/ctr_drbg.c"
+        # CIPHER ---------------------------------------------------------------
         "3rdParty/mbedtls/library/cipher.c"
         "3rdParty/mbedtls/library/cipher_wrap.c"
-        # DH
+        "3rdParty/mbedtls/library/aes.c"
+        "3rdParty/mbedtls/library/gcm.c"
+        # AGREEMENT ------------------------------------------------------------
         "3rdParty/mbedtls/library/dhm.c"
-        # EC dependencies
         "3rdParty/mbedtls/library/ecdh.c"
         "3rdParty/mbedtls/library/ecp.c"
         "3rdParty/mbedtls/library/ecp_curves.c"
-        # RSA dependencies
-        "3rdParty/mbedtls/library/md.c"
-        "3rdParty/mbedtls/library/md_wrap.c"
-        "3rdParty/mbedtls/library/bignum.c"
+        # SIGNATURE ------------------------------------------------------------
         "3rdParty/mbedtls/library/oid.c"
         "3rdParty/mbedtls/library/rsa.c"
         "3rdParty/mbedtls/library/rsa_internal.c"
+        # Temporary: For mbedTLS
+        "3rdParty/mbedtls/library/asn1parse.c"
     )
 endif()
 
