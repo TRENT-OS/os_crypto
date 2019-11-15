@@ -15,7 +15,7 @@
 #include "SeosCrypto_Impl.h"
 #include "SeosCryptoKey_Impl.h"
 
-#include "seos_err.h"
+#include "SeosError.h"
 #include "compiler.h"
 
 #include <stddef.h>

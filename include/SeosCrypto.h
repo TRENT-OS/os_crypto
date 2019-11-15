@@ -20,7 +20,7 @@
 #include "SeosCrypto_Handles.h"
 
 #include "compiler.h"
-#include "seos_err.h"
+#include "SeosError.h"
 
 /**
  * @brief initializes a crypto API context. Usually, no crypto context is needed

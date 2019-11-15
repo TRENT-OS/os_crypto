@@ -17,7 +17,7 @@
 #include "SeosCryptoCipher_Impl.h"
 
 #include "compiler.h"
-#include "seos_err.h"
+#include "SeosError.h"
 
 seos_err_t
 SeosCryptoCipher_init(SeosCryptoCipher*                 self,

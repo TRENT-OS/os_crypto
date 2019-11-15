@@ -17,7 +17,7 @@
 #include "SeosCryptoAgreement_Impl.h"
 
 #include "compiler.h"
-#include "seos_err.h"
+#include "SeosError.h"
 
 seos_err_t
 SeosCryptoAgreement_init(SeosCryptoAgreement*                   self,

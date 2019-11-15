@@ -109,8 +109,8 @@ target_include_directories(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME}
-    seos_libs
     seos_core_api
+    seos_libs
 )
 
 # if invoked from the SEOS sandbox, provide a documentation build target

@@ -20,7 +20,7 @@
 #include "SeosCryptoRpc_Impl.h"
 #include "SeosCrypto_Handles.h"
 
-#include "seos_err.h"
+#include "SeosError.h"
 #include "compiler.h"
 
 /**

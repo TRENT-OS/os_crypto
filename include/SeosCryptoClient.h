@@ -19,7 +19,7 @@
 #include "SeosCryptoRpc.h"
 
 #include "compiler.h"
-#include "seos_err.h"
+#include "SeosError.h"
 
 /**
  * @brief constructor of a seos crypto client

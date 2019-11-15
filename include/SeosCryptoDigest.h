@@ -16,7 +16,7 @@
 #include "SeosCryptoDigest_Impl.h"
 
 #include "compiler.h"
-#include "seos_err.h"
+#include "SeosError.h"
 
 #include <string.h>
 
