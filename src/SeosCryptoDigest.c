@@ -107,22 +107,38 @@ processImpl(SeosCryptoDigest*    self,
             const void*          data,
             const size_t         len)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
-
     switch (self->algorithm)
     {
     case SeosCryptoDigest_Algorithm_MD5:
-        retval = mbedtls_md5_update_ret(&self->mbedtls.md5, data, len) ?
-                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+        return mbedtls_md5_update_ret(&self->mbedtls.md5, data, len) ?
+               SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+    case SeosCryptoDigest_Algorithm_SHA256:
+        return mbedtls_sha256_update_ret(&self->mbedtls.sha256, data, len) ?
+               SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+    default:
+        return SEOS_ERROR_NOT_SUPPORTED;
+    }
+
+    return SEOS_ERROR_GENERIC;
+}
+
+static seos_err_t
+cloneImpl(SeosCryptoDigest*         self,
+          const SeosCryptoDigest*   source)
+{
+    switch (self->algorithm)
+    {
+    case SeosCryptoDigest_Algorithm_MD5:
+        mbedtls_md5_clone(&self->mbedtls.md5, &source->mbedtls.md5);
         break;
     case SeosCryptoDigest_Algorithm_SHA256:
-        retval = mbedtls_sha256_update_ret(&self->mbedtls.sha256, data, len) ?
-                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+        mbedtls_sha256_clone(&self->mbedtls.sha256, &source->mbedtls.sha256);
         break;
     default:
-        retval = SEOS_ERROR_NOT_SUPPORTED;
+        return SEOS_ERROR_NOT_SUPPORTED;
     }
-    return retval;
+
+    return SEOS_SUCCESS;
 }
 
 // Public Functions ------------------------------------------------------------
@@ -155,6 +171,20 @@ SeosCryptoDigest_free(SeosCryptoDigest*         self,
     }
 
     return freeImpl(self, memIf);
+}
+
+seos_err_t
+SeosCryptoDigest_clone(SeosCryptoDigest*         self,
+                       const SeosCryptoDigest*   source)
+{
+    if (NULL == self || NULL == source || self->algorithm != source->algorithm)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    self->processed = source->processed;
+
+    return cloneImpl(self, source);
 }
 
 seos_err_t

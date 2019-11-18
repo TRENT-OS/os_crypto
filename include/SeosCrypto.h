@@ -105,6 +105,11 @@ SeosCrypto_digestFree(SeosCryptoCtx*                api,
                       const SeosCrypto_DigestHandle digestHandle);
 
 seos_err_t
+SeosCrypto_digestClone(SeosCryptoCtx*                api,
+                       const SeosCrypto_DigestHandle dstDigHandle,
+                       const SeosCrypto_DigestHandle srcDigHandle);
+
+seos_err_t
 SeosCrypto_digestProcess(SeosCryptoCtx*                  api,
                          const SeosCrypto_DigestHandle   digestHandle,
                          const void*                     data,

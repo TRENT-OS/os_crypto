@@ -122,6 +122,15 @@ SeosCryptoApi_digestFree(SeosCryptoCtx*                 ctx,
 }
 
 seos_err_t
+SeosCryptoApi_digestClone(SeosCryptoCtx*                ctx,
+                          const SeosCrypto_DigestHandle dstDigHandle,
+                          const SeosCrypto_DigestHandle srcDigHandle)
+{
+    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
+           ctx->vtable->digestClone(ctx, dstDigHandle, srcDigHandle);
+}
+
+seos_err_t
 SeosCryptoApi_digestProcess(SeosCryptoCtx*                   ctx,
                             const SeosCrypto_DigestHandle    digestHandle,
                             const void*                      data,

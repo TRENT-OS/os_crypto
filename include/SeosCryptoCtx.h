@@ -73,6 +73,11 @@ typedef seos_err_t
                              const SeosCrypto_DigestHandle  digestHandle);
 
 typedef seos_err_t
+(*SeosCryptoCtx_digestCloneT)(SeosCryptoCtx*                 self,
+                              const SeosCrypto_DigestHandle  dstDigHandle,
+                              const SeosCrypto_DigestHandle  srcDigHandle);
+
+typedef seos_err_t
 (*SeosCryptoCtx_digestProcessT)(SeosCryptoCtx*                  self,
                                 const SeosCrypto_DigestHandle   digestHandle,
                                 const void*                     data,
@@ -224,6 +229,7 @@ typedef struct
     SeosCryptoCtx_macFinalizeT          macFinalize;
     SeosCryptoCtx_digestInitT           digestInit;
     SeosCryptoCtx_digestFreeT           digestFree;
+    SeosCryptoCtx_digestCloneT          digestClone;
     SeosCryptoCtx_digestProcessT        digestProcess;
     SeosCryptoCtx_digestFinalizeT       digestFinalize;
     SeosCryptoCtx_keyGenerateT          keyGenerate;

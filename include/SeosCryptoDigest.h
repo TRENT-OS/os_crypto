@@ -28,6 +28,10 @@ SeosCryptoDigest_free(SeosCryptoDigest*         self,
                       const SeosCrypto_MemIf*   memIf);
 
 seos_err_t
+SeosCryptoDigest_clone(SeosCryptoDigest*         self,
+                       const SeosCryptoDigest*   source);
+
+seos_err_t
 SeosCryptoDigest_process(SeosCryptoDigest*   self,
                          const void*         data,
                          const size_t        dataLen);

@@ -166,6 +166,15 @@ SeosCryptoRpc_digestFree(SeosCryptoRpc*            self,
 }
 
 seos_err_t
+SeosCryptoRpc_digestClone(SeosCryptoRpc*            self,
+                          SeosCrypto_DigestHandle   dstDigHandle,
+                          SeosCrypto_DigestHandle   srcDigHandle)
+{
+    return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_digestClone(self->seosCryptoApi, dstDigHandle, srcDigHandle);
+}
+
+seos_err_t
 SeosCryptoRpc_digestProcess(SeosCryptoRpc*           self,
                             SeosCrypto_DigestHandle  digestHandle,
                             size_t                   inLen)

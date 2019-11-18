@@ -20,6 +20,7 @@ static const SeosCryptoCtx_Vtable SeosCryptoClient_vtable =
     .macFinalize        = SeosCryptoClient_macFinalize,
     .digestInit         = SeosCryptoClient_digestInit,
     .digestFree         = SeosCryptoClient_digestFree,
+    .digestClone        = SeosCryptoClient_digestClone,
     .digestProcess      = SeosCryptoClient_digestProcess,
     .digestFinalize     = SeosCryptoClient_digestFinalize,
     .keyGenerate        = SeosCryptoClient_keyGenerate,
@@ -256,6 +257,21 @@ SeosCryptoClient_digestFree(SeosCryptoCtx*                  api,
     }
 
     return SeosCryptoRpc_digestFree(self->rpcHandle, digestHandle);
+}
+
+seos_err_t
+SeosCryptoClient_digestClone(SeosCryptoCtx*                 api,
+                             const SeosCrypto_DigestHandle  dstDigHandle,
+                             const SeosCrypto_DigestHandle  srcDigHandle)
+{
+    SeosCryptoClient* self = (SeosCryptoClient*) api;
+
+    if (NULL == api || self->parent.vtable != &SeosCryptoClient_vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    return SeosCryptoRpc_digestClone(self->rpcHandle, dstDigHandle, srcDigHandle);
 }
 
 seos_err_t
