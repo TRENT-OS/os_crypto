@@ -66,6 +66,10 @@ SeosCryptoApi_macStart(SeosCryptoCtx*               ctx,
                        const void*                  secret,
                        const size_t                 secretSize)
 {
+    if (secretSize > SeosCrypto_Size_BUFFER)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
            ctx->vtable->macStart(ctx, macHandle, secret, secretSize);
 }
@@ -76,6 +80,10 @@ SeosCryptoApi_macProcess(SeosCryptoCtx*             ctx,
                          const void*                data,
                          const size_t               dataSize)
 {
+    if (dataSize > SeosCrypto_Size_BUFFER)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
            ctx->vtable->macProcess(ctx, macHandle, data, dataSize);
 }
@@ -86,6 +94,10 @@ SeosCryptoApi_macFinalize(SeosCryptoCtx*                ctx,
                           void*                         mac,
                           size_t*                       macSize)
 {
+    if (NULL != macSize && *macSize > SeosCrypto_Size_BUFFER)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
            ctx->vtable->macFinalize(ctx, macHandle, mac, macSize);
 }

@@ -15,8 +15,8 @@
 #include "SeosCrypto_Impl.h"
 #include "SeosCryptoMac_Impl.h"
 
+#include "SeosError.h"
 #include "compiler.h"
-#include "seos_err.h"
 
 seos_err_t
 SeosCryptoMac_init(SeosCryptoMac*                 self,

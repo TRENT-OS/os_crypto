@@ -173,7 +173,7 @@ SeosCryptoClient_macStart(SeosCryptoCtx*                api,
     }
 
     memcpy(self->clientDataport, secret, secretSize);
-    return SeosCryptoRpc_macProcess(self->rpcHandle, macHandle, secretSize);
+    return SeosCryptoRpc_macStart(self->rpcHandle, macHandle, secretSize);
 }
 
 seos_err_t

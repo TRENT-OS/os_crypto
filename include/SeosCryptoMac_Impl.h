@@ -15,8 +15,6 @@
 #include "LibDebug/Debug.h"
 
 #include "mbedtls/md.h"
-#include "mbedtls/md5.h"
-#include "mbedtls/sha256.h"
 
 #include <stdbool.h>
 
@@ -35,8 +33,7 @@ typedef struct
 {
     union
     {
-        mbedtls_md5_context     md5;
-        mbedtls_sha256_context  sha256;
+        mbedtls_md_context_t    md;
     }
     mbedtls;
 
