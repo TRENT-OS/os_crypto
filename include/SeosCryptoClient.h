@@ -56,6 +56,35 @@ SeosCryptoClient_rngReSeed(SeosCryptoCtx*   self,
                            const void*      seed,
                            const size_t     seedLen);
 
+// -------------------------------- MAC API ------------------------------------
+
+seos_err_t
+SeosCryptoClient_macInit(SeosCryptoCtx*                 api,
+                         SeosCrypto_MacHandle*          pMacHandle,
+                         const SeosCryptoMac_Algorithm  algorithm);
+
+seos_err_t
+SeosCryptoClient_macFree(SeosCryptoCtx*             api,
+                         const SeosCrypto_MacHandle macHandle);
+
+seos_err_t
+SeosCryptoClient_macStart(SeosCryptoCtx*                api,
+                          const SeosCrypto_MacHandle    macHandle,
+                          const void*                   secret,
+                          const size_t                  secretSize);
+
+seos_err_t
+SeosCryptoClient_macProcess(SeosCryptoCtx*              api,
+                            const SeosCrypto_MacHandle  macHandle,
+                            const void*                 data,
+                            const size_t                dataLen);
+
+seos_err_t
+SeosCryptoClient_macFinalize(SeosCryptoCtx*             api,
+                             const SeosCrypto_MacHandle macHandle,
+                             void*                      mac,
+                             size_t*                    macSize);
+
 // ------------------------------ Digest API -----------------------------------
 
 seos_err_t

@@ -94,6 +94,58 @@ SeosCryptoRpc_rngReSeed(SeosCryptoRpc* self,
            SeosCrypto_rngReSeed(self->seosCryptoApi, self->serverDataport, seedLen);
 }
 
+
+// ------------------------------ Digest API -----------------------------------
+
+seos_err_t
+SeosCryptoRpc_macInit(SeosCryptoRpc*            self,
+                      SeosCrypto_MacHandle*     pMacHandle,
+                      SeosCryptoMac_Algorithm   algorithm)
+{
+    return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_macInit(self->seosCryptoApi, pMacHandle, algorithm);
+}
+
+seos_err_t
+SeosCryptoRpc_macFree(SeosCryptoRpc*        self,
+                      SeosCrypto_MacHandle  macHandle)
+{
+    return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_macFree(self->seosCryptoApi, macHandle);
+}
+
+seos_err_t
+SeosCryptoRpc_macStart(SeosCryptoRpc*       self,
+                       SeosCrypto_MacHandle macHandle,
+                       size_t               secretSize)
+{
+    return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_macStart(self->seosCryptoApi, macHandle,
+                               self->serverDataport, secretSize);
+}
+
+seos_err_t
+SeosCryptoRpc_macProcess(SeosCryptoRpc*         self,
+                         SeosCrypto_MacHandle   macHandle,
+                         size_t                 dataSize)
+{
+    return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_macProcess(self->seosCryptoApi, macHandle,
+                                 self->serverDataport, dataSize);
+}
+
+seos_err_t
+SeosCryptoRpc_macFinalize(SeosCryptoRpc*        self,
+                          SeosCrypto_MacHandle  macHandle,
+                          size_t*               macSize)
+{
+    *macSize = (*macSize <= SeosCrypto_Size_DATAPORT) ? *macSize :
+               SeosCrypto_Size_DATAPORT;
+    return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
+           SeosCrypto_macFinalize(self->seosCryptoApi, macHandle,
+                                  self->serverDataport, macSize);
+}
+
 // ------------------------------ Digest API -----------------------------------
 
 seos_err_t

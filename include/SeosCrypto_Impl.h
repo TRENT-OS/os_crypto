@@ -50,6 +50,7 @@ typedef struct
     SeosCrypto_MemIf    memIf;
     SeosCryptoRng       cryptoRng;
     PointerVector       keyHandleVector;
+    PointerVector       macHandleVector;
     PointerVector       digestHandleVector;
     PointerVector       cipherHandleVector;
     PointerVector       signatureHandleVector;

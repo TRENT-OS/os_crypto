@@ -48,14 +48,16 @@ SeosCryptoApi_macInit(SeosCryptoCtx*                    ctx,
                       SeosCrypto_MacHandle*             pMacHandle,
                       const SeosCryptoMac_Algorithm     algorithm)
 {
-    return SEOS_ERROR_NOT_SUPPORTED;
+    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
+           ctx->vtable->macInit(ctx, pMacHandle, algorithm);
 }
 
 seos_err_t
 SeosCryptoApi_macFree(SeosCryptoCtx*                ctx,
                       const SeosCrypto_MacHandle    macHandle)
 {
-    return SEOS_ERROR_NOT_SUPPORTED;
+    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
+           ctx->vtable->macFree(ctx, macHandle);
 }
 
 seos_err_t
@@ -64,7 +66,8 @@ SeosCryptoApi_macStart(SeosCryptoCtx*               ctx,
                        const void*                  secret,
                        const size_t                 secretSize)
 {
-    return SEOS_ERROR_NOT_SUPPORTED;
+    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
+           ctx->vtable->macStart(ctx, macHandle, secret, secretSize);
 }
 
 seos_err_t
@@ -73,7 +76,8 @@ SeosCryptoApi_macProcess(SeosCryptoCtx*             ctx,
                          const void*                data,
                          const size_t               dataSize)
 {
-    return SEOS_ERROR_NOT_SUPPORTED;
+    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
+           ctx->vtable->macProcess(ctx, macHandle, data, dataSize);
 }
 
 seos_err_t
@@ -82,7 +86,8 @@ SeosCryptoApi_macFinalize(SeosCryptoCtx*                ctx,
                           void*                         mac,
                           size_t*                       macSize)
 {
-    return SEOS_ERROR_NOT_SUPPORTED;
+    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
+           ctx->vtable->macFinalize(ctx, macHandle, mac, macSize);
 }
 
 // ------------------------------ Digest API -----------------------------------

@@ -17,32 +17,37 @@
 
 static const SeosCryptoCtx_Vtable SeosCrypto_vtable =
 {
-    .rngGetBytes         = SeosCrypto_rngGetBytes,
-    .rngReSeed           = SeosCrypto_rngReSeed,
-    .digestInit          = SeosCrypto_digestInit,
-    .digestFree          = SeosCrypto_digestFree,
-    .digestProcess       = SeosCrypto_digestProcess,
-    .digestFinalize      = SeosCrypto_digestFinalize,
-    .keyGenerate         = SeosCrypto_keyGenerate,
-    .keyMakePublic       = SeosCrypto_keyMakePublic,
-    .keyImport           = SeosCrypto_keyImport,
-    .keyExport           = SeosCrypto_keyExport,
-    .keyGetParams        = SeosCrypto_keyGetParams,
-    .keyLoadParams       = SeosCrypto_keyLoadParams,
-    .keyFree             = SeosCrypto_keyFree,
-    .signatureInit       = SeosCrypto_signatureInit,
-    .signatureFree       = SeosCrypto_signatureFree,
-    .signatureSign       = SeosCrypto_signatureSign,
-    .signatureVerify     = SeosCrypto_signatureVerify,
-    .agreementInit       = SeosCrypto_agreementInit,
-    .agreementFree       = SeosCrypto_agreementFree,
-    .agreementAgree      = SeosCrypto_agreementAgree,
-    .cipherInit          = SeosCrypto_cipherInit,
-    .cipherFree          = SeosCrypto_cipherFree,
-    .cipherProcess       = SeosCrypto_cipherProcess,
-    .cipherStart         = SeosCrypto_cipherStart,
-    .cipherFinalize      = SeosCrypto_cipherFinalize,
-    .free                = SeosCrypto_free
+    .rngGetBytes        = SeosCrypto_rngGetBytes,
+    .rngReSeed          = SeosCrypto_rngReSeed,
+    .macInit            = SeosCrypto_macInit,
+    .macFree            = SeosCrypto_macFree,
+    .macStart           = SeosCrypto_macStart,
+    .macProcess         = SeosCrypto_macProcess,
+    .macFinalize        = SeosCrypto_macFinalize,
+    .digestInit         = SeosCrypto_digestInit,
+    .digestFree         = SeosCrypto_digestFree,
+    .digestProcess      = SeosCrypto_digestProcess,
+    .digestFinalize     = SeosCrypto_digestFinalize,
+    .keyGenerate        = SeosCrypto_keyGenerate,
+    .keyMakePublic      = SeosCrypto_keyMakePublic,
+    .keyImport          = SeosCrypto_keyImport,
+    .keyExport          = SeosCrypto_keyExport,
+    .keyGetParams       = SeosCrypto_keyGetParams,
+    .keyLoadParams      = SeosCrypto_keyLoadParams,
+    .keyFree            = SeosCrypto_keyFree,
+    .signatureInit      = SeosCrypto_signatureInit,
+    .signatureFree      = SeosCrypto_signatureFree,
+    .signatureSign      = SeosCrypto_signatureSign,
+    .signatureVerify    = SeosCrypto_signatureVerify,
+    .agreementInit      = SeosCrypto_agreementInit,
+    .agreementFree      = SeosCrypto_agreementFree,
+    .agreementAgree     = SeosCrypto_agreementAgree,
+    .cipherInit         = SeosCrypto_cipherInit,
+    .cipherFree         = SeosCrypto_cipherFree,
+    .cipherProcess      = SeosCrypto_cipherProcess,
+    .cipherStart        = SeosCrypto_cipherStart,
+    .cipherFinalize     = SeosCrypto_cipherFinalize,
+    .free               = SeosCrypto_free
 };
 
 // Private static functions ----------------------------------------------------
@@ -95,45 +100,53 @@ SeosCrypto_init(SeosCrypto*                 self,
     {
         return SEOS_ERROR_ABORTED;
     }
-    else if (!PointerVector_ctor(&self->keyHandleVector, 1))
+    else if (!PointerVector_ctor(&self->macHandleVector, 1))
     {
         retval = SEOS_ERROR_ABORTED;
         goto err0;
     }
-    else if (!PointerVector_ctor(&self->cipherHandleVector, 1))
+    else if (!PointerVector_ctor(&self->keyHandleVector, 1))
     {
         retval = SEOS_ERROR_ABORTED;
         goto err1;
     }
-    else if (!PointerVector_ctor(&self->signatureHandleVector, 1))
+    else if (!PointerVector_ctor(&self->cipherHandleVector, 1))
     {
         retval = SEOS_ERROR_ABORTED;
         goto err2;
     }
-    else if (!PointerVector_ctor(&self->agreementHandleVector, 1))
+    else if (!PointerVector_ctor(&self->signatureHandleVector, 1))
     {
         retval = SEOS_ERROR_ABORTED;
         goto err3;
+    }
+    else if (!PointerVector_ctor(&self->agreementHandleVector, 1))
+    {
+        retval = SEOS_ERROR_ABORTED;
+        goto err4;
     }
 
     if ((retval = SeosCryptoRng_init(&self->cryptoRng, &self->memIf,
                                      (const SeosCrypto_EntropyFunc*) cbFuncs->entropy, entropyCtx)) != SEOS_SUCCESS)
     {
-        goto err4;
+        goto err5;
     }
 
     return retval;
 
-err4:
+err5:
     PointerVector_dtor(&self->agreementHandleVector);
-err3:
+err4:
     PointerVector_dtor(&self->signatureHandleVector);
-err2:
+err3:
     PointerVector_dtor(&self->cipherHandleVector);
-err1:
+err2:
     PointerVector_dtor(&self->keyHandleVector);
+err1:
+    PointerVector_dtor(&self->macHandleVector);
 err0:
     PointerVector_dtor(&self->digestHandleVector);
+
     return retval;
 }
 
@@ -148,6 +161,7 @@ SeosCrypto_free(SeosCryptoCtx* api)
     PointerVector_dtor(&self->signatureHandleVector);
     PointerVector_dtor(&self->cipherHandleVector);
     PointerVector_dtor(&self->keyHandleVector);
+    PointerVector_dtor(&self->macHandleVector);
     PointerVector_dtor(&self->digestHandleVector);
 
     return SEOS_SUCCESS;
@@ -184,6 +198,131 @@ SeosCrypto_rngReSeed(SeosCryptoCtx* api,
     }
 
     return SeosCryptoRng_reSeed(&self->cryptoRng, seed, seedLen);
+}
+
+// -------------------------------- MAC API ------------------------------------
+
+seos_err_t
+SeosCrypto_macInit(SeosCryptoCtx*                   api,
+                   SeosCrypto_MacHandle*            pMacHandle,
+                   const SeosCryptoMac_Algorithm    algorithm)
+{
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+    SeosCrypto* self = (SeosCrypto*) api;
+
+    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable
+        || NULL == pMacHandle)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else if ((*pMacHandle = self->memIf.malloc(sizeof(SeosCryptoMac))) == NULL)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
+
+    if ((retval = SeosCryptoMac_init(*pMacHandle, &self->memIf,
+                                     algorithm)) != SEOS_SUCCESS)
+    {
+        goto err0;
+    }
+    else if (!PointerVector_pushBack(&self->macHandleVector, *pMacHandle))
+    {
+        retval = SEOS_ERROR_INSUFFICIENT_SPACE;
+        goto err1;
+    }
+
+    return SEOS_SUCCESS;
+
+err1:
+    SeosCryptoMac_free(*pMacHandle, &self->memIf);
+err0:
+    self->memIf.free(*pMacHandle);
+
+    return retval;
+}
+
+seos_err_t
+SeosCrypto_macFree(SeosCryptoCtx*               api,
+                   const SeosCrypto_MacHandle   macHandle)
+{
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+    SeosCrypto* self = (SeosCrypto*) api;
+    size_t handlePos;
+
+    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    if ((handlePos = SeosCrypto_findHandle(&self->macHandleVector,
+                                           macHandle)) != -1)
+    {
+        if ((retval = SeosCryptoMac_free(macHandle, &self->memIf)) == SEOS_SUCCESS)
+        {
+            SeosCrypto_removeHandle(&self->macHandleVector, handlePos);
+            self->memIf.free(macHandle);
+        }
+    }
+    else
+    {
+        retval = SEOS_ERROR_INVALID_HANDLE;
+    }
+
+    return retval;
+}
+
+seos_err_t
+SeosCrypto_macStart(SeosCryptoCtx*              api,
+                    const SeosCrypto_MacHandle  macHandle,
+                    const void*                 secret,
+                    const size_t                secretSize)
+{
+    SeosCrypto* self = (SeosCrypto*) api;
+
+    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    return SeosCrypto_findHandle(&self->macHandleVector, macHandle) == -1 ?
+           SEOS_ERROR_INVALID_HANDLE :
+           SeosCryptoMac_start(macHandle, secret, secretSize);
+}
+
+seos_err_t
+SeosCrypto_macProcess(SeosCryptoCtx*                api,
+                      const SeosCrypto_MacHandle    macHandle,
+                      const void*                   data,
+                      const size_t                  dataLen)
+{
+    SeosCrypto* self = (SeosCrypto*) api;
+
+    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    return SeosCrypto_findHandle(&self->macHandleVector, macHandle) == -1 ?
+           SEOS_ERROR_INVALID_HANDLE :
+           SeosCryptoMac_process(macHandle, data, dataLen);
+}
+
+seos_err_t
+SeosCrypto_macFinalize(SeosCryptoCtx*               api,
+                       const SeosCrypto_MacHandle   macHandle,
+                       void*                        mac,
+                       size_t*                      macSize)
+{
+    SeosCrypto* self = (SeosCrypto*) api;
+
+    if (NULL == api || self->parent.vtable != &SeosCrypto_vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    return SeosCrypto_findHandle(&self->macHandleVector, macHandle) == -1 ?
+           SEOS_ERROR_INVALID_HANDLE :
+           SeosCryptoMac_finalize(macHandle, mac, macSize);
 }
 
 // ------------------------------ Digest API -----------------------------------

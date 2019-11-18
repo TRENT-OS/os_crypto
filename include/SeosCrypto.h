@@ -14,6 +14,7 @@
 #include "SeosCryptoRng_Impl.h"
 #include "SeosCryptoKey_Impl.h"
 #include "SeosCryptoDigest_Impl.h"
+#include "SeosCryptoDigest_Impl.h"
 #include "SeosCryptoCipher_Impl.h"
 #include "SeosCrypto_Impl.h"
 
@@ -62,6 +63,35 @@ seos_err_t
 SeosCrypto_rngReSeed(SeosCryptoCtx*     api,
                      const void*        seed,
                      const size_t       seedLen);
+
+// -------------------------------- MAC API ------------------------------------
+
+seos_err_t
+SeosCrypto_macInit(SeosCryptoCtx*                   api,
+                   SeosCrypto_MacHandle*            pMacHandle,
+                   const SeosCryptoMac_Algorithm    algorithm);
+
+seos_err_t
+SeosCrypto_macFree(SeosCryptoCtx*               api,
+                   const SeosCrypto_MacHandle   macHandle);
+
+seos_err_t
+SeosCrypto_macStart(SeosCryptoCtx*              api,
+                    const SeosCrypto_MacHandle  macHandle,
+                    const void*                 secret,
+                    const size_t                secretSize);
+
+seos_err_t
+SeosCrypto_macProcess(SeosCryptoCtx*                api,
+                      const SeosCrypto_MacHandle    macHandle,
+                      const void*                   data,
+                      const size_t                  dataLen);
+
+seos_err_t
+SeosCrypto_macFinalize(SeosCryptoCtx*               api,
+                       const SeosCrypto_MacHandle   macHandle,
+                       void*                        mac,
+                       size_t*                      macSize);
 
 // ------------------------------ Digest API -----------------------------------
 

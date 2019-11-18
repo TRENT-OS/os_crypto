@@ -63,6 +63,32 @@ seos_err_t
 SeosCryptoRpc_rngReSeed(SeosCryptoRpc*      self,
                         size_t              seedLen);
 
+// -------------------------------- MAC API ------------------------------------
+
+seos_err_t
+SeosCryptoRpc_macInit(SeosCryptoRpc*            self,
+                      SeosCrypto_MacHandle*     pMacHandle,
+                      SeosCryptoMac_Algorithm   algorithm);
+
+seos_err_t
+SeosCryptoRpc_macFree(SeosCryptoRpc*        self,
+                      SeosCrypto_MacHandle  macHandle);
+
+seos_err_t
+SeosCryptoRpc_macStart(SeosCryptoRpc*       self,
+                       SeosCrypto_MacHandle macHandle,
+                       size_t               secretSize);
+
+seos_err_t
+SeosCryptoRpc_macProcess(SeosCryptoRpc*         self,
+                         SeosCrypto_MacHandle   macHandle,
+                         size_t                 dataSize);
+
+seos_err_t
+SeosCryptoRpc_macFinalize(SeosCryptoRpc*        self,
+                          SeosCrypto_MacHandle  macHandle,
+                          size_t*               macSize);
+
 // ------------------------------ Digest API -----------------------------------
 
 seos_err_t

@@ -11,32 +11,37 @@
 
 static const SeosCryptoCtx_Vtable SeosCryptoClient_vtable =
 {
-    .rngGetBytes          = SeosCryptoClient_rngGetBytes,
-    .rngReSeed            = SeosCryptoClient_rngReSeed,
-    .digestInit           = SeosCryptoClient_digestInit,
-    .digestFree           = SeosCryptoClient_digestFree,
-    .digestProcess        = SeosCryptoClient_digestProcess,
-    .digestFinalize       = SeosCryptoClient_digestFinalize,
-    .keyGenerate          = SeosCryptoClient_keyGenerate,
-    .keyMakePublic        = SeosCryptoClient_keyMakePublic,
-    .keyImport            = SeosCryptoClient_keyImport,
-    .keyExport            = SeosCryptoClient_keyExport,
-    .keyGetParams         = SeosCryptoClient_keyGetParams,
-    .keyLoadParams        = SeosCryptoClient_keyLoadParams,
-    .keyFree              = SeosCryptoClient_keyFree,
-    .signatureInit        = SeosCryptoClient_signatureInit,
-    .signatureFree        = SeosCryptoClient_signatureFree,
-    .signatureSign        = SeosCryptoClient_signatureSign,
-    .signatureVerify      = SeosCryptoClient_signatureVerify,
-    .agreementInit        = SeosCryptoClient_agreementInit,
-    .agreementFree        = SeosCryptoClient_agreementFree,
-    .agreementAgree       = SeosCryptoClient_agreementAgree,
-    .cipherInit           = SeosCryptoClient_cipherInit,
-    .cipherFree           = SeosCryptoClient_cipherFree,
-    .cipherProcess        = SeosCryptoClient_cipherProcess,
-    .cipherStart          = SeosCryptoClient_cipherStart,
-    .cipherFinalize       = SeosCryptoClient_cipherFinalize,
-    .free                 = SeosCryptoClient_free
+    .rngGetBytes        = SeosCryptoClient_rngGetBytes,
+    .rngReSeed          = SeosCryptoClient_rngReSeed,
+    .macInit            = SeosCryptoClient_macInit,
+    .macFree            = SeosCryptoClient_macFree,
+    .macStart           = SeosCryptoClient_macStart,
+    .macProcess         = SeosCryptoClient_macProcess,
+    .macFinalize        = SeosCryptoClient_macFinalize,
+    .digestInit         = SeosCryptoClient_digestInit,
+    .digestFree         = SeosCryptoClient_digestFree,
+    .digestProcess      = SeosCryptoClient_digestProcess,
+    .digestFinalize     = SeosCryptoClient_digestFinalize,
+    .keyGenerate        = SeosCryptoClient_keyGenerate,
+    .keyMakePublic      = SeosCryptoClient_keyMakePublic,
+    .keyImport          = SeosCryptoClient_keyImport,
+    .keyExport          = SeosCryptoClient_keyExport,
+    .keyGetParams       = SeosCryptoClient_keyGetParams,
+    .keyLoadParams      = SeosCryptoClient_keyLoadParams,
+    .keyFree            = SeosCryptoClient_keyFree,
+    .signatureInit      = SeosCryptoClient_signatureInit,
+    .signatureFree      = SeosCryptoClient_signatureFree,
+    .signatureSign      = SeosCryptoClient_signatureSign,
+    .signatureVerify    = SeosCryptoClient_signatureVerify,
+    .agreementInit      = SeosCryptoClient_agreementInit,
+    .agreementFree      = SeosCryptoClient_agreementFree,
+    .agreementAgree     = SeosCryptoClient_agreementAgree,
+    .cipherInit         = SeosCryptoClient_cipherInit,
+    .cipherFree         = SeosCryptoClient_cipherFree,
+    .cipherProcess      = SeosCryptoClient_cipherProcess,
+    .cipherStart        = SeosCryptoClient_cipherStart,
+    .cipherFinalize     = SeosCryptoClient_cipherFinalize,
+    .free               = SeosCryptoClient_free
 };
 
 // Public functions ------------------------------------------------------------
@@ -115,6 +120,110 @@ SeosCryptoClient_rngReSeed(SeosCryptoCtx*   api,
 
     memcpy(self->clientDataport, seed, seedLen);
     return SeosCryptoRpc_rngReSeed(self->rpcHandle, seedLen);
+}
+
+// ------------------------------- MAC API -------------------------------------
+
+seos_err_t
+SeosCryptoClient_macInit(SeosCryptoCtx*                 api,
+                         SeosCrypto_MacHandle*          pMacHandle,
+                         const SeosCryptoMac_Algorithm  algorithm)
+{
+    SeosCryptoClient* self = (SeosCryptoClient*) api;
+
+    if (NULL == api || self->parent.vtable != &SeosCryptoClient_vtable
+        || NULL == pMacHandle)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    return SeosCryptoRpc_macInit(self->rpcHandle, pMacHandle, algorithm);
+}
+
+seos_err_t
+SeosCryptoClient_macFree(SeosCryptoCtx*             api,
+                         const SeosCrypto_MacHandle macHandle)
+{
+    SeosCryptoClient* self = (SeosCryptoClient*) api;
+
+    if (NULL == api || self->parent.vtable != &SeosCryptoClient_vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    return SeosCryptoRpc_macFree(self->rpcHandle, macHandle);
+}
+
+seos_err_t
+SeosCryptoClient_macStart(SeosCryptoCtx*                api,
+                          const SeosCrypto_MacHandle    macHandle,
+                          const void*                   secret,
+                          const size_t                  secretSize)
+{
+    SeosCryptoClient* self = (SeosCryptoClient*) api;
+
+    if (NULL == api || self->parent.vtable != &SeosCryptoClient_vtable
+        || NULL == secret || 0 == secretSize)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else if (secretSize > SeosCrypto_Size_DATAPORT)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
+
+    memcpy(self->clientDataport, secret, secretSize);
+    return SeosCryptoRpc_macProcess(self->rpcHandle, macHandle, secretSize);
+}
+
+seos_err_t
+SeosCryptoClient_macProcess(SeosCryptoCtx*              api,
+                            const SeosCrypto_MacHandle  macHandle,
+                            const void*                 data,
+                            const size_t                dataLen)
+{
+    SeosCryptoClient* self = (SeosCryptoClient*) api;
+
+    if (NULL == api || self->parent.vtable != &SeosCryptoClient_vtable
+        || NULL == data || 0 == dataLen)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else if (dataLen > SeosCrypto_Size_DATAPORT)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
+
+    memcpy(self->clientDataport, data, dataLen);
+    return SeosCryptoRpc_macProcess(self->rpcHandle, macHandle, dataLen);
+}
+
+seos_err_t
+SeosCryptoClient_macFinalize(SeosCryptoCtx*             api,
+                             const SeosCrypto_MacHandle macHandle,
+                             void*                      mac,
+                             size_t*                    macSize)
+{
+    seos_err_t retval = SEOS_ERROR_GENERIC;
+    SeosCryptoClient* self = (SeosCryptoClient*) api;
+
+    if (NULL == api || self->parent.vtable != &SeosCryptoClient_vtable
+        || NULL == mac || NULL == macSize)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    if ((retval = SeosCryptoRpc_macFinalize(self->rpcHandle, macHandle,
+                                            macSize)) == SEOS_SUCCESS)
+    {
+        if (*macSize > SeosCrypto_Size_DATAPORT)
+        {
+            return SEOS_ERROR_INSUFFICIENT_SPACE;
+        }
+        memcpy(mac, self->clientDataport, *macSize);
+    }
+
+    return retval;
 }
 
 // ------------------------------ Digest API -----------------------------------
