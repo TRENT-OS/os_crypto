@@ -20,10 +20,11 @@
 
 #include <stdbool.h>
 
-#define SeosCryptoCipher_AES_BLOCK_SIZE         16
-#define SeosCryptoCipher_AES_CBC_IV_SIZE        16
-#define SeosCryptoCipher_AES_GCM_IV_SIZE        12
-#define SeosCryptoCipher_AES_GCM_TAG_SIZE       16
+#define SeosCryptoCipher_Size_AES_BLOCK         16
+#define SeosCryptoCipher_Size_AES_CBC_IV        16
+#define SeosCryptoCipher_Size_AES_GCM_IV        12
+#define SeosCryptoCipher_Size_AES_GCM_TAG_MIN   4
+#define SeosCryptoCipher_Size_AES_GCM_TAG_MAX   SeosCryptoCipher_Size_AES_BLOCK
 
 typedef enum
 {
@@ -51,7 +52,7 @@ typedef struct
 
     SeosCryptoCipher_Algorithm  algorithm;
     const SeosCryptoKey*        key;
-    unsigned char               iv[SeosCryptoCipher_AES_BLOCK_SIZE];
+    unsigned char               iv[SeosCryptoCipher_Size_AES_BLOCK];
     size_t                      ivLen;
     size_t                      inputLen;
     bool                        started;

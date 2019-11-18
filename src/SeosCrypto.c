@@ -383,7 +383,7 @@ SeosCrypto_signatureSign(SeosCryptoCtx*                     api,
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if (hashSize > SeosCrypto_BUFFER_SIZE)
+    else if (hashSize > SeosCrypto_Size_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -843,7 +843,7 @@ SeosCrypto_cipherProcess(SeosCryptoCtx*                  api,
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if (inputSize > SeosCrypto_BUFFER_SIZE)
+    else if (inputSize > SeosCrypto_Size_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }

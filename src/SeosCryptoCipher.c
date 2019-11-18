@@ -135,7 +135,7 @@ setIvImpl(SeosCryptoCipher* self,
     {
     case SeosCryptoCipher_Algorithm_AES_CBC_ENC:
     case SeosCryptoCipher_Algorithm_AES_CBC_DEC:
-        retval = (iv == NULL || ivLen != SeosCryptoCipher_AES_CBC_IV_SIZE) ?
+        retval = (iv == NULL || ivLen != SeosCryptoCipher_Size_AES_CBC_IV) ?
                  SEOS_ERROR_INVALID_PARAMETER : SEOS_SUCCESS;
         break;
     case SeosCryptoCipher_Algorithm_AES_ECB_ENC:
@@ -146,7 +146,7 @@ setIvImpl(SeosCryptoCipher* self,
     case SeosCryptoCipher_Algorithm_AES_GCM_DEC:
         // We only support 96 bits of IV for GCM
         retval = (iv == NULL || ivLen == 0) ? SEOS_ERROR_INVALID_PARAMETER :
-                 (ivLen != SeosCryptoCipher_AES_GCM_IV_SIZE) ? SEOS_ERROR_NOT_SUPPORTED :
+                 (ivLen != SeosCryptoCipher_Size_AES_GCM_IV) ? SEOS_ERROR_NOT_SUPPORTED :
                  SEOS_SUCCESS;
         break;
     default:
@@ -181,7 +181,7 @@ processImpl(SeosCryptoCipher*    self,
         {
         case SeosCryptoCipher_Algorithm_AES_ECB_ENC:
         case SeosCryptoCipher_Algorithm_AES_ECB_DEC:
-            if  (inputSize % SeosCryptoCipher_AES_BLOCK_SIZE)
+            if  (inputSize % SeosCryptoCipher_Size_AES_BLOCK)
             {
                 retval = SEOS_ERROR_INVALID_PARAMETER;
             }
@@ -191,7 +191,7 @@ processImpl(SeosCryptoCipher*    self,
                 int mode = (self->algorithm == SeosCryptoCipher_Algorithm_AES_ECB_ENC) ?
                            MBEDTLS_AES_ENCRYPT : MBEDTLS_AES_DECRYPT;
                 retval = SEOS_SUCCESS;
-                for (offs = 0; offs < inputSize; offs += SeosCryptoCipher_AES_BLOCK_SIZE)
+                for (offs = 0; offs < inputSize; offs += SeosCryptoCipher_Size_AES_BLOCK)
                 {
                     if (mbedtls_aes_crypt_ecb(&self->mbedtls.aes, mode, input + offs,
                                               output + offs) != 0)
@@ -204,7 +204,7 @@ processImpl(SeosCryptoCipher*    self,
             break;
         case SeosCryptoCipher_Algorithm_AES_CBC_ENC:
         case SeosCryptoCipher_Algorithm_AES_CBC_DEC:
-            if (inputSize % SeosCryptoCipher_AES_BLOCK_SIZE)
+            if (inputSize % SeosCryptoCipher_Size_AES_BLOCK)
             {
                 retval = SEOS_ERROR_INVALID_PARAMETER;
             }
@@ -223,7 +223,7 @@ processImpl(SeosCryptoCipher*    self,
             // blocksize ONLY if we do it in the last call before calling finish. Here
             // we check that the user is not calling update after having already fed a
             // non-aligned block.
-            retval = (self->inputLen % SeosCryptoCipher_AES_BLOCK_SIZE) ||
+            retval = (self->inputLen % SeosCryptoCipher_Size_AES_BLOCK) ||
                      !self->started || self->finalized ||
                      mbedtls_gcm_update(&self->mbedtls.gcm, inputSize, input,
                                         output) ? SEOS_ERROR_ABORTED : SEOS_SUCCESS;
@@ -302,10 +302,15 @@ finalizeImpl(SeosCryptoCipher* self,
     {
     case SeosCryptoCipher_Algorithm_AES_GCM_DEC:
     {
-        unsigned char check[SeosCryptoCipher_AES_GCM_TAG_SIZE];
+        unsigned char check[SeosCryptoCipher_Size_AES_GCM_TAG_MAX];
+
+        if (*bufSize < SeosCryptoCipher_Size_AES_GCM_TAG_MIN)
+        {
+            return SEOS_ERROR_INVALID_PARAMETER;
+        }
         // Recompute the tag and compare it; bufSize is used here as INPUT param,
         // so we can compare at least TAG_SIZE bytes, but it can also be less
-        retval = (*bufSize > SeosCryptoCipher_AES_GCM_TAG_SIZE) ||
+        retval = (*bufSize > SeosCryptoCipher_Size_AES_GCM_TAG_MAX) ||
                  !self->started || !self->processed || self->finalized ||
                  mbedtls_gcm_finish(&self->mbedtls.gcm, check, *bufSize) != 0 ||
                  cmemcmp(buf, check, *bufSize) != 0 ?
@@ -314,16 +319,16 @@ finalizeImpl(SeosCryptoCipher* self,
     }
     case SeosCryptoCipher_Algorithm_AES_GCM_ENC:
     {
-        if (*bufSize < 4)
+        if (*bufSize < SeosCryptoCipher_Size_AES_GCM_TAG_MIN)
         {
-            // Tag length must be at least 4!
-            *bufSize = 4;
+            // We have a minimum tag length
+            *bufSize = SeosCryptoCipher_Size_AES_GCM_TAG_MIN;
             return SEOS_ERROR_BUFFER_TOO_SMALL;
         }
         // For GCM the last buf block is the authentication tag; the maximum
         // size of which is determined by the AES blocksize
-        *bufSize = (*bufSize > SeosCryptoCipher_AES_BLOCK_SIZE) ?
-                   SeosCryptoCipher_AES_BLOCK_SIZE : *bufSize;
+        *bufSize = (*bufSize > SeosCryptoCipher_Size_AES_BLOCK) ?
+                   SeosCryptoCipher_Size_AES_BLOCK : *bufSize;
         retval = !self->started || !self->processed || self->finalized ||
                  mbedtls_gcm_finish(&self->mbedtls.gcm, buf, *bufSize) != 0 ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;

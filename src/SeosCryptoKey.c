@@ -470,7 +470,7 @@ generateImpl(SeosCryptoKey*             self,
     case SeosCryptoKey_Type_RSA_PRV:
         if ((SeosCryptoKey_SpecType_BITS != spec->type)
             || (spec->key.params.bits < 128)
-            || (spec->key.params.bits > (SeosCryptoKey_Size_RSA * 8)))
+            || (spec->key.params.bits > (SeosCryptoKey_Size_RSA_MAX * 8)))
         {
             return SEOS_ERROR_NOT_SUPPORTED;
         }
@@ -497,7 +497,7 @@ generateImpl(SeosCryptoKey*             self,
         default:
             return SEOS_ERROR_NOT_SUPPORTED;
         }
-        if (bits > (SeosCryptoKey_Size_DH * 8) || bits < 64)
+        if (bits > (SeosCryptoKey_Size_DH_MAX * 8) || bits < 64)
         {
             return SEOS_ERROR_NOT_SUPPORTED;
         }
@@ -554,7 +554,7 @@ importImpl(SeosCryptoKey*               self,
             return SEOS_ERROR_INVALID_PARAMETER;
         }
         bits = getMpiLen(key->data.rsa.pub.nBytes, key->data.rsa.pub.nLen);
-        if (bits < 128 || bits > SeosCryptoKey_Size_RSA * 8)
+        if (bits < 128 || bits > SeosCryptoKey_Size_RSA_MAX * 8)
         {
             return SEOS_ERROR_NOT_SUPPORTED;
         }
@@ -570,7 +570,7 @@ importImpl(SeosCryptoKey*               self,
         }
         bits = getMpiLen(key->data.rsa.prv.pBytes, key->data.rsa.prv.pLen)
                + getMpiLen(key->data.rsa.prv.qBytes, key->data.rsa.prv.qLen);
-        if (bits < 128 || bits > SeosCryptoKey_Size_RSA * 8)
+        if (bits < 128 || bits > SeosCryptoKey_Size_RSA_MAX * 8)
         {
             return SEOS_ERROR_NOT_SUPPORTED;
         }
@@ -599,7 +599,7 @@ importImpl(SeosCryptoKey*               self,
             return SEOS_ERROR_INVALID_PARAMETER;
         }
         bits = getMpiLen(key->data.dh.pub.params.pBytes, key->data.dh.pub.params.pLen);
-        if (bits < 64 || bits > SeosCryptoKey_Size_DH * 8)
+        if (bits < 64 || bits > SeosCryptoKey_Size_DH_MAX * 8)
         {
             return SEOS_ERROR_NOT_SUPPORTED;
         }
@@ -613,7 +613,7 @@ importImpl(SeosCryptoKey*               self,
             return SEOS_ERROR_INVALID_PARAMETER;
         }
         bits = getMpiLen(key->data.dh.prv.params.pBytes, key->data.dh.prv.params.pLen);
-        if (bits < 64 || bits > SeosCryptoKey_Size_DH * 8)
+        if (bits < 64 || bits > SeosCryptoKey_Size_DH_MAX * 8)
         {
             return SEOS_ERROR_NOT_SUPPORTED;
         }

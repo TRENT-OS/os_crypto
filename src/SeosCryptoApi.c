@@ -20,7 +20,7 @@ SeosCryptoApi_rngGetBytes(SeosCryptoCtx*            ctx,
                           void*                     buf,
                           const size_t              bufSize)
 {
-    if (bufSize > SeosCrypto_BUFFER_SIZE)
+    if (bufSize > SeosCrypto_Size_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -33,7 +33,7 @@ SeosCryptoApi_rngReSeed(SeosCryptoCtx*      ctx,
                         const void*         seed,
                         const size_t        seedLen)
 {
-    if (seedLen > SeosCrypto_BUFFER_SIZE)
+    if (seedLen > SeosCrypto_Size_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -66,7 +66,7 @@ SeosCryptoApi_digestProcess(SeosCryptoCtx*                   ctx,
                             const void*                      data,
                             const size_t                     dataLen)
 {
-    if (dataLen > SeosCrypto_BUFFER_SIZE)
+    if (dataLen > SeosCrypto_Size_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -80,7 +80,7 @@ SeosCryptoApi_digestFinalize(SeosCryptoCtx*                 ctx,
                              void*                          digest,
                              size_t*                        digestSize)
 {
-    if (NULL != digestSize && *digestSize > SeosCrypto_BUFFER_SIZE)
+    if (NULL != digestSize && *digestSize > SeosCrypto_Size_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -118,8 +118,8 @@ SeosCryptoApi_signatureSign(SeosCryptoCtx*                      ctx,
                             size_t*                             signatureSize)
 {
     // They use the same buffer, but sequentially
-    if (hashSize > SeosCrypto_BUFFER_SIZE
-        || (NULL != signatureSize && *signatureSize > SeosCrypto_BUFFER_SIZE))
+    if (hashSize > SeosCrypto_Size_BUFFER
+        || (NULL != signatureSize && *signatureSize > SeosCrypto_Size_BUFFER))
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -137,7 +137,7 @@ SeosCryptoApi_signatureVerify(SeosCryptoCtx*                    ctx,
                               const size_t                      signatureSize)
 {
     // They use the same buffer, but in parallel
-    if (hashSize + signatureSize > SeosCrypto_BUFFER_SIZE)
+    if (hashSize + signatureSize > SeosCrypto_Size_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -173,7 +173,7 @@ SeosCryptoApi_agreementAgree(SeosCryptoCtx*                     ctx,
                              void*                              shared,
                              size_t*                            sharedSize)
 {
-    if (NULL != sharedSize && *sharedSize > SeosCrypto_BUFFER_SIZE)
+    if (NULL != sharedSize && *sharedSize > SeosCrypto_Size_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -228,7 +228,7 @@ SeosCryptoApi_keyGetParams(SeosCryptoCtx*               ctx,
                            void*                        keyParams,
                            size_t*                      paramSize)
 {
-    if (NULL != paramSize && *paramSize > SeosCrypto_BUFFER_SIZE)
+    if (NULL != paramSize && *paramSize > SeosCrypto_Size_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -242,7 +242,7 @@ SeosCryptoApi_keyLoadParams(SeosCryptoCtx*              ctx,
                             void*                       keyParams,
                             size_t*                     paramSize)
 {
-    if (NULL != paramSize && *paramSize > SeosCrypto_BUFFER_SIZE)
+    if (NULL != paramSize && *paramSize > SeosCrypto_Size_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -268,7 +268,7 @@ SeosCryptoApi_cipherInit(SeosCryptoCtx*                     ctx,
                          const void*                        iv,
                          const size_t                       ivLen)
 {
-    if (ivLen > SeosCrypto_BUFFER_SIZE)
+    if (ivLen > SeosCrypto_Size_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -293,8 +293,8 @@ SeosCryptoApi_cipherProcess(SeosCryptoCtx*                   ctx,
                             size_t*                          outputSize)
 {
     // They use the same buffer, but sequentially
-    if (dataSize > SeosCrypto_BUFFER_SIZE ||
-        (NULL != outputSize && *outputSize > SeosCrypto_BUFFER_SIZE))
+    if (dataSize > SeosCrypto_Size_BUFFER ||
+        (NULL != outputSize && *outputSize > SeosCrypto_Size_BUFFER))
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -309,7 +309,7 @@ SeosCryptoApi_cipherStart(SeosCryptoCtx*                ctx,
                           const void*                   ad,
                           const size_t                  adLen)
 {
-    if (adLen > SeosCrypto_BUFFER_SIZE)
+    if (adLen > SeosCrypto_Size_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -323,7 +323,7 @@ SeosCryptoApi_cipherFinalize(SeosCryptoCtx*                 ctx,
                              void*                          output,
                              size_t*                        outputSize)
 {
-    if (NULL != outputSize && *outputSize > SeosCrypto_BUFFER_SIZE)
+    if (NULL != outputSize && *outputSize > SeosCrypto_Size_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }

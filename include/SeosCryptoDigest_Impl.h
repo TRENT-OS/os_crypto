@@ -20,8 +20,8 @@
 
 #include <stdbool.h>
 
-#define SeosCryptoDigest_SIZE_MD5     16
-#define SeosCryptoDigest_SIZE_SHA256  32
+#define SeosCryptoDigest_Size_MD5     16
+#define SeosCryptoDigest_Size_SHA256  32
 
 typedef enum
 {
