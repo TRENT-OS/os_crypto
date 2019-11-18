@@ -20,6 +20,18 @@
 
 #include <stddef.h>
 
+/**
+ * Make sure that these structs are smaller than the width of the dataport so
+ * that we do not have any problem when passing them from SeosCryptoClient to
+ * SeosCryptoRpc via camkes-generated RPC calls.
+ *
+ * We have to do this here instead in the SeosCryptoKey_Impl.h header, because
+ * we need #defines from SeosCrypto_Impl.h and including that file in the
+ * SeosCryptoKey_Impl.h will lead to a mess.
+ */
+Debug_STATIC_ASSERT(sizeof(SeosCryptoKey_Spec) <= SeosCrypto_Size_DATAPORT);
+Debug_STATIC_ASSERT(sizeof(SeosCryptoKey_Data) <= SeosCrypto_Size_DATAPORT);
+
 seos_err_t
 SeosCryptoKey_generate(SeosCryptoKey*               self,
                        const SeosCrypto_MemIf*      memIf,

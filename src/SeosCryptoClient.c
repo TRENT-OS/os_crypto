@@ -373,7 +373,6 @@ SeosCryptoClient_keyGenerate(SeosCryptoCtx*             api,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    Debug_ASSERT(sizeof(SeosCryptoKey_Spec) <= SeosCrypto_Size_DATAPORT);
     memcpy(self->clientDataport, spec, sizeof(SeosCryptoKey_Spec));
     return SeosCryptoRpc_keyGenerate(self->rpcHandle, pKeyHandle);
 }
@@ -392,7 +391,6 @@ SeosCryptoClient_keyMakePublic(SeosCryptoCtx*               api,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    Debug_ASSERT(sizeof(SeosCryptoKey_Attribs) <= SeosCrypto_Size_DATAPORT);
     memcpy(self->clientDataport, attribs, sizeof(SeosCryptoKey_Attribs));
     return SeosCryptoRpc_keyMakePublic(self->rpcHandle, pPubKeyHandle,
                                        prvKeyHandle);
@@ -412,7 +410,6 @@ SeosCryptoClient_keyImport(SeosCryptoCtx*               api,
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    Debug_ASSERT(sizeof(SeosCryptoKey_Data) <= SeosCrypto_Size_DATAPORT);
     memcpy(self->clientDataport, keyData, sizeof(SeosCryptoKey_Data));
     return SeosCryptoRpc_keyImport(self->rpcHandle, pKeyHandle, wrapKeyHandle);
 }
@@ -435,7 +432,6 @@ SeosCryptoClient_keyExport(SeosCryptoCtx*               api,
     if ((retval = SeosCryptoRpc_keyExport(self->rpcHandle, keyHandle,
                                           wrapKeyHandle)) == SEOS_SUCCESS)
     {
-        Debug_ASSERT(sizeof(SeosCryptoKey_Data) <= SeosCrypto_Size_DATAPORT);
         memcpy(keyData, self->clientDataport, sizeof(SeosCryptoKey_Data));
     }
 
