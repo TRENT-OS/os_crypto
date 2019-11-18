@@ -55,7 +55,9 @@ typedef struct
     PointerVector       signatureHandleVector;
     PointerVector       agreementHandleVector;
     /**
-     * Buffer for outputs produced by crypto
+     * When we have a function that takes an input buffer and produces an output
+     * buffer, we copy the inputs to this buffer internally, so the caller can
+     * use the identical buffer as input/output.
      */
     unsigned char       buffer[SeosCrypto_BUFFER_SIZE];
 } SeosCrypto;

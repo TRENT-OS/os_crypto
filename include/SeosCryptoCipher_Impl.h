@@ -18,6 +18,8 @@
 #include "mbedtls/aes.h"
 #include "mbedtls/gcm.h"
 
+#include <stdbool.h>
+
 #define SeosCryptoCipher_AES_BLOCK_SIZE         16
 #define SeosCryptoCipher_AES_CBC_IV_SIZE        16
 #define SeosCryptoCipher_AES_GCM_IV_SIZE        12

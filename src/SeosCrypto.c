@@ -12,6 +12,8 @@
 
 #include "LibDebug/Debug.h"
 
+#include <string.h>
+
 static const SeosCryptoCtx_Vtable SeosCrypto_vtable =
 {
     .rngGetBytes         = SeosCrypto_rngGetBytes,

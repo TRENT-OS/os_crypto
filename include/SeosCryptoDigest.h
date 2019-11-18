@@ -18,8 +18,6 @@
 #include "compiler.h"
 #include "SeosError.h"
 
-#include <string.h>
-
 seos_err_t
 SeosCryptoDigest_init(SeosCryptoDigest*                 self,
                       const SeosCrypto_MemIf*           memIf,
