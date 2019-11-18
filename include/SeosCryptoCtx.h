@@ -32,6 +32,35 @@ typedef seos_err_t
                             const void*     seed,
                             const size_t    seedLen);
 
+// --------------------------------- MAC API -----------------------------------
+
+typedef seos_err_t
+(*SeosCryptoCtx_macInitT)(SeosCryptoCtx*                self,
+                          SeosCrypto_MacHandle*         pMacHandle,
+                          const SeosCryptoMac_Algorithm algorithm);
+
+typedef seos_err_t
+(*SeosCryptoCtx_macFreeT)(SeosCryptoCtx*                self,
+                          const SeosCrypto_MacHandle    macHandle);
+
+typedef seos_err_t
+(*SeosCryptoCtx_macStartT)(SeosCryptoCtx*               self,
+                           const SeosCrypto_MacHandle   macHandle,
+                           const void*                  secret,
+                           const size_t                 secretLen);
+
+typedef seos_err_t
+(*SeosCryptoCtx_macProcessT)(SeosCryptoCtx*                 self,
+                             const SeosCrypto_MacHandle     macHandle,
+                             const void*                    data,
+                             const size_t                   dataLen);
+
+typedef seos_err_t
+(*SeosCryptoCtx_macFinalizeT)(SeosCryptoCtx*                self,
+                              const SeosCrypto_MacHandle    macHandle,
+                              void*                         mac,
+                              size_t*                       macSize);
+
 // ------------------------------- Digest API ----------------------------------
 
 typedef seos_err_t
@@ -186,32 +215,37 @@ typedef seos_err_t (*SeosCryptoCtx_freeT)(SeosCryptoCtx* self);
 
 typedef struct
 {
-    SeosCryptoCtx_rngGetBytesT           rngGetBytes;
-    SeosCryptoCtx_rngReSeedT             rngReSeed;
-    SeosCryptoCtx_digestInitT            digestInit;
-    SeosCryptoCtx_digestFreeT            digestFree;
-    SeosCryptoCtx_digestProcessT         digestProcess;
-    SeosCryptoCtx_digestFinalizeT        digestFinalize;
-    SeosCryptoCtx_keyGenerateT           keyGenerate;
-    SeosCryptoCtx_keyMakePublicT         keyMakePublic;
-    SeosCryptoCtx_keyImportT             keyImport;
-    SeosCryptoCtx_keyExportT             keyExport;
-    SeosCryptoCtx_keyGetParamsT          keyGetParams;
-    SeosCryptoCtx_keyLoadParamsT         keyLoadParams;
-    SeosCryptoCtx_keyFreeT               keyFree;
-    SeosCryptoCtx_signatureInitT         signatureInit;
-    SeosCryptoCtx_signatureFreeT         signatureFree;
-    SeosCryptoCtx_signatureSignT         signatureSign;
-    SeosCryptoCtx_signatureVerifyT       signatureVerify;
-    SeosCryptoCtx_agreementInitT         agreementInit;
-    SeosCryptoCtx_agreementFreeT         agreementFree;
-    SeosCryptoCtx_agreementAgreeT        agreementAgree;
-    SeosCryptoCtx_cipherInitT            cipherInit;
-    SeosCryptoCtx_cipherFreeT            cipherFree;
-    SeosCryptoCtx_cipherProcessT         cipherProcess;
-    SeosCryptoCtx_cipherStartT           cipherStart;
-    SeosCryptoCtx_cipherFinalizeT        cipherFinalize;
-    SeosCryptoCtx_freeT                  free;
+    SeosCryptoCtx_rngGetBytesT          rngGetBytes;
+    SeosCryptoCtx_rngReSeedT            rngReSeed;
+    SeosCryptoCtx_macInitT              macInit;
+    SeosCryptoCtx_macFreeT              macFree;
+    SeosCryptoCtx_macStartT             macStart;
+    SeosCryptoCtx_macProcessT           macProcess;
+    SeosCryptoCtx_macFinalizeT          macFinalize;
+    SeosCryptoCtx_digestInitT           digestInit;
+    SeosCryptoCtx_digestFreeT           digestFree;
+    SeosCryptoCtx_digestProcessT        digestProcess;
+    SeosCryptoCtx_digestFinalizeT       digestFinalize;
+    SeosCryptoCtx_keyGenerateT          keyGenerate;
+    SeosCryptoCtx_keyMakePublicT        keyMakePublic;
+    SeosCryptoCtx_keyImportT            keyImport;
+    SeosCryptoCtx_keyExportT            keyExport;
+    SeosCryptoCtx_keyGetParamsT         keyGetParams;
+    SeosCryptoCtx_keyLoadParamsT        keyLoadParams;
+    SeosCryptoCtx_keyFreeT              keyFree;
+    SeosCryptoCtx_signatureInitT        signatureInit;
+    SeosCryptoCtx_signatureFreeT        signatureFree;
+    SeosCryptoCtx_signatureSignT        signatureSign;
+    SeosCryptoCtx_signatureVerifyT      signatureVerify;
+    SeosCryptoCtx_agreementInitT        agreementInit;
+    SeosCryptoCtx_agreementFreeT        agreementFree;
+    SeosCryptoCtx_agreementAgreeT       agreementAgree;
+    SeosCryptoCtx_cipherInitT           cipherInit;
+    SeosCryptoCtx_cipherFreeT           cipherFree;
+    SeosCryptoCtx_cipherProcessT        cipherProcess;
+    SeosCryptoCtx_cipherStartT          cipherStart;
+    SeosCryptoCtx_cipherFinalizeT       cipherFinalize;
+    SeosCryptoCtx_freeT                 free;
 }
 SeosCryptoCtx_Vtable;
 

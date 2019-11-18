@@ -41,6 +41,50 @@ SeosCryptoApi_rngReSeed(SeosCryptoCtx*      ctx,
            ctx->vtable->rngReSeed(ctx, seed, seedLen);
 }
 
+// ------------------------------- MAC API -------------------------------------
+
+seos_err_t
+SeosCryptoApi_macInit(SeosCryptoCtx*                    ctx,
+                      SeosCrypto_MacHandle*             pMacHandle,
+                      const SeosCryptoMac_Algorithm     algorithm)
+{
+    return SEOS_ERROR_NOT_SUPPORTED;
+}
+
+seos_err_t
+SeosCryptoApi_macFree(SeosCryptoCtx*                ctx,
+                      const SeosCrypto_MacHandle    macHandle)
+{
+    return SEOS_ERROR_NOT_SUPPORTED;
+}
+
+seos_err_t
+SeosCryptoApi_macStart(SeosCryptoCtx*               ctx,
+                       const SeosCrypto_MacHandle   macHandle,
+                       const void*                  secret,
+                       const size_t                 secretSize)
+{
+    return SEOS_ERROR_NOT_SUPPORTED;
+}
+
+seos_err_t
+SeosCryptoApi_macProcess(SeosCryptoCtx*             ctx,
+                         const SeosCrypto_MacHandle macHandle,
+                         const void*                data,
+                         const size_t               dataSize)
+{
+    return SEOS_ERROR_NOT_SUPPORTED;
+}
+
+seos_err_t
+SeosCryptoApi_macFinalize(SeosCryptoCtx*                ctx,
+                          const SeosCrypto_MacHandle    macHandle,
+                          void*                         mac,
+                          size_t*                       macSize)
+{
+    return SEOS_ERROR_NOT_SUPPORTED;
+}
+
 // ------------------------------ Digest API -----------------------------------
 
 seos_err_t

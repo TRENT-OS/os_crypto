@@ -6,6 +6,7 @@
 #include "SeosCryptoKey.h"
 #include "SeosCryptoRng.h"
 #include "SeosCryptoDigest.h"
+#include "SeosCryptoMac.h"
 #include "SeosCryptoSignature.h"
 #include "SeosCryptoAgreement.h"
 #include "SeosCrypto.h"
