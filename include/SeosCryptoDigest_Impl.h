@@ -23,11 +23,13 @@
 #define SeosCryptoDigest_Size_MD5     16
 #define SeosCryptoDigest_Size_SHA256  32
 
+// Attention: These need to be matched to the respective IDs in mbedTLS, or
+// parts of will break (e.g., the signature verficiation)
 typedef enum
 {
-    SeosCryptoDigest_Algorithm_NONE = 0,
-    SeosCryptoDigest_Algorithm_MD5,
-    SeosCryptoDigest_Algorithm_SHA256,
+    SeosCryptoDigest_Algorithm_NONE     = MBEDTLS_MD_NONE,
+    SeosCryptoDigest_Algorithm_MD5      = MBEDTLS_MD_MD5,
+    SeosCryptoDigest_Algorithm_SHA256   = MBEDTLS_MD_SHA256
 }
 SeosCryptoDigest_Algorithm;
 
