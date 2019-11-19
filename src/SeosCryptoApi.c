@@ -164,11 +164,13 @@ seos_err_t
 SeosCryptoApi_signatureInit(SeosCryptoCtx*                      ctx,
                             SeosCrypto_SignatureHandle*         pSigHandle,
                             const SeosCryptoSignature_Algorithm algorithm,
+                            const SeosCryptoDigest_Algorithm    digest,
                             const SeosCrypto_KeyHandle          prvHandle,
                             const SeosCrypto_KeyHandle          pubHandle)
 {
     return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->signatureInit(ctx, pSigHandle, algorithm, prvHandle, pubHandle);
+           ctx->vtable->signatureInit(ctx, pSigHandle, algorithm, digest, prvHandle,
+                                      pubHandle);
 }
 
 seos_err_t

@@ -459,6 +459,7 @@ seos_err_t
 SeosCrypto_signatureInit(SeosCryptoCtx*                         api,
                          SeosCrypto_SignatureHandle*            pSigHandle,
                          const SeosCryptoSignature_Algorithm    algorithm,
+                         const SeosCryptoDigest_Algorithm       digest,
                          const SeosCrypto_KeyHandle             prvHandle,
                          const SeosCrypto_KeyHandle             pubHandle)
 {
@@ -477,7 +478,7 @@ SeosCrypto_signatureInit(SeosCryptoCtx*                         api,
     }
 
     if ((retval = SeosCryptoSignature_init(*pSigHandle, &self->memIf, algorithm,
-                                           prvHandle, pubHandle)) != SEOS_SUCCESS)
+                                           digest, prvHandle, pubHandle)) != SEOS_SUCCESS)
     {
         goto err0;
     }

@@ -330,6 +330,7 @@ seos_err_t
 SeosCryptoClient_signatureInit(SeosCryptoCtx*                       api,
                                SeosCrypto_SignatureHandle*          pSigHandle,
                                const SeosCryptoSignature_Algorithm  algorithm,
+                               const SeosCryptoDigest_Algorithm     digest,
                                const SeosCrypto_KeyHandle           prvHandle,
                                const SeosCrypto_KeyHandle           pubHandle)
 {
@@ -342,7 +343,7 @@ SeosCryptoClient_signatureInit(SeosCryptoCtx*                       api,
     }
 
     return SeosCryptoRpc_signatureInit(self->rpcHandle, pSigHandle, algorithm,
-                                       prvHandle, pubHandle);
+                                       digest, prvHandle, pubHandle);
 }
 
 seos_err_t

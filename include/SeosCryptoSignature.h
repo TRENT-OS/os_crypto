@@ -20,11 +20,11 @@
 #include "SeosError.h"
 #include "compiler.h"
 
-
 seos_err_t
 SeosCryptoSignature_init(SeosCryptoSignature*                   self,
                          const SeosCrypto_MemIf*                memIf,
                          const SeosCryptoSignature_Algorithm    algorithm,
+                         const SeosCryptoDigest_Algorithm       digest,
                          const SeosCryptoKey*                   prvKey,
                          const SeosCryptoKey*                   pubKey);
 

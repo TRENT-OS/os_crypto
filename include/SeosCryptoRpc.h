@@ -153,11 +153,12 @@ SeosCryptoRpc_keyFree(SeosCryptoRpc*        self,
 // ----------------------------- Signature API ---------------------------------
 
 seos_err_t
-SeosCryptoRpc_signatureInit(SeosCryptoRpc*                   self,
-                            SeosCrypto_SignatureHandle*      pSigHandle,
-                            SeosCryptoSignature_Algorithm    algorithm,
-                            SeosCrypto_KeyHandle             prvHandle,
-                            SeosCrypto_KeyHandle             pubHandle);
+SeosCryptoRpc_signatureInit(SeosCryptoRpc*                  self,
+                            SeosCrypto_SignatureHandle*     pSigHandle,
+                            SeosCryptoSignature_Algorithm   algorithm,
+                            SeosCryptoDigest_Algorithm      digest,
+                            SeosCrypto_KeyHandle            prvHandle,
+                            SeosCrypto_KeyHandle            pubHandle);
 
 seos_err_t
 SeosCryptoRpc_signatureVerify(SeosCryptoRpc*                self,

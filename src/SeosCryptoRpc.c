@@ -305,15 +305,16 @@ SeosCryptoRpc_agreementFree(SeosCryptoRpc*                self,
 // ----------------------------- Signature API ---------------------------------
 
 seos_err_t
-SeosCryptoRpc_signatureInit(SeosCryptoRpc*                   self,
-                            SeosCrypto_SignatureHandle*      pSigHandle,
-                            unsigned int                     algorithm,
-                            SeosCrypto_KeyHandle             prvHandle,
-                            SeosCrypto_KeyHandle             pubHandle)
+SeosCryptoRpc_signatureInit(SeosCryptoRpc*                      self,
+                            SeosCrypto_SignatureHandle*         pSigHandle,
+                            const SeosCryptoSignature_Algorithm algorithm,
+                            const SeosCryptoDigest_Algorithm    digest,
+                            SeosCrypto_KeyHandle                prvHandle,
+                            SeosCrypto_KeyHandle                pubHandle)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCrypto_signatureInit(self->seosCryptoApi, pSigHandle, algorithm, prvHandle,
-                                    pubHandle);
+           SeosCrypto_signatureInit(self->seosCryptoApi, pSigHandle, algorithm, digest,
+                                    prvHandle, pubHandle);
 }
 
 seos_err_t
