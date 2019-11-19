@@ -24,6 +24,9 @@ initImpl(SeosCryptoSignature*       self,
     case SeosCryptoSignature_Algorithm_RSA_PKCS1_V15:
         padding = MBEDTLS_RSA_PKCS_V15;
         break;
+    case SeosCryptoSignature_Algorithm_RSA_PKCS1_V21:
+        padding = MBEDTLS_RSA_PKCS_V21;
+        break;
     default:
         return SEOS_ERROR_NOT_SUPPORTED;
     }
@@ -54,6 +57,7 @@ freeImpl(SeosCryptoSignature*       self,
     switch (self->algorithm)
     {
     case SeosCryptoSignature_Algorithm_RSA_PKCS1_V15:
+    case SeosCryptoSignature_Algorithm_RSA_PKCS1_V21:
         mbedtls_rsa_free(&self->mbedtls.rsa);
         break;
     default:
@@ -72,6 +76,7 @@ setKeyImpl(SeosCryptoSignature* self)
     switch (self->algorithm)
     {
     case SeosCryptoSignature_Algorithm_RSA_PKCS1_V15:
+    case SeosCryptoSignature_Algorithm_RSA_PKCS1_V21:
         if (NULL != self->pubKey)
         {
             if (self->pubKey->type != SeosCryptoKey_Type_RSA_PUB)
@@ -110,6 +115,7 @@ verifyHashImpl(SeosCryptoSignature*             self,
     switch (self->algorithm)
     {
     case SeosCryptoSignature_Algorithm_RSA_PKCS1_V15:
+    case SeosCryptoSignature_Algorithm_RSA_PKCS1_V21:
         if (self->mbedtls.rsa.len != signatureSize)
         {
             retval = SEOS_ERROR_INVALID_PARAMETER;
@@ -144,6 +150,7 @@ signHashImpl(SeosCryptoSignature*               self,
     switch (self->algorithm)
     {
     case SeosCryptoSignature_Algorithm_RSA_PKCS1_V15:
+    case SeosCryptoSignature_Algorithm_RSA_PKCS1_V21:
         if (self->mbedtls.rsa.len > *signatureSize)
         {
             retval = SEOS_ERROR_BUFFER_TOO_SMALL;

@@ -23,6 +23,7 @@ typedef enum
 {
     SeosCryptoSignature_Algorithm_NONE = 0,
     SeosCryptoSignature_Algorithm_RSA_PKCS1_V15,
+    SeosCryptoSignature_Algorithm_RSA_PKCS1_V21
 }
 SeosCryptoSignature_Algorithm;
 
