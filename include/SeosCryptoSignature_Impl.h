@@ -13,6 +13,7 @@
 #pragma once
 
 #include "SeosCryptoKey_Impl.h"
+#include "SeosCryptoDigest_Impl.h"
 
 #include "mbedtls/rsa.h"
 
@@ -21,7 +22,7 @@
 typedef enum
 {
     SeosCryptoSignature_Algorithm_NONE = 0,
-    SeosCryptoSignature_Algorithm_RSA_PKCS1
+    SeosCryptoSignature_Algorithm_RSA_PKCS1_V15,
 }
 SeosCryptoSignature_Algorithm;
 

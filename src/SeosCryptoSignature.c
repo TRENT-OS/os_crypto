@@ -17,19 +17,32 @@ initImpl(SeosCryptoSignature*       self,
 
 {
     UNUSED_VAR(memIf);
-    seos_err_t retval = SEOS_ERROR_GENERIC;
+    int padding;
 
     switch (self->algorithm)
     {
-    case SeosCryptoSignature_Algorithm_RSA_PKCS1:
-        mbedtls_rsa_init(&self->mbedtls.rsa, MBEDTLS_RSA_PKCS_V15, MBEDTLS_MD_NONE);
-        retval = SEOS_SUCCESS;
+    case SeosCryptoSignature_Algorithm_RSA_PKCS1_V15:
+        padding = MBEDTLS_RSA_PKCS_V15;
         break;
     default:
-        retval = SEOS_ERROR_NOT_SUPPORTED;
+        return SEOS_ERROR_NOT_SUPPORTED;
     }
 
-    return retval;
+    // Make sure we only get in the digests here which we currently support.
+    switch (self->digest)
+    {
+    case SeosCryptoDigest_Algorithm_NONE:
+    case SeosCryptoDigest_Algorithm_MD5:
+    case SeosCryptoDigest_Algorithm_SHA256:
+        break;
+    default:
+        return SEOS_ERROR_NOT_SUPPORTED;
+    }
+
+    // digest is matched to mbedTLS constants
+    mbedtls_rsa_init(&self->mbedtls.rsa, padding, self->digest);
+
+    return SEOS_SUCCESS;
 }
 
 static seos_err_t
@@ -37,19 +50,17 @@ freeImpl(SeosCryptoSignature*       self,
          const SeosCrypto_MemIf*    memIf)
 {
     UNUSED_VAR(memIf);
-    seos_err_t retval = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
-    case SeosCryptoSignature_Algorithm_RSA_PKCS1:
+    case SeosCryptoSignature_Algorithm_RSA_PKCS1_V15:
         mbedtls_rsa_free(&self->mbedtls.rsa);
-        retval = SEOS_SUCCESS;
         break;
     default:
-        retval = SEOS_ERROR_NOT_SUPPORTED;
+        return SEOS_ERROR_NOT_SUPPORTED;
     }
 
-    return retval;
+    return SEOS_SUCCESS;
 }
 
 static seos_err_t
@@ -60,7 +71,7 @@ setKeyImpl(SeosCryptoSignature* self)
     retval = SEOS_SUCCESS;
     switch (self->algorithm)
     {
-    case SeosCryptoSignature_Algorithm_RSA_PKCS1:
+    case SeosCryptoSignature_Algorithm_RSA_PKCS1_V15:
         if (NULL != self->pubKey)
         {
             if (self->pubKey->type != SeosCryptoKey_Type_RSA_PUB)
@@ -86,60 +97,62 @@ setKeyImpl(SeosCryptoSignature* self)
 }
 
 static seos_err_t
-verifyHashImpl(SeosCryptoSignature* self,
-               SeosCryptoRng*       rng,
-               const void*          hash,
-               const size_t         hashSize,
-               const void*          signature,
-               const size_t         signatureSize)
+verifyHashImpl(SeosCryptoSignature*             self,
+               SeosCryptoRng*                   rng,
+               const void*                      hash,
+               const size_t                     hashSize,
+               const void*                      signature,
+               const size_t                     signatureSize)
 {
     void* rngFunc = (NULL != rng) ? SeosCryptoRng_getBytesMbedtls : NULL;
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
-    case SeosCryptoSignature_Algorithm_RSA_PKCS1:
+    case SeosCryptoSignature_Algorithm_RSA_PKCS1_V15:
         if (self->mbedtls.rsa.len != signatureSize)
         {
             retval = SEOS_ERROR_INVALID_PARAMETER;
         }
         else
         {
+            // digest is matched to mbedTLS constants
             retval = mbedtls_rsa_pkcs1_verify(&self->mbedtls.rsa, rngFunc, rng,
-                                              MBEDTLS_RSA_PUBLIC, MBEDTLS_MD_NONE, hashSize,
+                                              MBEDTLS_RSA_PUBLIC, self->digest, hashSize,
                                               hash, signature) != 0 ?
                      SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         }
         break;
     default:
-        retval = SEOS_ERROR_NOT_SUPPORTED;
+        return SEOS_ERROR_NOT_SUPPORTED;
     }
 
     return retval;
 }
 
 static seos_err_t
-signHashImpl(SeosCryptoSignature*   self,
-             SeosCryptoRng*         rng,
-             const void*            hash,
-             const size_t           hashSize,
-             void*                  signature,
-             size_t*                signatureSize)
+signHashImpl(SeosCryptoSignature*               self,
+             SeosCryptoRng*                     rng,
+             const void*                        hash,
+             const size_t                       hashSize,
+             void*                              signature,
+             size_t*                            signatureSize)
 {
     void* rngFunc = (NULL != rng) ? SeosCryptoRng_getBytesMbedtls : NULL;
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
-    case SeosCryptoSignature_Algorithm_RSA_PKCS1:
+    case SeosCryptoSignature_Algorithm_RSA_PKCS1_V15:
         if (self->mbedtls.rsa.len > *signatureSize)
         {
             retval = SEOS_ERROR_BUFFER_TOO_SMALL;
         }
         else
         {
+            // digest is matched to mbedTLS constants
             retval = mbedtls_rsa_pkcs1_sign(&self->mbedtls.rsa, rngFunc, rng,
-                                            MBEDTLS_RSA_PRIVATE, MBEDTLS_MD_NONE, hashSize,
+                                            MBEDTLS_RSA_PRIVATE, self->digest, hashSize,
                                             hash, signature) != 0 ?
                      SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         }
@@ -159,6 +172,7 @@ seos_err_t
 SeosCryptoSignature_init(SeosCryptoSignature*                   self,
                          const SeosCrypto_MemIf*                memIf,
                          const SeosCryptoSignature_Algorithm    algorithm,
+                         const SeosCryptoDigest_Algorithm       digest,
                          const SeosCryptoKey*                   prvKey,
                          const SeosCryptoKey*                   pubKey)
 {
@@ -167,32 +181,29 @@ SeosCryptoSignature_init(SeosCryptoSignature*                   self,
     // We can have one of those keys be empty, but not both
     if (NULL == memIf || NULL == self || (NULL == prvKey && NULL == pubKey))
     {
-        retval = SEOS_ERROR_INVALID_PARAMETER;
-        goto exit;
+        return SEOS_ERROR_INVALID_PARAMETER;
     }
 
     memset(self, 0, sizeof(*self));
 
-    self->algorithm  = algorithm;
-    self->prvKey     = prvKey;
-    self->pubKey     = pubKey;
+    self->algorithm = algorithm;
+    self->digest    = digest;
+    self->prvKey    = prvKey;
+    self->pubKey    = pubKey;
 
-    retval = initImpl(self, memIf);
-    if (retval != SEOS_SUCCESS)
+    if ((retval = initImpl(self, memIf)) != SEOS_SUCCESS)
     {
-        goto exit;
+        return retval;
     }
-
-    retval = setKeyImpl(self);
-    if (retval != SEOS_SUCCESS)
+    if ((retval = setKeyImpl(self)) != SEOS_SUCCESS)
     {
         goto err0;
     }
 
-    goto exit;
+    return SEOS_SUCCESS;
+
 err0:
     freeImpl(self, memIf);
-exit:
     return retval;
 }
 
@@ -209,12 +220,12 @@ SeosCryptoSignature_free(SeosCryptoSignature*       self,
 }
 
 seos_err_t
-SeosCryptoSignature_sign(SeosCryptoSignature*   self,
-                         SeosCryptoRng*         rng,
-                         const void*            hash,
-                         const size_t           hashSize,
-                         void*                  signature,
-                         size_t*                signatureSize)
+SeosCryptoSignature_sign(SeosCryptoSignature*               self,
+                         SeosCryptoRng*                     rng,
+                         const void*                        hash,
+                         const size_t                       hashSize,
+                         void*                              signature,
+                         size_t*                            signatureSize)
 {
     if (NULL == self || NULL == hash || 0 == hashSize || NULL == signature
         || NULL == signatureSize)
@@ -235,19 +246,13 @@ SeosCryptoSignature_verify(SeosCryptoSignature* self,
                            const void*          signature,
                            const size_t         signatureSize)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
-
     if (NULL == self || NULL == hash || 0 == hashSize || NULL == signature
         || 0 == signatureSize)
     {
-        retval = SEOS_ERROR_INVALID_PARAMETER;
-    }
-    else
-    {
-        retval = (self->pubKey != NULL) ?
-                 verifyHashImpl(self, rng, hash, hashSize, signature, signatureSize) :
-                 SEOS_ERROR_ABORTED ;
+        return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return retval;
+    return (self->pubKey != NULL) ?
+           verifyHashImpl(self, rng, hash, hashSize, signature, signatureSize) :
+           SEOS_ERROR_ABORTED ;
 }
