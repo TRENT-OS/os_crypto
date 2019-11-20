@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include "LibDebug/Debug.h"
+
 #include "mbedtls/ecp.h"
 
 /**
@@ -30,17 +32,23 @@
 
 // -----------------------------------------------------------------------------
 
-/**
- * We map the params we can load here to the constants to mbedTLS, because that
- * is effectively where we get those parameters from.
- */
 typedef enum
 {
-    SeosCryptoKey_Param_NONE = 0,
+    SeosCryptoKey_Param_NONE          = MBEDTLS_ECP_DP_NONE,
     SeosCryptoKey_Param_ECC_SECP192R1 = MBEDTLS_ECP_DP_SECP192R1,
     SeosCryptoKey_Param_ECC_SECP224R1 = MBEDTLS_ECP_DP_SECP224R1,
     SeosCryptoKey_Param_ECC_SECP256R1 = MBEDTLS_ECP_DP_SECP256R1,
 } SeosCryptoKey_Param;
+
+// Make sure these hold, otherwise stuff will break!
+Debug_STATIC_ASSERT((int)SeosCryptoKey_Param_NONE            ==
+                    (int)MBEDTLS_ECP_DP_NONE);
+Debug_STATIC_ASSERT((int)SeosCryptoKey_Param_ECC_SECP192R1   ==
+                    (int)MBEDTLS_ECP_DP_SECP192R1);
+Debug_STATIC_ASSERT((int)SeosCryptoKey_Param_ECC_SECP224R1   ==
+                    (int)MBEDTLS_ECP_DP_SECP224R1);
+Debug_STATIC_ASSERT((int)SeosCryptoKey_Param_ECC_SECP256R1   ==
+                    (int)MBEDTLS_ECP_DP_SECP256R1);
 
 typedef enum
 {

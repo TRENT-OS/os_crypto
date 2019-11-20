@@ -23,8 +23,6 @@
 #define SeosCryptoDigest_Size_MD5     16
 #define SeosCryptoDigest_Size_SHA256  32
 
-// Attention: These need to be matched to the respective IDs in mbedTLS, or
-// parts of will break (e.g., the signature verficiation)
 typedef enum
 {
     SeosCryptoDigest_Algorithm_NONE     = MBEDTLS_MD_NONE,
@@ -32,6 +30,14 @@ typedef enum
     SeosCryptoDigest_Algorithm_SHA256   = MBEDTLS_MD_SHA256
 }
 SeosCryptoDigest_Algorithm;
+
+// Make sure these hold, otherwise stuff will break!
+Debug_STATIC_ASSERT((int)SeosCryptoDigest_Algorithm_NONE     ==
+                    (int)MBEDTLS_MD_NONE);
+Debug_STATIC_ASSERT((int)SeosCryptoDigest_Algorithm_MD5      ==
+                    (int)MBEDTLS_MD_MD5);
+Debug_STATIC_ASSERT((int)SeosCryptoDigest_Algorithm_SHA256   ==
+                    (int)MBEDTLS_MD_SHA256);
 
 typedef struct
 {
