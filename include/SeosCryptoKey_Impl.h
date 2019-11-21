@@ -26,7 +26,9 @@
 #define SeosCryptoKey_RSA_EXPONENT      65537   ///< Public exp. 2^16+1
 
 #define SeosCryptoKey_Size_AES_MAX      32      ///< max 256 bit
+#define SeosCryptoKey_Size_RSA_MIN      16      ///< min 128 bit
 #define SeosCryptoKey_Size_RSA_MAX      512     ///< max 4096 bit
+#define SeosCryptoKey_Size_DH_MIN       8       ///< min 64 bit
 #define SeosCryptoKey_Size_DH_MAX       512     ///< max 4096 bit
 #define SeosCryptoKey_Size_ECC_MAX      32      ///< always 256 bit
 

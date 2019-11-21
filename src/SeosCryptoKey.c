@@ -469,7 +469,7 @@ generateImpl(SeosCryptoKey*             self,
 
     case SeosCryptoKey_Type_RSA_PRV:
         if ((SeosCryptoKey_SpecType_BITS != spec->type)
-            || (spec->key.params.bits < 128)
+            || (spec->key.params.bits < (SeosCryptoKey_Size_RSA_MIN * 8))
             || (spec->key.params.bits > (SeosCryptoKey_Size_RSA_MAX * 8)))
         {
             return SEOS_ERROR_NOT_SUPPORTED;
@@ -497,7 +497,8 @@ generateImpl(SeosCryptoKey*             self,
         default:
             return SEOS_ERROR_NOT_SUPPORTED;
         }
-        if (bits > (SeosCryptoKey_Size_DH_MAX * 8) || bits < 64)
+        if (bits > (SeosCryptoKey_Size_DH_MAX * 8)
+            || bits < (SeosCryptoKey_Size_DH_MIN * 8))
         {
             return SEOS_ERROR_NOT_SUPPORTED;
         }
@@ -554,7 +555,8 @@ importImpl(SeosCryptoKey*               self,
             return SEOS_ERROR_INVALID_PARAMETER;
         }
         bits = getMpiLen(key->data.rsa.pub.nBytes, key->data.rsa.pub.nLen);
-        if (bits < 128 || bits > SeosCryptoKey_Size_RSA_MAX * 8)
+        if (bits < (SeosCryptoKey_Size_RSA_MIN * 8)
+            || bits > (SeosCryptoKey_Size_RSA_MAX * 8))
         {
             return SEOS_ERROR_NOT_SUPPORTED;
         }
@@ -570,7 +572,8 @@ importImpl(SeosCryptoKey*               self,
         }
         bits = getMpiLen(key->data.rsa.prv.pBytes, key->data.rsa.prv.pLen)
                + getMpiLen(key->data.rsa.prv.qBytes, key->data.rsa.prv.qLen);
-        if (bits < 128 || bits > SeosCryptoKey_Size_RSA_MAX * 8)
+        if (bits < (SeosCryptoKey_Size_RSA_MIN * 8)
+            || bits > (SeosCryptoKey_Size_RSA_MAX * 8))
         {
             return SEOS_ERROR_NOT_SUPPORTED;
         }
