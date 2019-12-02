@@ -97,6 +97,8 @@ if (SEOS_CRYPTO_IMPL_MBEDTLS)
         "3rdParty/mbedtls/library/rsa_internal.c"
         # Temporary: For mbedTLS
         "3rdParty/mbedtls/library/asn1parse.c"
+        "3rdParty/mbedtls/library/pem.c"
+        "3rdParty/mbedtls/library/base64.c"
     )
 endif()
 

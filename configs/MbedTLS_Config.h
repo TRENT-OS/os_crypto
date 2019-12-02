@@ -7,6 +7,8 @@
 
 #define MBEDTLS_DEBUG_C
 
+#define USE_SEOS_CRYPTO
+
 // -----------------------------------------------------------------------------
 // Modules for seos_crypto_api
 // -----------------------------------------------------------------------------
@@ -45,8 +47,11 @@
 #define MBEDTLS_SSL_TLS_C
 
 #define MBEDTLS_KEY_EXCHANGE_DHE_RSA_ENABLED
+#define MBEDTLS_KEY_EXCHANGE_ECDHE_RSA_ENABLED
 
 #define MBEDTLS_X509_CRT_PARSE_C
+#define MBEDTLS_PEM_PARSE_C
+#define MBEDTLS_BASE64_C
 #define MBEDTLS_X509_USE_C
 #define MBEDTLS_PK_PARSE_C
 #define MBEDTLS_PK_C
