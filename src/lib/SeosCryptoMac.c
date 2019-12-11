@@ -12,8 +12,9 @@
 // Private Functions -----------------------------------------------------------
 
 static seos_err_t
-initImpl(SeosCryptoMac*             self,
-         const SeosCryptoApi_MemIf* memIf)
+initImpl(
+    SeosCryptoMac*             self,
+    const SeosCryptoApi_MemIf* memIf)
 {
     UNUSED_VAR(memIf);
     mbedtls_md_type_t type;
@@ -36,8 +37,9 @@ initImpl(SeosCryptoMac*             self,
 }
 
 static seos_err_t
-freeImpl(SeosCryptoMac*             self,
-         const SeosCryptoApi_MemIf* memIf)
+freeImpl(
+    SeosCryptoMac*             self,
+    const SeosCryptoApi_MemIf* memIf)
 {
     UNUSED_VAR(memIf);
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -57,9 +59,10 @@ freeImpl(SeosCryptoMac*             self,
 }
 
 static seos_err_t
-startImpl(SeosCryptoMac* self,
-          const void*    secret,
-          const size_t   secretSize)
+startImpl(
+    SeosCryptoMac* self,
+    const void*    secret,
+    const size_t   secretSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -78,9 +81,10 @@ startImpl(SeosCryptoMac* self,
 }
 
 static seos_err_t
-processImpl(SeosCryptoMac* self,
-            const void*    data,
-            const size_t   dataSize)
+processImpl(
+    SeosCryptoMac* self,
+    const void*    data,
+    const size_t   dataSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -99,9 +103,10 @@ processImpl(SeosCryptoMac* self,
 }
 
 static seos_err_t
-finalizeImpl(SeosCryptoMac* self,
-             void*          mac,
-             size_t*        macSize)
+finalizeImpl(
+    SeosCryptoMac* self,
+    void*          mac,
+    size_t*        macSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -141,9 +146,10 @@ finalizeImpl(SeosCryptoMac* self,
 // Public Functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoMac_init(SeosCryptoMac*              self,
-                   const SeosCryptoApi_MemIf*  memIf,
-                   const SeosCryptoApi_Mac_Alg algorithm)
+SeosCryptoMac_init(
+    SeosCryptoMac*              self,
+    const SeosCryptoApi_MemIf*  memIf,
+    const SeosCryptoApi_Mac_Alg algorithm)
 {
     if (NULL == memIf || NULL == self)
     {
@@ -160,8 +166,9 @@ SeosCryptoMac_init(SeosCryptoMac*              self,
 }
 
 seos_err_t
-SeosCryptoMac_free(SeosCryptoMac*             self,
-                   const SeosCryptoApi_MemIf* memIf)
+SeosCryptoMac_free(
+    SeosCryptoMac*             self,
+    const SeosCryptoApi_MemIf* memIf)
 {
     if (NULL == memIf || NULL == self)
     {
@@ -172,9 +179,10 @@ SeosCryptoMac_free(SeosCryptoMac*             self,
 }
 
 seos_err_t
-SeosCryptoMac_start(SeosCryptoMac* self,
-                    const void*    secret,
-                    const size_t   secretSize)
+SeosCryptoMac_start(
+    SeosCryptoMac* self,
+    const void*    secret,
+    const size_t   secretSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -191,9 +199,10 @@ SeosCryptoMac_start(SeosCryptoMac* self,
 }
 
 seos_err_t
-SeosCryptoMac_process(SeosCryptoMac* self,
-                      const void*    data,
-                      const size_t   dataSize)
+SeosCryptoMac_process(
+    SeosCryptoMac* self,
+    const void*    data,
+    const size_t   dataSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -210,9 +219,10 @@ SeosCryptoMac_process(SeosCryptoMac* self,
 }
 
 seos_err_t
-SeosCryptoMac_finalize(SeosCryptoMac* self,
-                       void*          mac,
-                       size_t*        macSize)
+SeosCryptoMac_finalize(
+    SeosCryptoMac* self,
+    void*          mac,
+    size_t*        macSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 

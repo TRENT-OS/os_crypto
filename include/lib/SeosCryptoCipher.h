@@ -46,32 +46,37 @@ struct SeosCryptoCipher
 // Internal functions ----------------------------------------------------------
 
 seos_err_t
-SeosCryptoCipher_init(SeosCryptoCipher*              self,
-                      const SeosCryptoApi_MemIf*     memIf,
-                      const SeosCryptoApi_Cipher_Alg algorithm,
-                      const SeosCryptoKey*           key,
-                      const void*                    iv,
-                      size_t                         ivLen);
+SeosCryptoCipher_init(
+    SeosCryptoCipher*              self,
+    const SeosCryptoApi_MemIf*     memIf,
+    const SeosCryptoApi_Cipher_Alg algorithm,
+    const SeosCryptoKey*           key,
+    const void*                    iv,
+    size_t                         ivLen);
 
 seos_err_t
-SeosCryptoCipher_free(SeosCryptoCipher*          self,
-                      const SeosCryptoApi_MemIf* memIf);
+SeosCryptoCipher_free(
+    SeosCryptoCipher*          self,
+    const SeosCryptoApi_MemIf* memIf);
 
 seos_err_t
-SeosCryptoCipher_start(SeosCryptoCipher* self,
-                       const void*       input,
-                       const size_t      inputSize);
+SeosCryptoCipher_start(
+    SeosCryptoCipher* self,
+    const void*       input,
+    const size_t      inputSize);
 
 seos_err_t
-SeosCryptoCipher_process(SeosCryptoCipher* self,
-                         const void*       input,
-                         const size_t      inputSize,
-                         void*             output,
-                         size_t*           outputSize);
+SeosCryptoCipher_process(
+    SeosCryptoCipher* self,
+    const void*       input,
+    const size_t      inputSize,
+    void*             output,
+    size_t*           outputSize);
 
 seos_err_t
-SeosCryptoCipher_finalize(SeosCryptoCipher* self,
-                          void*             output,
-                          size_t*           outputSize);
+SeosCryptoCipher_finalize(
+    SeosCryptoCipher* self,
+    void*             output,
+    size_t*           outputSize);
 
 /** @} */

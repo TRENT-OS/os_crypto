@@ -36,20 +36,23 @@ struct SeosCryptoAgreement
 // Internal functions ----------------------------------------------------------
 
 seos_err_t
-SeosCryptoAgreement_init(SeosCryptoAgreement*              self,
-                         const SeosCryptoApi_MemIf*        memIf,
-                         const SeosCryptoApi_Agreement_Alg algorithm,
-                         const SeosCryptoKey*              privateKey);
+SeosCryptoAgreement_init(
+    SeosCryptoAgreement*              self,
+    const SeosCryptoApi_MemIf*        memIf,
+    const SeosCryptoApi_Agreement_Alg algorithm,
+    const SeosCryptoKey*              privateKey);
 
 seos_err_t
-SeosCryptoAgreement_agree(SeosCryptoAgreement* self,
-                          SeosCryptoRng*       rng,
-                          const SeosCryptoKey* pubKey,
-                          void*                shared,
-                          size_t*              sharedSize);
+SeosCryptoAgreement_agree(
+    SeosCryptoAgreement* self,
+    SeosCryptoRng*       rng,
+    const SeosCryptoKey* pubKey,
+    void*                shared,
+    size_t*              sharedSize);
 
 seos_err_t
-SeosCryptoAgreement_free(SeosCryptoAgreement*       self,
-                         const SeosCryptoApi_MemIf* memIf);
+SeosCryptoAgreement_free(
+    SeosCryptoAgreement*       self,
+    const SeosCryptoApi_MemIf* memIf);
 
 /** @} */

@@ -36,27 +36,32 @@ struct SeosCryptoMac
 // Internal functions ----------------------------------------------------------
 
 seos_err_t
-SeosCryptoMac_init(SeosCryptoMac*              self,
-                   const SeosCryptoApi_MemIf*  memIf,
-                   const SeosCryptoApi_Mac_Alg algorithm);
+SeosCryptoMac_init(
+    SeosCryptoMac*              self,
+    const SeosCryptoApi_MemIf*  memIf,
+    const SeosCryptoApi_Mac_Alg algorithm);
 
 seos_err_t
-SeosCryptoMac_free(SeosCryptoMac*             self,
-                   const SeosCryptoApi_MemIf* memIf);
+SeosCryptoMac_free(
+    SeosCryptoMac*             self,
+    const SeosCryptoApi_MemIf* memIf);
 
 seos_err_t
-SeosCryptoMac_start(SeosCryptoMac* self,
-                    const void*    secret,
-                    const size_t   secretSize);
+SeosCryptoMac_start(
+    SeosCryptoMac* self,
+    const void*    secret,
+    const size_t   secretSize);
 
 seos_err_t
-SeosCryptoMac_process(SeosCryptoMac* self,
-                      const void*    data,
-                      const size_t   dataSize);
+SeosCryptoMac_process(
+    SeosCryptoMac* self,
+    const void*    data,
+    const size_t   dataSize);
 
 seos_err_t
-SeosCryptoMac_finalize(SeosCryptoMac* self,
-                       void*          mac,
-                       size_t*        macSize);
+SeosCryptoMac_finalize(
+    SeosCryptoMac* self,
+    void*          mac,
+    size_t*        macSize);
 
 /** @} */

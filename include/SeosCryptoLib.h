@@ -66,206 +66,239 @@ struct SeosCryptoLib
  *
  */
 seos_err_t
-SeosCryptoLib_init(SeosCryptoLib*                 self,
-                   const SeosCryptoApi_Callbacks* cbFuncs,
-                   void*                          entropyCtx);
+SeosCryptoLib_init(
+    SeosCryptoLib*                 self,
+    const SeosCryptoApi_Callbacks* cbFuncs,
+    void*                          entropyCtx);
 
 seos_err_t
-SeosCryptoLib_free(SeosCryptoApi_Context* api);
+SeosCryptoLib_free(
+    SeosCryptoApi_Context* api);
 
 // -------------------------------- RNG API ------------------------------------
 
 seos_err_t
-SeosCryptoLib_Rng_getBytes(SeosCryptoApi_Context*       api,
-                           const SeosCryptoApi_Rng_Flag flags,
-                           void*                        buf,
-                           const size_t                 bufLen);
+SeosCryptoLib_Rng_getBytes(
+    SeosCryptoApi_Context*       api,
+    const SeosCryptoApi_Rng_Flag flags,
+    void*                        buf,
+    const size_t                 bufLen);
 
 seos_err_t
-SeosCryptoLib_Rng_reseed(SeosCryptoApi_Context* api,
-                         const void*            seed,
-                         const size_t           seedLen);
+SeosCryptoLib_Rng_reseed(
+    SeosCryptoApi_Context* api,
+    const void*            seed,
+    const size_t           seedLen);
 
 // -------------------------------- MAC API ------------------------------------
 
 seos_err_t
-SeosCryptoLib_Mac_init(SeosCryptoApi_Context*      api,
-                       SeosCryptoApi_Mac*          pMacHandle,
-                       const SeosCryptoApi_Mac_Alg algorithm);
+SeosCryptoLib_Mac_init(
+    SeosCryptoApi_Context*      api,
+    SeosCryptoApi_Mac*          pMacHandle,
+    const SeosCryptoApi_Mac_Alg algorithm);
 
 seos_err_t
-SeosCryptoLib_Mac_free(SeosCryptoApi_Context*  api,
-                       const SeosCryptoApi_Mac macHandle);
+SeosCryptoLib_Mac_free(
+    SeosCryptoApi_Context*  api,
+    const SeosCryptoApi_Mac macHandle);
 
 seos_err_t
-SeosCryptoLib_Mac_start(SeosCryptoApi_Context*  api,
-                        const SeosCryptoApi_Mac macHandle,
-                        const void*             secret,
-                        const size_t            secretSize);
+SeosCryptoLib_Mac_start(
+    SeosCryptoApi_Context*  api,
+    const SeosCryptoApi_Mac macHandle,
+    const void*             secret,
+    const size_t            secretSize);
 
 seos_err_t
-SeosCryptoLib_Mac_process(SeosCryptoApi_Context*  api,
-                          const SeosCryptoApi_Mac macHandle,
-                          const void*             data,
-                          const size_t            dataLen);
+SeosCryptoLib_Mac_process(
+    SeosCryptoApi_Context*  api,
+    const SeosCryptoApi_Mac macHandle,
+    const void*             data,
+    const size_t            dataLen);
 
 seos_err_t
-SeosCryptoLib_Mac_finalize(SeosCryptoApi_Context*  api,
-                           const SeosCryptoApi_Mac macHandle,
-                           void*                   mac,
-                           size_t*                 macSize);
+SeosCryptoLib_Mac_finalize(
+    SeosCryptoApi_Context*  api,
+    const SeosCryptoApi_Mac macHandle,
+    void*                   mac,
+    size_t*                 macSize);
 
 // ------------------------------ Digest API -----------------------------------
 
 seos_err_t
-SeosCryptoLib_Digest_init(SeosCryptoApi_Context*         api,
-                          SeosCryptoApi_Digest*          pDigestHandle,
-                          const SeosCryptoApi_Digest_Alg algorithm);
+SeosCryptoLib_Digest_init(
+    SeosCryptoApi_Context*         api,
+    SeosCryptoApi_Digest*          pDigestHandle,
+    const SeosCryptoApi_Digest_Alg algorithm);
 
 seos_err_t
-SeosCryptoLib_Digest_free(SeosCryptoApi_Context*     api,
-                          const SeosCryptoApi_Digest digestHandle);
+SeosCryptoLib_Digest_free(
+    SeosCryptoApi_Context*     api,
+    const SeosCryptoApi_Digest digestHandle);
 
 seos_err_t
-SeosCryptoLib_Digest_clone(SeosCryptoApi_Context*     api,
-                           const SeosCryptoApi_Digest dstDigHandle,
-                           const SeosCryptoApi_Digest srcDigHandle);
+SeosCryptoLib_Digest_clone(
+    SeosCryptoApi_Context*     api,
+    const SeosCryptoApi_Digest dstDigHandle,
+    const SeosCryptoApi_Digest srcDigHandle);
 
 seos_err_t
-SeosCryptoLib_Digest_process(SeosCryptoApi_Context*     api,
-                             const SeosCryptoApi_Digest digestHandle,
-                             const void*                data,
-                             const size_t               len);
+SeosCryptoLib_Digest_process(
+    SeosCryptoApi_Context*     api,
+    const SeosCryptoApi_Digest digestHandle,
+    const void*                data,
+    const size_t               len);
 
 seos_err_t
-SeosCryptoLib_Digest_finalize(SeosCryptoApi_Context*     api,
-                              const SeosCryptoApi_Digest digestHandle,
-                              void*                      digest,
-                              size_t*                    digestSize);
+SeosCryptoLib_Digest_finalize(
+    SeosCryptoApi_Context*     api,
+    const SeosCryptoApi_Digest digestHandle,
+    void*                      digest,
+    size_t*                    digestSize);
 
 // -------------------------------- Key API ------------------------------------
 
 seos_err_t
-SeosCryptoLib_Key_generate(SeosCryptoApi_Context*        api,
-                           SeosCryptoApi_Key*            pKeyHandle,
-                           const SeosCryptoApi_Key_Spec* spec);
+SeosCryptoLib_Key_generate(
+    SeosCryptoApi_Context*        api,
+    SeosCryptoApi_Key*            pKeyHandle,
+    const SeosCryptoApi_Key_Spec* spec);
 
 seos_err_t
-SeosCryptoLib_Key_makePublic(SeosCryptoApi_Context*           api,
-                             SeosCryptoApi_Key*               pPubKeyHandle,
-                             const SeosCryptoApi_Key          prvKeyHandle,
-                             const SeosCryptoApi_Key_Attribs* attribs);
+SeosCryptoLib_Key_makePublic(
+    SeosCryptoApi_Context*           api,
+    SeosCryptoApi_Key*               pPubKeyHandle,
+    const SeosCryptoApi_Key          prvKeyHandle,
+    const SeosCryptoApi_Key_Attribs* attribs);
 
 seos_err_t
-SeosCryptoLib_Key_import(SeosCryptoApi_Context*        api,
-                         SeosCryptoApi_Key*            pKeyHandle,
-                         const SeosCryptoApi_Key       wrapKeyHandle,
-                         const SeosCryptoApi_Key_Data* keyData);
+SeosCryptoLib_Key_import(
+    SeosCryptoApi_Context*        api,
+    SeosCryptoApi_Key*            pKeyHandle,
+    const SeosCryptoApi_Key       wrapKeyHandle,
+    const SeosCryptoApi_Key_Data* keyData);
 
 seos_err_t
-SeosCryptoLib_Key_export(SeosCryptoApi_Context*  api,
-                         const SeosCryptoApi_Key keyHandle,
-                         const SeosCryptoApi_Key wrapKeyHandle,
-                         SeosCryptoApi_Key_Data* keyData);
+SeosCryptoLib_Key_export(
+    SeosCryptoApi_Context*  api,
+    const SeosCryptoApi_Key keyHandle,
+    const SeosCryptoApi_Key wrapKeyHandle,
+    SeosCryptoApi_Key_Data* keyData);
 
 seos_err_t
-SeosCryptoLib_Key_getParams(SeosCryptoApi_Context*  api,
-                            const SeosCryptoApi_Key keyHandle,
-                            void*                   keyParams,
-                            size_t*                 paramSize);
+SeosCryptoLib_Key_getParams(
+    SeosCryptoApi_Context*  api,
+    const SeosCryptoApi_Key keyHandle,
+    void*                   keyParams,
+    size_t*                 paramSize);
 
 seos_err_t
-SeosCryptoLib_Key_loadParams(SeosCryptoApi_Context*        api,
-                             const SeosCryptoApi_Key_Param name,
-                             void*                         keyParams,
-                             size_t*                       paramSize);
+SeosCryptoLib_Key_loadParams(
+    SeosCryptoApi_Context*        api,
+    const SeosCryptoApi_Key_Param name,
+    void*                         keyParams,
+    size_t*                       paramSize);
 
 seos_err_t
-SeosCryptoLib_Key_free(SeosCryptoApi_Context*  api,
-                       const SeosCryptoApi_Key keyHandle);
+SeosCryptoLib_Key_free(
+    SeosCryptoApi_Context*  api,
+    const SeosCryptoApi_Key keyHandle);
 
 // ------------------------------ Cipher API -----------------------------------
 
 seos_err_t
-SeosCryptoLib_Cipher_init(SeosCryptoApi_Context*         api,
-                          SeosCryptoApi_Cipher*          pCipherHandle,
-                          const SeosCryptoApi_Cipher_Alg algorithm,
-                          const SeosCryptoApi_Key        keyHandle,
-                          const void*                    iv,
-                          const size_t                   ivLen);
+SeosCryptoLib_Cipher_init(
+    SeosCryptoApi_Context*         api,
+    SeosCryptoApi_Cipher*          pCipherHandle,
+    const SeosCryptoApi_Cipher_Alg algorithm,
+    const SeosCryptoApi_Key        keyHandle,
+    const void*                    iv,
+    const size_t                   ivLen);
 
 seos_err_t
-SeosCryptoLib_Cipher_free(SeosCryptoApi_Context*     api,
-                          const SeosCryptoApi_Cipher cipherHandle);
+SeosCryptoLib_Cipher_free(
+    SeosCryptoApi_Context*     api,
+    const SeosCryptoApi_Cipher cipherHandle);
 
 seos_err_t
-SeosCryptoLib_Cipher_process(SeosCryptoApi_Context*     api,
-                             const SeosCryptoApi_Cipher cipherHandle,
-                             const void*                input,
-                             const size_t               inputSize,
-                             void*                      output,
-                             size_t*                    outputSize);
+SeosCryptoLib_Cipher_process(
+    SeosCryptoApi_Context*     api,
+    const SeosCryptoApi_Cipher cipherHandle,
+    const void*                input,
+    const size_t               inputSize,
+    void*                      output,
+    size_t*                    outputSize);
 
 seos_err_t
-SeosCryptoLib_Cipher_start(SeosCryptoApi_Context*     api,
-                           const SeosCryptoApi_Cipher cipherHandle,
-                           const void*                input,
-                           const size_t               inputSize);
+SeosCryptoLib_Cipher_start(
+    SeosCryptoApi_Context*     api,
+    const SeosCryptoApi_Cipher cipherHandle,
+    const void*                input,
+    const size_t               inputSize);
 
 seos_err_t
-SeosCryptoLib_Cipher_finalize(SeosCryptoApi_Context*     api,
-                              const SeosCryptoApi_Cipher cipherHandle,
-                              void*                      output,
-                              size_t*                    outputSize);
+SeosCryptoLib_Cipher_finalize(
+    SeosCryptoApi_Context*     api,
+    const SeosCryptoApi_Cipher cipherHandle,
+    void*                      output,
+    size_t*                    outputSize);
 
 // ----------------------------- Signature API ---------------------------------
 
 seos_err_t
-SeosCryptoLib_Signature_init(SeosCryptoApi_Context*            api,
-                             SeosCryptoApi_Signature*          pSigHandle,
-                             const SeosCryptoApi_Signature_Alg algorithm,
-                             const SeosCryptoApi_Digest_Alg    digest,
-                             const SeosCryptoApi_Key           prvHandle,
-                             const SeosCryptoApi_Key           pubHandle);
+SeosCryptoLib_Signature_init(
+    SeosCryptoApi_Context*            api,
+    SeosCryptoApi_Signature*          pSigHandle,
+    const SeosCryptoApi_Signature_Alg algorithm,
+    const SeosCryptoApi_Digest_Alg    digest,
+    const SeosCryptoApi_Key           prvHandle,
+    const SeosCryptoApi_Key           pubHandle);
 
 seos_err_t
-SeosCryptoLib_Signature_free(SeosCryptoApi_Context*        api,
-                             const SeosCryptoApi_Signature sigHandle);
+SeosCryptoLib_Signature_free(
+    SeosCryptoApi_Context*        api,
+    const SeosCryptoApi_Signature sigHandle);
 
 
 seos_err_t
-SeosCryptoLib_Signature_sign(SeosCryptoApi_Context*        api,
-                             const SeosCryptoApi_Signature sigHandle,
-                             const void*                   hash,
-                             const size_t                  hashSize,
-                             void*                         signature,
-                             size_t*                       signatureSize);
+SeosCryptoLib_Signature_sign(
+    SeosCryptoApi_Context*        api,
+    const SeosCryptoApi_Signature sigHandle,
+    const void*                   hash,
+    const size_t                  hashSize,
+    void*                         signature,
+    size_t*                       signatureSize);
 
 seos_err_t
-SeosCryptoLib_Signature_verify(SeosCryptoApi_Context*        api,
-                               const SeosCryptoApi_Signature sigHandle,
-                               const void*                   hash,
-                               const size_t                  hashSize,
-                               const void*                   signature,
-                               const size_t                  signatureSize);
+SeosCryptoLib_Signature_verify(
+    SeosCryptoApi_Context*        api,
+    const SeosCryptoApi_Signature sigHandle,
+    const void*                   hash,
+    const size_t                  hashSize,
+    const void*                   signature,
+    const size_t                  signatureSize);
 
 // ----------------------------- Agreement API ---------------------------------
 
 seos_err_t
-SeosCryptoLib_Agreement_init(SeosCryptoApi_Context*            api,
-                             SeosCryptoApi_Agreement*          pAgrHandle,
-                             const SeosCryptoApi_Agreement_Alg algorithm,
-                             const SeosCryptoApi_Key           prvHandle);
+SeosCryptoLib_Agreement_init(
+    SeosCryptoApi_Context*            api,
+    SeosCryptoApi_Agreement*          pAgrHandle,
+    const SeosCryptoApi_Agreement_Alg algorithm,
+    const SeosCryptoApi_Key           prvHandle);
 
 seos_err_t
-SeosCryptoLib_Agreement_free(SeosCryptoApi_Context*        api,
-                             const SeosCryptoApi_Agreement agrHandle);
+SeosCryptoLib_Agreement_free(
+    SeosCryptoApi_Context*        api,
+    const SeosCryptoApi_Agreement agrHandle);
 
 seos_err_t
-SeosCryptoLib_Agreement_agree(SeosCryptoApi_Context*        api,
-                              const SeosCryptoApi_Agreement agrHandle,
-                              const SeosCryptoApi_Key       pubHandle,
-                              void*                         shared,
-                              size_t*                       sharedSize);
+SeosCryptoLib_Agreement_agree(
+    SeosCryptoApi_Context*        api,
+    const SeosCryptoApi_Agreement agrHandle,
+    const SeosCryptoApi_Key       pubHandle,
+    void*                         shared,
+    size_t*                       sharedSize);
 
 /** @} */

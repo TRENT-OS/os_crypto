@@ -49,9 +49,10 @@ static const SeosCryptoApi_Vtable SeosCryptoRpcClient_vtable =
 // Public functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoRpcClient_init(SeosCryptoRpcClient*    self,
-                         SeosCryptoApi_RpcServer rpcHandle,
-                         void*                   dataport)
+SeosCryptoRpcClient_init(
+    SeosCryptoRpcClient*    self,
+    SeosCryptoApi_RpcServer rpcHandle,
+    void*                   dataport)
 {
     if (NULL == self || NULL == rpcHandle || NULL == dataport)
     {
@@ -68,7 +69,8 @@ SeosCryptoRpcClient_init(SeosCryptoRpcClient*    self,
 }
 
 seos_err_t
-SeosCryptoRpcClient_free(SeosCryptoApi_Context* api)
+SeosCryptoRpcClient_free(
+    SeosCryptoApi_Context* api)
 {
     return SEOS_SUCCESS;
 }
@@ -76,10 +78,11 @@ SeosCryptoRpcClient_free(SeosCryptoApi_Context* api)
 // -------------------------------- RNG API ------------------------------------
 
 seos_err_t
-SeosCryptoRpcClient_Rng_getBytes(SeosCryptoApi_Context*       api,
-                                 const SeosCryptoApi_Rng_Flag flags,
-                                 void*                        buf,
-                                 const size_t                 bufLen)
+SeosCryptoRpcClient_Rng_getBytes(
+    SeosCryptoApi_Context*       api,
+    const SeosCryptoApi_Rng_Flag flags,
+    void*                        buf,
+    const size_t                 bufLen)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
@@ -104,9 +107,10 @@ SeosCryptoRpcClient_Rng_getBytes(SeosCryptoApi_Context*       api,
 }
 
 seos_err_t
-SeosCryptoRpcClient_Rng_reseed(SeosCryptoApi_Context* api,
-                               const void*            seed,
-                               const size_t           seedLen)
+SeosCryptoRpcClient_Rng_reseed(
+    SeosCryptoApi_Context* api,
+    const void*            seed,
+    const size_t           seedLen)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -127,9 +131,10 @@ SeosCryptoRpcClient_Rng_reseed(SeosCryptoApi_Context* api,
 // ------------------------------- MAC API -------------------------------------
 
 seos_err_t
-SeosCryptoRpcClient_Mac_init(SeosCryptoApi_Context*      api,
-                             SeosCryptoApi_Mac*          pMacHandle,
-                             const SeosCryptoApi_Mac_Alg algorithm)
+SeosCryptoRpcClient_Mac_init(
+    SeosCryptoApi_Context*      api,
+    SeosCryptoApi_Mac*          pMacHandle,
+    const SeosCryptoApi_Mac_Alg algorithm)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -143,8 +148,9 @@ SeosCryptoRpcClient_Mac_init(SeosCryptoApi_Context*      api,
 }
 
 seos_err_t
-SeosCryptoRpcClient_Mac_free(SeosCryptoApi_Context*  api,
-                             const SeosCryptoApi_Mac macHandle)
+SeosCryptoRpcClient_Mac_free(
+    SeosCryptoApi_Context*  api,
+    const SeosCryptoApi_Mac macHandle)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -157,10 +163,11 @@ SeosCryptoRpcClient_Mac_free(SeosCryptoApi_Context*  api,
 }
 
 seos_err_t
-SeosCryptoRpcClient_Mac_start(SeosCryptoApi_Context*  api,
-                              const SeosCryptoApi_Mac macHandle,
-                              const void*             secret,
-                              const size_t            secretSize)
+SeosCryptoRpcClient_Mac_start(
+    SeosCryptoApi_Context*  api,
+    const SeosCryptoApi_Mac macHandle,
+    const void*             secret,
+    const size_t            secretSize)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -179,10 +186,11 @@ SeosCryptoRpcClient_Mac_start(SeosCryptoApi_Context*  api,
 }
 
 seos_err_t
-SeosCryptoRpcClient_Mac_process(SeosCryptoApi_Context*  api,
-                                const SeosCryptoApi_Mac macHandle,
-                                const void*             data,
-                                const size_t            dataLen)
+SeosCryptoRpcClient_Mac_process(
+    SeosCryptoApi_Context*  api,
+    const SeosCryptoApi_Mac macHandle,
+    const void*             data,
+    const size_t            dataLen)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -201,10 +209,11 @@ SeosCryptoRpcClient_Mac_process(SeosCryptoApi_Context*  api,
 }
 
 seos_err_t
-SeosCryptoRpcClient_Mac_finalize(SeosCryptoApi_Context*  api,
-                                 const SeosCryptoApi_Mac macHandle,
-                                 void*                   mac,
-                                 size_t*                 macSize)
+SeosCryptoRpcClient_Mac_finalize(
+    SeosCryptoApi_Context*  api,
+    const SeosCryptoApi_Mac macHandle,
+    void*                   mac,
+    size_t*                 macSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
@@ -231,9 +240,10 @@ SeosCryptoRpcClient_Mac_finalize(SeosCryptoApi_Context*  api,
 // ------------------------------ Digest API -----------------------------------
 
 seos_err_t
-SeosCryptoRpcClient_Digest_init(SeosCryptoApi_Context*         api,
-                                SeosCryptoApi_Digest*          pDigestHandle,
-                                const SeosCryptoApi_Digest_Alg algorithm)
+SeosCryptoRpcClient_Digest_init(
+    SeosCryptoApi_Context*         api,
+    SeosCryptoApi_Digest*          pDigestHandle,
+    const SeosCryptoApi_Digest_Alg algorithm)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -248,8 +258,9 @@ SeosCryptoRpcClient_Digest_init(SeosCryptoApi_Context*         api,
 }
 
 seos_err_t
-SeosCryptoRpcClient_Digest_free(SeosCryptoApi_Context*     api,
-                                const SeosCryptoApi_Digest digestHandle)
+SeosCryptoRpcClient_Digest_free(
+    SeosCryptoApi_Context*     api,
+    const SeosCryptoApi_Digest digestHandle)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -262,9 +273,10 @@ SeosCryptoRpcClient_Digest_free(SeosCryptoApi_Context*     api,
 }
 
 seos_err_t
-SeosCryptoRpcClient_Digest_clone(SeosCryptoApi_Context*     api,
-                                 const SeosCryptoApi_Digest dstDigHandle,
-                                 const SeosCryptoApi_Digest srcDigHandle)
+SeosCryptoRpcClient_Digest_clone(
+    SeosCryptoApi_Context*     api,
+    const SeosCryptoApi_Digest dstDigHandle,
+    const SeosCryptoApi_Digest srcDigHandle)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -278,10 +290,11 @@ SeosCryptoRpcClient_Digest_clone(SeosCryptoApi_Context*     api,
 }
 
 seos_err_t
-SeosCryptoRpcClient_Digest_process(SeosCryptoApi_Context*     api,
-                                   const SeosCryptoApi_Digest digestHandle,
-                                   const void*                data,
-                                   const size_t               dataLen)
+SeosCryptoRpcClient_Digest_process(
+    SeosCryptoApi_Context*     api,
+    const SeosCryptoApi_Digest digestHandle,
+    const void*                data,
+    const size_t               dataLen)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -301,10 +314,11 @@ SeosCryptoRpcClient_Digest_process(SeosCryptoApi_Context*     api,
 }
 
 seos_err_t
-SeosCryptoRpcClient_Digest_finalize(SeosCryptoApi_Context*     api,
-                                    const SeosCryptoApi_Digest digestHandle,
-                                    void*                      digest,
-                                    size_t*                    digestSize)
+SeosCryptoRpcClient_Digest_finalize(
+    SeosCryptoApi_Context*     api,
+    const SeosCryptoApi_Digest digestHandle,
+    void*                      digest,
+    size_t*                    digestSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
@@ -331,13 +345,14 @@ SeosCryptoRpcClient_Digest_finalize(SeosCryptoApi_Context*     api,
 // ----------------------------- Signature API ---------------------------------
 
 seos_err_t
-SeosCryptoRpcClient_Signature_init(SeosCryptoApi_Context*
-                                   api,
-                                   SeosCryptoApi_Signature*          pSigHandle,
-                                   const SeosCryptoApi_Signature_Alg algorithm,
-                                   const SeosCryptoApi_Digest_Alg    digest,
-                                   const SeosCryptoApi_Key           prvHandle,
-                                   const SeosCryptoApi_Key           pubHandle)
+SeosCryptoRpcClient_Signature_init(
+    SeosCryptoApi_Context*
+    api,
+    SeosCryptoApi_Signature*          pSigHandle,
+    const SeosCryptoApi_Signature_Alg algorithm,
+    const SeosCryptoApi_Digest_Alg    digest,
+    const SeosCryptoApi_Key           prvHandle,
+    const SeosCryptoApi_Key           pubHandle)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -353,8 +368,9 @@ SeosCryptoRpcClient_Signature_init(SeosCryptoApi_Context*
 }
 
 seos_err_t
-SeosCryptoRpcClient_Signature_free(SeosCryptoApi_Context*        api,
-                                   const SeosCryptoApi_Signature sigHandle)
+SeosCryptoRpcClient_Signature_free(
+    SeosCryptoApi_Context*        api,
+    const SeosCryptoApi_Signature sigHandle)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -367,12 +383,13 @@ SeosCryptoRpcClient_Signature_free(SeosCryptoApi_Context*        api,
 }
 
 seos_err_t
-SeosCryptoRpcClient_Signature_sign(SeosCryptoApi_Context*        api,
-                                   const SeosCryptoApi_Signature sigHandle,
-                                   const void*                   hash,
-                                   const size_t                  hashSize,
-                                   void*                         signature,
-                                   size_t*                       signatureSize)
+SeosCryptoRpcClient_Signature_sign(
+    SeosCryptoApi_Context*        api,
+    const SeosCryptoApi_Signature sigHandle,
+    const void*                   hash,
+    const size_t                  hashSize,
+    void*                         signature,
+    size_t*                       signatureSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
@@ -402,13 +419,14 @@ SeosCryptoRpcClient_Signature_sign(SeosCryptoApi_Context*        api,
 }
 
 seos_err_t
-SeosCryptoRpcClient_Signature_verify(SeosCryptoApi_Context*
-                                     api,
-                                     const SeosCryptoApi_Signature sigHandle,
-                                     const void*                   hash,
-                                     const size_t                  hashSize,
-                                     const void*                   signature,
-                                     const size_t                  signatureSize)
+SeosCryptoRpcClient_Signature_verify(
+    SeosCryptoApi_Context*
+    api,
+    const SeosCryptoApi_Signature sigHandle,
+    const void*                   hash,
+    const size_t                  hashSize,
+    const void*                   signature,
+    const size_t                  signatureSize)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -432,11 +450,12 @@ SeosCryptoRpcClient_Signature_verify(SeosCryptoApi_Context*
 // ----------------------------- Agreement API ---------------------------------
 
 seos_err_t
-SeosCryptoRpcClient_Agreement_init(SeosCryptoApi_Context*
-                                   api,
-                                   SeosCryptoApi_Agreement*          pAgrHandle,
-                                   const SeosCryptoApi_Agreement_Alg algorithm,
-                                   const SeosCryptoApi_Key           prvHandle)
+SeosCryptoRpcClient_Agreement_init(
+    SeosCryptoApi_Context*
+    api,
+    SeosCryptoApi_Agreement*          pAgrHandle,
+    const SeosCryptoApi_Agreement_Alg algorithm,
+    const SeosCryptoApi_Key           prvHandle)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -452,8 +471,9 @@ SeosCryptoRpcClient_Agreement_init(SeosCryptoApi_Context*
 }
 
 seos_err_t
-SeosCryptoRpcClient_Agreement_free(SeosCryptoApi_Context*        api,
-                                   const SeosCryptoApi_Agreement agrHandle)
+SeosCryptoRpcClient_Agreement_free(
+    SeosCryptoApi_Context*        api,
+    const SeosCryptoApi_Agreement agrHandle)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -466,12 +486,13 @@ SeosCryptoRpcClient_Agreement_free(SeosCryptoApi_Context*        api,
 }
 
 seos_err_t
-SeosCryptoRpcClient_Agreement_agree(SeosCryptoApi_Context*
-                                    api,
-                                    const SeosCryptoApi_Agreement agrHandle,
-                                    const SeosCryptoApi_Key       pubHandle,
-                                    void*                         shared,
-                                    size_t*                       sharedSize)
+SeosCryptoRpcClient_Agreement_agree(
+    SeosCryptoApi_Context*
+    api,
+    const SeosCryptoApi_Agreement agrHandle,
+    const SeosCryptoApi_Key       pubHandle,
+    void*                         shared,
+    size_t*                       sharedSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
@@ -498,9 +519,10 @@ SeosCryptoRpcClient_Agreement_agree(SeosCryptoApi_Context*
 // -------------------------------- Key API ------------------------------------
 
 seos_err_t
-SeosCryptoRpcClient_Key_generate(SeosCryptoApi_Context*        api,
-                                 SeosCryptoApi_Key*            pKeyHandle,
-                                 const SeosCryptoApi_Key_Spec* spec)
+SeosCryptoRpcClient_Key_generate(
+    SeosCryptoApi_Context*        api,
+    SeosCryptoApi_Key*            pKeyHandle,
+    const SeosCryptoApi_Key_Spec* spec)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -515,10 +537,11 @@ SeosCryptoRpcClient_Key_generate(SeosCryptoApi_Context*        api,
 }
 
 seos_err_t
-SeosCryptoRpcClient_Key_makePublic(SeosCryptoApi_Context*           api,
-                                   SeosCryptoApi_Key*               pPubKeyHandle,
-                                   const SeosCryptoApi_Key          prvKeyHandle,
-                                   const SeosCryptoApi_Key_Attribs* attribs)
+SeosCryptoRpcClient_Key_makePublic(
+    SeosCryptoApi_Context*           api,
+    SeosCryptoApi_Key*               pPubKeyHandle,
+    const SeosCryptoApi_Key          prvKeyHandle,
+    const SeosCryptoApi_Key_Attribs* attribs)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -534,10 +557,11 @@ SeosCryptoRpcClient_Key_makePublic(SeosCryptoApi_Context*           api,
 }
 
 seos_err_t
-SeosCryptoRpcClient_Key_import(SeosCryptoApi_Context*        api,
-                               SeosCryptoApi_Key*            pKeyHandle,
-                               const SeosCryptoApi_Key       wrapKeyHandle,
-                               const SeosCryptoApi_Key_Data* keyData)
+SeosCryptoRpcClient_Key_import(
+    SeosCryptoApi_Context*        api,
+    SeosCryptoApi_Key*            pKeyHandle,
+    const SeosCryptoApi_Key       wrapKeyHandle,
+    const SeosCryptoApi_Key_Data* keyData)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -553,10 +577,11 @@ SeosCryptoRpcClient_Key_import(SeosCryptoApi_Context*        api,
 }
 
 seos_err_t
-SeosCryptoRpcClient_Key_export(SeosCryptoApi_Context*  api,
-                               const SeosCryptoApi_Key keyHandle,
-                               const SeosCryptoApi_Key wrapKeyHandle,
-                               SeosCryptoApi_Key_Data* keyData)
+SeosCryptoRpcClient_Key_export(
+    SeosCryptoApi_Context*  api,
+    const SeosCryptoApi_Key keyHandle,
+    const SeosCryptoApi_Key wrapKeyHandle,
+    SeosCryptoApi_Key_Data* keyData)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -577,10 +602,11 @@ SeosCryptoRpcClient_Key_export(SeosCryptoApi_Context*  api,
 }
 
 seos_err_t
-SeosCryptoRpcClient_Key_getParams(SeosCryptoApi_Context*  api,
-                                  const SeosCryptoApi_Key keyHandle,
-                                  void*                   keyParams,
-                                  size_t*                 paramSize)
+SeosCryptoRpcClient_Key_getParams(
+    SeosCryptoApi_Context*  api,
+    const SeosCryptoApi_Key keyHandle,
+    void*                   keyParams,
+    size_t*                 paramSize)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -605,10 +631,11 @@ SeosCryptoRpcClient_Key_getParams(SeosCryptoApi_Context*  api,
 }
 
 seos_err_t
-SeosCryptoRpcClient_Key_loadParams(SeosCryptoApi_Context*        api,
-                                   const SeosCryptoApi_Key_Param name,
-                                   void*                         keyParams,
-                                   size_t*                       paramSize)
+SeosCryptoRpcClient_Key_loadParams(
+    SeosCryptoApi_Context*        api,
+    const SeosCryptoApi_Key_Param name,
+    void*                         keyParams,
+    size_t*                       paramSize)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -633,8 +660,9 @@ SeosCryptoRpcClient_Key_loadParams(SeosCryptoApi_Context*        api,
 }
 
 seos_err_t
-SeosCryptoRpcClient_Key_free(SeosCryptoApi_Context*  api,
-                             const SeosCryptoApi_Key keyHandle)
+SeosCryptoRpcClient_Key_free(
+    SeosCryptoApi_Context*  api,
+    const SeosCryptoApi_Key keyHandle)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -649,12 +677,13 @@ SeosCryptoRpcClient_Key_free(SeosCryptoApi_Context*  api,
 // ------------------------------ Cipher API -----------------------------------
 
 seos_err_t
-SeosCryptoRpcClient_Cipher_init(SeosCryptoApi_Context*         api,
-                                SeosCryptoApi_Cipher*          pCipherHandle,
-                                const SeosCryptoApi_Cipher_Alg algorithm,
-                                const SeosCryptoApi_Key        key,
-                                const void*                    iv,
-                                const size_t                   ivLen)
+SeosCryptoRpcClient_Cipher_init(
+    SeosCryptoApi_Context*         api,
+    SeosCryptoApi_Cipher*          pCipherHandle,
+    const SeosCryptoApi_Cipher_Alg algorithm,
+    const SeosCryptoApi_Key        key,
+    const void*                    iv,
+    const size_t                   ivLen)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -679,8 +708,9 @@ SeosCryptoRpcClient_Cipher_init(SeosCryptoApi_Context*         api,
 }
 
 seos_err_t
-SeosCryptoRpcClient_Cipher_free(SeosCryptoApi_Context*     api,
-                                const SeosCryptoApi_Cipher cipherHandle)
+SeosCryptoRpcClient_Cipher_free(
+    SeosCryptoApi_Context*     api,
+    const SeosCryptoApi_Cipher cipherHandle)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -693,12 +723,13 @@ SeosCryptoRpcClient_Cipher_free(SeosCryptoApi_Context*     api,
 }
 
 seos_err_t
-SeosCryptoRpcClient_Cipher_process(SeosCryptoApi_Context*     api,
-                                   const SeosCryptoApi_Cipher cipherHandle,
-                                   const void*                input,
-                                   const size_t               inputSize,
-                                   void*                      output,
-                                   size_t*                    outputSize)
+SeosCryptoRpcClient_Cipher_process(
+    SeosCryptoApi_Context*     api,
+    const SeosCryptoApi_Cipher cipherHandle,
+    const void*                input,
+    const size_t               inputSize,
+    void*                      output,
+    size_t*                    outputSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
@@ -728,10 +759,11 @@ SeosCryptoRpcClient_Cipher_process(SeosCryptoApi_Context*     api,
 }
 
 seos_err_t
-SeosCryptoRpcClient_Cipher_start(SeosCryptoApi_Context*     api,
-                                 const SeosCryptoApi_Cipher cipherHandle,
-                                 const void*                data,
-                                 const size_t               dataLen)
+SeosCryptoRpcClient_Cipher_start(
+    SeosCryptoApi_Context*     api,
+    const SeosCryptoApi_Cipher cipherHandle,
+    const void*                data,
+    const size_t               dataLen)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -753,10 +785,11 @@ SeosCryptoRpcClient_Cipher_start(SeosCryptoApi_Context*     api,
 }
 
 seos_err_t
-SeosCryptoRpcClient_Cipher_finalize(SeosCryptoApi_Context*     api,
-                                    const SeosCryptoApi_Cipher cipherHandle,
-                                    void*                      tag,
-                                    size_t*                    tagSize)
+SeosCryptoRpcClient_Cipher_finalize(
+    SeosCryptoApi_Context*     api,
+    const SeosCryptoApi_Cipher cipherHandle,
+    void*                      tag,
+    size_t*                    tagSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;

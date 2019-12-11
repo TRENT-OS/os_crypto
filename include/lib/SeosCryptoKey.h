@@ -62,82 +62,101 @@ Debug_STATIC_ASSERT(sizeof(SeosCryptoApi_Key_Data)
                     <= SeosCryptoApi_SIZE_DATAPORT);
 
 seos_err_t
-SeosCryptoKey_generate(SeosCryptoKey*                self,
-                       const SeosCryptoApi_MemIf*    memIf,
-                       SeosCryptoRng*                rng,
-                       const SeosCryptoApi_Key_Spec* spec);
+SeosCryptoKey_generate(
+    SeosCryptoKey*                self,
+    const SeosCryptoApi_MemIf*    memIf,
+    SeosCryptoRng*                rng,
+    const SeosCryptoApi_Key_Spec* spec);
 
 seos_err_t
-SeosCryptoKey_makePublic(SeosCryptoKey*                   self,
-                         const SeosCryptoApi_MemIf*       memIf,
-                         const SeosCryptoKey*             prvKey,
-                         const SeosCryptoApi_Key_Attribs* attribs);
+SeosCryptoKey_makePublic(
+    SeosCryptoKey*                   self,
+    const SeosCryptoApi_MemIf*       memIf,
+    const SeosCryptoKey*             prvKey,
+    const SeosCryptoApi_Key_Attribs* attribs);
 
 seos_err_t
-SeosCryptoKey_import(SeosCryptoKey*                self,
-                     const SeosCryptoApi_MemIf*    memIf,
-                     const SeosCryptoKey*          wrapKey,
-                     const SeosCryptoApi_Key_Data* keyData);
+SeosCryptoKey_import(
+    SeosCryptoKey*                self,
+    const SeosCryptoApi_MemIf*    memIf,
+    const SeosCryptoKey*          wrapKey,
+    const SeosCryptoApi_Key_Data* keyData);
 
 seos_err_t
-SeosCryptoKey_export(SeosCryptoKey*          self,
-                     const SeosCryptoKey*    wrapKey,
-                     SeosCryptoApi_Key_Data* keyData);
+SeosCryptoKey_export(
+    SeosCryptoKey*          self,
+    const SeosCryptoKey*    wrapKey,
+    SeosCryptoApi_Key_Data* keyData);
 
 seos_err_t
-SeosCryptoKey_getParams(SeosCryptoKey* self,
-                        void*          keyParams,
-                        size_t*        paramSize);
+SeosCryptoKey_getParams(
+    SeosCryptoKey* self,
+    void*          keyParams,
+    size_t*        paramSize);
 
 seos_err_t
-SeosCryptoKey_loadParams(const SeosCryptoApi_Key_Param name,
-                         void*                         keyParams,
-                         size_t*                       paramSize);
+SeosCryptoKey_loadParams(
+    const SeosCryptoApi_Key_Param name,
+    void*                         keyParams,
+    size_t*                       paramSize);
 
 seos_err_t
-SeosCryptoKey_free(SeosCryptoKey*             self,
-                   const SeosCryptoApi_MemIf* memIf);
+SeosCryptoKey_free(
+    SeosCryptoKey*             self,
+    const SeosCryptoApi_MemIf* memIf);
 
 /**
  * @brief Writes key data into mbedTLS RSA object
  */
 seos_err_t
-SeosCryptoKey_writeRSAPub(const SeosCryptoKey* key,
-                          mbedtls_rsa_context* rsa);
+SeosCryptoKey_writeRsaPub(
+    const SeosCryptoKey* key,
+    mbedtls_rsa_context* rsa);
+
 seos_err_t
-SeosCryptoKey_writeRSAPrv(const SeosCryptoKey* key,
-                          mbedtls_rsa_context* rsa);
+SeosCryptoKey_writeRsaPrv(
+    const SeosCryptoKey* key,
+    mbedtls_rsa_context* rsa);
 
 /**
  * @brief Writes key data into mbedTLS DH object
  */
 seos_err_t
-SeosCryptoKey_writeDHPub(const SeosCryptoKey* key,
-                         mbedtls_dhm_context* dh);
+SeosCryptoKey_writeDhPub(
+    const SeosCryptoKey* key,
+    mbedtls_dhm_context* dh);
+
 seos_err_t
-SeosCryptoKey_writeDHPrv(const SeosCryptoKey* key,
-                         mbedtls_dhm_context* dh);
+SeosCryptoKey_writeDhPrv(
+    const SeosCryptoKey* key,
+    mbedtls_dhm_context* dh);
 
 /**
  * @brief Writes key data into mbedTLS ECDH object
  */
 seos_err_t
-SeosCryptoKey_writeSECP256r1Pub(const SeosCryptoKey*  key,
-                                mbedtls_ecdh_context* ecdh);
+SeosCryptoKey_writeSecp256r1Pub(
+    const SeosCryptoKey*  key,
+    mbedtls_ecdh_context* ecdh);
+
 seos_err_t
-SeosCryptoKey_writeSECP256r1Prv(const SeosCryptoKey*  key,
-                                mbedtls_ecdh_context* ecdh);
+SeosCryptoKey_writeSecp256r1Prv(
+    const SeosCryptoKey*  key,
+    mbedtls_ecdh_context* ecdh);
 
 /**
  * @brief Translates key data into RSA public/private key
  */
 INLINE SeosCryptoApi_Key_RsaRub*
-SeosCryptoKey_getRSAPub(const SeosCryptoKey* key)
+SeosCryptoKey_getRsaPub(
+    const SeosCryptoKey* key)
 {
     return (SeosCryptoApi_Key_RsaRub*) key->data;
 }
+
 INLINE SeosCryptoApi_Key_RsaRrv*
-SeosCryptoKey_getRSAPrv(const SeosCryptoKey* key)
+SeosCryptoKey_getRsaPrv(
+    const SeosCryptoKey* key)
 {
     return (SeosCryptoApi_Key_RsaRrv*) key->data;
 }
@@ -146,12 +165,15 @@ SeosCryptoKey_getRSAPrv(const SeosCryptoKey* key)
  * @brief Translates key data into SECP256r1 public/private key
  */
 INLINE SeosCryptoApi_Key_Secp256r1Pub*
-SeosCryptoKey_getSECP256r1Pub(const SeosCryptoKey* key)
+SeosCryptoKey_getSecp256r1Pub(
+    const SeosCryptoKey* key)
 {
     return (SeosCryptoApi_Key_Secp256r1Pub*) key->data;
 }
+
 INLINE SeosCryptoApi_Key_Secp256r1Prv*
-SeosCryptoKey_getSECP256r1Prv(const SeosCryptoKey* key)
+SeosCryptoKey_getSecp256r1Prv(
+    const SeosCryptoKey* key)
 {
     return (SeosCryptoApi_Key_Secp256r1Prv*) key->data;
 }
@@ -160,12 +182,15 @@ SeosCryptoKey_getSECP256r1Prv(const SeosCryptoKey* key)
  * @brief Translates key data into DH public/private key
  */
 INLINE SeosCryptoApi_Key_DhPub*
-SeosCryptoKey_getDHPub(const SeosCryptoKey* key)
+SeosCryptoKey_getDhPub(
+    const SeosCryptoKey* key)
 {
     return (SeosCryptoApi_Key_DhPub*) key->data;
 }
+
 INLINE SeosCryptoApi_Key_DhPrv*
-SeosCryptoKey_getDHPrv(const SeosCryptoKey* key)
+SeosCryptoKey_getDhPrv(
+    const SeosCryptoKey* key)
 {
     return (SeosCryptoApi_Key_DhPrv*) key->data;
 }
@@ -174,7 +199,8 @@ SeosCryptoKey_getDHPrv(const SeosCryptoKey* key)
  * @brief Translates key data into AES key
  */
 INLINE SeosCryptoApi_Key_Aes*
-SeosCryptoKey_getAES(const SeosCryptoKey* key)
+SeosCryptoKey_getAes(
+    const SeosCryptoKey* key)
 {
     return (SeosCryptoApi_Key_Aes*) key->data;
 }

@@ -12,8 +12,9 @@
 // Private static functions ----------------------------------------------------
 
 static seos_err_t
-initImpl(SeosCryptoCipher*          self,
-         const SeosCryptoApi_MemIf* memIf)
+initImpl(
+    SeosCryptoCipher*          self,
+    const SeosCryptoApi_MemIf* memIf)
 {
     UNUSED_VAR(memIf);
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -44,8 +45,9 @@ initImpl(SeosCryptoCipher*          self,
 }
 
 static seos_err_t
-freeImpl(SeosCryptoCipher*          self,
-         const SeosCryptoApi_MemIf* memIf)
+freeImpl(
+    SeosCryptoCipher*          self,
+    const SeosCryptoApi_MemIf* memIf)
 {
     UNUSED_VAR(memIf);
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -73,7 +75,8 @@ freeImpl(SeosCryptoCipher*          self,
 }
 
 static seos_err_t
-setKeyImpl(SeosCryptoCipher* self)
+setKeyImpl(
+    SeosCryptoCipher* self)
 {
     SeosCryptoApi_Key_Aes* aesKey;
     seos_err_t retval = SEOS_SUCCESS;
@@ -87,7 +90,7 @@ setKeyImpl(SeosCryptoCipher* self)
     case SeosCryptoApi_Cipher_ALG_AES_GCM_ENC:
     case SeosCryptoApi_Cipher_ALG_AES_GCM_DEC:
         if (SeosCryptoApi_Key_TYPE_AES != self->key->type ||
-            (aesKey = SeosCryptoKey_getAES(self->key)) == NULL)
+            (aesKey = SeosCryptoKey_getAes(self->key)) == NULL)
         {
             return SEOS_ERROR_INVALID_PARAMETER;
         }
@@ -125,9 +128,10 @@ setKeyImpl(SeosCryptoCipher* self)
 }
 
 static seos_err_t
-setIvImpl(SeosCryptoCipher* self,
-          const void*       iv,
-          const size_t      ivLen)
+setIvImpl(
+    SeosCryptoCipher* self,
+    const void*       iv,
+    const size_t      ivLen)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -163,11 +167,12 @@ setIvImpl(SeosCryptoCipher* self,
 }
 
 static seos_err_t
-processImpl(SeosCryptoCipher* self,
-            const void*       input,
-            const size_t      inputSize,
-            void*             output,
-            size_t*           outputSize)
+processImpl(
+    SeosCryptoCipher* self,
+    const void*       input,
+    const size_t      inputSize,
+    void*             output,
+    size_t*           outputSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -245,9 +250,10 @@ processImpl(SeosCryptoCipher* self,
 }
 
 static seos_err_t
-startImpl(SeosCryptoCipher* self,
-          const void*       ad,
-          const size_t      adLen)
+startImpl(
+    SeosCryptoCipher* self,
+    const void*       ad,
+    const size_t      adLen)
 {
     int mode;
 
@@ -274,9 +280,10 @@ startImpl(SeosCryptoCipher* self,
  * a non-zero value.
  */
 static int
-cmemcmp(const void* v1,
-        const void* v2,
-        size_t      len)
+cmemcmp(
+    const void* v1,
+    const void* v2,
+    size_t      len)
 {
     const unsigned char* p1 = (const unsigned char*) v1;
     const unsigned char* p2 = (const unsigned char*) v2;
@@ -292,9 +299,10 @@ cmemcmp(const void* v1,
 }
 
 static seos_err_t
-finalizeImpl(SeosCryptoCipher* self,
-             void*             buf,
-             size_t*           bufSize)
+finalizeImpl(
+    SeosCryptoCipher* self,
+    void*             buf,
+    size_t*           bufSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -344,12 +352,13 @@ finalizeImpl(SeosCryptoCipher* self,
 // Public functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoCipher_init(SeosCryptoCipher*              self,
-                      const SeosCryptoApi_MemIf*     memIf,
-                      const SeosCryptoApi_Cipher_Alg algorithm,
-                      const SeosCryptoKey*           key,
-                      const void*                    iv,
-                      const size_t                   ivLen)
+SeosCryptoCipher_init(
+    SeosCryptoCipher*              self,
+    const SeosCryptoApi_MemIf*     memIf,
+    const SeosCryptoApi_Cipher_Alg algorithm,
+    const SeosCryptoKey*           key,
+    const void*                    iv,
+    const size_t                   ivLen)
 {
     seos_err_t retval;
 
@@ -387,8 +396,9 @@ err0:
 }
 
 seos_err_t
-SeosCryptoCipher_free(SeosCryptoCipher*          self,
-                      const SeosCryptoApi_MemIf* memIf)
+SeosCryptoCipher_free(
+    SeosCryptoCipher*          self,
+    const SeosCryptoApi_MemIf* memIf)
 {
     if (NULL == memIf || NULL == self)
     {
@@ -399,9 +409,10 @@ SeosCryptoCipher_free(SeosCryptoCipher*          self,
 }
 
 seos_err_t
-SeosCryptoCipher_start(SeosCryptoCipher* self,
-                       const void*       input,
-                       const size_t      inputSize)
+SeosCryptoCipher_start(
+    SeosCryptoCipher* self,
+    const void*       input,
+    const size_t      inputSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -417,11 +428,12 @@ SeosCryptoCipher_start(SeosCryptoCipher* self,
 }
 
 seos_err_t
-SeosCryptoCipher_process(SeosCryptoCipher* self,
-                         const void*       input,
-                         const size_t      inputSize,
-                         void*             output,
-                         size_t*           outputSize)
+SeosCryptoCipher_process(
+    SeosCryptoCipher* self,
+    const void*       input,
+    const size_t      inputSize,
+    void*             output,
+    size_t*           outputSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -441,9 +453,10 @@ SeosCryptoCipher_process(SeosCryptoCipher* self,
 }
 
 seos_err_t
-SeosCryptoCipher_finalize(SeosCryptoCipher* self,
-                          void*             buf,
-                          size_t*           bufSize)
+SeosCryptoCipher_finalize(
+    SeosCryptoCipher* self,
+    void*             buf,
+    size_t*           bufSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 

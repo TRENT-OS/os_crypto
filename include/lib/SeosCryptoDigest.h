@@ -48,26 +48,31 @@ Debug_STATIC_ASSERT((int)SeosCryptoApi_Digest_ALG_SHA256   ==
                     (int)MBEDTLS_MD_SHA256);
 
 seos_err_t
-SeosCryptoDigest_init(SeosCryptoDigest*              self,
-                      const SeosCryptoApi_MemIf*     memIf,
-                      const SeosCryptoApi_Digest_Alg algorithm);
+SeosCryptoDigest_init(
+    SeosCryptoDigest*              self,
+    const SeosCryptoApi_MemIf*     memIf,
+    const SeosCryptoApi_Digest_Alg algorithm);
 
 seos_err_t
-SeosCryptoDigest_free(SeosCryptoDigest*          self,
-                      const SeosCryptoApi_MemIf* memIf);
+SeosCryptoDigest_free(
+    SeosCryptoDigest*          self,
+    const SeosCryptoApi_MemIf* memIf);
 
 seos_err_t
-SeosCryptoDigest_clone(SeosCryptoDigest*       self,
-                       const SeosCryptoDigest* source);
+SeosCryptoDigest_clone(
+    SeosCryptoDigest*       self,
+    const SeosCryptoDigest* source);
 
 seos_err_t
-SeosCryptoDigest_process(SeosCryptoDigest* self,
-                         const void*       data,
-                         const size_t      dataLen);
+SeosCryptoDigest_process(
+    SeosCryptoDigest* self,
+    const void*       data,
+    const size_t      dataLen);
 
 seos_err_t
-SeosCryptoDigest_finalize(SeosCryptoDigest* self,
-                          void*             digest,
-                          size_t*           digestSize);
+SeosCryptoDigest_finalize(
+    SeosCryptoDigest* self,
+    void*             digest,
+    size_t*           digestSize);
 
 /** @} */
