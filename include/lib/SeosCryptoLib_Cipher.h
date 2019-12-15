@@ -4,7 +4,7 @@
  * @addtogroup Wrappers
  * @{
  *
- * @file SeosCryptoCipher.h
+ * @file SeosCryptoLib_Cipher.h
  *
  * @brief Cipher functions
  *
@@ -24,7 +24,7 @@
 
 // Internal types/defines/enums ------------------------------------------------
 
-struct SeosCryptoCipher
+struct SeosCryptoLib_Cipher
 {
     union
     {
@@ -47,7 +47,7 @@ struct SeosCryptoCipher
 
 seos_err_t
 SeosCryptoCipher_init(
-    SeosCryptoCipher*              self,
+    SeosCryptoLib_Cipher*          self,
     const SeosCryptoApi_MemIf*     memIf,
     const SeosCryptoApi_Cipher_Alg algorithm,
     const SeosCryptoKey*           key,
@@ -56,27 +56,27 @@ SeosCryptoCipher_init(
 
 seos_err_t
 SeosCryptoCipher_free(
-    SeosCryptoCipher*          self,
+    SeosCryptoLib_Cipher*      self,
     const SeosCryptoApi_MemIf* memIf);
 
 seos_err_t
 SeosCryptoCipher_start(
-    SeosCryptoCipher* self,
-    const void*       input,
-    const size_t      inputSize);
+    SeosCryptoLib_Cipher* self,
+    const void*           input,
+    const size_t          inputSize);
 
 seos_err_t
 SeosCryptoCipher_process(
-    SeosCryptoCipher* self,
-    const void*       input,
-    const size_t      inputSize,
-    void*             output,
-    size_t*           outputSize);
+    SeosCryptoLib_Cipher* self,
+    const void*           input,
+    const size_t          inputSize,
+    void*                 output,
+    size_t*               outputSize);
 
 seos_err_t
 SeosCryptoCipher_finalize(
-    SeosCryptoCipher* self,
-    void*             output,
-    size_t*           outputSize);
+    SeosCryptoLib_Cipher* self,
+    void*                 output,
+    size_t*               outputSize);
 
 /** @} */

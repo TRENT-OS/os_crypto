@@ -2,7 +2,7 @@
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 
-#include "lib/SeosCryptoCipher.h"
+#include "lib/SeosCryptoLib_Cipher.h"
 #include "lib/SeosCryptoKey.h"
 #include "lib/SeosCryptoRng.h"
 #include "lib/SeosCryptoDigest.h"
@@ -803,7 +803,7 @@ SeosCryptoLib_Key_free(
 seos_err_t
 SeosCryptoLib_Cipher_init(
     SeosCryptoApi_Context*         api,
-    SeosCryptoApi_Cipher*          pCipherHandle,
+    SeosCryptoLib_Cipher**         pCipherObj,
     const SeosCryptoApi_Cipher_Alg algorithm,
     const SeosCryptoApi_Key        key,
     const void*                    iv,
@@ -812,7 +812,7 @@ SeosCryptoLib_Cipher_init(
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
-    if (NULL == api || NULL == pCipherHandle)
+    if (NULL == api || NULL == pCipherObj)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -821,19 +821,18 @@ SeosCryptoLib_Cipher_init(
         return SEOS_ERROR_INVALID_HANDLE;
     }
 
-    if ((*pCipherHandle = self->memIf.malloc(sizeof(SeosCryptoCipher))) ==
-        NULL)
+    if ((*pCipherObj = self->memIf.malloc(sizeof(SeosCryptoLib_Cipher))) ==  NULL)
     {
         retval = SEOS_ERROR_INSUFFICIENT_SPACE;
     }
     else
     {
-        if ((retval = SeosCryptoCipher_init(*pCipherHandle, &self->memIf, algorithm,
-                                            key,  iv, ivLen)) != SEOS_SUCCESS)
+        if ((retval = SeosCryptoCipher_init(*pCipherObj, &self->memIf, algorithm, key,
+                                            iv, ivLen)) != SEOS_SUCCESS)
         {
             goto err0;
         }
-        else if (!PointerVector_pushBack(&self->cipherHandleVector, *pCipherHandle))
+        else if (!PointerVector_pushBack(&self->cipherHandleVector, *pCipherObj))
         {
             retval = SEOS_ERROR_INSUFFICIENT_SPACE;
             goto err1;
@@ -843,17 +842,17 @@ SeosCryptoLib_Cipher_init(
     return retval;
 
 err1:
-    SeosCryptoCipher_free(*pCipherHandle, &self->memIf);
+    SeosCryptoCipher_free(*pCipherObj, &self->memIf);
 err0:
-    self->memIf.free(*pCipherHandle);
+    self->memIf.free(*pCipherObj);
 
     return retval;
 }
 
 seos_err_t
 SeosCryptoLib_Cipher_free(
-    SeosCryptoApi_Context*     api,
-    const SeosCryptoApi_Cipher cipherHandle)
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Cipher*  cipherObj)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoLib* self = (SeosCryptoLib*) api;
@@ -865,13 +864,12 @@ SeosCryptoLib_Cipher_free(
     }
 
     if ((handlePos = SeosCryptoLib_findHandle(&self->cipherHandleVector,
-                                              cipherHandle)) != -1)
+                                              cipherObj)) != -1)
     {
-        if ((retval = SeosCryptoCipher_free(cipherHandle,
-                                            &self->memIf)) == SEOS_SUCCESS)
+        if ((retval = SeosCryptoCipher_free(cipherObj, &self->memIf)) == SEOS_SUCCESS)
         {
             SeosCryptoLib_removeHandle(&self->cipherHandleVector, handlePos);
-            self->memIf.free(cipherHandle);
+            self->memIf.free(cipherObj);
         }
     }
     else
@@ -884,12 +882,12 @@ SeosCryptoLib_Cipher_free(
 
 seos_err_t
 SeosCryptoLib_Cipher_process(
-    SeosCryptoApi_Context*     api,
-    const SeosCryptoApi_Cipher cipherHandle,
-    const void*                input,
-    const size_t               inputSize,
-    void*                      output,
-    size_t*                    outputSize)
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Cipher*  cipherObj,
+    const void*            input,
+    const size_t           inputSize,
+    void*                  output,
+    size_t*                outputSize)
 {
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
@@ -904,19 +902,18 @@ SeosCryptoLib_Cipher_process(
 
     // Make local copy of input buffer, to allow overlapping input/output buffers
     memcpy(self->buffer, input, inputSize);
-    return (SeosCryptoLib_findHandle(&self->cipherHandleVector,
-                                     cipherHandle) == -1) ?
+    return (SeosCryptoLib_findHandle(&self->cipherHandleVector, cipherObj) == -1) ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoCipher_process(cipherHandle, self->buffer, inputSize,
-                                    output, outputSize);
+           SeosCryptoCipher_process(cipherObj, self->buffer, inputSize, output,
+                                    outputSize);
 }
 
 seos_err_t
 SeosCryptoLib_Cipher_start(
-    SeosCryptoApi_Context*     api,
-    const SeosCryptoApi_Cipher cipherHandle,
-    const void*                input,
-    const size_t               inputSize)
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Cipher*  cipherObj,
+    const void*            input,
+    const size_t           inputSize)
 {
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
@@ -926,17 +923,17 @@ SeosCryptoLib_Cipher_start(
     }
 
     return (SeosCryptoLib_findHandle(&self->cipherHandleVector,
-                                     cipherHandle) == -1) ?
+                                     cipherObj) == -1) ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoCipher_start(cipherHandle, input, inputSize);
+           SeosCryptoCipher_start(cipherObj, input, inputSize);
 }
 
 seos_err_t
 SeosCryptoLib_Cipher_finalize(
-    SeosCryptoApi_Context*     api,
-    const SeosCryptoApi_Cipher cipherHandle,
-    void*                      buf,
-    size_t*                    bufSize)
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Cipher*  cipherObj,
+    void*                  buf,
+    size_t*                bufSize)
 {
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
@@ -946,9 +943,9 @@ SeosCryptoLib_Cipher_finalize(
     }
 
     return (SeosCryptoLib_findHandle(&self->cipherHandleVector,
-                                     cipherHandle) == -1) ?
+                                     cipherObj) == -1) ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoCipher_finalize(cipherHandle, buf, bufSize);
+           SeosCryptoCipher_finalize(cipherObj, buf, bufSize);
 }
 
 // ---------------------------- API Management ---------------------------------

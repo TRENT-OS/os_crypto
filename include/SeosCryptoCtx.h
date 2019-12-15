@@ -208,8 +208,8 @@ typedef seos_err_t
 
 typedef seos_err_t
 (*SeosCryptoApi_Cipher_initT)(
-    SeosCryptoApi_Context*         self,
-    SeosCryptoApi_Cipher*          pCipherHandle,
+    SeosCryptoApi_Context*         ctx,
+    SeosCryptoLib_Cipher**         pCipherObj,
     const SeosCryptoApi_Cipher_Alg algorithm,
     const SeosCryptoApi_Key        keyHandle,
     const void*                    iv,
@@ -217,31 +217,31 @@ typedef seos_err_t
 
 typedef seos_err_t
 (*SeosCryptoApi_Cipher_freeT)(
-    SeosCryptoApi_Context*     self,
-    const SeosCryptoApi_Cipher cipherHandle);
+    SeosCryptoApi_Context* ctx,
+    SeosCryptoLib_Cipher*  cipherObj);
 
 typedef seos_err_t
 (*SeosCryptoApi_Cipher_processT)(
-    SeosCryptoApi_Context*     self,
-    const SeosCryptoApi_Cipher cipherHandle,
-    const void*                data,
-    const size_t               dataLen,
-    void*                      output,
-    size_t*                    outputSize);
+    SeosCryptoApi_Context* ctx,
+    SeosCryptoLib_Cipher*  cipherObj,
+    const void*            data,
+    const size_t           dataLen,
+    void*                  output,
+    size_t*                outputSize);
 
 typedef seos_err_t
 (*SeosCryptoApi_Cipher_startT)(
-    SeosCryptoApi_Context*     self,
-    const SeosCryptoApi_Cipher cipherHandle,
-    const void*                data,
-    const size_t               dataLen);
+    SeosCryptoApi_Context* ctx,
+    SeosCryptoLib_Cipher*  cipherObj,
+    const void*            data,
+    const size_t           dataLen);
 
 typedef seos_err_t
 (*SeosCryptoApi_Cipher_finalizeT)(
-    SeosCryptoApi_Context*     self,
-    const SeosCryptoApi_Cipher cipherHandle,
-    void*                      output,
-    size_t*                    outputSize);
+    SeosCryptoApi_Context* ctx,
+    SeosCryptoLib_Cipher*  cipherObj,
+    void*                  output,
+    size_t*                outputSize);
 
 // -----------------------------------------------------------------------------
 

@@ -12,7 +12,7 @@ add_library(
     "src/lib/SeosCryptoRng.c"
     "src/lib/SeosCryptoDigest.c"
     "src/lib/SeosCryptoLib_Mac.c"
-    "src/lib/SeosCryptoCipher.c"
+    "src/lib/SeosCryptoLib_Cipher.c"
     "src/lib/SeosCryptoSignature.c"
     "src/lib/SeosCryptoKey.c"
 )

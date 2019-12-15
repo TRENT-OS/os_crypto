@@ -380,38 +380,44 @@ SeosCryptoApi_Key_free(
 
 seos_err_t
 SeosCryptoApi_Cipher_init(
-    SeosCryptoApi_Context*         ctx,
-    SeosCryptoApi_Cipher*          pCipherHandle,
+    SeosCryptoApi_Context*         apiCtx,
+    SeosCryptoApi_Cipher*          cipherCtx,
     const SeosCryptoApi_Cipher_Alg algorithm,
     const SeosCryptoApi_Key        keyHandle,
     const void*                    iv,
     const size_t                   ivLen)
 {
-    if (ivLen > SeosCryptoLib_SIZE_BUFFER)
+    if (NULL == apiCtx || NULL == cipherCtx || NULL == apiCtx->vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else if (ivLen > SeosCryptoLib_SIZE_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
-    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->Cipher_init(ctx, pCipherHandle, algorithm, keyHandle, iv, ivLen);
+
+    cipherCtx->api = apiCtx;
+    return (NULL == apiCtx->vtable->Cipher_init) ? SEOS_ERROR_NOT_SUPPORTED :
+           apiCtx->vtable->Cipher_init(apiCtx, &cipherCtx->cipher, algorithm, keyHandle,
+                                       iv, ivLen);
 }
 
 seos_err_t
 SeosCryptoApi_Cipher_free(
-    SeosCryptoApi_Context*     ctx,
-    const SeosCryptoApi_Cipher cipherHandle)
+    SeosCryptoApi_Cipher* wCipher)
 {
-    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->Cipher_free(ctx, cipherHandle);
+    return (NULL == wCipher) ? SEOS_ERROR_INVALID_PARAMETER :
+           (NULL == wCipher->api->vtable->Cipher_free) ? SEOS_ERROR_NOT_SUPPORTED :
+           wCipher->api->vtable->Cipher_free(wCipher->api, wCipher->cipher);
 }
 
 seos_err_t
 SeosCryptoApi_Cipher_process(
-    SeosCryptoApi_Context*     ctx,
-    const SeosCryptoApi_Cipher cipherHandle,
-    const void*                data,
-    const size_t               dataSize,
-    void*                      output,
-    size_t*                    outputSize)
+    SeosCryptoApi_Cipher* wCipher,
+    const void*           data,
+    const size_t          dataSize,
+    void*                 output,
+    size_t*               outputSize)
 {
     // They use the same buffer, but sequentially
     if (dataSize > SeosCryptoLib_SIZE_BUFFER ||
@@ -419,37 +425,43 @@ SeosCryptoApi_Cipher_process(
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
-    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->Cipher_process(ctx, cipherHandle, data, dataSize, output,
-                                       outputSize);
+
+    return (NULL == wCipher) ? SEOS_ERROR_INVALID_PARAMETER :
+           (NULL == wCipher->api->vtable->Cipher_process) ? SEOS_ERROR_NOT_SUPPORTED :
+           wCipher->api->vtable->Cipher_process(wCipher->api, wCipher->cipher, data,
+                                                dataSize, output,
+                                                outputSize);
 }
 
 seos_err_t
 SeosCryptoApi_Cipher_start(
-    SeosCryptoApi_Context*     ctx,
-    const SeosCryptoApi_Cipher cipherHandle,
-    const void*                ad,
-    const size_t               adLen)
+    SeosCryptoApi_Cipher* wCipher,
+    const void*           ad,
+    const size_t          adSize)
 {
-    if (adLen > SeosCryptoLib_SIZE_BUFFER)
+    if (adSize > SeosCryptoLib_SIZE_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
-    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->Cipher_start(ctx, cipherHandle, ad, adLen);
+
+    return (NULL == wCipher) ? SEOS_ERROR_INVALID_PARAMETER :
+           (NULL == wCipher->api->vtable->Cipher_start) ? SEOS_ERROR_NOT_SUPPORTED :
+           wCipher->api->vtable->Cipher_start(wCipher->api, wCipher->cipher, ad, adSize);
 }
 
 seos_err_t
 SeosCryptoApi_Cipher_finalize(
-    SeosCryptoApi_Context*     ctx,
-    const SeosCryptoApi_Cipher cipherHandle,
-    void*                      output,
-    size_t*                    outputSize)
+    SeosCryptoApi_Cipher* wCipher,
+    void*                 output,
+    size_t*               outputSize)
 {
     if (NULL != outputSize && *outputSize > SeosCryptoLib_SIZE_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
-    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->Cipher_finalize(ctx, cipherHandle, output, outputSize);
+
+    return (NULL == wCipher) ? SEOS_ERROR_INVALID_PARAMETER :
+           (NULL == wCipher->api->vtable->Cipher_finalize) ? SEOS_ERROR_NOT_SUPPORTED :
+           wCipher->api->vtable->Cipher_finalize(wCipher->api, wCipher->cipher, output,
+                                                 outputSize);
 }

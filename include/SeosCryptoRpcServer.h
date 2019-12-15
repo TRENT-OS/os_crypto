@@ -238,36 +238,38 @@ SeosCryptoRpcServer_Agreement_free(
 
 // ------------------------------- Cipher API ----------------------------------
 
+typedef SeosCryptoLib_Cipher* SeosCryptoLib_Cipher_Ptr;
+
 seos_err_t
 SeosCryptoRpcServer_Cipher_init(
-    SeosCryptoRpcServer*     self,
-    SeosCryptoApi_Cipher*    pCipherHandle,
-    SeosCryptoApi_Cipher_Alg algorithm,
-    SeosCryptoApi_Key        keyHandle,
-    size_t                   ivLen);
+    SeosCryptoRpcServer*      self,
+    SeosCryptoLib_Cipher_Ptr* pCipherPtr,
+    SeosCryptoApi_Cipher_Alg  algorithm,
+    SeosCryptoApi_Key         keyHandle,
+    size_t                    ivLen);
 
 seos_err_t
 SeosCryptoRpcServer_Cipher_free(
-    SeosCryptoRpcServer* self,
-    SeosCryptoApi_Cipher cipherHandle);
+    SeosCryptoRpcServer*     self,
+    SeosCryptoLib_Cipher_Ptr cipherPtr);
 
 seos_err_t
 SeosCryptoRpcServer_Cipher_process(
-    SeosCryptoRpcServer* self,
-    SeosCryptoApi_Cipher cipherHandle,
-    size_t               inputLen,
-    size_t*              outputSize);
+    SeosCryptoRpcServer*     self,
+    SeosCryptoLib_Cipher_Ptr cipherPtr,
+    size_t                   inputLen,
+    size_t*                  outputSize);
 
 seos_err_t
 SeosCryptoRpcServer_Cipher_start(
-    SeosCryptoRpcServer* self,
-    SeosCryptoApi_Cipher cipherHandle,
-    size_t               len);
+    SeosCryptoRpcServer*     self,
+    SeosCryptoLib_Cipher_Ptr cipherPtr,
+    size_t                   len);
 
 seos_err_t
 SeosCryptoRpcServer_Cipher_finalize(
-    SeosCryptoRpcServer* self,
-    SeosCryptoApi_Cipher cipherHandle,
-    size_t*              len);
+    SeosCryptoRpcServer*     self,
+    SeosCryptoLib_Cipher_Ptr cipherPtr,
+    size_t*                  len);
 
 /** @} */

@@ -210,7 +210,7 @@ SeosCryptoLib_Key_free(
 seos_err_t
 SeosCryptoLib_Cipher_init(
     SeosCryptoApi_Context*         api,
-    SeosCryptoApi_Cipher*          pCipherHandle,
+    SeosCryptoLib_Cipher**         pCipherObj,
     const SeosCryptoApi_Cipher_Alg algorithm,
     const SeosCryptoApi_Key        keyHandle,
     const void*                    iv,
@@ -218,31 +218,31 @@ SeosCryptoLib_Cipher_init(
 
 seos_err_t
 SeosCryptoLib_Cipher_free(
-    SeosCryptoApi_Context*     api,
-    const SeosCryptoApi_Cipher cipherHandle);
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Cipher*  cipherObj);
 
 seos_err_t
 SeosCryptoLib_Cipher_process(
-    SeosCryptoApi_Context*     api,
-    const SeosCryptoApi_Cipher cipherHandle,
-    const void*                input,
-    const size_t               inputSize,
-    void*                      output,
-    size_t*                    outputSize);
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Cipher*  cipherObj,
+    const void*            input,
+    const size_t           inputSize,
+    void*                  output,
+    size_t*                outputSize);
 
 seos_err_t
 SeosCryptoLib_Cipher_start(
-    SeosCryptoApi_Context*     api,
-    const SeosCryptoApi_Cipher cipherHandle,
-    const void*                input,
-    const size_t               inputSize);
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Cipher*  cipherObj,
+    const void*            input,
+    const size_t           inputSize);
 
 seos_err_t
 SeosCryptoLib_Cipher_finalize(
-    SeosCryptoApi_Context*     api,
-    const SeosCryptoApi_Cipher cipherHandle,
-    void*                      output,
-    size_t*                    outputSize);
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Cipher*  cipherObj,
+    void*                  output,
+    size_t*                outputSize);
 
 // ----------------------------- Signature API ---------------------------------
 

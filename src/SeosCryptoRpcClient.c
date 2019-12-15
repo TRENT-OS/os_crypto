@@ -592,7 +592,7 @@ SeosCryptoRpcClient_Key_free(
 seos_err_t
 SeosCryptoRpcClient_Cipher_init(
     SeosCryptoApi_Context*         api,
-    SeosCryptoApi_Cipher*          pCipherHandle,
+    SeosCryptoLib_Cipher**         pCipherObj,
     const SeosCryptoApi_Cipher_Alg algorithm,
     const SeosCryptoApi_Key        key,
     const void*                    iv,
@@ -600,7 +600,7 @@ SeosCryptoRpcClient_Cipher_init(
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
-    if (NULL == self || NULL == pCipherHandle)
+    if (NULL == self || NULL == pCipherObj)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -614,15 +614,14 @@ SeosCryptoRpcClient_Cipher_init(
         memcpy(self->clientDataport, iv, ivLen);
     }
 
-    return SeosCryptoRpcServer_Cipher_init(self->rpcHandle, pCipherHandle,
-                                           algorithm,
+    return SeosCryptoRpcServer_Cipher_init(self->rpcHandle, pCipherObj, algorithm,
                                            key, ivLen);
 }
 
 seos_err_t
 SeosCryptoRpcClient_Cipher_free(
-    SeosCryptoApi_Context*     api,
-    const SeosCryptoApi_Cipher cipherHandle)
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Cipher*  cipherObj)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -631,17 +630,17 @@ SeosCryptoRpcClient_Cipher_free(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoRpcServer_Cipher_free(self->rpcHandle, cipherHandle);
+    return SeosCryptoRpcServer_Cipher_free(self->rpcHandle, cipherObj);
 }
 
 seos_err_t
 SeosCryptoRpcClient_Cipher_process(
-    SeosCryptoApi_Context*     api,
-    const SeosCryptoApi_Cipher cipherHandle,
-    const void*                input,
-    const size_t               inputSize,
-    void*                      output,
-    size_t*                    outputSize)
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Cipher*  cipherObj,
+    const void*            input,
+    const size_t           inputSize,
+    void*                  output,
+    size_t*                outputSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
@@ -656,7 +655,7 @@ SeosCryptoRpcClient_Cipher_process(
     }
 
     memcpy(self->clientDataport, input, inputSize);
-    if ((retval = SeosCryptoRpcServer_Cipher_process(self->rpcHandle, cipherHandle,
+    if ((retval = SeosCryptoRpcServer_Cipher_process(self->rpcHandle, cipherObj,
                                                      inputSize, outputSize)) == SEOS_SUCCESS)
     {
         if (*outputSize > SeosCryptoApi_SIZE_DATAPORT)
@@ -671,10 +670,10 @@ SeosCryptoRpcClient_Cipher_process(
 
 seos_err_t
 SeosCryptoRpcClient_Cipher_start(
-    SeosCryptoApi_Context*     api,
-    const SeosCryptoApi_Cipher cipherHandle,
-    const void*                data,
-    const size_t               dataLen)
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Cipher*  cipherObj,
+    const void*            data,
+    const size_t           dataLen)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -692,15 +691,15 @@ SeosCryptoRpcClient_Cipher_start(
         memcpy(self->clientDataport, data, dataLen);
     }
 
-    return SeosCryptoRpcServer_Cipher_start(self->rpcHandle, cipherHandle, dataLen);
+    return SeosCryptoRpcServer_Cipher_start(self->rpcHandle, cipherObj, dataLen);
 }
 
 seos_err_t
 SeosCryptoRpcClient_Cipher_finalize(
-    SeosCryptoApi_Context*     api,
-    const SeosCryptoApi_Cipher cipherHandle,
-    void*                      tag,
-    size_t*                    tagSize)
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Cipher*  cipherObj,
+    void*                  tag,
+    size_t*                tagSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
@@ -715,7 +714,7 @@ SeosCryptoRpcClient_Cipher_finalize(
     }
 
     memcpy(self->clientDataport, tag, *tagSize);
-    if ((retval = SeosCryptoRpcServer_Cipher_finalize(self->rpcHandle, cipherHandle,
+    if ((retval = SeosCryptoRpcServer_Cipher_finalize(self->rpcHandle, cipherObj,
                                                       tagSize)) == SEOS_SUCCESS)
     {
         if (*tagSize > SeosCryptoApi_SIZE_DATAPORT)
