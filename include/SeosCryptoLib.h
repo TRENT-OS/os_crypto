@@ -95,34 +95,34 @@ SeosCryptoLib_Rng_reseed(
 seos_err_t
 SeosCryptoLib_Mac_init(
     SeosCryptoApi_Context*      api,
-    SeosCryptoApi_Mac*          pMacHandle,
+    SeosCryptoLib_Mac**         pMacObj,
     const SeosCryptoApi_Mac_Alg algorithm);
 
 seos_err_t
 SeosCryptoLib_Mac_free(
-    SeosCryptoApi_Context*  api,
-    const SeosCryptoApi_Mac macHandle);
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Mac*     macObj);
 
 seos_err_t
 SeosCryptoLib_Mac_start(
-    SeosCryptoApi_Context*  api,
-    const SeosCryptoApi_Mac macHandle,
-    const void*             secret,
-    const size_t            secretSize);
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Mac*     macObj,
+    const void*            secret,
+    const size_t           secretSize);
 
 seos_err_t
 SeosCryptoLib_Mac_process(
-    SeosCryptoApi_Context*  api,
-    const SeosCryptoApi_Mac macHandle,
-    const void*             data,
-    const size_t            dataLen);
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Mac*     macObj,
+    const void*            data,
+    const size_t           dataLen);
 
 seos_err_t
 SeosCryptoLib_Mac_finalize(
-    SeosCryptoApi_Context*  api,
-    const SeosCryptoApi_Mac macHandle,
-    void*                   mac,
-    size_t*                 macSize);
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Mac*     macObj,
+    void*                  mac,
+    size_t*                macSize);
 
 // ------------------------------ Digest API -----------------------------------
 

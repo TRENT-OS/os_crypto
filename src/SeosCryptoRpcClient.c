@@ -66,7 +66,7 @@ SeosCryptoRpcClient_Rng_reseed(
 seos_err_t
 SeosCryptoRpcClient_Mac_init(
     SeosCryptoApi_Context*      api,
-    SeosCryptoApi_Mac*          pMacHandle,
+    SeosCryptoLib_Mac**         pMacHandle,
     const SeosCryptoApi_Mac_Alg algorithm)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
@@ -81,8 +81,8 @@ SeosCryptoRpcClient_Mac_init(
 
 seos_err_t
 SeosCryptoRpcClient_Mac_free(
-    SeosCryptoApi_Context*  api,
-    const SeosCryptoApi_Mac macHandle)
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Mac*     macHandle)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -96,10 +96,10 @@ SeosCryptoRpcClient_Mac_free(
 
 seos_err_t
 SeosCryptoRpcClient_Mac_start(
-    SeosCryptoApi_Context*  api,
-    const SeosCryptoApi_Mac macHandle,
-    const void*             secret,
-    const size_t            secretSize)
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Mac*     macHandle,
+    const void*            secret,
+    const size_t           secretSize)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -118,10 +118,10 @@ SeosCryptoRpcClient_Mac_start(
 
 seos_err_t
 SeosCryptoRpcClient_Mac_process(
-    SeosCryptoApi_Context*  api,
-    const SeosCryptoApi_Mac macHandle,
-    const void*             data,
-    const size_t            dataLen)
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Mac*     macHandle,
+    const void*            data,
+    const size_t           dataLen)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -140,10 +140,10 @@ SeosCryptoRpcClient_Mac_process(
 
 seos_err_t
 SeosCryptoRpcClient_Mac_finalize(
-    SeosCryptoApi_Context*  api,
-    const SeosCryptoApi_Mac macHandle,
-    void*                   mac,
-    size_t*                 macSize)
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Mac*     macHandle,
+    void*                  mac,
+    size_t*                macSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;

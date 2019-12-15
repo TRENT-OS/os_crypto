@@ -78,34 +78,36 @@ SeosCryptoRpcServer_Rng_reseed(
 
 // -------------------------------- MAC API ------------------------------------
 
+typedef SeosCryptoLib_Mac* SeosCryptoLib_Mac_Ptr;
+
 seos_err_t
 SeosCryptoRpcServer_Mac_init(
-    SeosCryptoRpcServer*  self,
-    SeosCryptoApi_Mac*    pMacHandle,
-    SeosCryptoApi_Mac_Alg algorithm);
+    SeosCryptoRpcServer*   self,
+    SeosCryptoLib_Mac_Ptr* pMacPtr,
+    SeosCryptoApi_Mac_Alg  algorithm);
 
 seos_err_t
 SeosCryptoRpcServer_Mac_free(
-    SeosCryptoRpcServer* self,
-    SeosCryptoApi_Mac    macHandle);
+    SeosCryptoRpcServer*  self,
+    SeosCryptoLib_Mac_Ptr macPtr);
 
 seos_err_t
 SeosCryptoRpcServer_Mac_start(
-    SeosCryptoRpcServer* self,
-    SeosCryptoApi_Mac    macHandle,
-    size_t               secretSize);
+    SeosCryptoRpcServer*  self,
+    SeosCryptoLib_Mac_Ptr macPtr,
+    size_t                secretSize);
 
 seos_err_t
 SeosCryptoRpcServer_Mac_process(
-    SeosCryptoRpcServer* self,
-    SeosCryptoApi_Mac    macHandle,
-    size_t               dataSize);
+    SeosCryptoRpcServer*  self,
+    SeosCryptoLib_Mac_Ptr macPtr,
+    size_t                dataSize);
 
 seos_err_t
 SeosCryptoRpcServer_Mac_finalize(
-    SeosCryptoRpcServer* self,
-    SeosCryptoApi_Mac    macHandle,
-    size_t*              macSize);
+    SeosCryptoRpcServer*  self,
+    SeosCryptoLib_Mac_Ptr macPtr,
+    size_t*               macSize);
 
 // ------------------------------ Digest API -----------------------------------
 

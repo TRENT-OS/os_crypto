@@ -2,7 +2,7 @@
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 
-#include "lib/SeosCryptoMac.h"
+#include "lib/SeosCryptoLib_Mac.h"
 
 #include "LibDebug/Debug.h"
 #include "compiler.h"
@@ -13,7 +13,7 @@
 
 static seos_err_t
 initImpl(
-    SeosCryptoMac*             self,
+    SeosCryptoLib_Mac*         self,
     const SeosCryptoApi_MemIf* memIf)
 {
     UNUSED_VAR(memIf);
@@ -38,7 +38,7 @@ initImpl(
 
 static seos_err_t
 freeImpl(
-    SeosCryptoMac*             self,
+    SeosCryptoLib_Mac*         self,
     const SeosCryptoApi_MemIf* memIf)
 {
     UNUSED_VAR(memIf);
@@ -60,9 +60,9 @@ freeImpl(
 
 static seos_err_t
 startImpl(
-    SeosCryptoMac* self,
-    const void*    secret,
-    const size_t   secretSize)
+    SeosCryptoLib_Mac* self,
+    const void*        secret,
+    const size_t       secretSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -82,9 +82,9 @@ startImpl(
 
 static seos_err_t
 processImpl(
-    SeosCryptoMac* self,
-    const void*    data,
-    const size_t   dataSize)
+    SeosCryptoLib_Mac* self,
+    const void*        data,
+    const size_t       dataSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -104,9 +104,9 @@ processImpl(
 
 static seos_err_t
 finalizeImpl(
-    SeosCryptoMac* self,
-    void*          mac,
-    size_t*        macSize)
+    SeosCryptoLib_Mac* self,
+    void*              mac,
+    size_t*            macSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -147,7 +147,7 @@ finalizeImpl(
 
 seos_err_t
 SeosCryptoMac_init(
-    SeosCryptoMac*              self,
+    SeosCryptoLib_Mac*          self,
     const SeosCryptoApi_MemIf*  memIf,
     const SeosCryptoApi_Mac_Alg algorithm)
 {
@@ -167,7 +167,7 @@ SeosCryptoMac_init(
 
 seos_err_t
 SeosCryptoMac_free(
-    SeosCryptoMac*             self,
+    SeosCryptoLib_Mac*         self,
     const SeosCryptoApi_MemIf* memIf)
 {
     if (NULL == memIf || NULL == self)
@@ -180,9 +180,9 @@ SeosCryptoMac_free(
 
 seos_err_t
 SeosCryptoMac_start(
-    SeosCryptoMac* self,
-    const void*    secret,
-    const size_t   secretSize)
+    SeosCryptoLib_Mac* self,
+    const void*        secret,
+    const size_t       secretSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -200,9 +200,9 @@ SeosCryptoMac_start(
 
 seos_err_t
 SeosCryptoMac_process(
-    SeosCryptoMac* self,
-    const void*    data,
-    const size_t   dataSize)
+    SeosCryptoLib_Mac* self,
+    const void*        data,
+    const size_t       dataSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -220,9 +220,9 @@ SeosCryptoMac_process(
 
 seos_err_t
 SeosCryptoMac_finalize(
-    SeosCryptoMac* self,
-    void*          mac,
-    size_t*        macSize)
+    SeosCryptoLib_Mac* self,
+    void*              mac,
+    size_t*            macSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 

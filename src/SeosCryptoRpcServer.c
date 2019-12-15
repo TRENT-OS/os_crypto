@@ -106,55 +106,55 @@ SeosCryptoRpcServer_Rng_reseed(
 
 seos_err_t
 SeosCryptoRpcServer_Mac_init(
-    SeosCryptoRpcServer*  self,
-    SeosCryptoApi_Mac*    pMacHandle,
-    SeosCryptoApi_Mac_Alg algorithm)
+    SeosCryptoRpcServer*   self,
+    SeosCryptoLib_Mac_Ptr* pMacObj,
+    SeosCryptoApi_Mac_Alg  algorithm)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_Mac_init(self->seosCryptoApi, pMacHandle, algorithm);
+           SeosCryptoLib_Mac_init(self->seosCryptoApi, pMacObj, algorithm);
 }
 
 seos_err_t
 SeosCryptoRpcServer_Mac_free(
-    SeosCryptoRpcServer* self,
-    SeosCryptoApi_Mac    macHandle)
+    SeosCryptoRpcServer*  self,
+    SeosCryptoLib_Mac_Ptr macObj)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_Mac_free(self->seosCryptoApi, macHandle);
+           SeosCryptoLib_Mac_free(self->seosCryptoApi, macObj);
 }
 
 seos_err_t
 SeosCryptoRpcServer_Mac_start(
-    SeosCryptoRpcServer* self,
-    SeosCryptoApi_Mac    macHandle,
-    size_t               secretSize)
+    SeosCryptoRpcServer*  self,
+    SeosCryptoLib_Mac_Ptr macObj,
+    size_t                secretSize)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_Mac_start(self->seosCryptoApi, macHandle,
+           SeosCryptoLib_Mac_start(self->seosCryptoApi, macObj,
                                    self->serverDataport, secretSize);
 }
 
 seos_err_t
 SeosCryptoRpcServer_Mac_process(
-    SeosCryptoRpcServer* self,
-    SeosCryptoApi_Mac    macHandle,
-    size_t               dataSize)
+    SeosCryptoRpcServer*  self,
+    SeosCryptoLib_Mac_Ptr macObj,
+    size_t                dataSize)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_Mac_process(self->seosCryptoApi, macHandle,
+           SeosCryptoLib_Mac_process(self->seosCryptoApi, macObj,
                                      self->serverDataport, dataSize);
 }
 
 seos_err_t
 SeosCryptoRpcServer_Mac_finalize(
-    SeosCryptoRpcServer* self,
-    SeosCryptoApi_Mac    macHandle,
-    size_t*              macSize)
+    SeosCryptoRpcServer*  self,
+    SeosCryptoLib_Mac_Ptr macObj,
+    size_t*               macSize)
 {
     *macSize = (*macSize <= SeosCryptoApi_SIZE_DATAPORT) ? *macSize :
                SeosCryptoApi_SIZE_DATAPORT;
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_Mac_finalize(self->seosCryptoApi, macHandle,
+           SeosCryptoLib_Mac_finalize(self->seosCryptoApi, macObj,
                                       self->serverDataport, macSize);
 }
 

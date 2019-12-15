@@ -11,7 +11,7 @@ add_library(
     "src/lib/SeosCryptoAgreement.c"
     "src/lib/SeosCryptoRng.c"
     "src/lib/SeosCryptoDigest.c"
-    "src/lib/SeosCryptoMac.c"
+    "src/lib/SeosCryptoLib_Mac.c"
     "src/lib/SeosCryptoCipher.c"
     "src/lib/SeosCryptoSignature.c"
     "src/lib/SeosCryptoKey.c"

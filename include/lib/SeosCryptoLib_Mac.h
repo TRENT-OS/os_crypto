@@ -4,7 +4,7 @@
  * @addtogroup Wrappers
  * @{
  *
- * @file SeosCryptoMac.h
+ * @file SeosCryptoLib_Mac.h
  *
  * @brief Message authentication code (MAC) functions
  *
@@ -21,7 +21,7 @@
 
 // Internal types/defines/enums ------------------------------------------------
 
-struct SeosCryptoMac
+struct SeosCryptoLib_Mac
 {
     union
     {
@@ -37,31 +37,31 @@ struct SeosCryptoMac
 
 seos_err_t
 SeosCryptoMac_init(
-    SeosCryptoMac*              self,
+    SeosCryptoLib_Mac*          self,
     const SeosCryptoApi_MemIf*  memIf,
     const SeosCryptoApi_Mac_Alg algorithm);
 
 seos_err_t
 SeosCryptoMac_free(
-    SeosCryptoMac*             self,
+    SeosCryptoLib_Mac*         self,
     const SeosCryptoApi_MemIf* memIf);
 
 seos_err_t
 SeosCryptoMac_start(
-    SeosCryptoMac* self,
-    const void*    secret,
-    const size_t   secretSize);
+    SeosCryptoLib_Mac* self,
+    const void*        secret,
+    const size_t       secretSize);
 
 seos_err_t
 SeosCryptoMac_process(
-    SeosCryptoMac* self,
-    const void*    data,
-    const size_t   dataSize);
+    SeosCryptoLib_Mac* self,
+    const void*        data,
+    const size_t       dataSize);
 
 seos_err_t
 SeosCryptoMac_finalize(
-    SeosCryptoMac* self,
-    void*          mac,
-    size_t*        macSize);
+    SeosCryptoLib_Mac* self,
+    void*              mac,
+    size_t*            macSize);
 
 /** @} */

@@ -6,7 +6,7 @@
 #include "lib/SeosCryptoKey.h"
 #include "lib/SeosCryptoRng.h"
 #include "lib/SeosCryptoDigest.h"
-#include "lib/SeosCryptoMac.h"
+#include "lib/SeosCryptoLib_Mac.h"
 #include "lib/SeosCryptoSignature.h"
 #include "lib/SeosCryptoAgreement.h"
 
@@ -83,27 +83,27 @@ SeosCryptoLib_Rng_reseed(
 seos_err_t
 SeosCryptoLib_Mac_init(
     SeosCryptoApi_Context*      api,
-    SeosCryptoApi_Mac*          pMacHandle,
+    SeosCryptoLib_Mac**         pMacObj,
     const SeosCryptoApi_Mac_Alg algorithm)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
-    if (NULL == api || NULL == pMacHandle)
+    if (NULL == api || NULL == pMacObj)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if ((*pMacHandle = self->memIf.malloc(sizeof(SeosCryptoMac))) == NULL)
+    else if ((*pMacObj = self->memIf.malloc(sizeof(SeosCryptoLib_Mac))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((retval = SeosCryptoMac_init(*pMacHandle, &self->memIf,
+    if ((retval = SeosCryptoMac_init(*pMacObj, &self->memIf,
                                      algorithm)) != SEOS_SUCCESS)
     {
         goto err0;
     }
-    else if (!PointerVector_pushBack(&self->macHandleVector, *pMacHandle))
+    else if (!PointerVector_pushBack(&self->macHandleVector, *pMacObj))
     {
         retval = SEOS_ERROR_INSUFFICIENT_SPACE;
         goto err1;
@@ -112,17 +112,17 @@ SeosCryptoLib_Mac_init(
     return SEOS_SUCCESS;
 
 err1:
-    SeosCryptoMac_free(*pMacHandle, &self->memIf);
+    SeosCryptoMac_free(*pMacObj, &self->memIf);
 err0:
-    self->memIf.free(*pMacHandle);
+    self->memIf.free(*pMacObj);
 
     return retval;
 }
 
 seos_err_t
 SeosCryptoLib_Mac_free(
-    SeosCryptoApi_Context*  api,
-    const SeosCryptoApi_Mac macHandle)
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Mac*     macObj)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoLib* self = (SeosCryptoLib*) api;
@@ -134,12 +134,12 @@ SeosCryptoLib_Mac_free(
     }
 
     if ((handlePos = SeosCryptoLib_findHandle(&self->macHandleVector,
-                                              macHandle)) != -1)
+                                              macObj)) != -1)
     {
-        if ((retval = SeosCryptoMac_free(macHandle, &self->memIf)) == SEOS_SUCCESS)
+        if ((retval = SeosCryptoMac_free(macObj, &self->memIf)) == SEOS_SUCCESS)
         {
             SeosCryptoLib_removeHandle(&self->macHandleVector, handlePos);
-            self->memIf.free(macHandle);
+            self->memIf.free(macObj);
         }
     }
     else
@@ -152,10 +152,10 @@ SeosCryptoLib_Mac_free(
 
 seos_err_t
 SeosCryptoLib_Mac_start(
-    SeosCryptoApi_Context*  api,
-    const SeosCryptoApi_Mac macHandle,
-    const void*             secret,
-    const size_t            secretSize)
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Mac*     macObj,
+    const void*            secret,
+    const size_t           secretSize)
 {
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
@@ -164,17 +164,17 @@ SeosCryptoLib_Mac_start(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoLib_findHandle(&self->macHandleVector, macHandle) == -1 ?
+    return SeosCryptoLib_findHandle(&self->macHandleVector, macObj) == -1 ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoMac_start(macHandle, secret, secretSize);
+           SeosCryptoMac_start(macObj, secret, secretSize);
 }
 
 seos_err_t
 SeosCryptoLib_Mac_process(
-    SeosCryptoApi_Context*  api,
-    const SeosCryptoApi_Mac macHandle,
-    const void*             data,
-    const size_t            dataLen)
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Mac*     macObj,
+    const void*            data,
+    const size_t           dataLen)
 {
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
@@ -183,17 +183,17 @@ SeosCryptoLib_Mac_process(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoLib_findHandle(&self->macHandleVector, macHandle) == -1 ?
+    return SeosCryptoLib_findHandle(&self->macHandleVector, macObj) == -1 ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoMac_process(macHandle, data, dataLen);
+           SeosCryptoMac_process(macObj, data, dataLen);
 }
 
 seos_err_t
 SeosCryptoLib_Mac_finalize(
-    SeosCryptoApi_Context*  api,
-    const SeosCryptoApi_Mac macHandle,
-    void*                   mac,
-    size_t*                 macSize)
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Mac*     macObj,
+    void*                  mac,
+    size_t*                macSize)
 {
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
@@ -202,9 +202,9 @@ SeosCryptoLib_Mac_finalize(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoLib_findHandle(&self->macHandleVector, macHandle) == -1 ?
+    return SeosCryptoLib_findHandle(&self->macHandleVector, macObj) == -1 ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoMac_finalize(macHandle, mac, macSize);
+           SeosCryptoMac_finalize(macObj, mac, macSize);
 }
 
 // ------------------------------ Digest API -----------------------------------

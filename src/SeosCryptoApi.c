@@ -48,66 +48,76 @@ SeosCryptoApi_Rng_reseed(
 
 seos_err_t
 SeosCryptoApi_Mac_init(
-    SeosCryptoApi_Context*      ctx,
-    SeosCryptoApi_Mac*          pMacHandle,
+    SeosCryptoApi_Context*      api,
+    SeosCryptoApi_Mac*          wMac,
     const SeosCryptoApi_Mac_Alg algorithm)
 {
-    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->Mac_init(ctx, pMacHandle, algorithm);
+    if (NULL == api || NULL == wMac || NULL == api->vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    wMac->api = api;
+
+    return (NULL == api->vtable->Mac_init) ? SEOS_ERROR_NOT_SUPPORTED :
+           api->vtable->Mac_init(api, &wMac->mac, algorithm);
 }
 
 seos_err_t
 SeosCryptoApi_Mac_free(
-    SeosCryptoApi_Context*  ctx,
-    const SeosCryptoApi_Mac macHandle)
+    SeosCryptoApi_Mac* wMac)
 {
-    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->Mac_free(ctx, macHandle);
+    return (NULL == wMac) ? SEOS_ERROR_INVALID_PARAMETER :
+           (NULL == wMac->api->vtable->Mac_free) ? SEOS_ERROR_NOT_SUPPORTED :
+           wMac->api->vtable->Mac_free(wMac->api, wMac->mac);
 }
 
 seos_err_t
 SeosCryptoApi_Mac_start(
-    SeosCryptoApi_Context*  ctx,
-    const SeosCryptoApi_Mac macHandle,
-    const void*             secret,
-    const size_t            secretSize)
+    SeosCryptoApi_Mac* wMac,
+    const void*        secret,
+    const size_t       secretSize)
 {
     if (secretSize > SeosCryptoLib_SIZE_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
-    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->Mac_start(ctx, macHandle, secret, secretSize);
+
+    return (NULL == wMac) ? SEOS_ERROR_INVALID_PARAMETER :
+           (NULL == wMac->api->vtable->Mac_start) ? SEOS_ERROR_NOT_SUPPORTED :
+           wMac->api->vtable->Mac_start(wMac->api, wMac->mac, secret, secretSize);
 }
 
 seos_err_t
 SeosCryptoApi_Mac_process(
-    SeosCryptoApi_Context*  ctx,
-    const SeosCryptoApi_Mac macHandle,
-    const void*             data,
-    const size_t            dataSize)
+    SeosCryptoApi_Mac* wMac,
+    const void*        data,
+    const size_t       dataSize)
 {
     if (dataSize > SeosCryptoLib_SIZE_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
-    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->Mac_process(ctx, macHandle, data, dataSize);
+
+    return (NULL == wMac) ? SEOS_ERROR_INVALID_PARAMETER :
+           (NULL == wMac->api->vtable->Mac_process) ? SEOS_ERROR_NOT_SUPPORTED :
+           wMac->api->vtable->Mac_process(wMac->api, wMac->mac, data, dataSize);
 }
 
 seos_err_t
 SeosCryptoApi_Mac_finalize(
-    SeosCryptoApi_Context*  ctx,
-    const SeosCryptoApi_Mac macHandle,
-    void*                   mac,
-    size_t*                 macSize)
+    SeosCryptoApi_Mac* wMac,
+    void*              mac,
+    size_t*            macSize)
 {
     if (NULL != macSize && *macSize > SeosCryptoLib_SIZE_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
-    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->Mac_finalize(ctx, macHandle, mac, macSize);
+
+    return (NULL == wMac) ? SEOS_ERROR_INVALID_PARAMETER :
+           (NULL == wMac->api->vtable->Mac_finalize) ? SEOS_ERROR_NOT_SUPPORTED :
+           wMac->api->vtable->Mac_finalize(wMac->api, wMac->mac, mac, macSize);
 }
 
 // ------------------------------ Digest API -----------------------------------
