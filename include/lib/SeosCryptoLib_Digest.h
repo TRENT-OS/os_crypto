@@ -4,7 +4,7 @@
  * @addtogroup Wrappers
  * @{
  *
- * @file SeosCryptoDigest.h
+ * @file SeosCryptoLib_Digest.h
  *
  * @brief Digest functions
  *
@@ -25,7 +25,7 @@
 
 // Internal types/defines/enums ------------------------------------------------
 
-struct SeosCryptoDigest
+struct SeosCryptoLib_Digest
 {
     union
     {
@@ -49,30 +49,30 @@ Debug_STATIC_ASSERT((int)SeosCryptoApi_Digest_ALG_SHA256   ==
 
 seos_err_t
 SeosCryptoDigest_init(
-    SeosCryptoDigest*              self,
+    SeosCryptoLib_Digest*          self,
     const SeosCryptoApi_MemIf*     memIf,
     const SeosCryptoApi_Digest_Alg algorithm);
 
 seos_err_t
 SeosCryptoDigest_free(
-    SeosCryptoDigest*          self,
+    SeosCryptoLib_Digest*      self,
     const SeosCryptoApi_MemIf* memIf);
 
 seos_err_t
 SeosCryptoDigest_clone(
-    SeosCryptoDigest*       self,
-    const SeosCryptoDigest* source);
+    SeosCryptoLib_Digest*       self,
+    const SeosCryptoLib_Digest* source);
 
 seos_err_t
 SeosCryptoDigest_process(
-    SeosCryptoDigest* self,
-    const void*       data,
-    const size_t      dataLen);
+    SeosCryptoLib_Digest* self,
+    const void*           data,
+    const size_t          dataLen);
 
 seos_err_t
 SeosCryptoDigest_finalize(
-    SeosCryptoDigest* self,
-    void*             digest,
-    size_t*           digestSize);
+    SeosCryptoLib_Digest* self,
+    void*                 digest,
+    size_t*               digestSize);
 
 /** @} */

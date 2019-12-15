@@ -129,33 +129,33 @@ SeosCryptoLib_Mac_finalize(
 seos_err_t
 SeosCryptoLib_Digest_init(
     SeosCryptoApi_Context*         api,
-    SeosCryptoApi_Digest*          pDigestHandle,
+    SeosCryptoLib_Digest**         pDigObj,
     const SeosCryptoApi_Digest_Alg algorithm);
 
 seos_err_t
 SeosCryptoLib_Digest_free(
-    SeosCryptoApi_Context*     api,
-    const SeosCryptoApi_Digest digestHandle);
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Digest*  digObj);
 
 seos_err_t
 SeosCryptoLib_Digest_clone(
-    SeosCryptoApi_Context*     api,
-    const SeosCryptoApi_Digest dstDigHandle,
-    const SeosCryptoApi_Digest srcDigHandle);
+    SeosCryptoApi_Context*      api,
+    SeosCryptoLib_Digest*       dstDigObj,
+    const SeosCryptoLib_Digest* srcDigObj);
 
 seos_err_t
 SeosCryptoLib_Digest_process(
-    SeosCryptoApi_Context*     api,
-    const SeosCryptoApi_Digest digestHandle,
-    const void*                data,
-    const size_t               len);
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Digest*  digObj,
+    const void*            data,
+    const size_t           len);
 
 seos_err_t
 SeosCryptoLib_Digest_finalize(
-    SeosCryptoApi_Context*     api,
-    const SeosCryptoApi_Digest digestHandle,
-    void*                      digest,
-    size_t*                    digestSize);
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Digest*  digObj,
+    void*                  digest,
+    size_t*                digestSize);
 
 // -------------------------------- Key API ------------------------------------
 

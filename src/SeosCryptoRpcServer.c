@@ -162,28 +162,28 @@ SeosCryptoRpcServer_Mac_finalize(
 
 seos_err_t
 SeosCryptoRpcServer_Digest_init(
-    SeosCryptoRpcServer*     self,
-    SeosCryptoApi_Digest*    pDigestHandle,
-    SeosCryptoApi_Digest_Alg algorithm)
+    SeosCryptoRpcServer*      self,
+    SeosCryptoLib_Digest_Ptr* pDigestObj,
+    SeosCryptoApi_Digest_Alg  algorithm)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_Digest_init(self->seosCryptoApi, pDigestHandle, algorithm);
+           SeosCryptoLib_Digest_init(self->seosCryptoApi, pDigestObj, algorithm);
 }
 
 seos_err_t
 SeosCryptoRpcServer_Digest_free(
-    SeosCryptoRpcServer* self,
-    SeosCryptoApi_Digest digestHandle)
+    SeosCryptoRpcServer*     self,
+    SeosCryptoLib_Digest_Ptr digestObj)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_Digest_free(self->seosCryptoApi, digestHandle);
+           SeosCryptoLib_Digest_free(self->seosCryptoApi, digestObj);
 }
 
 seos_err_t
 SeosCryptoRpcServer_Digest_clone(
-    SeosCryptoRpcServer* self,
-    SeosCryptoApi_Digest dstDigHandle,
-    SeosCryptoApi_Digest srcDigHandle)
+    SeosCryptoRpcServer*      self,
+    SeosCryptoLib_Digest_Ptr  dstDigHandle,
+    SeosCryptoLib_Digest_CPtr srcDigHandle)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
            SeosCryptoLib_Digest_clone(self->seosCryptoApi, dstDigHandle, srcDigHandle);
@@ -191,25 +191,25 @@ SeosCryptoRpcServer_Digest_clone(
 
 seos_err_t
 SeosCryptoRpcServer_Digest_process(
-    SeosCryptoRpcServer* self,
-    SeosCryptoApi_Digest digestHandle,
-    size_t               inLen)
+    SeosCryptoRpcServer*     self,
+    SeosCryptoLib_Digest_Ptr digestObj,
+    size_t                   inLen)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_Digest_process(self->seosCryptoApi, digestHandle,
+           SeosCryptoLib_Digest_process(self->seosCryptoApi, digestObj,
                                         self->serverDataport, inLen);
 }
 
 seos_err_t
 SeosCryptoRpcServer_Digest_finalize(
-    SeosCryptoRpcServer* self,
-    SeosCryptoApi_Digest digestHandle,
-    size_t*              digestSize)
+    SeosCryptoRpcServer*     self,
+    SeosCryptoLib_Digest_Ptr digestObj,
+    size_t*                  digestSize)
 {
     *digestSize = (*digestSize <= SeosCryptoApi_SIZE_DATAPORT) ? *digestSize :
                   SeosCryptoApi_SIZE_DATAPORT;
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_Digest_finalize(self->seosCryptoApi, digestHandle,
+           SeosCryptoLib_Digest_finalize(self->seosCryptoApi, digestObj,
                                          self->serverDataport, digestSize);
 }
 

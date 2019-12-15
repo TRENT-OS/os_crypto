@@ -2,7 +2,7 @@
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 
-#include "lib/SeosCryptoDigest.h"
+#include "lib/SeosCryptoLib_Digest.h"
 
 #include "LibDebug/Debug.h"
 #include "compiler.h"
@@ -13,7 +13,7 @@
 
 static seos_err_t
 initImpl(
-    SeosCryptoDigest*          self,
+    SeosCryptoLib_Digest*      self,
     const SeosCryptoApi_MemIf* memIf)
 {
     UNUSED_VAR(memIf);
@@ -40,7 +40,7 @@ initImpl(
 
 static seos_err_t
 freeImpl(
-    SeosCryptoDigest*          self,
+    SeosCryptoLib_Digest*      self,
     const SeosCryptoApi_MemIf* memIf)
 {
     UNUSED_VAR(memIf);
@@ -65,9 +65,9 @@ freeImpl(
 
 static seos_err_t
 finalizeImpl(
-    SeosCryptoDigest* self,
-    void*             digest,
-    size_t*           digestSize)
+    SeosCryptoLib_Digest* self,
+    void*                 digest,
+    size_t*               digestSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -108,9 +108,9 @@ finalizeImpl(
 
 static seos_err_t
 processImpl(
-    SeosCryptoDigest* self,
-    const void*       data,
-    const size_t      len)
+    SeosCryptoLib_Digest* self,
+    const void*           data,
+    const size_t          len)
 {
     switch (self->algorithm)
     {
@@ -129,8 +129,8 @@ processImpl(
 
 static seos_err_t
 cloneImpl(
-    SeosCryptoDigest*       self,
-    const SeosCryptoDigest* source)
+    SeosCryptoLib_Digest*       self,
+    const SeosCryptoLib_Digest* source)
 {
     switch (self->algorithm)
     {
@@ -151,7 +151,7 @@ cloneImpl(
 
 seos_err_t
 SeosCryptoDigest_init(
-    SeosCryptoDigest*              self,
+    SeosCryptoLib_Digest*          self,
     const SeosCryptoApi_MemIf*     memIf,
     const SeosCryptoApi_Digest_Alg algorithm)
 {
@@ -170,7 +170,7 @@ SeosCryptoDigest_init(
 
 seos_err_t
 SeosCryptoDigest_free(
-    SeosCryptoDigest*          self,
+    SeosCryptoLib_Digest*      self,
     const SeosCryptoApi_MemIf* memIf)
 {
     if (NULL == memIf || NULL == self)
@@ -183,8 +183,8 @@ SeosCryptoDigest_free(
 
 seos_err_t
 SeosCryptoDigest_clone(
-    SeosCryptoDigest*       self,
-    const SeosCryptoDigest* source)
+    SeosCryptoLib_Digest*       self,
+    const SeosCryptoLib_Digest* source)
 {
     if (NULL == self || NULL == source || self->algorithm != source->algorithm)
     {
@@ -198,9 +198,9 @@ SeosCryptoDigest_clone(
 
 seos_err_t
 SeosCryptoDigest_process(
-    SeosCryptoDigest* self,
-    const void*       data,
-    const size_t      len)
+    SeosCryptoLib_Digest* self,
+    const void*           data,
+    const size_t          len)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -217,9 +217,9 @@ SeosCryptoDigest_process(
 
 seos_err_t
 SeosCryptoDigest_finalize(
-    SeosCryptoDigest* self,
-    void*             digest,
-    size_t*           digestSize)
+    SeosCryptoLib_Digest* self,
+    void*                 digest,
+    size_t*               digestSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 

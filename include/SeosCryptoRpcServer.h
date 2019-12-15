@@ -111,34 +111,37 @@ SeosCryptoRpcServer_Mac_finalize(
 
 // ------------------------------ Digest API -----------------------------------
 
+typedef SeosCryptoLib_Digest* SeosCryptoLib_Digest_Ptr;
+typedef const SeosCryptoLib_Digest* SeosCryptoLib_Digest_CPtr;
+
 seos_err_t
 SeosCryptoRpcServer_Digest_init(
-    SeosCryptoRpcServer*     self,
-    SeosCryptoApi_Digest*    pDigestHandle,
-    SeosCryptoApi_Digest_Alg algorithm);
+    SeosCryptoRpcServer*      self,
+    SeosCryptoLib_Digest_Ptr* pDigPtr,
+    SeosCryptoApi_Digest_Alg  algorithm);
 
 seos_err_t
 SeosCryptoRpcServer_Digest_free(
-    SeosCryptoRpcServer* self,
-    SeosCryptoApi_Digest digestHandle);
+    SeosCryptoRpcServer*     self,
+    SeosCryptoLib_Digest_Ptr digPtr);
 
 seos_err_t
 SeosCryptoRpcServer_Digest_clone(
-    SeosCryptoRpcServer* self,
-    SeosCryptoApi_Digest dstDigHandle,
-    SeosCryptoApi_Digest srcDigHandle);
+    SeosCryptoRpcServer*      self,
+    SeosCryptoLib_Digest_Ptr  dstDigPtr,
+    SeosCryptoLib_Digest_CPtr srcDigPtr);
 
 seos_err_t
 SeosCryptoRpcServer_Digest_process(
-    SeosCryptoRpcServer* self,
-    SeosCryptoApi_Digest digestHandle,
-    size_t               inLen);
+    SeosCryptoRpcServer*     self,
+    SeosCryptoLib_Digest_Ptr digPtr,
+    size_t                   inLen);
 
 seos_err_t
 SeosCryptoRpcServer_Digest_finalize(
-    SeosCryptoRpcServer* self,
-    SeosCryptoApi_Digest digestHandle,
-    size_t*              digestSize);
+    SeosCryptoRpcServer*     self,
+    SeosCryptoLib_Digest_Ptr digPtr,
+    size_t*                  digestSize);
 
 // -------------------------------- Key API ------------------------------------
 

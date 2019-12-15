@@ -5,7 +5,7 @@
 #include "lib/SeosCryptoLib_Cipher.h"
 #include "lib/SeosCryptoKey.h"
 #include "lib/SeosCryptoRng.h"
-#include "lib/SeosCryptoDigest.h"
+#include "lib/SeosCryptoLib_Digest.h"
 #include "lib/SeosCryptoLib_Mac.h"
 #include "lib/SeosCryptoSignature.h"
 #include "lib/SeosCryptoLib_Agreement.h"
@@ -212,28 +212,28 @@ SeosCryptoLib_Mac_finalize(
 seos_err_t
 SeosCryptoLib_Digest_init(
     SeosCryptoApi_Context*         api,
-    SeosCryptoApi_Digest*          pDigestHandle,
+    SeosCryptoLib_Digest**         pDigObj,
     const SeosCryptoApi_Digest_Alg algorithm)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
-    if (NULL == api || NULL == pDigestHandle)
+    if (NULL == api || NULL == pDigObj)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if ((*pDigestHandle = self->memIf.malloc(
-                                   sizeof(SeosCryptoDigest))) == NULL)
+    else if ((*pDigObj = self->memIf.malloc(
+                             sizeof(SeosCryptoLib_Digest))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((retval = SeosCryptoDigest_init(*pDigestHandle, &self->memIf,
+    if ((retval = SeosCryptoDigest_init(*pDigObj, &self->memIf,
                                         algorithm)) != SEOS_SUCCESS)
     {
         goto err0;
     }
-    else if (!PointerVector_pushBack(&self->digestHandleVector, *pDigestHandle))
+    else if (!PointerVector_pushBack(&self->digestHandleVector, *pDigObj))
     {
         retval = SEOS_ERROR_INSUFFICIENT_SPACE;
         goto err1;
@@ -242,17 +242,17 @@ SeosCryptoLib_Digest_init(
     return SEOS_SUCCESS;
 
 err1:
-    SeosCryptoDigest_free(*pDigestHandle, &self->memIf);
+    SeosCryptoDigest_free(*pDigObj, &self->memIf);
 err0:
-    self->memIf.free(*pDigestHandle);
+    self->memIf.free(*pDigObj);
 
     return retval;
 }
 
 seos_err_t
 SeosCryptoLib_Digest_free(
-    SeosCryptoApi_Context*     api,
-    const SeosCryptoApi_Digest digestHandle)
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Digest*  digObj)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoLib* self = (SeosCryptoLib*) api;
@@ -264,13 +264,12 @@ SeosCryptoLib_Digest_free(
     }
 
     if ((handlePos = SeosCryptoLib_findHandle(&self->digestHandleVector,
-                                              digestHandle)) != -1)
+                                              digObj)) != -1)
     {
-        if ((retval = SeosCryptoDigest_free(digestHandle,
-                                            &self->memIf)) == SEOS_SUCCESS)
+        if ((retval = SeosCryptoDigest_free(digObj, &self->memIf)) == SEOS_SUCCESS)
         {
             SeosCryptoLib_removeHandle(&self->digestHandleVector, handlePos);
-            self->memIf.free(digestHandle);
+            self->memIf.free(digObj);
         }
     }
     else
@@ -283,9 +282,9 @@ SeosCryptoLib_Digest_free(
 
 seos_err_t
 SeosCryptoLib_Digest_clone(
-    SeosCryptoApi_Context*     api,
-    const SeosCryptoApi_Digest dstDigHandle,
-    const SeosCryptoApi_Digest srcDigHandle)
+    SeosCryptoApi_Context*      api,
+    SeosCryptoLib_Digest*       dstDigObj,
+    const SeosCryptoLib_Digest* srcDigObj)
 {
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
@@ -294,19 +293,18 @@ SeosCryptoLib_Digest_clone(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoLib_findHandle(&self->digestHandleVector, dstDigHandle) == -1
-           ||
-           SeosCryptoLib_findHandle(&self->digestHandleVector, srcDigHandle) == -1 ?
+    return SeosCryptoLib_findHandle(&self->digestHandleVector, dstDigObj) == -1 ||
+           SeosCryptoLib_findHandle(&self->digestHandleVector, srcDigObj) == -1 ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoDigest_clone(dstDigHandle, srcDigHandle);
+           SeosCryptoDigest_clone(dstDigObj, srcDigObj);
 }
 
 seos_err_t
 SeosCryptoLib_Digest_process(
-    SeosCryptoApi_Context*     api,
-    const SeosCryptoApi_Digest digestHandle,
-    const void*                data,
-    const size_t               dataLen)
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Digest*  digObj,
+    const void*            data,
+    const size_t           dataLen)
 {
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
@@ -315,17 +313,17 @@ SeosCryptoLib_Digest_process(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoLib_findHandle(&self->digestHandleVector, digestHandle) == -1 ?
+    return SeosCryptoLib_findHandle(&self->digestHandleVector, digObj) == -1 ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoDigest_process(digestHandle, data, dataLen);
+           SeosCryptoDigest_process(digObj, data, dataLen);
 }
 
 seos_err_t
 SeosCryptoLib_Digest_finalize(
-    SeosCryptoApi_Context*     api,
-    const SeosCryptoApi_Digest digestHandle,
-    void*                      digest,
-    size_t*                    digestSize)
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Digest*  digObj,
+    void*                  digest,
+    size_t*                digestSize)
 {
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
@@ -334,9 +332,9 @@ SeosCryptoLib_Digest_finalize(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoLib_findHandle(&self->digestHandleVector, digestHandle) == -1 ?
+    return SeosCryptoLib_findHandle(&self->digestHandleVector, digObj) == -1 ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoDigest_finalize(digestHandle, digest, digestSize);
+           SeosCryptoDigest_finalize(digObj, digest, digestSize);
 }
 
 // ----------------------------- Signature API ---------------------------------

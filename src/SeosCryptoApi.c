@@ -124,61 +124,72 @@ SeosCryptoApi_Mac_finalize(
 
 seos_err_t
 SeosCryptoApi_Digest_init(
-    SeosCryptoApi_Context*         ctx,
-    SeosCryptoApi_Digest*          pDigestHandle,
+    SeosCryptoApi_Context*         api,
+    SeosCryptoApi_Digest*          wDigest,
     const SeosCryptoApi_Digest_Alg algorithm)
 {
-    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->Digest_init(ctx, pDigestHandle, algorithm);
+    if (NULL == api || NULL == wDigest || NULL == api->vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    wDigest->api = api;
+
+    return (NULL == api->vtable->Digest_init) ? SEOS_ERROR_NOT_SUPPORTED :
+           api->vtable->Digest_init(api, &wDigest->digest, algorithm);
 }
 
 seos_err_t
 SeosCryptoApi_Digest_free(
-    SeosCryptoApi_Context*     ctx,
-    const SeosCryptoApi_Digest digestHandle)
+    SeosCryptoApi_Digest* wDigest)
 {
-    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->Digest_free(ctx, digestHandle);
+    return (NULL == wDigest) ? SEOS_ERROR_INVALID_PARAMETER :
+           (NULL == wDigest->api->vtable->Digest_free) ? SEOS_ERROR_NOT_SUPPORTED :
+           wDigest->api->vtable->Digest_free(wDigest->api, wDigest->digest);
 }
 
 seos_err_t
 SeosCryptoApi_Digest_clone(
-    SeosCryptoApi_Context*     ctx,
-    const SeosCryptoApi_Digest dstDigHandle,
-    const SeosCryptoApi_Digest srcDigHandle)
+    SeosCryptoApi_Digest*       wDst,
+    const SeosCryptoApi_Digest* wSrc)
 {
-    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->Digest_clone(ctx, dstDigHandle, srcDigHandle);
+    return (NULL == wSrc || NULL == wDst) ? SEOS_ERROR_INVALID_PARAMETER :
+           (NULL == wDst->api->vtable->Digest_clone) ? SEOS_ERROR_NOT_SUPPORTED :
+           wDst->api->vtable->Digest_clone(wDst->api, wDst->digest, wSrc->digest);
 }
 
 seos_err_t
 SeosCryptoApi_Digest_process(
-    SeosCryptoApi_Context*     ctx,
-    const SeosCryptoApi_Digest digestHandle,
-    const void*                data,
-    const size_t               dataLen)
+    SeosCryptoApi_Digest* wDigest,
+    const void*           data,
+    const size_t          dataLen)
 {
     if (dataLen > SeosCryptoLib_SIZE_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
-    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->Digest_process(ctx, digestHandle, data, dataLen);
+
+    return (NULL == wDigest) ? SEOS_ERROR_INVALID_PARAMETER :
+           (NULL == wDigest->api->vtable->Digest_process) ? SEOS_ERROR_NOT_SUPPORTED :
+           wDigest->api->vtable->Digest_process(wDigest->api, wDigest->digest,  data,
+                                                dataLen);
 }
 
 seos_err_t
 SeosCryptoApi_Digest_finalize(
-    SeosCryptoApi_Context*     ctx,
-    const SeosCryptoApi_Digest digestHandle,
-    void*                      digest,
-    size_t*                    digestSize)
+    SeosCryptoApi_Digest* wDigest,
+    void*                 digest,
+    size_t*               digestSize)
 {
     if (NULL != digestSize && *digestSize > SeosCryptoLib_SIZE_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
-    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->Digest_finalize(ctx, digestHandle, digest, digestSize);
+
+    return (NULL == wDigest) ? SEOS_ERROR_INVALID_PARAMETER :
+           (NULL == wDigest->api->vtable->Digest_finalize) ? SEOS_ERROR_NOT_SUPPORTED :
+           wDigest->api->vtable->Digest_finalize(wDigest->api, wDigest->digest, digest,
+                                                 digestSize);
 }
 
 // ----------------------------- Signature API ---------------------------------

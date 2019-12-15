@@ -67,34 +67,34 @@ typedef seos_err_t
 
 typedef seos_err_t
 (*SeosCryptoApi_Digest_initT)(
-    SeosCryptoApi_Context*         self,
-    SeosCryptoApi_Digest*          pDigestHandle,
+    SeosCryptoApi_Context*         ctx,
+    SeosCryptoLib_Digest**         pDigObj,
     const SeosCryptoApi_Digest_Alg algorithm);
 
 typedef seos_err_t
 (*SeosCryptoApi_Digest_freeT)(
-    SeosCryptoApi_Context*     self,
-    const SeosCryptoApi_Digest digestHandle);
+    SeosCryptoApi_Context* ctx,
+    SeosCryptoLib_Digest*  digObj);
 
 typedef seos_err_t
 (*SeosCryptoApi_Digest_cloneT)(
-    SeosCryptoApi_Context*     self,
-    const SeosCryptoApi_Digest dstDigHandle,
-    const SeosCryptoApi_Digest srcDigHandle);
+    SeosCryptoApi_Context*      ctx,
+    SeosCryptoLib_Digest*       dstDigObj,
+    const SeosCryptoLib_Digest* srcDigObj);
 
 typedef seos_err_t
 (*SeosCryptoApi_Digest_processT)(
-    SeosCryptoApi_Context*     self,
-    const SeosCryptoApi_Digest digestHandle,
-    const void*                data,
-    const size_t               dataLen);
+    SeosCryptoApi_Context* ctx,
+    SeosCryptoLib_Digest*  digObj,
+    const void*            data,
+    const size_t           dataLen);
 
 typedef seos_err_t
 (*SeosCryptoApi_Digest_finalizeT)(
-    SeosCryptoApi_Context*     self,
-    const SeosCryptoApi_Digest digestHandle,
-    void*                      digest,
-    size_t*                    digestSize);
+    SeosCryptoApi_Context* ctx,
+    SeosCryptoLib_Digest*  digObj,
+    void*                  digest,
+    size_t*                digestSize);
 
 // -------------------------------- Key API ------------------------------------
 

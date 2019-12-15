@@ -171,7 +171,7 @@ SeosCryptoRpcClient_Mac_finalize(
 seos_err_t
 SeosCryptoRpcClient_Digest_init(
     SeosCryptoApi_Context*         api,
-    SeosCryptoApi_Digest*          pDigestHandle,
+    SeosCryptoLib_Digest**         pDigestHandle,
     const SeosCryptoApi_Digest_Alg algorithm)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
@@ -187,8 +187,8 @@ SeosCryptoRpcClient_Digest_init(
 
 seos_err_t
 SeosCryptoRpcClient_Digest_free(
-    SeosCryptoApi_Context*     api,
-    const SeosCryptoApi_Digest digestHandle)
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Digest*  digestHandle)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -202,9 +202,9 @@ SeosCryptoRpcClient_Digest_free(
 
 seos_err_t
 SeosCryptoRpcClient_Digest_clone(
-    SeosCryptoApi_Context*     api,
-    const SeosCryptoApi_Digest dstDigHandle,
-    const SeosCryptoApi_Digest srcDigHandle)
+    SeosCryptoApi_Context*      api,
+    SeosCryptoLib_Digest*       dstDigHandle,
+    const SeosCryptoLib_Digest* srcDigHandle)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -219,10 +219,10 @@ SeosCryptoRpcClient_Digest_clone(
 
 seos_err_t
 SeosCryptoRpcClient_Digest_process(
-    SeosCryptoApi_Context*     api,
-    const SeosCryptoApi_Digest digestHandle,
-    const void*                data,
-    const size_t               dataLen)
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Digest*  digestHandle,
+    const void*            data,
+    const size_t           dataLen)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -242,10 +242,10 @@ SeosCryptoRpcClient_Digest_process(
 
 seos_err_t
 SeosCryptoRpcClient_Digest_finalize(
-    SeosCryptoApi_Context*     api,
-    const SeosCryptoApi_Digest digestHandle,
-    void*                      digest,
-    size_t*                    digestSize)
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Digest*  digestHandle,
+    void*                  digest,
+    size_t*                digestSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
