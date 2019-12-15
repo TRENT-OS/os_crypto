@@ -4,7 +4,7 @@
  * @addtogroup Wrappers
  * @{
  *
- * @file SeosCryptoRng.h
+ * @file SeosCryptoLib_Rng.h
  *
  * @brief RNG functions
  *
@@ -22,7 +22,7 @@
 
 // Internal types/defines/enums ------------------------------------------------
 
-struct SeosCryptoRng
+struct SeosCryptoLib_Rng
 {
     mbedtls_ctr_drbg_context drbg;
 };
@@ -31,27 +31,27 @@ struct SeosCryptoRng
 
 seos_err_t
 SeosCryptoRng_init(
-    SeosCryptoRng*                       self,
+    SeosCryptoLib_Rng*                   self,
     const SeosCryptoApi_MemIf*           memIf,
     const SeosCryptoApi_Rng_EntropyFunc* entropyFunc,
     void*                                entropyCtx);
 
 seos_err_t
 SeosCryptoRng_getBytes(
-    SeosCryptoRng*               self,
+    SeosCryptoLib_Rng*           self,
     const SeosCryptoApi_Rng_Flag flags,
     void*                        buf,
     const size_t                 bufSize);
 
 seos_err_t
 SeosCryptoRng_reSeed(
-    SeosCryptoRng* self,
-    const void*    seed,
-    const size_t   seedLen);
+    SeosCryptoLib_Rng* self,
+    const void*        seed,
+    const size_t       seedLen);
 
 seos_err_t
 SeosCryptoRng_free(
-    SeosCryptoRng*             self,
+    SeosCryptoLib_Rng*         self,
     const SeosCryptoApi_MemIf* memIf);
 
 /**

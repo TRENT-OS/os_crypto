@@ -4,7 +4,7 @@
 
 #include "lib/SeosCryptoLib_Cipher.h"
 #include "lib/SeosCryptoLib_Key.h"
-#include "lib/SeosCryptoRng.h"
+#include "lib/SeosCryptoLib_Rng.h"
 #include "lib/SeosCryptoLib_Digest.h"
 #include "lib/SeosCryptoLib_Mac.h"
 #include "lib/SeosCryptoLib_Signature.h"

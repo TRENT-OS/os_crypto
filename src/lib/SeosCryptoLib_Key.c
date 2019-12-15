@@ -3,7 +3,7 @@
  */
 
 #include "lib/SeosCryptoLib_Key.h"
-#include "lib/SeosCryptoRng.h"
+#include "lib/SeosCryptoLib_Rng.h"
 
 #include "LibDebug/Debug.h"
 
@@ -75,7 +75,7 @@ cleanup:
 
 static seos_err_t
 generate_DHParams(
-    SeosCryptoRng*              rng,
+    SeosCryptoLib_Rng*          rng,
     const size_t                bits,
     SeosCryptoApi_Key_DhParams* params)
 {
@@ -145,7 +145,7 @@ generate_DHParams(
 static seos_err_t
 generate_DHPrv(
     SeosCryptoApi_Key_DhPrv* key,
-    SeosCryptoRng*           rng)
+    SeosCryptoLib_Rng*       rng)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     mbedtls_mpi X, GX, G, P;
@@ -261,7 +261,7 @@ exit:
 static seos_err_t
 generate_RsaPrv(
     SeosCryptoApi_Key_RsaRrv* key,
-    SeosCryptoRng*            rng,
+    SeosCryptoLib_Rng*        rng,
     const size_t              bits)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -335,7 +335,7 @@ exit:
 static seos_err_t
 generate_SECP256r1Prv(
     SeosCryptoApi_Key_Secp256r1Prv* key,
-    SeosCryptoRng*                  rng)
+    SeosCryptoLib_Rng*              rng)
 {
     seos_err_t retval;
     mbedtls_ecp_group grp;
@@ -453,7 +453,7 @@ initImpl(
 static seos_err_t
 generateImpl(
     SeosCryptoLib_Key*            self,
-    SeosCryptoRng*                rng,
+    SeosCryptoLib_Rng*            rng,
     const SeosCryptoApi_Key_Spec* spec)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -778,7 +778,7 @@ seos_err_t
 SeosCryptoKey_generate(
     SeosCryptoLib_Key*            self,
     const SeosCryptoApi_MemIf*    memIf,
-    SeosCryptoRng*                rng,
+    SeosCryptoLib_Rng*            rng,
     const SeosCryptoApi_Key_Spec* spec)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;

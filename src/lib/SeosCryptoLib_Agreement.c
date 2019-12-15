@@ -3,7 +3,7 @@
  */
 
 #include "lib/SeosCryptoLib_Agreement.h"
-#include "lib/SeosCryptoRng.h"
+#include "lib/SeosCryptoLib_Rng.h"
 #include "lib/SeosCryptoLib_Key.h"
 
 #include "LibDebug/Debug.h"
@@ -90,7 +90,7 @@ setKeyImpl(
 static seos_err_t
 agreeImpl(
     SeosCryptoLib_Agreement* self,
-    SeosCryptoRng*           rng,
+    SeosCryptoLib_Rng*       rng,
     const SeosCryptoLib_Key* pubKey,
     void*                    buf,
     size_t*                  bufSize)
@@ -188,7 +188,7 @@ exit:
 seos_err_t
 SeosCryptoAgreement_agree(
     SeosCryptoLib_Agreement* self,
-    SeosCryptoRng*           rng,
+    SeosCryptoLib_Rng*       rng,
     const SeosCryptoLib_Key* pubKey,
     void*                    shared,
     size_t*                  sharedSize)

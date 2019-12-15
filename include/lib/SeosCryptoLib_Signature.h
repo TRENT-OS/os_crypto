@@ -55,7 +55,7 @@ SeosCryptoSignature_free(
 seos_err_t
 SeosCryptoSignature_sign(
     SeosCryptoLib_Signature* self,
-    SeosCryptoRng*           rng,
+    SeosCryptoLib_Rng*       rng,
     const void*              hash,
     const size_t             hashSize,
     void*                    signature,
@@ -64,7 +64,7 @@ SeosCryptoSignature_sign(
 seos_err_t
 SeosCryptoSignature_verify(
     SeosCryptoLib_Signature* self,
-    SeosCryptoRng*           rng,
+    SeosCryptoLib_Rng*       rng,
     const void*              hash,
     const size_t             hashSize,
     const void*              signature,

@@ -14,7 +14,7 @@
 #include "SeosCryptoApi.h"
 #include "SeosCryptoCtx.h"
 
-#include "lib/SeosCryptoRng.h"
+#include "lib/SeosCryptoLib_Rng.h"
 
 #include "LibUtil/PointerVector.h"
 
@@ -28,7 +28,7 @@ struct SeosCryptoLib
 {
     SeosCryptoApi_Context parent;
     SeosCryptoApi_MemIf memIf;
-    SeosCryptoRng cryptoRng;
+    SeosCryptoLib_Rng cryptoRng;
     PointerVector keyHandleVector;
     PointerVector macHandleVector;
     PointerVector digestHandleVector;

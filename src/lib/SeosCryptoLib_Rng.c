@@ -2,7 +2,7 @@
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 
-#include "lib/SeosCryptoRng.h"
+#include "lib/SeosCryptoLib_Rng.h"
 
 #include "LibDebug/Debug.h"
 
@@ -10,7 +10,7 @@
 
 seos_err_t
 SeosCryptoRng_init(
-    SeosCryptoRng*                       self,
+    SeosCryptoLib_Rng*                   self,
     const SeosCryptoApi_MemIf*           memIf,
     const SeosCryptoApi_Rng_EntropyFunc* entropyFunc,
     void*                                entropyCtx)
@@ -45,7 +45,7 @@ err0:
 
 seos_err_t
 SeosCryptoRng_getBytes(
-    SeosCryptoRng*               self,
+    SeosCryptoLib_Rng*           self,
     const SeosCryptoApi_Rng_Flag flags,
     void*                        buf,
     const size_t                 bufSize)
@@ -65,9 +65,9 @@ SeosCryptoRng_getBytes(
 
 seos_err_t
 SeosCryptoRng_reSeed(
-    SeosCryptoRng* self,
-    const void*    seed,
-    const size_t   seedLen)
+    SeosCryptoLib_Rng* self,
+    const void*        seed,
+    const size_t       seedLen)
 {
     if (NULL == seed || 0 == seedLen)
     {
@@ -85,7 +85,7 @@ SeosCryptoRng_reSeed(
 
 seos_err_t
 SeosCryptoRng_free(
-    SeosCryptoRng*             self,
+    SeosCryptoLib_Rng*         self,
     const SeosCryptoApi_MemIf* memIf)
 {
     UNUSED_VAR(memIf);

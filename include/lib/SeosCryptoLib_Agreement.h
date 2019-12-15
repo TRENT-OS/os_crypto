@@ -45,7 +45,7 @@ SeosCryptoAgreement_init(
 seos_err_t
 SeosCryptoAgreement_agree(
     SeosCryptoLib_Agreement* self,
-    SeosCryptoRng*           rng,
+    SeosCryptoLib_Rng*       rng,
     const SeosCryptoLib_Key* pubKey,
     void*                    shared,
     size_t*                  sharedSize);

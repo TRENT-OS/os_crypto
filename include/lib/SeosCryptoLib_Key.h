@@ -61,7 +61,7 @@ seos_err_t
 SeosCryptoKey_generate(
     SeosCryptoLib_Key*            self,
     const SeosCryptoApi_MemIf*    memIf,
-    SeosCryptoRng*                rng,
+    SeosCryptoLib_Rng*            rng,
     const SeosCryptoApi_Key_Spec* spec);
 
 seos_err_t

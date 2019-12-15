@@ -3,7 +3,7 @@
  */
 
 #include "lib/SeosCryptoLib_Signature.h"
-#include "lib/SeosCryptoRng.h"
+#include "lib/SeosCryptoLib_Rng.h"
 #include "lib/SeosCryptoLib_Key.h"
 
 #include "LibDebug/Debug.h"
@@ -107,7 +107,7 @@ setKeyImpl(
 static seos_err_t
 verifyHashImpl(
     SeosCryptoLib_Signature* self,
-    SeosCryptoRng*           rng,
+    SeosCryptoLib_Rng*       rng,
     const void*              hash,
     const size_t             hashSize,
     const void*              signature,
@@ -143,7 +143,7 @@ verifyHashImpl(
 static seos_err_t
 signHashImpl(
     SeosCryptoLib_Signature* self,
-    SeosCryptoRng*           rng,
+    SeosCryptoLib_Rng*       rng,
     const void*              hash,
     const size_t             hashSize,
     void*                    signature,
@@ -236,7 +236,7 @@ SeosCryptoSignature_free(
 seos_err_t
 SeosCryptoSignature_sign(
     SeosCryptoLib_Signature* self,
-    SeosCryptoRng*           rng,
+    SeosCryptoLib_Rng*       rng,
     const void*              hash,
     const size_t             hashSize,
     void*                    signature,
@@ -256,7 +256,7 @@ SeosCryptoSignature_sign(
 seos_err_t
 SeosCryptoSignature_verify(
     SeosCryptoLib_Signature* self,
-    SeosCryptoRng*           rng,
+    SeosCryptoLib_Rng*       rng,
     const void*              hash,
     const size_t             hashSize,
     const void*              signature,
