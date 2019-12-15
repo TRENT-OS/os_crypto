@@ -215,24 +215,26 @@ SeosCryptoRpcServer_Signature_free(
 
 // ----------------------------- Agreement API ---------------------------------
 
+typedef SeosCryptoLib_Agreement* SeosCryptoLib_Agreement_Ptr;
+
 seos_err_t
 SeosCryptoRpcServer_Agreement_init(
-    SeosCryptoRpcServer*        self,
-    SeosCryptoApi_Agreement*    pAgrHandle,
-    SeosCryptoApi_Agreement_Alg algorithm,
-    SeosCryptoApi_Key           prvHandle);
+    SeosCryptoRpcServer*         self,
+    SeosCryptoLib_Agreement_Ptr* pAgrPtr,
+    SeosCryptoApi_Agreement_Alg  algorithm,
+    SeosCryptoApi_Key            prvHandle);
 
 seos_err_t
 SeosCryptoRpcServer_Agreement_agree(
-    SeosCryptoRpcServer*    self,
-    SeosCryptoApi_Agreement agrHandle,
-    SeosCryptoApi_Key       pubHandle,
-    size_t*                 sharedSize);
+    SeosCryptoRpcServer*        self,
+    SeosCryptoLib_Agreement_Ptr agrPtr,
+    SeosCryptoApi_Key           pubHandle,
+    size_t*                     sharedSize);
 
 seos_err_t
 SeosCryptoRpcServer_Agreement_free(
-    SeosCryptoRpcServer*    self,
-    SeosCryptoApi_Agreement agrHandle);
+    SeosCryptoRpcServer*        self,
+    SeosCryptoLib_Agreement_Ptr agrPtr);
 
 // ------------------------------- Cipher API ----------------------------------
 

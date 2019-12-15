@@ -297,10 +297,10 @@ SeosCryptoRpcServer_Key_free(
 
 seos_err_t
 SeosCryptoRpcServer_Agreement_init(
-    SeosCryptoRpcServer*        self,
-    SeosCryptoApi_Agreement*    pAgrHandle,
-    SeosCryptoApi_Agreement_Alg algorithm,
-    SeosCryptoApi_Key           prvHandle)
+    SeosCryptoRpcServer*         self,
+    SeosCryptoLib_Agreement_Ptr* pAgrHandle,
+    SeosCryptoApi_Agreement_Alg  algorithm,
+    SeosCryptoApi_Key            prvHandle)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
            SeosCryptoLib_Agreement_init(self->seosCryptoApi, pAgrHandle, algorithm,
@@ -309,10 +309,10 @@ SeosCryptoRpcServer_Agreement_init(
 
 seos_err_t
 SeosCryptoRpcServer_Agreement_agree(
-    SeosCryptoRpcServer*    self,
-    SeosCryptoApi_Agreement agrHandle,
-    SeosCryptoApi_Key       pubHandle,
-    size_t*                 sharedSize)
+    SeosCryptoRpcServer*        self,
+    SeosCryptoLib_Agreement_Ptr agrHandle,
+    SeosCryptoApi_Key           pubHandle,
+    size_t*                     sharedSize)
 {
     *sharedSize = (*sharedSize <= SeosCryptoApi_SIZE_DATAPORT) ? *sharedSize :
                   SeosCryptoApi_SIZE_DATAPORT;
@@ -323,8 +323,8 @@ SeosCryptoRpcServer_Agreement_agree(
 
 seos_err_t
 SeosCryptoRpcServer_Agreement_free(
-    SeosCryptoRpcServer*    self,
-    SeosCryptoApi_Agreement agrHandle)
+    SeosCryptoRpcServer*        self,
+    SeosCryptoLib_Agreement_Ptr agrHandle)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
            SeosCryptoLib_Agreement_free(self->seosCryptoApi, agrHandle);

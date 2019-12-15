@@ -8,7 +8,7 @@
 #include "lib/SeosCryptoDigest.h"
 #include "lib/SeosCryptoLib_Mac.h"
 #include "lib/SeosCryptoSignature.h"
-#include "lib/SeosCryptoAgreement.h"
+#include "lib/SeosCryptoLib_Agreement.h"
 
 #include "SeosCryptoLib.h"
 
@@ -471,33 +471,33 @@ SeosCryptoLib_Signature_verify(
 seos_err_t
 SeosCryptoLib_Agreement_init(
     SeosCryptoApi_Context*            api,
-    SeosCryptoApi_Agreement*          pAgrHandle,
+    SeosCryptoLib_Agreement**         pAgrObj,
     const SeosCryptoApi_Agreement_Alg algorithm,
-    const SeosCryptoApi_Key           prvHandle)
+    const SeosCryptoApi_Key           prvKey)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
-    if (NULL == api || NULL == pAgrHandle)
+    if (NULL == api || NULL == pAgrObj)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if (SeosCryptoLib_findHandle(&self->keyHandleVector, prvHandle) == -1)
+    else if (SeosCryptoLib_findHandle(&self->keyHandleVector, prvKey) == -1)
     {
         return SEOS_ERROR_INVALID_HANDLE;
     }
-    else if ((*pAgrHandle = self->memIf.malloc(
-                                sizeof(SeosCryptoAgreement))) == NULL)
+    else if ((*pAgrObj = self->memIf.malloc(
+                             sizeof(SeosCryptoLib_Agreement))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((retval = SeosCryptoAgreement_init(*pAgrHandle, &self->memIf, algorithm,
-                                           prvHandle)) != SEOS_SUCCESS)
+    if ((retval = SeosCryptoAgreement_init(*pAgrObj, &self->memIf, algorithm,
+                                           prvKey)) != SEOS_SUCCESS)
     {
         goto err0;
     }
-    else if (!PointerVector_pushBack(&self->agreementHandleVector, *pAgrHandle))
+    else if (!PointerVector_pushBack(&self->agreementHandleVector, *pAgrObj))
     {
         retval = SEOS_ERROR_INSUFFICIENT_SPACE;
         goto err1;
@@ -506,16 +506,16 @@ SeosCryptoLib_Agreement_init(
     return retval;
 
 err1:
-    SeosCryptoAgreement_free(*pAgrHandle, &self->memIf);
+    SeosCryptoAgreement_free(*pAgrObj, &self->memIf);
 err0:
-    self->memIf.free(*pAgrHandle);
+    self->memIf.free(*pAgrObj);
     return retval;
 }
 
 seos_err_t
 SeosCryptoLib_Agreement_free(
-    SeosCryptoApi_Context*        api,
-    const SeosCryptoApi_Agreement agrHandle)
+    SeosCryptoApi_Context*   api,
+    SeosCryptoLib_Agreement* agrObj)
 {
     seos_err_t retval = SEOS_SUCCESS;
     SeosCryptoLib* self = (SeosCryptoLib*) api;
@@ -526,16 +526,15 @@ SeosCryptoLib_Agreement_free(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
     if ((handlePos = SeosCryptoLib_findHandle(&self->agreementHandleVector,
-                                              agrHandle)) == -1)
+                                              agrObj)) == -1)
     {
         return SEOS_ERROR_INVALID_HANDLE;
     }
 
-    if ((retval = SeosCryptoAgreement_free(agrHandle,
-                                           &self->memIf)) != SEOS_SUCCESS)
+    if ((retval = SeosCryptoAgreement_free(agrObj, &self->memIf)) != SEOS_SUCCESS)
     {
         SeosCryptoLib_removeHandle(&self->agreementHandleVector, handlePos);
-        self->memIf.free(agrHandle);
+        self->memIf.free(agrObj);
     }
 
     return retval;
@@ -543,11 +542,11 @@ SeosCryptoLib_Agreement_free(
 
 seos_err_t
 SeosCryptoLib_Agreement_agree(
-    SeosCryptoApi_Context*        api,
-    const SeosCryptoApi_Agreement agrHandle,
-    const SeosCryptoApi_Key       pubHandle,
-    void*                         shared,
-    size_t*                       sharedSize)
+    SeosCryptoApi_Context*   api,
+    SeosCryptoLib_Agreement* agrObj,
+    const SeosCryptoApi_Key  pubKey,
+    void*                    shared,
+    size_t*                  sharedSize)
 {
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
@@ -556,11 +555,10 @@ SeosCryptoLib_Agreement_agree(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return (SeosCryptoLib_findHandle(&self->agreementHandleVector, agrHandle) == -1)
-           || (SeosCryptoLib_findHandle(&self->keyHandleVector, pubHandle) == -1) ?
+    return (SeosCryptoLib_findHandle(&self->agreementHandleVector, agrObj) == -1)
+           || (SeosCryptoLib_findHandle(&self->keyHandleVector, pubKey) == -1) ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoAgreement_agree(agrHandle, &self->cryptoRng, pubHandle,
-                                     shared, sharedSize);
+           SeosCryptoAgreement_agree(agrObj, &self->cryptoRng, pubKey, shared, sharedSize);
 }
 
 // -------------------------------- Key API ------------------------------------

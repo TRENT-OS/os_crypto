@@ -249,38 +249,47 @@ SeosCryptoApi_Signature_verify(
 
 seos_err_t
 SeosCryptoApi_Agreement_init(
-    SeosCryptoApi_Context*            ctx,
-    SeosCryptoApi_Agreement*          pAgrHandle,
+    SeosCryptoApi_Context*            apiCtx,
+    SeosCryptoApi_Agreement*          agrCtx,
     const SeosCryptoApi_Agreement_Alg algorithm,
-    const SeosCryptoApi_Key           prvHandle)
+    const SeosCryptoApi_Key           prvKey)
 {
-    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->Agreement_init(ctx, pAgrHandle, algorithm, prvHandle);
+    if (NULL == apiCtx || NULL == agrCtx || NULL == apiCtx->vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    agrCtx->api = apiCtx;
+    return (NULL == apiCtx->vtable->Agreement_init) ? SEOS_ERROR_NOT_SUPPORTED :
+           apiCtx->vtable->Agreement_init(apiCtx, &agrCtx->agreement, algorithm,
+                                          prvKey);
 }
 
 seos_err_t
 SeosCryptoApi_Agreement_free(
-    SeosCryptoApi_Context*        ctx,
-    const SeosCryptoApi_Agreement agrHandle)
+    SeosCryptoApi_Agreement* wAgr)
 {
-    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->Agreement_free(ctx, agrHandle);
+    return (NULL == wAgr) ? SEOS_ERROR_INVALID_PARAMETER :
+           (NULL == wAgr->api->vtable->Agreement_free) ? SEOS_ERROR_NOT_SUPPORTED :
+           wAgr->api->vtable->Agreement_free(wAgr->api, wAgr->agreement);
 }
 
 seos_err_t
 SeosCryptoApi_Agreement_agree(
-    SeosCryptoApi_Context*        ctx,
-    const SeosCryptoApi_Agreement agrHandle,
-    const SeosCryptoApi_Key       pubHandle,
-    void*                         shared,
-    size_t*                       sharedSize)
+    SeosCryptoApi_Agreement* wAgr,
+    const SeosCryptoApi_Key* pubKey,
+    void*                    shared,
+    size_t*                  sharedSize)
 {
     if (NULL != sharedSize && *sharedSize > SeosCryptoLib_SIZE_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
-    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->Agreement_agree(ctx, agrHandle, pubHandle, shared, sharedSize);
+
+    return (NULL == wAgr) ? SEOS_ERROR_INVALID_PARAMETER :
+           (NULL == wAgr->api->vtable->Agreement_agree) ? SEOS_ERROR_NOT_SUPPORTED :
+           wAgr->api->vtable->Agreement_agree(wAgr->api, wAgr->agreement,
+                                              UNWRAP_KEY(pubKey), shared, sharedSize);
 }
 
 // -------------------------------- Key API ------------------------------------

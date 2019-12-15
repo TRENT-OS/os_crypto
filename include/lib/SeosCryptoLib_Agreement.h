@@ -4,7 +4,7 @@
  * @addtogroup Wrappers
  * @{
  *
- * @file SeosCryptoAgreement.h
+ * @file SeosCryptoLib_Agreement.h
  *
  * @brief Agreement functions
  *
@@ -21,7 +21,7 @@
 
 // Internal types/defines/enums ------------------------------------------------
 
-struct SeosCryptoAgreement
+struct SeosCryptoLib_Agreement
 {
     union
     {
@@ -37,22 +37,22 @@ struct SeosCryptoAgreement
 
 seos_err_t
 SeosCryptoAgreement_init(
-    SeosCryptoAgreement*              self,
+    SeosCryptoLib_Agreement*          self,
     const SeosCryptoApi_MemIf*        memIf,
     const SeosCryptoApi_Agreement_Alg algorithm,
     const SeosCryptoKey*              privateKey);
 
 seos_err_t
 SeosCryptoAgreement_agree(
-    SeosCryptoAgreement* self,
-    SeosCryptoRng*       rng,
-    const SeosCryptoKey* pubKey,
-    void*                shared,
-    size_t*              sharedSize);
+    SeosCryptoLib_Agreement* self,
+    SeosCryptoRng*           rng,
+    const SeosCryptoKey*     pubKey,
+    void*                    shared,
+    size_t*                  sharedSize);
 
 seos_err_t
 SeosCryptoAgreement_free(
-    SeosCryptoAgreement*       self,
+    SeosCryptoLib_Agreement*   self,
     const SeosCryptoApi_MemIf* memIf);
 
 /** @} */

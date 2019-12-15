@@ -284,21 +284,21 @@ SeosCryptoLib_Signature_verify(
 seos_err_t
 SeosCryptoLib_Agreement_init(
     SeosCryptoApi_Context*            api,
-    SeosCryptoApi_Agreement*          pAgrHandle,
+    SeosCryptoLib_Agreement**         pAgrObj,
     const SeosCryptoApi_Agreement_Alg algorithm,
     const SeosCryptoApi_Key           prvHandle);
 
 seos_err_t
 SeosCryptoLib_Agreement_free(
-    SeosCryptoApi_Context*        api,
-    const SeosCryptoApi_Agreement agrHandle);
+    SeosCryptoApi_Context*   api,
+    SeosCryptoLib_Agreement* agrObj);
 
 seos_err_t
 SeosCryptoLib_Agreement_agree(
-    SeosCryptoApi_Context*        api,
-    const SeosCryptoApi_Agreement agrHandle,
-    const SeosCryptoApi_Key       pubHandle,
-    void*                         shared,
-    size_t*                       sharedSize);
+    SeosCryptoApi_Context*   api,
+    SeosCryptoLib_Agreement* agrObj,
+    const SeosCryptoApi_Key  pubHandle,
+    void*                    shared,
+    size_t*                  sharedSize);
 
 /** @} */

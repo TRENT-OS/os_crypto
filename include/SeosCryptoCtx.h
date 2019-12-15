@@ -186,26 +186,23 @@ typedef seos_err_t
 
 typedef seos_err_t
 (*SeosCryptoApi_Agreement_initT)(
-    SeosCryptoApi_Context*
-    self,
-    SeosCryptoApi_Agreement*          pAgrHandle,
+    SeosCryptoApi_Context*            ctx,
+    SeosCryptoLib_Agreement**         pAgrObj,
     const SeosCryptoApi_Agreement_Alg algorithm,
     const SeosCryptoApi_Key           prvHandle);
 
 typedef seos_err_t
 (*SeosCryptoApi_Agreement_freeT)(
-    SeosCryptoApi_Context*
-    self,
-    const SeosCryptoApi_Agreement agrHandle);
+    SeosCryptoApi_Context*   ctx,
+    SeosCryptoLib_Agreement* agrObj);
 
 typedef seos_err_t
 (*SeosCryptoApi_Agreement_agreeT)(
-    SeosCryptoApi_Context*
-    self,
-    const SeosCryptoApi_Agreement agrHandle,
-    const SeosCryptoApi_Key       pubHandle,
-    void*                         shared,
-    size_t*                       sharedSize);
+    SeosCryptoApi_Context*   ctx,
+    SeosCryptoLib_Agreement* agrObj,
+    const SeosCryptoApi_Key  pubHandle,
+    void*                    shared,
+    size_t*                  sharedSize);
 
 // ------------------------------ Cipher API -----------------------------------
 

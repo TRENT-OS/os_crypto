@@ -2,7 +2,7 @@
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 
-#include "lib/SeosCryptoAgreement.h"
+#include "lib/SeosCryptoLib_Agreement.h"
 #include "lib/SeosCryptoRng.h"
 #include "lib/SeosCryptoKey.h"
 
@@ -14,7 +14,7 @@
 
 static seos_err_t
 initImpl(
-    SeosCryptoAgreement*       self,
+    SeosCryptoLib_Agreement*   self,
     const SeosCryptoApi_MemIf* memIf)
 {
     UNUSED_VAR(memIf);
@@ -39,7 +39,7 @@ initImpl(
 
 static seos_err_t
 freeImpl(
-    SeosCryptoAgreement*       self,
+    SeosCryptoLib_Agreement*   self,
     const SeosCryptoApi_MemIf* memIf)
 {
     UNUSED_VAR(memIf);
@@ -64,7 +64,7 @@ freeImpl(
 
 static seos_err_t
 setKeyImpl(
-    SeosCryptoAgreement* self)
+    SeosCryptoLib_Agreement* self)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -89,11 +89,11 @@ setKeyImpl(
 
 static seos_err_t
 agreeImpl(
-    SeosCryptoAgreement* self,
-    SeosCryptoRng*       rng,
-    const SeosCryptoKey* pubKey,
-    void*                buf,
-    size_t*              bufSize)
+    SeosCryptoLib_Agreement* self,
+    SeosCryptoRng*           rng,
+    const SeosCryptoKey*     pubKey,
+    void*                    buf,
+    size_t*                  bufSize)
 {
     void* rngFunc = (NULL != rng) ? SeosCryptoRng_getBytesMbedtls : NULL;
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -148,7 +148,7 @@ agreeImpl(
 
 seos_err_t
 SeosCryptoAgreement_init(
-    SeosCryptoAgreement*              self,
+    SeosCryptoLib_Agreement*          self,
     const SeosCryptoApi_MemIf*        memIf,
     const SeosCryptoApi_Agreement_Alg algorithm,
     const SeosCryptoKey*              prvKey)
@@ -187,11 +187,11 @@ exit:
 
 seos_err_t
 SeosCryptoAgreement_agree(
-    SeosCryptoAgreement* self,
-    SeosCryptoRng*       rng,
-    const SeosCryptoKey* pubKey,
-    void*                shared,
-    size_t*              sharedSize)
+    SeosCryptoLib_Agreement* self,
+    SeosCryptoRng*           rng,
+    const SeosCryptoKey*     pubKey,
+    void*                    shared,
+    size_t*                  sharedSize)
 {
     if (NULL == self || NULL == pubKey || NULL == shared || NULL == sharedSize)
     {
@@ -203,7 +203,7 @@ SeosCryptoAgreement_agree(
 
 seos_err_t
 SeosCryptoAgreement_free(
-    SeosCryptoAgreement*       self,
+    SeosCryptoLib_Agreement*   self,
     const SeosCryptoApi_MemIf* memIf)
 {
     if (NULL == self || NULL == memIf)

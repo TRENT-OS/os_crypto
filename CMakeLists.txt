@@ -8,7 +8,7 @@ add_library(
     "src/SeosCryptoLib.c"
     "src/SeosCryptoApi.c"
     "src/SeosCryptoRpcClient.c"
-    "src/lib/SeosCryptoAgreement.c"
+    "src/lib/SeosCryptoLib_Agreement.c"
     "src/lib/SeosCryptoRng.c"
     "src/lib/SeosCryptoDigest.c"
     "src/lib/SeosCryptoLib_Mac.c"

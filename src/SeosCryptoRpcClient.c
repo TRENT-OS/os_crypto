@@ -374,9 +374,8 @@ SeosCryptoRpcClient_Signature_verify(
 
 seos_err_t
 SeosCryptoRpcClient_Agreement_init(
-    SeosCryptoApi_Context*
-    api,
-    SeosCryptoApi_Agreement*          pAgrHandle,
+    SeosCryptoApi_Context*            api,
+    SeosCryptoLib_Agreement**         pAgrHandle,
     const SeosCryptoApi_Agreement_Alg algorithm,
     const SeosCryptoApi_Key           prvHandle)
 {
@@ -394,8 +393,8 @@ SeosCryptoRpcClient_Agreement_init(
 
 seos_err_t
 SeosCryptoRpcClient_Agreement_free(
-    SeosCryptoApi_Context*        api,
-    const SeosCryptoApi_Agreement agrHandle)
+    SeosCryptoApi_Context*   api,
+    SeosCryptoLib_Agreement* agrHandle)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -409,12 +408,11 @@ SeosCryptoRpcClient_Agreement_free(
 
 seos_err_t
 SeosCryptoRpcClient_Agreement_agree(
-    SeosCryptoApi_Context*
-    api,
-    const SeosCryptoApi_Agreement agrHandle,
-    const SeosCryptoApi_Key       pubHandle,
-    void*                         shared,
-    size_t*                       sharedSize)
+    SeosCryptoApi_Context*   api,
+    SeosCryptoLib_Agreement* agrHandle,
+    const SeosCryptoApi_Key  pubHandle,
+    void*                    shared,
+    size_t*                  sharedSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
