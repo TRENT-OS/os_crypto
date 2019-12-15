@@ -248,8 +248,8 @@ SeosCryptoLib_Cipher_finalize(
 
 seos_err_t
 SeosCryptoLib_Signature_init(
-    SeosCryptoApi_Context*            api,
-    SeosCryptoApi_Signature*          pSigHandle,
+    SeosCryptoApi_Context*            ctx,
+    SeosCryptoLib_Signature**         pSigObj,
     const SeosCryptoApi_Signature_Alg algorithm,
     const SeosCryptoApi_Digest_Alg    digest,
     const SeosCryptoApi_Key           prvHandle,
@@ -257,27 +257,27 @@ SeosCryptoLib_Signature_init(
 
 seos_err_t
 SeosCryptoLib_Signature_free(
-    SeosCryptoApi_Context*        api,
-    const SeosCryptoApi_Signature sigHandle);
+    SeosCryptoApi_Context*   ctx,
+    SeosCryptoLib_Signature* sigObj);
 
 
 seos_err_t
 SeosCryptoLib_Signature_sign(
-    SeosCryptoApi_Context*        api,
-    const SeosCryptoApi_Signature sigHandle,
-    const void*                   hash,
-    const size_t                  hashSize,
-    void*                         signature,
-    size_t*                       signatureSize);
+    SeosCryptoApi_Context*   ctx,
+    SeosCryptoLib_Signature* sigObj,
+    const void*              hash,
+    const size_t             hashSize,
+    void*                    signature,
+    size_t*                  signatureSize);
 
 seos_err_t
 SeosCryptoLib_Signature_verify(
-    SeosCryptoApi_Context*        api,
-    const SeosCryptoApi_Signature sigHandle,
-    const void*                   hash,
-    const size_t                  hashSize,
-    const void*                   signature,
-    const size_t                  signatureSize);
+    SeosCryptoApi_Context*   ctx,
+    SeosCryptoLib_Signature* sigObj,
+    const void*              hash,
+    const size_t             hashSize,
+    const void*              signature,
+    const size_t             signatureSize);
 
 // ----------------------------- Agreement API ---------------------------------
 

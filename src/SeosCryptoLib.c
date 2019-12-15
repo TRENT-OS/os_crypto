@@ -7,7 +7,7 @@
 #include "lib/SeosCryptoRng.h"
 #include "lib/SeosCryptoLib_Digest.h"
 #include "lib/SeosCryptoLib_Mac.h"
-#include "lib/SeosCryptoSignature.h"
+#include "lib/SeosCryptoLib_Signature.h"
 #include "lib/SeosCryptoLib_Agreement.h"
 
 #include "SeosCryptoLib.h"
@@ -342,7 +342,7 @@ SeosCryptoLib_Digest_finalize(
 seos_err_t
 SeosCryptoLib_Signature_init(
     SeosCryptoApi_Context*            api,
-    SeosCryptoApi_Signature*          pSigHandle,
+    SeosCryptoLib_Signature**         pSigObj,
     const SeosCryptoApi_Signature_Alg algorithm,
     const SeosCryptoApi_Digest_Alg    digest,
     const SeosCryptoApi_Key           prvHandle,
@@ -351,22 +351,22 @@ SeosCryptoLib_Signature_init(
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
-    if (NULL == api || NULL == pSigHandle)
+    if (NULL == api || NULL == pSigObj)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if ((*pSigHandle = self->memIf.malloc(
-                                sizeof(SeosCryptoSignature))) == NULL)
+    else if ((*pSigObj = self->memIf.malloc(sizeof(SeosCryptoLib_Signature))) ==
+             NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((retval = SeosCryptoSignature_init(*pSigHandle, &self->memIf, algorithm,
+    if ((retval = SeosCryptoSignature_init(*pSigObj, &self->memIf, algorithm,
                                            digest, prvHandle, pubHandle)) != SEOS_SUCCESS)
     {
         goto err0;
     }
-    else if (!PointerVector_pushBack(&self->signatureHandleVector, *pSigHandle))
+    else if (!PointerVector_pushBack(&self->signatureHandleVector, *pSigObj))
     {
         retval = SEOS_ERROR_INSUFFICIENT_SPACE;
         goto err1;
@@ -375,17 +375,17 @@ SeosCryptoLib_Signature_init(
     return SEOS_SUCCESS;
 
 err1:
-    SeosCryptoSignature_free(*pSigHandle, &self->memIf);
+    SeosCryptoSignature_free(*pSigObj, &self->memIf);
 err0:
-    self->memIf.free(*pSigHandle);
+    self->memIf.free(*pSigObj);
 
     return retval;
 }
 
 seos_err_t
 SeosCryptoLib_Signature_free(
-    SeosCryptoApi_Context*        api,
-    const SeosCryptoApi_Signature sigHandle)
+    SeosCryptoApi_Context*   api,
+    SeosCryptoLib_Signature* sigObj)
 {
     seos_err_t retval = SEOS_SUCCESS;
     SeosCryptoLib* self = (SeosCryptoLib*) api;
@@ -396,14 +396,12 @@ SeosCryptoLib_Signature_free(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((handlePos = SeosCryptoLib_findHandle(&self->signatureHandleVector,
-                                              sigHandle)) != -1)
+    if ((handlePos = SeosCryptoLib_findHandle(&self->signatureHandleVector, sigObj)) != -1)
     {
-        if ((retval = SeosCryptoSignature_free(sigHandle,
-                                               &self->memIf)) != SEOS_SUCCESS)
+        if ((retval = SeosCryptoSignature_free(sigObj, &self->memIf)) != SEOS_SUCCESS)
         {
             SeosCryptoLib_removeHandle(&self->signatureHandleVector, handlePos);
-            self->memIf.free(sigHandle);
+            self->memIf.free(sigObj);
         }
     }
     else
@@ -416,12 +414,12 @@ SeosCryptoLib_Signature_free(
 
 seos_err_t
 SeosCryptoLib_Signature_sign(
-    SeosCryptoApi_Context*        api,
-    const SeosCryptoApi_Signature sigHandle,
-    const void*                   hash,
-    const size_t                  hashSize,
-    void*                         signature,
-    size_t*                       signatureSize)
+    SeosCryptoApi_Context*   api,
+    SeosCryptoLib_Signature* sigObj,
+    const void*              hash,
+    const size_t             hashSize,
+    void*                    signature,
+    size_t*                  signatureSize)
 {
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
@@ -436,20 +434,20 @@ SeosCryptoLib_Signature_sign(
 
     // Make local copy of input buffer, to allow overlapping hash/signature buffers
     memcpy(self->buffer, hash, hashSize);
-    return SeosCryptoLib_findHandle(&self->signatureHandleVector, sigHandle) == -1 ?
+    return SeosCryptoLib_findHandle(&self->signatureHandleVector, sigObj) == -1 ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoSignature_sign(sigHandle, &self->cryptoRng, self->buffer,
+           SeosCryptoSignature_sign(sigObj, &self->cryptoRng, self->buffer,
                                     hashSize, signature, signatureSize);
 }
 
 seos_err_t
 SeosCryptoLib_Signature_verify(
-    SeosCryptoApi_Context*        api,
-    const SeosCryptoApi_Signature sigHandle,
-    const void*                   hash,
-    const size_t                  hashSize,
-    const void*                   signature,
-    const size_t                  signatureSize)
+    SeosCryptoApi_Context*   api,
+    SeosCryptoLib_Signature* sigObj,
+    const void*              hash,
+    const size_t             hashSize,
+    const void*              signature,
+    const size_t             signatureSize)
 {
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
@@ -458,10 +456,10 @@ SeosCryptoLib_Signature_verify(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoLib_findHandle(&self->signatureHandleVector, sigHandle) == -1 ?
+    return SeosCryptoLib_findHandle(&self->signatureHandleVector, sigObj) == -1 ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoSignature_verify(sigHandle, &self->cryptoRng, hash, hashSize,
-                                      signature, signatureSize);
+           SeosCryptoSignature_verify(sigObj, &self->cryptoRng, hash, hashSize, signature,
+                                      signatureSize);
 }
 
 // ----------------------------- Agreement API ---------------------------------

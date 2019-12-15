@@ -13,7 +13,7 @@ add_library(
     "src/lib/SeosCryptoLib_Digest.c"
     "src/lib/SeosCryptoLib_Mac.c"
     "src/lib/SeosCryptoLib_Cipher.c"
-    "src/lib/SeosCryptoSignature.c"
+    "src/lib/SeosCryptoLib_Signature.c"
     "src/lib/SeosCryptoKey.c"
 )
 if (ENABLE_LINT)

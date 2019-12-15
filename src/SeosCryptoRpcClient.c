@@ -272,9 +272,8 @@ SeosCryptoRpcClient_Digest_finalize(
 
 seos_err_t
 SeosCryptoRpcClient_Signature_init(
-    SeosCryptoApi_Context*
-    api,
-    SeosCryptoApi_Signature*          pSigHandle,
+    SeosCryptoApi_Context*            api,
+    SeosCryptoLib_Signature**         pObj,
     const SeosCryptoApi_Signature_Alg algorithm,
     const SeosCryptoApi_Digest_Alg    digest,
     const SeosCryptoApi_Key           prvHandle,
@@ -282,20 +281,19 @@ SeosCryptoRpcClient_Signature_init(
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
-    if (NULL == api || NULL == pSigHandle)
+    if (NULL == api || NULL == pObj)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoRpcServer_Signature_init(self->rpcHandle, pSigHandle,
-                                              algorithm,
+    return SeosCryptoRpcServer_Signature_init(self->rpcHandle, pObj, algorithm,
                                               digest, prvHandle, pubHandle);
 }
 
 seos_err_t
 SeosCryptoRpcClient_Signature_free(
-    SeosCryptoApi_Context*        api,
-    const SeosCryptoApi_Signature sigHandle)
+    SeosCryptoApi_Context*   api,
+    SeosCryptoLib_Signature* sigObj)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -304,17 +302,17 @@ SeosCryptoRpcClient_Signature_free(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoRpcServer_Signature_free(self->rpcHandle, sigHandle);
+    return SeosCryptoRpcServer_Signature_free(self->rpcHandle, sigObj);
 }
 
 seos_err_t
 SeosCryptoRpcClient_Signature_sign(
-    SeosCryptoApi_Context*        api,
-    const SeosCryptoApi_Signature sigHandle,
-    const void*                   hash,
-    const size_t                  hashSize,
-    void*                         signature,
-    size_t*                       signatureSize)
+    SeosCryptoApi_Context*   api,
+    SeosCryptoLib_Signature* sigObj,
+    const void*              hash,
+    const size_t             hashSize,
+    void*                    signature,
+    size_t*                  signatureSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
@@ -329,7 +327,7 @@ SeosCryptoRpcClient_Signature_sign(
     }
 
     memcpy(self->clientDataport, hash, hashSize);
-    if ((retval = SeosCryptoRpcServer_Signature_sign(self->rpcHandle, sigHandle,
+    if ((retval = SeosCryptoRpcServer_Signature_sign(self->rpcHandle, sigObj,
                                                      hashSize, signatureSize)) == SEOS_SUCCESS)
     {
         if (*signatureSize > SeosCryptoApi_SIZE_DATAPORT)
@@ -344,13 +342,12 @@ SeosCryptoRpcClient_Signature_sign(
 
 seos_err_t
 SeosCryptoRpcClient_Signature_verify(
-    SeosCryptoApi_Context*
-    api,
-    const SeosCryptoApi_Signature sigHandle,
-    const void*                   hash,
-    const size_t                  hashSize,
-    const void*                   signature,
-    const size_t                  signatureSize)
+    SeosCryptoApi_Context*   api,
+    SeosCryptoLib_Signature* sigObj,
+    const void*              hash,
+    const size_t             hashSize,
+    const void*              signature,
+    const size_t             signatureSize)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -365,8 +362,7 @@ SeosCryptoRpcClient_Signature_verify(
 
     memcpy(self->clientDataport, hash, hashSize);
     memcpy(self->clientDataport + hashSize, signature, signatureSize);
-    return SeosCryptoRpcServer_Signature_verify(self->rpcHandle, sigHandle,
-                                                hashSize,
+    return SeosCryptoRpcServer_Signature_verify(self->rpcHandle, sigObj, hashSize,
                                                 signatureSize);
 }
 

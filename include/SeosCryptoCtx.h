@@ -148,9 +148,8 @@ typedef seos_err_t
 
 typedef seos_err_t
 (*SeosCryptoApi_Signature_initT)(
-    SeosCryptoApi_Context*
-    self,
-    SeosCryptoApi_Signature*          pSigHandle,
+    SeosCryptoApi_Context*            ctx,
+    SeosCryptoLib_Signature**         pSigObj,
     const SeosCryptoApi_Signature_Alg algorithm,
     const SeosCryptoApi_Digest_Alg    digest,
     const SeosCryptoApi_Key           prvHandle,
@@ -158,29 +157,26 @@ typedef seos_err_t
 
 typedef seos_err_t
 (*SeosCryptoApi_Signature_freeT)(
-    SeosCryptoApi_Context*
-    self,
-    const SeosCryptoApi_Signature sigHandle);
+    SeosCryptoApi_Context*   ctx,
+    SeosCryptoLib_Signature* sigObj);
 
 typedef seos_err_t
 (*SeosCryptoApi_Signature_signT)(
-    SeosCryptoApi_Context*
-    self,
-    const SeosCryptoApi_Signature sigHandle,
-    const void*                   hash,
-    const size_t                  hashSize,
-    void*                         signature,
-    size_t*                       signatureSize);
+    SeosCryptoApi_Context*   ctx,
+    SeosCryptoLib_Signature* sigObj,
+    const void*              hash,
+    const size_t             hashSize,
+    void*                    signature,
+    size_t*                  signatureSize);
 
 typedef seos_err_t
 (*SeosCryptoApi_Signature_verifyT)(
-    SeosCryptoApi_Context*
-    self,
-    const SeosCryptoApi_Signature sigHandle,
-    const void*                   hash,
-    const size_t                  hashSize,
-    const void*                   signature,
-    const size_t                  signatureSize);
+    SeosCryptoApi_Context*   ctx,
+    SeosCryptoLib_Signature* sigObj,
+    const void*              hash,
+    const size_t             hashSize,
+    const void*              signature,
+    const size_t             signatureSize);
 
 // ----------------------------- Agreement API ---------------------------------
 

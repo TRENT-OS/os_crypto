@@ -2,7 +2,7 @@
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 
-#include "lib/SeosCryptoSignature.h"
+#include "lib/SeosCryptoLib_Signature.h"
 #include "lib/SeosCryptoRng.h"
 #include "lib/SeosCryptoKey.h"
 
@@ -14,9 +14,8 @@
 
 static seos_err_t
 initImpl(
-    SeosCryptoSignature*       self,
+    SeosCryptoLib_Signature*   self,
     const SeosCryptoApi_MemIf* memIf)
-
 {
     UNUSED_VAR(memIf);
     int padding;
@@ -52,7 +51,7 @@ initImpl(
 
 static seos_err_t
 freeImpl(
-    SeosCryptoSignature*       self,
+    SeosCryptoLib_Signature*   self,
     const SeosCryptoApi_MemIf* memIf)
 {
     UNUSED_VAR(memIf);
@@ -72,7 +71,7 @@ freeImpl(
 
 static seos_err_t
 setKeyImpl(
-    SeosCryptoSignature* self)
+    SeosCryptoLib_Signature* self)
 {
     seos_err_t retval;
 
@@ -107,12 +106,12 @@ setKeyImpl(
 
 static seos_err_t
 verifyHashImpl(
-    SeosCryptoSignature* self,
-    SeosCryptoRng*       rng,
-    const void*          hash,
-    const size_t         hashSize,
-    const void*          signature,
-    const size_t         signatureSize)
+    SeosCryptoLib_Signature* self,
+    SeosCryptoRng*           rng,
+    const void*              hash,
+    const size_t             hashSize,
+    const void*              signature,
+    const size_t             signatureSize)
 {
     void* rngFunc = (NULL != rng) ? SeosCryptoRng_getBytesMbedtls : NULL;
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -143,12 +142,12 @@ verifyHashImpl(
 
 static seos_err_t
 signHashImpl(
-    SeosCryptoSignature* self,
-    SeosCryptoRng*       rng,
-    const void*          hash,
-    const size_t         hashSize,
-    void*                signature,
-    size_t*              signatureSize)
+    SeosCryptoLib_Signature* self,
+    SeosCryptoRng*           rng,
+    const void*              hash,
+    const size_t             hashSize,
+    void*                    signature,
+    size_t*                  signatureSize)
 {
     void* rngFunc = (NULL != rng) ? SeosCryptoRng_getBytesMbedtls : NULL;
     seos_err_t retval = SEOS_ERROR_GENERIC;
@@ -183,7 +182,7 @@ signHashImpl(
 
 seos_err_t
 SeosCryptoSignature_init(
-    SeosCryptoSignature*              self,
+    SeosCryptoLib_Signature*          self,
     const SeosCryptoApi_MemIf*        memIf,
     const SeosCryptoApi_Signature_Alg algorithm,
     const SeosCryptoApi_Digest_Alg    digest,
@@ -223,7 +222,7 @@ err0:
 
 seos_err_t
 SeosCryptoSignature_free(
-    SeosCryptoSignature*       self,
+    SeosCryptoLib_Signature*   self,
     const SeosCryptoApi_MemIf* memIf)
 {
     if (NULL == memIf || NULL == self)
@@ -236,12 +235,12 @@ SeosCryptoSignature_free(
 
 seos_err_t
 SeosCryptoSignature_sign(
-    SeosCryptoSignature* self,
-    SeosCryptoRng*       rng,
-    const void*          hash,
-    const size_t         hashSize,
-    void*                signature,
-    size_t*              signatureSize)
+    SeosCryptoLib_Signature* self,
+    SeosCryptoRng*           rng,
+    const void*              hash,
+    const size_t             hashSize,
+    void*                    signature,
+    size_t*                  signatureSize)
 {
     if (NULL == self || NULL == hash || 0 == hashSize || NULL == signature
         || NULL == signatureSize)
@@ -256,12 +255,12 @@ SeosCryptoSignature_sign(
 
 seos_err_t
 SeosCryptoSignature_verify(
-    SeosCryptoSignature* self,
-    SeosCryptoRng*       rng,
-    const void*          hash,
-    const size_t         hashSize,
-    const void*          signature,
-    const size_t         signatureSize)
+    SeosCryptoLib_Signature* self,
+    SeosCryptoRng*           rng,
+    const void*              hash,
+    const size_t             hashSize,
+    const void*              signature,
+    const size_t             signatureSize)
 {
     if (NULL == self || NULL == hash || 0 == hashSize || NULL == signature
         || 0 == signatureSize)

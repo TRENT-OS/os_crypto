@@ -196,35 +196,40 @@ SeosCryptoApi_Digest_finalize(
 
 seos_err_t
 SeosCryptoApi_Signature_init(
-    SeosCryptoApi_Context*            ctx,
-    SeosCryptoApi_Signature*          pSigHandle,
+    SeosCryptoApi_Context*            apiCtx,
+    SeosCryptoApi_Signature*          sigCtx,
     const SeosCryptoApi_Signature_Alg algorithm,
     const SeosCryptoApi_Digest_Alg    digest,
     const SeosCryptoApi_Key           prvHandle,
     const SeosCryptoApi_Key           pubHandle)
 {
-    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->Signature_init(ctx, pSigHandle, algorithm, digest, prvHandle,
-                                       pubHandle);
+    if (NULL == apiCtx || NULL == sigCtx || NULL == apiCtx->vtable)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    sigCtx->api = apiCtx;
+    return (NULL == apiCtx->vtable->Signature_init) ? SEOS_ERROR_NOT_SUPPORTED :
+           apiCtx->vtable->Signature_init(apiCtx, &sigCtx->signature, algorithm, digest,
+                                          prvHandle, pubHandle);
 }
 
 seos_err_t
 SeosCryptoApi_Signature_free(
-    SeosCryptoApi_Context*        ctx,
-    const SeosCryptoApi_Signature sigHandle)
+    SeosCryptoApi_Signature* wSig)
 {
-    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->Signature_free(ctx, sigHandle);
+    return (NULL == wSig) ? SEOS_ERROR_INVALID_PARAMETER :
+           (NULL == wSig->api->vtable->Signature_free) ? SEOS_ERROR_NOT_SUPPORTED :
+           wSig->api->vtable->Signature_free(wSig->api, wSig->signature);
 }
 
 seos_err_t
 SeosCryptoApi_Signature_sign(
-    SeosCryptoApi_Context*        ctx,
-    const SeosCryptoApi_Signature sigHandle,
-    const void*                   hash,
-    const size_t                  hashSize,
-    void*                         signature,
-    size_t*                       signatureSize)
+    SeosCryptoApi_Signature* wSig,
+    const void*              hash,
+    const size_t             hashSize,
+    void*                    signature,
+    size_t*                  signatureSize)
 {
     // They use the same buffer, but sequentially
     if (hashSize > SeosCryptoLib_SIZE_BUFFER
@@ -232,28 +237,31 @@ SeosCryptoApi_Signature_sign(
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
-    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->Signature_sign(ctx, sigHandle, hash, hashSize, signature,
-                                       signatureSize);
+
+    return (NULL == wSig) ? SEOS_ERROR_INVALID_PARAMETER :
+           (NULL == wSig->api->vtable->Signature_sign) ? SEOS_ERROR_NOT_SUPPORTED :
+           wSig->api->vtable->Signature_sign(wSig->api, wSig->signature, hash, hashSize,
+                                             signature, signatureSize);
 }
 
 seos_err_t
 SeosCryptoApi_Signature_verify(
-    SeosCryptoApi_Context*        ctx,
-    const SeosCryptoApi_Signature sigHandle,
-    const void*                   hash,
-    const size_t                  hashSize,
-    const void*                   signature,
-    const size_t                  signatureSize)
+    SeosCryptoApi_Signature* wSig,
+    const void*              hash,
+    const size_t             hashSize,
+    const void*              signature,
+    const size_t             signatureSize)
 {
     // They use the same buffer, but in parallel
     if (hashSize + signatureSize > SeosCryptoLib_SIZE_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
-    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->Signature_verify(ctx, sigHandle, hash, hashSize, signature,
-                                         signatureSize);
+
+    return (NULL == wSig) ? SEOS_ERROR_INVALID_PARAMETER :
+           (NULL == wSig->api->vtable->Signature_verify) ? SEOS_ERROR_NOT_SUPPORTED :
+           wSig->api->vtable->Signature_verify(wSig->api, wSig->signature, hash, hashSize,
+                                               signature, signatureSize);
 }
 
 // ----------------------------- Agreement API ---------------------------------

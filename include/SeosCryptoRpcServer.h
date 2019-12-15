@@ -187,33 +187,35 @@ SeosCryptoRpcServer_Key_free(
 
 // ----------------------------- Signature API ---------------------------------
 
+typedef SeosCryptoLib_Signature* SeosCryptoLib_Signature_Ptr;
+
 seos_err_t
 SeosCryptoRpcServer_Signature_init(
-    SeosCryptoRpcServer*        self,
-    SeosCryptoApi_Signature*    pSigHandle,
-    SeosCryptoApi_Signature_Alg algorithm,
-    SeosCryptoApi_Digest_Alg    digest,
-    SeosCryptoApi_Key           prvHandle,
-    SeosCryptoApi_Key           pubHandle);
+    SeosCryptoRpcServer*         self,
+    SeosCryptoLib_Signature_Ptr* pSigPtr,
+    SeosCryptoApi_Signature_Alg  algorithm,
+    SeosCryptoApi_Digest_Alg     digest,
+    SeosCryptoApi_Key            prvHandle,
+    SeosCryptoApi_Key            pubHandle);
 
 seos_err_t
 SeosCryptoRpcServer_Signature_verify(
-    SeosCryptoRpcServer*    self,
-    SeosCryptoApi_Signature sigHandle,
-    size_t                  hashSize,
-    size_t                  signatureSize);
+    SeosCryptoRpcServer*        self,
+    SeosCryptoLib_Signature_Ptr sigPtr,
+    size_t                      hashSize,
+    size_t                      signatureSize);
 
 seos_err_t
 SeosCryptoRpcServer_Signature_sign(
-    SeosCryptoRpcServer*    self,
-    SeosCryptoApi_Signature sigHandle,
-    size_t                  hashSize,
-    size_t*                 signatureSize);
+    SeosCryptoRpcServer*        self,
+    SeosCryptoLib_Signature_Ptr sigPtr,
+    size_t                      hashSize,
+    size_t*                     signatureSize);
 
 seos_err_t
 SeosCryptoRpcServer_Signature_free(
-    SeosCryptoRpcServer*    self,
-    SeosCryptoApi_Signature sigHandle);
+    SeosCryptoRpcServer*        self,
+    SeosCryptoLib_Signature_Ptr sigPtr);
 
 
 // ----------------------------- Agreement API ---------------------------------

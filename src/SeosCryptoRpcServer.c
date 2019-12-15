@@ -334,55 +334,53 @@ SeosCryptoRpcServer_Agreement_free(
 
 seos_err_t
 SeosCryptoRpcServer_Signature_init(
-    SeosCryptoRpcServer*              self,
-    SeosCryptoApi_Signature*          pSigHandle,
-    const SeosCryptoApi_Signature_Alg algorithm,
-    const SeosCryptoApi_Digest_Alg    digest,
-    SeosCryptoApi_Key                 prvHandle,
-    SeosCryptoApi_Key                 pubHandle)
+    SeosCryptoRpcServer*         self,
+    SeosCryptoLib_Signature_Ptr* pObj,
+    SeosCryptoApi_Signature_Alg  algorithm,
+    SeosCryptoApi_Digest_Alg     digest,
+    SeosCryptoApi_Key            prvHandle,
+    SeosCryptoApi_Key            pubHandle)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_Signature_init(self->seosCryptoApi, pSigHandle, algorithm, digest,
+           SeosCryptoLib_Signature_init(self->seosCryptoApi, pObj, algorithm, digest,
                                         prvHandle, pubHandle);
 }
 
 seos_err_t
 SeosCryptoRpcServer_Signature_verify(
-    SeosCryptoRpcServer*    self,
-    SeosCryptoApi_Signature sigHandle,
-    size_t                  hashSize,
-    size_t                  signatureSize)
+    SeosCryptoRpcServer*        self,
+    SeosCryptoLib_Signature_Ptr obj,
+    size_t                      hashSize,
+    size_t                      signatureSize)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_Signature_verify(self->seosCryptoApi, sigHandle,
-                                          self->serverDataport,
+           SeosCryptoLib_Signature_verify(self->seosCryptoApi, obj, self->serverDataport,
                                           hashSize, self->serverDataport + hashSize, signatureSize);
 }
 
 seos_err_t
 SeosCryptoRpcServer_Signature_sign(
-    SeosCryptoRpcServer*    self,
-    SeosCryptoApi_Signature sigHandle,
-    size_t                  hashSize,
-    size_t*                 signatureSize)
+    SeosCryptoRpcServer*        self,
+    SeosCryptoLib_Signature_Ptr obj,
+    size_t                      hashSize,
+    size_t*                     signatureSize)
 {
     *signatureSize = (*signatureSize <= SeosCryptoApi_SIZE_DATAPORT) ?
                      *signatureSize :
                      SeosCryptoApi_SIZE_DATAPORT;
     return !isValidHandle(self) ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_Signature_sign(self->seosCryptoApi, sigHandle,
-                                        self->serverDataport, hashSize,
-                                        self->serverDataport, signatureSize);
+           SeosCryptoLib_Signature_sign(self->seosCryptoApi, obj, self->serverDataport,
+                                        hashSize, self->serverDataport, signatureSize);
 }
 
 seos_err_t
 SeosCryptoRpcServer_Signature_free(
-    SeosCryptoRpcServer*    self,
-    SeosCryptoApi_Signature sigHandle)
+    SeosCryptoRpcServer*        self,
+    SeosCryptoLib_Signature_Ptr obj)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_Signature_free(self->seosCryptoApi, sigHandle);
+           SeosCryptoLib_Signature_free(self->seosCryptoApi, obj);
 }
 
 // ------------------------------- Cipher API ----------------------------------
