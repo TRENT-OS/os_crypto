@@ -14,7 +14,7 @@ add_library(
     "src/lib/SeosCryptoLib_Mac.c"
     "src/lib/SeosCryptoLib_Cipher.c"
     "src/lib/SeosCryptoLib_Signature.c"
-    "src/lib/SeosCryptoKey.c"
+    "src/lib/SeosCryptoLib_Key.c"
 )
 if (ENABLE_LINT)
         set(CMAKE_C_CPPCHECK "cppcheck;--enable=warning;--inline-suppr")

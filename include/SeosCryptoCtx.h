@@ -18,14 +18,14 @@
 
 typedef seos_err_t
 (*SeosCryptoApi_Rng_getBytesT)(
-    SeosCryptoApi_Context* self,
+    SeosCryptoApi_Context* ctx,
     unsigned int           flags,
     void*                  buf,
     const size_t           bufSize);
 
 typedef seos_err_t
 (*SeosCryptoApi_Rng_reseedT)(
-    SeosCryptoApi_Context* self,
+    SeosCryptoApi_Context* ctx,
     const void*            seed,
     const size_t           seedLen);
 
@@ -100,49 +100,49 @@ typedef seos_err_t
 
 typedef seos_err_t
 (*SeosCryptoApi_Key_generateT)(
-    SeosCryptoApi_Context*        self,
-    SeosCryptoApi_Key*            pKeyHandle,
+    SeosCryptoApi_Context*        ctx,
+    SeosCryptoLib_Key**           pKeyObj,
     const SeosCryptoApi_Key_Spec* spec);
 
 typedef seos_err_t
-(*SeosCryptoApi_Key_makePublicT)(
-    SeosCryptoApi_Context*           self,
-    SeosCryptoApi_Key*               pPubKeyHandle,
-    const SeosCryptoApi_Key          prvKeyHandle,
-    const SeosCryptoApi_Key_Attribs* attribs);
-
-typedef seos_err_t
 (*SeosCryptoApi_Key_importT)(
-    SeosCryptoApi_Context*        self,
-    SeosCryptoApi_Key*            pKeyHandle,
-    const SeosCryptoApi_Key       wrapKeyHandle,
+    SeosCryptoApi_Context*        ctx,
+    SeosCryptoLib_Key**           pKeyObj,
+    const SeosCryptoLib_Key*      wrapKeyObj,
     const SeosCryptoApi_Key_Data* keyData);
 
 typedef seos_err_t
+(*SeosCryptoApi_Key_makePublicT)(
+    SeosCryptoApi_Context*           ctx,
+    SeosCryptoLib_Key**              pPubKeyObj,
+    const SeosCryptoLib_Key*         prvKeyObj,
+    const SeosCryptoApi_Key_Attribs* attribs);
+
+typedef seos_err_t
 (*SeosCryptoApi_Key_exportT)(
-    SeosCryptoApi_Context*  self,
-    const SeosCryptoApi_Key keyHandle,
-    const SeosCryptoApi_Key wrapKeyHandle,
-    SeosCryptoApi_Key_Data* keyData);
+    SeosCryptoApi_Context*   ctx,
+    const SeosCryptoLib_Key* keyObj,
+    const SeosCryptoLib_Key* wrapKeyObj,
+    SeosCryptoApi_Key_Data*  keyData);
 
 typedef seos_err_t
 (*SeosCryptoApi_Key_getParamsT)(
-    SeosCryptoApi_Context*  self,
-    const SeosCryptoApi_Key keyHandle,
-    void*                   keyParams,
-    size_t*                 paramSize);
-
-typedef seos_err_t
-(*SeosCryptoApi_Key_loadParamsT)(
-    SeosCryptoApi_Context*        self,
-    const SeosCryptoApi_Key_Param name,
-    void*                         keyParams,
-    size_t*                       paramSize);
+    SeosCryptoApi_Context*   ctx,
+    const SeosCryptoLib_Key* keyObj,
+    void*                    keyParams,
+    size_t*                  paramSize);
 
 typedef seos_err_t
 (*SeosCryptoApi_Key_freeT)(
-    SeosCryptoApi_Context*  self,
-    const SeosCryptoApi_Key keyHandle);
+    SeosCryptoApi_Context* ctx,
+    SeosCryptoLib_Key*     keyObj);
+
+typedef seos_err_t
+(*SeosCryptoApi_Key_loadParamsT)(
+    SeosCryptoApi_Context*        ctx,
+    const SeosCryptoApi_Key_Param name,
+    void*                         keyParams,
+    size_t*                       paramSize);
 
 // ----------------------------- Signature API ---------------------------------
 
@@ -152,8 +152,8 @@ typedef seos_err_t
     SeosCryptoLib_Signature**         pSigObj,
     const SeosCryptoApi_Signature_Alg algorithm,
     const SeosCryptoApi_Digest_Alg    digest,
-    const SeosCryptoApi_Key           prvHandle,
-    const SeosCryptoApi_Key           pubHandle);
+    const SeosCryptoLib_Key*          prvKey,
+    const SeosCryptoLib_Key*          pubKey);
 
 typedef seos_err_t
 (*SeosCryptoApi_Signature_freeT)(
@@ -185,7 +185,7 @@ typedef seos_err_t
     SeosCryptoApi_Context*            ctx,
     SeosCryptoLib_Agreement**         pAgrObj,
     const SeosCryptoApi_Agreement_Alg algorithm,
-    const SeosCryptoApi_Key           prvHandle);
+    const SeosCryptoLib_Key*          prvKey);
 
 typedef seos_err_t
 (*SeosCryptoApi_Agreement_freeT)(
@@ -196,7 +196,7 @@ typedef seos_err_t
 (*SeosCryptoApi_Agreement_agreeT)(
     SeosCryptoApi_Context*   ctx,
     SeosCryptoLib_Agreement* agrObj,
-    const SeosCryptoApi_Key  pubHandle,
+    const SeosCryptoLib_Key* pubKey,
     void*                    shared,
     size_t*                  sharedSize);
 
@@ -207,7 +207,7 @@ typedef seos_err_t
     SeosCryptoApi_Context*         ctx,
     SeosCryptoLib_Cipher**         pCipherObj,
     const SeosCryptoApi_Cipher_Alg algorithm,
-    const SeosCryptoApi_Key        keyHandle,
+    const SeosCryptoLib_Key*       key,
     const void*                    iv,
     const size_t                   ivLen);
 
@@ -242,7 +242,7 @@ typedef seos_err_t
 // -----------------------------------------------------------------------------
 
 typedef seos_err_t (*SeosCryptoApi_freeT)(
-    SeosCryptoApi_Context* self);
+    SeosCryptoApi_Context* ctx);
 
 // -----------------------------------------------------------------------------
 

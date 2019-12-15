@@ -32,8 +32,8 @@ struct SeosCryptoLib_Signature
     mbedtls;
     SeosCryptoApi_Signature_Alg algorithm;
     SeosCryptoApi_Digest_Alg digest;
-    const SeosCryptoKey* prvKey;
-    const SeosCryptoKey* pubKey;
+    const SeosCryptoLib_Key* prvKey;
+    const SeosCryptoLib_Key* pubKey;
 };
 
 // Internal functions ----------------------------------------------------------
@@ -44,8 +44,8 @@ SeosCryptoSignature_init(
     const SeosCryptoApi_MemIf*        memIf,
     const SeosCryptoApi_Signature_Alg algorithm,
     const SeosCryptoApi_Digest_Alg    digest,
-    const SeosCryptoKey*              prvKey,
-    const SeosCryptoKey*              pubKey);
+    const SeosCryptoLib_Key*          prvKey,
+    const SeosCryptoLib_Key*          pubKey);
 
 seos_err_t
 SeosCryptoSignature_free(

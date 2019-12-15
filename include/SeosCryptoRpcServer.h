@@ -145,34 +145,37 @@ SeosCryptoRpcServer_Digest_finalize(
 
 // -------------------------------- Key API ------------------------------------
 
+typedef SeosCryptoLib_Key* SeosCryptoLib_Key_Ptr;
+typedef const SeosCryptoLib_Key* SeosCryptoLib_Key_CPtr;
+
 seos_err_t
 SeosCryptoRpcServer_Key_generate(
-    SeosCryptoRpcServer* self,
-    SeosCryptoApi_Key*   pKeyHandle);
+    SeosCryptoRpcServer*   self,
+    SeosCryptoLib_Key_Ptr* pKeyPtr);
 
 seos_err_t
 SeosCryptoRpcServer_Key_makePublic(
-    SeosCryptoRpcServer* self,
-    SeosCryptoApi_Key*   pPubKeyHandle,
-    SeosCryptoApi_Key    prvKeyHandle);
+    SeosCryptoRpcServer*   self,
+    SeosCryptoLib_Key_Ptr* pPubKeyPtr,
+    SeosCryptoLib_Key_CPtr prvkeyPtr);
 
 seos_err_t
 SeosCryptoRpcServer_Key_import(
-    SeosCryptoRpcServer* self,
-    SeosCryptoApi_Key*   pKeyHandle,
-    SeosCryptoApi_Key    wrapKeyHandle);
+    SeosCryptoRpcServer*   self,
+    SeosCryptoLib_Key_Ptr* pPubKeyPtr,
+    SeosCryptoLib_Key_CPtr wrapKeyPtr);
 
 seos_err_t
 SeosCryptoRpcServer_Key_export(
-    SeosCryptoRpcServer* self,
-    SeosCryptoApi_Key    keyHandle,
-    SeosCryptoApi_Key    wrapKeyHandle);
+    SeosCryptoRpcServer*   self,
+    SeosCryptoLib_Key_CPtr keyPtr,
+    SeosCryptoLib_Key_CPtr wrapKeyPtr);
 
 seos_err_t
 SeosCryptoRpcServer_Key_getParams(
-    SeosCryptoRpcServer* self,
-    SeosCryptoApi_Key    keyHandle,
-    size_t*              paramSize);
+    SeosCryptoRpcServer*   self,
+    SeosCryptoLib_Key_CPtr keyPtr,
+    size_t*                paramSize);
 
 seos_err_t
 SeosCryptoRpcServer_Key_loadParams(
@@ -182,8 +185,8 @@ SeosCryptoRpcServer_Key_loadParams(
 
 seos_err_t
 SeosCryptoRpcServer_Key_free(
-    SeosCryptoRpcServer* self,
-    SeosCryptoApi_Key    keyHandle);
+    SeosCryptoRpcServer*  self,
+    SeosCryptoLib_Key_Ptr keyPtr);
 
 // ----------------------------- Signature API ---------------------------------
 
@@ -195,8 +198,8 @@ SeosCryptoRpcServer_Signature_init(
     SeosCryptoLib_Signature_Ptr* pSigPtr,
     SeosCryptoApi_Signature_Alg  algorithm,
     SeosCryptoApi_Digest_Alg     digest,
-    SeosCryptoApi_Key            prvHandle,
-    SeosCryptoApi_Key            pubHandle);
+    SeosCryptoLib_Key_CPtr       prvPtr,
+    SeosCryptoLib_Key_CPtr       pubPtr);
 
 seos_err_t
 SeosCryptoRpcServer_Signature_verify(
@@ -227,13 +230,13 @@ SeosCryptoRpcServer_Agreement_init(
     SeosCryptoRpcServer*         self,
     SeosCryptoLib_Agreement_Ptr* pAgrPtr,
     SeosCryptoApi_Agreement_Alg  algorithm,
-    SeosCryptoApi_Key            prvHandle);
+    SeosCryptoLib_Key_CPtr       prvPtr);
 
 seos_err_t
 SeosCryptoRpcServer_Agreement_agree(
     SeosCryptoRpcServer*        self,
     SeosCryptoLib_Agreement_Ptr agrPtr,
-    SeosCryptoApi_Key           pubHandle,
+    SeosCryptoLib_Key_CPtr      pubPtr,
     size_t*                     sharedSize);
 
 seos_err_t
@@ -250,7 +253,7 @@ SeosCryptoRpcServer_Cipher_init(
     SeosCryptoRpcServer*      self,
     SeosCryptoLib_Cipher_Ptr* pCipherPtr,
     SeosCryptoApi_Cipher_Alg  algorithm,
-    SeosCryptoApi_Key         keyHandle,
+    SeosCryptoLib_Key_CPtr    keyPtr,
     size_t                    ivLen);
 
 seos_err_t

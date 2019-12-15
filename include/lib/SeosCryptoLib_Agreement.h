@@ -30,7 +30,7 @@ struct SeosCryptoLib_Agreement
     }
     mbedtls;
     SeosCryptoApi_Agreement_Alg algorithm;
-    const SeosCryptoKey* prvKey;
+    const SeosCryptoLib_Key* prvKey;
 };
 
 // Internal functions ----------------------------------------------------------
@@ -40,13 +40,13 @@ SeosCryptoAgreement_init(
     SeosCryptoLib_Agreement*          self,
     const SeosCryptoApi_MemIf*        memIf,
     const SeosCryptoApi_Agreement_Alg algorithm,
-    const SeosCryptoKey*              privateKey);
+    const SeosCryptoLib_Key*          privateKey);
 
 seos_err_t
 SeosCryptoAgreement_agree(
     SeosCryptoLib_Agreement* self,
     SeosCryptoRng*           rng,
-    const SeosCryptoKey*     pubKey,
+    const SeosCryptoLib_Key* pubKey,
     void*                    shared,
     size_t*                  sharedSize);
 

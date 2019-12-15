@@ -4,7 +4,7 @@
 
 #include "lib/SeosCryptoLib_Signature.h"
 #include "lib/SeosCryptoRng.h"
-#include "lib/SeosCryptoKey.h"
+#include "lib/SeosCryptoLib_Key.h"
 
 #include "LibDebug/Debug.h"
 
@@ -186,8 +186,8 @@ SeosCryptoSignature_init(
     const SeosCryptoApi_MemIf*        memIf,
     const SeosCryptoApi_Signature_Alg algorithm,
     const SeosCryptoApi_Digest_Alg    digest,
-    const SeosCryptoKey*              prvKey,
-    const SeosCryptoKey*              pubKey)
+    const SeosCryptoLib_Key*          prvKey,
+    const SeosCryptoLib_Key*          pubKey)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 

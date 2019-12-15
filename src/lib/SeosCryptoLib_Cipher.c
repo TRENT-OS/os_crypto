@@ -3,7 +3,7 @@
  */
 
 #include "lib/SeosCryptoLib_Cipher.h"
-#include "lib/SeosCryptoKey.h"
+#include "lib/SeosCryptoLib_Key.h"
 
 #include "LibDebug/Debug.h"
 
@@ -356,7 +356,7 @@ SeosCryptoCipher_init(
     SeosCryptoLib_Cipher*          self,
     const SeosCryptoApi_MemIf*     memIf,
     const SeosCryptoApi_Cipher_Alg algorithm,
-    const SeosCryptoKey*           key,
+    const SeosCryptoLib_Key*       key,
     const void*                    iv,
     const size_t                   ivLen)
 {

@@ -162,36 +162,41 @@ SeosCryptoLib_Digest_finalize(
 seos_err_t
 SeosCryptoLib_Key_generate(
     SeosCryptoApi_Context*        api,
-    SeosCryptoApi_Key*            pKeyHandle,
+    SeosCryptoLib_Key**           pKeyObj,
     const SeosCryptoApi_Key_Spec* spec);
 
 seos_err_t
 SeosCryptoLib_Key_makePublic(
     SeosCryptoApi_Context*           api,
-    SeosCryptoApi_Key*               pPubKeyHandle,
-    const SeosCryptoApi_Key          prvKeyHandle,
+    SeosCryptoLib_Key**              pPubKeyObj,
+    const SeosCryptoLib_Key*         prvKeyObj,
     const SeosCryptoApi_Key_Attribs* attribs);
 
 seos_err_t
 SeosCryptoLib_Key_import(
     SeosCryptoApi_Context*        api,
-    SeosCryptoApi_Key*            pKeyHandle,
-    const SeosCryptoApi_Key       wrapKeyHandle,
+    SeosCryptoLib_Key**           pKeyObj,
+    const SeosCryptoLib_Key*      wrapKeyObj,
     const SeosCryptoApi_Key_Data* keyData);
 
 seos_err_t
 SeosCryptoLib_Key_export(
-    SeosCryptoApi_Context*  api,
-    const SeosCryptoApi_Key keyHandle,
-    const SeosCryptoApi_Key wrapKeyHandle,
-    SeosCryptoApi_Key_Data* keyData);
+    SeosCryptoApi_Context*   api,
+    const SeosCryptoLib_Key* keyObj,
+    const SeosCryptoLib_Key* wrapKeyObj,
+    SeosCryptoApi_Key_Data*  keyData);
 
 seos_err_t
 SeosCryptoLib_Key_getParams(
-    SeosCryptoApi_Context*  api,
-    const SeosCryptoApi_Key keyHandle,
-    void*                   keyParams,
-    size_t*                 paramSize);
+    SeosCryptoApi_Context*   api,
+    const SeosCryptoLib_Key* keyObj,
+    void*                    keyParams,
+    size_t*                  paramSize);
+
+seos_err_t
+SeosCryptoLib_Key_free(
+    SeosCryptoApi_Context* api,
+    SeosCryptoLib_Key*     keyObj);
 
 seos_err_t
 SeosCryptoLib_Key_loadParams(
@@ -200,11 +205,6 @@ SeosCryptoLib_Key_loadParams(
     void*                         keyParams,
     size_t*                       paramSize);
 
-seos_err_t
-SeosCryptoLib_Key_free(
-    SeosCryptoApi_Context*  api,
-    const SeosCryptoApi_Key keyHandle);
-
 // ------------------------------ Cipher API -----------------------------------
 
 seos_err_t
@@ -212,7 +212,7 @@ SeosCryptoLib_Cipher_init(
     SeosCryptoApi_Context*         api,
     SeosCryptoLib_Cipher**         pCipherObj,
     const SeosCryptoApi_Cipher_Alg algorithm,
-    const SeosCryptoApi_Key        keyHandle,
+    const SeosCryptoLib_Key*       keyObj,
     const void*                    iv,
     const size_t                   ivLen);
 
@@ -252,8 +252,8 @@ SeosCryptoLib_Signature_init(
     SeosCryptoLib_Signature**         pSigObj,
     const SeosCryptoApi_Signature_Alg algorithm,
     const SeosCryptoApi_Digest_Alg    digest,
-    const SeosCryptoApi_Key           prvHandle,
-    const SeosCryptoApi_Key           pubHandle);
+    const SeosCryptoLib_Key*          prvKey,
+    const SeosCryptoLib_Key*          pubKey);
 
 seos_err_t
 SeosCryptoLib_Signature_free(
@@ -286,7 +286,7 @@ SeosCryptoLib_Agreement_init(
     SeosCryptoApi_Context*            api,
     SeosCryptoLib_Agreement**         pAgrObj,
     const SeosCryptoApi_Agreement_Alg algorithm,
-    const SeosCryptoApi_Key           prvHandle);
+    const SeosCryptoLib_Key*          prvKey);
 
 seos_err_t
 SeosCryptoLib_Agreement_free(
@@ -297,7 +297,7 @@ seos_err_t
 SeosCryptoLib_Agreement_agree(
     SeosCryptoApi_Context*   api,
     SeosCryptoLib_Agreement* agrObj,
-    const SeosCryptoApi_Key  pubHandle,
+    const SeosCryptoLib_Key* pubKey,
     void*                    shared,
     size_t*                  sharedSize);
 

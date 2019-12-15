@@ -34,7 +34,7 @@ struct SeosCryptoLib_Cipher
     }
     mbedtls;
     SeosCryptoApi_Cipher_Alg algorithm;
-    const SeosCryptoKey* key;
+    const SeosCryptoLib_Key* key;
     uint8_t iv[SeosCryptoApi_Cipher_SIZE_AES_BLOCK];
     size_t ivLen;
     size_t inputLen;
@@ -50,7 +50,7 @@ SeosCryptoCipher_init(
     SeosCryptoLib_Cipher*          self,
     const SeosCryptoApi_MemIf*     memIf,
     const SeosCryptoApi_Cipher_Alg algorithm,
-    const SeosCryptoKey*           key,
+    const SeosCryptoLib_Key*       key,
     const void*                    iv,
     size_t                         ivLen);
 

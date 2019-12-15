@@ -4,7 +4,7 @@
 
 #include "lib/SeosCryptoLib_Agreement.h"
 #include "lib/SeosCryptoRng.h"
-#include "lib/SeosCryptoKey.h"
+#include "lib/SeosCryptoLib_Key.h"
 
 #include "LibDebug/Debug.h"
 
@@ -91,7 +91,7 @@ static seos_err_t
 agreeImpl(
     SeosCryptoLib_Agreement* self,
     SeosCryptoRng*           rng,
-    const SeosCryptoKey*     pubKey,
+    const SeosCryptoLib_Key* pubKey,
     void*                    buf,
     size_t*                  bufSize)
 {
@@ -151,7 +151,7 @@ SeosCryptoAgreement_init(
     SeosCryptoLib_Agreement*          self,
     const SeosCryptoApi_MemIf*        memIf,
     const SeosCryptoApi_Agreement_Alg algorithm,
-    const SeosCryptoKey*              prvKey)
+    const SeosCryptoLib_Key*          prvKey)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -189,7 +189,7 @@ seos_err_t
 SeosCryptoAgreement_agree(
     SeosCryptoLib_Agreement* self,
     SeosCryptoRng*           rng,
-    const SeosCryptoKey*     pubKey,
+    const SeosCryptoLib_Key* pubKey,
     void*                    shared,
     size_t*                  sharedSize)
 {
