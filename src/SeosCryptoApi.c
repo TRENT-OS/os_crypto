@@ -6,7 +6,28 @@
 #include "SeosCryptoApi.h"
 #include "SeosCryptoLib.h"
 
-#define UNWRAP_KEY(w) ((w) == NULL ? NULL : (w)->key)
+#include <string.h>
+
+// A wrapped object could be NULL, if so, just pass NULL
+#define UNWRAP_SAFE(w, obj) ((w) == NULL ? NULL : (w)->obj)
+
+// We call a function from a wrapped object's API. Make sure that the API call
+// is actually implemented.
+#define CALL_SAFE(w, func, ...)                                 \
+    (NULL == w) ? SEOS_ERROR_INVALID_PARAMETER :                \
+    (NULL == w->api->vtable->func) ? SEOS_ERROR_NOT_SUPPORTED : \
+    w->api->vtable->func(w->api, __VA_ARGS__)                   \
+
+// Initialize a wrapped object from existing API pointer
+#define INIT_SAFE(w, ctx) {                                     \
+        if (NULL == w || NULL == ctx) {                         \
+            return SEOS_ERROR_INVALID_PARAMETER;                \
+        }                                                       \
+        memset(w, 0, sizeof(*w));                               \
+        w->api = ctx;                                           \
+}
+
+// ------------------------------- Init/Free -----------------------------------
 
 seos_err_t
 SeosCryptoApi_free(
@@ -53,32 +74,24 @@ SeosCryptoApi_Rng_reseed(
 seos_err_t
 SeosCryptoApi_Mac_init(
     SeosCryptoApi_Context*      api,
-    SeosCryptoApi_Mac*          wMac,
+    SeosCryptoApi_Mac*          wrap,
     const SeosCryptoApi_Mac_Alg algorithm)
 {
-    if (NULL == api || NULL == wMac || NULL == api->vtable)
-    {
-        return SEOS_ERROR_INVALID_PARAMETER;
-    }
+    INIT_SAFE(wrap, api);
 
-    wMac->api = api;
-
-    return (NULL == api->vtable->Mac_init) ? SEOS_ERROR_NOT_SUPPORTED :
-           api->vtable->Mac_init(api, &wMac->mac, algorithm);
+    return CALL_SAFE(wrap, Mac_init, &wrap->mac, algorithm);
 }
 
 seos_err_t
 SeosCryptoApi_Mac_free(
-    SeosCryptoApi_Mac* wMac)
+    SeosCryptoApi_Mac* wrap)
 {
-    return (NULL == wMac) ? SEOS_ERROR_INVALID_PARAMETER :
-           (NULL == wMac->api->vtable->Mac_free) ? SEOS_ERROR_NOT_SUPPORTED :
-           wMac->api->vtable->Mac_free(wMac->api, wMac->mac);
+    return CALL_SAFE(wrap, Mac_free, wrap->mac);
 }
 
 seos_err_t
 SeosCryptoApi_Mac_start(
-    SeosCryptoApi_Mac* wMac,
+    SeosCryptoApi_Mac* wrap,
     const void*        secret,
     const size_t       secretSize)
 {
@@ -87,14 +100,12 @@ SeosCryptoApi_Mac_start(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return (NULL == wMac) ? SEOS_ERROR_INVALID_PARAMETER :
-           (NULL == wMac->api->vtable->Mac_start) ? SEOS_ERROR_NOT_SUPPORTED :
-           wMac->api->vtable->Mac_start(wMac->api, wMac->mac, secret, secretSize);
+    return CALL_SAFE(wrap, Mac_start, wrap->mac, secret, secretSize);
 }
 
 seos_err_t
 SeosCryptoApi_Mac_process(
-    SeosCryptoApi_Mac* wMac,
+    SeosCryptoApi_Mac* wrap,
     const void*        data,
     const size_t       dataSize)
 {
@@ -103,14 +114,12 @@ SeosCryptoApi_Mac_process(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return (NULL == wMac) ? SEOS_ERROR_INVALID_PARAMETER :
-           (NULL == wMac->api->vtable->Mac_process) ? SEOS_ERROR_NOT_SUPPORTED :
-           wMac->api->vtable->Mac_process(wMac->api, wMac->mac, data, dataSize);
+    return CALL_SAFE(wrap, Mac_process, wrap->mac, data, dataSize);
 }
 
 seos_err_t
 SeosCryptoApi_Mac_finalize(
-    SeosCryptoApi_Mac* wMac,
+    SeosCryptoApi_Mac* wrap,
     void*              mac,
     size_t*            macSize)
 {
@@ -119,9 +128,7 @@ SeosCryptoApi_Mac_finalize(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return (NULL == wMac) ? SEOS_ERROR_INVALID_PARAMETER :
-           (NULL == wMac->api->vtable->Mac_finalize) ? SEOS_ERROR_NOT_SUPPORTED :
-           wMac->api->vtable->Mac_finalize(wMac->api, wMac->mac, mac, macSize);
+    return CALL_SAFE(wrap, Mac_finalize, wrap->mac, mac, macSize);
 }
 
 // ------------------------------ Digest API -----------------------------------
@@ -129,42 +136,33 @@ SeosCryptoApi_Mac_finalize(
 seos_err_t
 SeosCryptoApi_Digest_init(
     SeosCryptoApi_Context*         api,
-    SeosCryptoApi_Digest*          wDigest,
+    SeosCryptoApi_Digest*          wrap,
     const SeosCryptoApi_Digest_Alg algorithm)
 {
-    if (NULL == api || NULL == wDigest || NULL == api->vtable)
-    {
-        return SEOS_ERROR_INVALID_PARAMETER;
-    }
+    INIT_SAFE(wrap, api);
 
-    wDigest->api = api;
-
-    return (NULL == api->vtable->Digest_init) ? SEOS_ERROR_NOT_SUPPORTED :
-           api->vtable->Digest_init(api, &wDigest->digest, algorithm);
+    return CALL_SAFE(wrap, Digest_init, &wrap->digest, algorithm);
 }
 
 seos_err_t
 SeosCryptoApi_Digest_free(
-    SeosCryptoApi_Digest* wDigest)
+    SeosCryptoApi_Digest* wrap)
 {
-    return (NULL == wDigest) ? SEOS_ERROR_INVALID_PARAMETER :
-           (NULL == wDigest->api->vtable->Digest_free) ? SEOS_ERROR_NOT_SUPPORTED :
-           wDigest->api->vtable->Digest_free(wDigest->api, wDigest->digest);
+    return CALL_SAFE(wrap, Digest_free, wrap->digest);
 }
 
 seos_err_t
 SeosCryptoApi_Digest_clone(
-    SeosCryptoApi_Digest*       wDst,
-    const SeosCryptoApi_Digest* wSrc)
+    SeosCryptoApi_Digest*       wrap,
+    const SeosCryptoApi_Digest* srcWrap)
 {
-    return (NULL == wSrc || NULL == wDst) ? SEOS_ERROR_INVALID_PARAMETER :
-           (NULL == wDst->api->vtable->Digest_clone) ? SEOS_ERROR_NOT_SUPPORTED :
-           wDst->api->vtable->Digest_clone(wDst->api, wDst->digest, wSrc->digest);
+    return CALL_SAFE(wrap, Digest_clone, wrap->digest, UNWRAP_SAFE(srcWrap,
+                     digest));
 }
 
 seos_err_t
 SeosCryptoApi_Digest_process(
-    SeosCryptoApi_Digest* wDigest,
+    SeosCryptoApi_Digest* wrap,
     const void*           data,
     const size_t          dataLen)
 {
@@ -173,15 +171,12 @@ SeosCryptoApi_Digest_process(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return (NULL == wDigest) ? SEOS_ERROR_INVALID_PARAMETER :
-           (NULL == wDigest->api->vtable->Digest_process) ? SEOS_ERROR_NOT_SUPPORTED :
-           wDigest->api->vtable->Digest_process(wDigest->api, wDigest->digest,  data,
-                                                dataLen);
+    return CALL_SAFE(wrap, Digest_process, wrap->digest, data, dataLen);
 }
 
 seos_err_t
 SeosCryptoApi_Digest_finalize(
-    SeosCryptoApi_Digest* wDigest,
+    SeosCryptoApi_Digest* wrap,
     void*                 digest,
     size_t*               digestSize)
 {
@@ -190,10 +185,7 @@ SeosCryptoApi_Digest_finalize(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return (NULL == wDigest) ? SEOS_ERROR_INVALID_PARAMETER :
-           (NULL == wDigest->api->vtable->Digest_finalize) ? SEOS_ERROR_NOT_SUPPORTED :
-           wDigest->api->vtable->Digest_finalize(wDigest->api, wDigest->digest, digest,
-                                                 digestSize);
+    return CALL_SAFE(wrap, Digest_finalize, wrap->digest, digest, digestSize);
 }
 
 // ----------------------------- Signature API ---------------------------------
@@ -201,36 +193,28 @@ SeosCryptoApi_Digest_finalize(
 seos_err_t
 SeosCryptoApi_Signature_init(
     SeosCryptoApi_Context*            api,
-    SeosCryptoApi_Signature*          wSig,
+    SeosCryptoApi_Signature*          wrap,
     const SeosCryptoApi_Signature_Alg algorithm,
     const SeosCryptoApi_Digest_Alg    digest,
     const SeosCryptoApi_Key*          prvKey,
     const SeosCryptoApi_Key*          pubKey)
 {
-    if (NULL == api || NULL == wSig || NULL == api->vtable)
-    {
-        return SEOS_ERROR_INVALID_PARAMETER;
-    }
+    INIT_SAFE(wrap, api);
 
-    wSig->api = api;
-
-    return (NULL == api->vtable->Signature_init) ? SEOS_ERROR_NOT_SUPPORTED :
-           api->vtable->Signature_init(api, &wSig->signature, algorithm, digest,
-                                       UNWRAP_KEY(prvKey), UNWRAP_KEY(pubKey));
+    return CALL_SAFE(wrap, Signature_init, &wrap->signature, algorithm, digest,
+                     UNWRAP_SAFE(prvKey, key), UNWRAP_SAFE(pubKey, key));
 }
 
 seos_err_t
 SeosCryptoApi_Signature_free(
-    SeosCryptoApi_Signature* wSig)
+    SeosCryptoApi_Signature* wrap)
 {
-    return (NULL == wSig) ? SEOS_ERROR_INVALID_PARAMETER :
-           (NULL == wSig->api->vtable->Signature_free) ? SEOS_ERROR_NOT_SUPPORTED :
-           wSig->api->vtable->Signature_free(wSig->api, wSig->signature);
+    return CALL_SAFE(wrap, Signature_free, wrap->signature);
 }
 
 seos_err_t
 SeosCryptoApi_Signature_sign(
-    SeosCryptoApi_Signature* wSig,
+    SeosCryptoApi_Signature* wrap,
     const void*              hash,
     const size_t             hashSize,
     void*                    signature,
@@ -243,15 +227,13 @@ SeosCryptoApi_Signature_sign(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return (NULL == wSig) ? SEOS_ERROR_INVALID_PARAMETER :
-           (NULL == wSig->api->vtable->Signature_sign) ? SEOS_ERROR_NOT_SUPPORTED :
-           wSig->api->vtable->Signature_sign(wSig->api, wSig->signature, hash, hashSize,
-                                             signature, signatureSize);
+    return CALL_SAFE(wrap, Signature_sign, wrap->signature, hash, hashSize,
+                     signature, signatureSize);
 }
 
 seos_err_t
 SeosCryptoApi_Signature_verify(
-    SeosCryptoApi_Signature* wSig,
+    SeosCryptoApi_Signature* wrap,
     const void*              hash,
     const size_t             hashSize,
     const void*              signature,
@@ -263,10 +245,8 @@ SeosCryptoApi_Signature_verify(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return (NULL == wSig) ? SEOS_ERROR_INVALID_PARAMETER :
-           (NULL == wSig->api->vtable->Signature_verify) ? SEOS_ERROR_NOT_SUPPORTED :
-           wSig->api->vtable->Signature_verify(wSig->api, wSig->signature, hash, hashSize,
-                                               signature, signatureSize);
+    return CALL_SAFE(wrap, Signature_verify, wrap->signature, hash, hashSize,
+                     signature, signatureSize);
 }
 
 // ----------------------------- Agreement API ---------------------------------
@@ -274,34 +254,26 @@ SeosCryptoApi_Signature_verify(
 seos_err_t
 SeosCryptoApi_Agreement_init(
     SeosCryptoApi_Context*            api,
-    SeosCryptoApi_Agreement*          wAgr,
+    SeosCryptoApi_Agreement*          wrap,
     const SeosCryptoApi_Agreement_Alg algorithm,
     const SeosCryptoApi_Key*          prvKey)
 {
-    if (NULL == api || NULL == wAgr || NULL == api->vtable)
-    {
-        return SEOS_ERROR_INVALID_PARAMETER;
-    }
+    INIT_SAFE(wrap, api);
 
-    wAgr->api = api;
-
-    return (NULL == api->vtable->Agreement_init) ? SEOS_ERROR_NOT_SUPPORTED :
-           api->vtable->Agreement_init(api, &wAgr->agreement, algorithm,
-                                       UNWRAP_KEY(prvKey));
+    return CALL_SAFE(wrap, Agreement_init, &wrap->agreement, algorithm,
+                     UNWRAP_SAFE(prvKey, key));
 }
 
 seos_err_t
 SeosCryptoApi_Agreement_free(
-    SeosCryptoApi_Agreement* wAgr)
+    SeosCryptoApi_Agreement* wrap)
 {
-    return (NULL == wAgr) ? SEOS_ERROR_INVALID_PARAMETER :
-           (NULL == wAgr->api->vtable->Agreement_free) ? SEOS_ERROR_NOT_SUPPORTED :
-           wAgr->api->vtable->Agreement_free(wAgr->api, wAgr->agreement);
+    return CALL_SAFE(wrap, Agreement_free, wrap->agreement);
 }
 
 seos_err_t
 SeosCryptoApi_Agreement_agree(
-    SeosCryptoApi_Agreement* wAgr,
+    SeosCryptoApi_Agreement* wrap,
     const SeosCryptoApi_Key* pubKey,
     void*                    shared,
     size_t*                  sharedSize)
@@ -311,10 +283,8 @@ SeosCryptoApi_Agreement_agree(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return (NULL == wAgr) ? SEOS_ERROR_INVALID_PARAMETER :
-           (NULL == wAgr->api->vtable->Agreement_agree) ? SEOS_ERROR_NOT_SUPPORTED :
-           wAgr->api->vtable->Agreement_agree(wAgr->api, wAgr->agreement,
-                                              UNWRAP_KEY(pubKey), shared, sharedSize);
+    return CALL_SAFE(wrap, Agreement_agree, wrap->agreement,
+                     UNWRAP_SAFE(pubKey, key), shared, sharedSize);
 }
 
 // -------------------------------- Key API ------------------------------------
@@ -322,72 +292,57 @@ SeosCryptoApi_Agreement_agree(
 seos_err_t
 SeosCryptoApi_Key_generate(
     SeosCryptoApi_Context*        api,
-    SeosCryptoApi_Key*            wKey,
+    SeosCryptoApi_Key*            wrap,
     const SeosCryptoApi_Key_Spec* spec)
 {
-    if (NULL == api || NULL == wKey || NULL == api->vtable)
-    {
-        return SEOS_ERROR_INVALID_PARAMETER;
-    }
+    INIT_SAFE(wrap, api);
 
-    wKey->api = api;
-
-    return (NULL == api->vtable->Key_generate) ? SEOS_ERROR_NOT_SUPPORTED :
-           api->vtable->Key_generate(api, &wKey->key, spec);
+    return CALL_SAFE(wrap, Key_generate, &wrap->key, spec);
 }
 
 seos_err_t
 SeosCryptoApi_Key_import(
     SeosCryptoApi_Context*        api,
-    SeosCryptoApi_Key*            wKey,
-    const SeosCryptoApi_Key*      wWrapKey,
+    SeosCryptoApi_Key*            wrap,
+    const SeosCryptoApi_Key*      wrapKey,
     const SeosCryptoApi_Key_Data* keyData)
 {
-    if (NULL == api || NULL == wKey || NULL == api->vtable)
-    {
-        return SEOS_ERROR_INVALID_PARAMETER;
-    }
+    INIT_SAFE(wrap, api);
 
-    wKey->api = api;
-
-    return (NULL == wKey->api->vtable->Key_import) ? SEOS_ERROR_NOT_SUPPORTED :
-           wKey->api->vtable->Key_import(wKey->api, &wKey->key, UNWRAP_KEY(wWrapKey),
-                                         keyData);
+    return CALL_SAFE(wrap, Key_import, &wrap->key, UNWRAP_SAFE(wrapKey, key),
+                     keyData);
 }
 
 seos_err_t
 SeosCryptoApi_Key_makePublic(
-    SeosCryptoApi_Key*               wKey,
-    const SeosCryptoApi_Key*         wPrvKey,
+    SeosCryptoApi_Key*               wrap,
+    const SeosCryptoApi_Key*         prvKey,
     const SeosCryptoApi_Key_Attribs* attribs)
 {
-    if (NULL == wKey || NULL == wPrvKey)
+    if (NULL == prvKey)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    wKey->api = wPrvKey->api;
+    INIT_SAFE(wrap, prvKey->api);
 
-    return (NULL == wKey->api->vtable->Key_makePublic) ? SEOS_ERROR_NOT_SUPPORTED :
-           wKey->api->vtable->Key_makePublic(wKey->api, &wKey->key, UNWRAP_KEY(wPrvKey),
-                                             attribs);
+    return CALL_SAFE(wrap, Key_makePublic, &wrap->key, UNWRAP_SAFE(prvKey, key),
+                     attribs);
 }
 
 seos_err_t
 SeosCryptoApi_Key_export(
-    const SeosCryptoApi_Key* wKey,
-    const SeosCryptoApi_Key* wWrapKey,
+    const SeosCryptoApi_Key* wrap,
+    const SeosCryptoApi_Key* wrapKey,
     SeosCryptoApi_Key_Data*  keyData)
 {
-    return (NULL == wKey) ? SEOS_ERROR_INVALID_PARAMETER :
-           (NULL == wKey->api->vtable->Key_export) ? SEOS_ERROR_NOT_SUPPORTED :
-           wKey->api->vtable->Key_export(wKey->api, wKey->key, UNWRAP_KEY(wWrapKey),
-                                         keyData);
+    return CALL_SAFE(wrap, Key_export, wrap->key, UNWRAP_SAFE(wrapKey, key),
+                     keyData);
 }
 
 seos_err_t
 SeosCryptoApi_Key_getParams(
-    const SeosCryptoApi_Key* wKey,
+    const SeosCryptoApi_Key* wrap,
     void*                    keyParams,
     size_t*                  paramSize)
 {
@@ -396,18 +351,14 @@ SeosCryptoApi_Key_getParams(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return (NULL == wKey) ? SEOS_ERROR_INVALID_PARAMETER :
-           (NULL == wKey->api->vtable->Key_getParams) ? SEOS_ERROR_NOT_SUPPORTED :
-           wKey->api->vtable->Key_getParams(wKey->api, wKey->key, keyParams, paramSize);
+    return CALL_SAFE(wrap, Key_getParams, wrap->key, keyParams, paramSize);
 }
 
 seos_err_t
 SeosCryptoApi_Key_free(
-    SeosCryptoApi_Key* wKey)
+    SeosCryptoApi_Key* wrap)
 {
-    return (NULL == wKey) ? SEOS_ERROR_INVALID_PARAMETER :
-           (NULL == wKey->api->vtable->Key_free) ? SEOS_ERROR_NOT_SUPPORTED :
-           wKey->api->vtable->Key_free(wKey->api, wKey->key);
+    return CALL_SAFE(wrap, Key_free, wrap->key);
 }
 
 seos_err_t
@@ -423,6 +374,7 @@ SeosCryptoApi_Key_loadParams(
     }
 
     return (NULL == api) ? SEOS_ERROR_INVALID_PARAMETER :
+           (NULL == api->vtable->Key_loadParams) ? SEOS_ERROR_NOT_SUPPORTED :
            api->vtable->Key_loadParams(api, name, keyParams, paramSize);
 }
 
@@ -431,40 +383,33 @@ SeosCryptoApi_Key_loadParams(
 seos_err_t
 SeosCryptoApi_Cipher_init(
     SeosCryptoApi_Context*         api,
-    SeosCryptoApi_Cipher*          wCipher,
+    SeosCryptoApi_Cipher*          wrap,
     const SeosCryptoApi_Cipher_Alg algorithm,
-    const SeosCryptoApi_Key*       key,
+    const SeosCryptoApi_Key*       symKey,
     const void*                    iv,
     const size_t                   ivLen)
 {
-    if (NULL == api || NULL == wCipher || NULL == api->vtable)
-    {
-        return SEOS_ERROR_INVALID_PARAMETER;
-    }
-    else if (ivLen > SeosCryptoLib_SIZE_BUFFER)
+    if (ivLen > SeosCryptoLib_SIZE_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    wCipher->api = api;
+    INIT_SAFE(wrap, api);
 
-    return (NULL == api->vtable->Cipher_init) ? SEOS_ERROR_NOT_SUPPORTED :
-           api->vtable->Cipher_init(api, &wCipher->cipher, algorithm, UNWRAP_KEY(key), iv,
-                                    ivLen);
+    return CALL_SAFE(wrap, Cipher_init, &wrap->cipher, algorithm,
+                     UNWRAP_SAFE(symKey, key), iv, ivLen);
 }
 
 seos_err_t
 SeosCryptoApi_Cipher_free(
-    SeosCryptoApi_Cipher* wCipher)
+    SeosCryptoApi_Cipher* wrap)
 {
-    return (NULL == wCipher) ? SEOS_ERROR_INVALID_PARAMETER :
-           (NULL == wCipher->api->vtable->Cipher_free) ? SEOS_ERROR_NOT_SUPPORTED :
-           wCipher->api->vtable->Cipher_free(wCipher->api, wCipher->cipher);
+    return CALL_SAFE(wrap, Cipher_free, wrap->cipher);
 }
 
 seos_err_t
 SeosCryptoApi_Cipher_process(
-    SeosCryptoApi_Cipher* wCipher,
+    SeosCryptoApi_Cipher* wrap,
     const void*           data,
     const size_t          dataSize,
     void*                 output,
@@ -477,16 +422,13 @@ SeosCryptoApi_Cipher_process(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return (NULL == wCipher) ? SEOS_ERROR_INVALID_PARAMETER :
-           (NULL == wCipher->api->vtable->Cipher_process) ? SEOS_ERROR_NOT_SUPPORTED :
-           wCipher->api->vtable->Cipher_process(wCipher->api, wCipher->cipher, data,
-                                                dataSize, output,
-                                                outputSize);
+    return CALL_SAFE(wrap, Cipher_process, wrap->cipher, data, dataSize, output,
+                     outputSize);
 }
 
 seos_err_t
 SeosCryptoApi_Cipher_start(
-    SeosCryptoApi_Cipher* wCipher,
+    SeosCryptoApi_Cipher* wrap,
     const void*           ad,
     const size_t          adSize)
 {
@@ -495,14 +437,12 @@ SeosCryptoApi_Cipher_start(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return (NULL == wCipher) ? SEOS_ERROR_INVALID_PARAMETER :
-           (NULL == wCipher->api->vtable->Cipher_start) ? SEOS_ERROR_NOT_SUPPORTED :
-           wCipher->api->vtable->Cipher_start(wCipher->api, wCipher->cipher, ad, adSize);
+    return CALL_SAFE(wrap, Cipher_start, wrap->cipher, ad, adSize);
 }
 
 seos_err_t
 SeosCryptoApi_Cipher_finalize(
-    SeosCryptoApi_Cipher* wCipher,
+    SeosCryptoApi_Cipher* wrap,
     void*                 output,
     size_t*               outputSize)
 {
@@ -511,8 +451,5 @@ SeosCryptoApi_Cipher_finalize(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return (NULL == wCipher) ? SEOS_ERROR_INVALID_PARAMETER :
-           (NULL == wCipher->api->vtable->Cipher_finalize) ? SEOS_ERROR_NOT_SUPPORTED :
-           wCipher->api->vtable->Cipher_finalize(wCipher->api, wCipher->cipher, output,
-                                                 outputSize);
+    return CALL_SAFE(wrap, Cipher_finalize, wrap->cipher, output, outputSize);
 }
