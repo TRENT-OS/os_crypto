@@ -975,7 +975,6 @@ static const SeosCryptoApi_Vtable SeosCryptoLib_vtable =
     .Cipher_process      = SeosCryptoLib_Cipher_process,
     .Cipher_start        = SeosCryptoLib_Cipher_start,
     .Cipher_finalize     = SeosCryptoLib_Cipher_finalize,
-    .free                = SeosCryptoLib_free
 };
 
 seos_err_t

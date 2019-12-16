@@ -241,11 +241,6 @@ typedef seos_err_t
 
 // -----------------------------------------------------------------------------
 
-typedef seos_err_t (*SeosCryptoApi_freeT)(
-    SeosCryptoApi_Context* ctx);
-
-// -----------------------------------------------------------------------------
-
 typedef struct
 {
     SeosCryptoApi_Rng_getBytesT Rng_getBytes;
@@ -279,7 +274,6 @@ typedef struct
     SeosCryptoApi_Cipher_processT Cipher_process;
     SeosCryptoApi_Cipher_startT Cipher_start;
     SeosCryptoApi_Cipher_finalizeT Cipher_finalize;
-    SeosCryptoApi_freeT free;
 }
 SeosCryptoApi_Vtable;
 

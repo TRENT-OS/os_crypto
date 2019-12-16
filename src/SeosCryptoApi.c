@@ -30,10 +30,18 @@
 // ------------------------------- Init/Free -----------------------------------
 
 seos_err_t
+SeosCryptoApi_init(
+    SeosCryptoApi_Context* ctx,
+    SeosCryptoApi_Config* cfg)
+{
+    return SEOS_SUCCESS;
+}
+
+seos_err_t
 SeosCryptoApi_free(
     SeosCryptoApi_Context* ctx)
 {
-    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER : ctx->vtable->free(ctx);
+    return SEOS_SUCCESS;
 }
 
 // -------------------------------- RNG API ------------------------------------

@@ -759,7 +759,6 @@ static const SeosCryptoApi_Vtable SeosCryptoRpcClient_vtable =
     .Cipher_process      = Cipher_process,
     .Cipher_start        = Cipher_start,
     .Cipher_finalize     = Cipher_finalize,
-    .free                = SeosCryptoRpcClient_free
 };
 
 seos_err_t
