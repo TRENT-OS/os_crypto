@@ -1,12 +1,12 @@
 /**
  * Copyright(C) 2019, Hensoldt Cyber GmbH
  *
- * @addtogroup Wrappers
+ * @addtogroup Crypto
  * @{
  *
  * @file SeosCryptoLib_Key.h
  *
- * @brief Key functions
+ * @brief Crypto library implementation of Key functions
  *
  */
 

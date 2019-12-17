@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  *
- * @addtogroup Wrappers
+ * @addtogroup Crypto
  * @{
  *
  * @file SeosCryptoLib_Signature.h
  *
- * @brief Signature functions and context
+ * @brief Crypto library implementation of Signature functions
  *
  */
 

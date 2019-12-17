@@ -1,12 +1,12 @@
 /**
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  *
- * @addtogroup Wrappers
+ * @addtogroup Crypto
  * @{
  *
  * @file SeosCryptoLib.h
  *
- * @brief Crypto core functions
+ * @brief Crypto library core module
  *
  */
 

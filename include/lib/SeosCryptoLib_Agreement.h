@@ -1,12 +1,12 @@
 /**
  * Copyright(C) 2019, Hensoldt Cyber GmbH
  *
- * @addtogroup Wrappers
+ * @addtogroup Crypto
  * @{
  *
  * @file SeosCryptoLib_Agreement.h
  *
- * @brief Agreement functions
+ * @brief Crypto library implementation of Agreement functions
  *
  */
 

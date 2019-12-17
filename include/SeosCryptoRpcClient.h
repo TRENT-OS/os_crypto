@@ -1,15 +1,15 @@
 /**
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  *
- * @addtogroup API
+ * @addtogroup RPC
  * @{
  *
  * @file SeosCryptoRpcClient.h
  *
- * @brief Client object and functions to access the SEOS crypto API running on
- *  a camkes server. May of the functions here are just a wrapper of the
- *  SeosCryptoRpcServer functions running on the server and called by the client via
- *  RPC calls.
+ * @brief RPC client object and functions to access a SEOS Crypto API instance
+ * running as RPC server in another component. If configured to act as RPC client,
+ * API calls will transparently be mapped to RPC calls and thus to execute
+ * in isolation (e.g., on the RPC server running in its own component).
  *
  */
 

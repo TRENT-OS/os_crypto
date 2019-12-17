@@ -1,12 +1,12 @@
 /**
  * Copyright(C) 2019, Hensoldt Cyber GmbH
  *
- * @addtogroup Wrappers
+ * @addtogroup Crypto
  * @{
  *
  * @file SeosCryptoLib_Mac.h
  *
- * @brief Message authentication code (MAC) functions
+ * @brief Crypto library implementation of Message Authentication Code (MAC) functions
  *
  */
 

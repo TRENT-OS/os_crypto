@@ -1,13 +1,14 @@
 /**
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  *
- * @addtogroup Server
+ * @addtogroup RPC
  * @{
  *
  * @file SeosCryptoRpcServer.h
  *
- * @brief RPC functions to handle the requests of a SEOS crypto client on the
- * server's side
+ * @brief RPC server object and functions to provide a SEOS Crypto API RPC server
+ * which can be used from a RPC client instance. Calls to this object are mapped
+ * to an implementation (e.g., a crypto library).
  *
  */
 

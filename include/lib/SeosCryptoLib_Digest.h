@@ -1,12 +1,12 @@
 /**
  * Copyright(C) 2019, Hensoldt Cyber GmbH
  *
- * @addtogroup Wrappers
+ * @addtogroup Crypto
  * @{
  *
  * @file SeosCryptoLib_Digest.h
  *
- * @brief Digest functions
+ * @brief Crypto library implementation of Digest functions
  *
  */
 

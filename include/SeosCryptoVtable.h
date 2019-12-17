@@ -1,13 +1,5 @@
 /**
  * Copyright (C) 2019, Hensoldt Cyber GmbH
- *
- * @addtogroup API
- * @{
- *
- * @file SeosCryptoVtable.h
- *
- * @brief SEOS Crypto API interface context
- *
  */
 
 #pragma once
@@ -275,5 +267,3 @@ struct SeosCryptoVtable
     SeosCryptoVtable_Cipher_startT Cipher_start;
     SeosCryptoVtable_Cipher_finalizeT Cipher_finalize;
 };
-
-/** @} */
