@@ -16,7 +16,7 @@ SeosCryptoRng_init(
     void*                                entropyCtx)
 {
     UNUSED_VAR(memIf);
-    seos_err_t retval = SEOS_SUCCESS;
+    seos_err_t err = SEOS_SUCCESS;
 
     if (NULL == memIf || NULL == self || NULL == entropyFunc)
     {
@@ -28,7 +28,7 @@ SeosCryptoRng_init(
     mbedtls_ctr_drbg_init(&self->drbg);
     if (mbedtls_ctr_drbg_seed(&self->drbg, entropyFunc, entropyCtx, NULL, 0) != 0)
     {
-        retval = SEOS_ERROR_ABORTED;
+        err = SEOS_ERROR_ABORTED;
         goto err0;
     }
 
@@ -40,7 +40,7 @@ SeosCryptoRng_init(
 
 err0:
     mbedtls_ctr_drbg_free(&self->drbg);
-    return retval;
+    return err;
 }
 
 seos_err_t

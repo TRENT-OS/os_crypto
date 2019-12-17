@@ -79,7 +79,7 @@ generate_DHParams(
     const size_t                bits,
     SeosCryptoApi_Key_DhParams* params)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
+    seos_err_t err = SEOS_ERROR_GENERIC;
     mbedtls_mpi Q, T, G, P;
     size_t retries;
 
@@ -125,13 +125,13 @@ generate_DHParams(
     {
         params->pLen = mbedtls_mpi_size(&P);
         params->gLen = mbedtls_mpi_size(&G);
-        retval = mbedtls_mpi_write_binary(&P, params->pBytes, params->pLen) != 0 ||
-                 mbedtls_mpi_write_binary(&G, params->gBytes, params->gLen) != 0 ?
-                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+        err = mbedtls_mpi_write_binary(&P, params->pBytes, params->pLen) != 0 ||
+              mbedtls_mpi_write_binary(&G, params->gBytes, params->gLen) != 0 ?
+              SEOS_ERROR_ABORTED : SEOS_SUCCESS;
     }
     else
     {
-        retval = SEOS_ERROR_ABORTED;
+        err = SEOS_ERROR_ABORTED;
     }
 
     mbedtls_mpi_free(&T);
@@ -139,7 +139,7 @@ generate_DHParams(
     mbedtls_mpi_free(&P);
     mbedtls_mpi_free(&G);
 
-    return retval;
+    return err;
 }
 
 static seos_err_t
@@ -147,7 +147,7 @@ generate_DHPrv(
     SeosCryptoApi_Key_DhPrv* key,
     SeosCryptoLib_Rng*       rng)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
+    seos_err_t err = SEOS_ERROR_GENERIC;
     mbedtls_mpi X, GX, G, P;
     size_t retries;
 
@@ -160,7 +160,7 @@ generate_DHPrv(
     if (mbedtls_mpi_read_binary(&G, key->params.gBytes, key->params.gLen) != 0 ||
         mbedtls_mpi_read_binary(&P, key->params.pBytes, key->params.pLen) != 0)
     {
-        retval = SEOS_ERROR_INVALID_PARAMETER;
+        err = SEOS_ERROR_INVALID_PARAMETER;
         goto exit;
     }
 
@@ -192,12 +192,12 @@ generate_DHPrv(
     if (retries > 0)
     {
         key->xLen = mbedtls_mpi_size(&X);
-        retval = mbedtls_mpi_write_binary(&X, key->xBytes, key->xLen) != 0 ?
-                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+        err = mbedtls_mpi_write_binary(&X, key->xBytes, key->xLen) != 0 ?
+              SEOS_ERROR_ABORTED : SEOS_SUCCESS;
     }
     else
     {
-        retval = SEOS_ERROR_ABORTED;
+        err = SEOS_ERROR_ABORTED;
     }
 
 exit:
@@ -206,7 +206,7 @@ exit:
     mbedtls_mpi_free(&G);
     mbedtls_mpi_free(&P);
 
-    return retval;
+    return err;
 }
 
 static seos_err_t
@@ -214,7 +214,7 @@ make_DHPub(
     SeosCryptoApi_Key_DhPub*       pubKey,
     const SeosCryptoApi_Key_DhPrv* prvKey)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
+    seos_err_t err = SEOS_ERROR_GENERIC;
     const SeosCryptoApi_Key_DhParams* params = &prvKey->params;
     mbedtls_mpi GX, X, P, G;
 
@@ -228,7 +228,7 @@ make_DHPub(
         mbedtls_mpi_read_binary(&P, params->pBytes, params->pLen) != 0 ||
         mbedtls_mpi_read_binary(&G, params->gBytes, params->gLen) != 0)
     {
-        retval = SEOS_ERROR_INVALID_PARAMETER;
+        err = SEOS_ERROR_INVALID_PARAMETER;
         goto exit;
     }
 
@@ -239,12 +239,12 @@ make_DHPub(
     {
         memcpy(&pubKey->params, params, sizeof(SeosCryptoApi_Key_DhParams));
         pubKey->gxLen = mbedtls_mpi_size(&GX);
-        retval = mbedtls_mpi_write_binary(&GX, pubKey->gxBytes, pubKey->gxLen) != 0 ?
-                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+        err = mbedtls_mpi_write_binary(&GX, pubKey->gxBytes, pubKey->gxLen) != 0 ?
+              SEOS_ERROR_ABORTED : SEOS_SUCCESS;
     }
     else
     {
-        retval = SEOS_ERROR_ABORTED;
+        err = SEOS_ERROR_ABORTED;
     }
 
 exit:
@@ -253,7 +253,7 @@ exit:
     mbedtls_mpi_free(&G);
     mbedtls_mpi_free(&P);
 
-    return retval;
+    return err;
 }
 
 // -------------------------------- RSA Keys -----------------------------------
@@ -264,7 +264,7 @@ generate_RsaPrv(
     SeosCryptoLib_Rng*        rng,
     const size_t              bits)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
+    seos_err_t err = SEOS_ERROR_GENERIC;
     mbedtls_rsa_context rsa;
 
     mbedtls_rsa_init(&rsa, MBEDTLS_RSA_PKCS_V15, MBEDTLS_MD_NONE);
@@ -272,7 +272,7 @@ generate_RsaPrv(
     if (mbedtls_rsa_gen_key(&rsa, SeosCryptoRng_getBytesMbedtls, rng, bits,
                             SeosCryptoKey_RSA_EXPONENT) != 0)
     {
-        retval = SEOS_ERROR_ABORTED;
+        err = SEOS_ERROR_ABORTED;
         goto exit;
     }
 
@@ -280,16 +280,16 @@ generate_RsaPrv(
     key->qLen = mbedtls_mpi_size(&rsa.Q);
     key->pLen = mbedtls_mpi_size(&rsa.P);
     key->dLen = mbedtls_mpi_size(&rsa.D);
-    retval = mbedtls_mpi_write_binary(&rsa.P, key->pBytes, key->pLen) ||
-             mbedtls_mpi_write_binary(&rsa.Q, key->qBytes, key->qLen) ||
-             mbedtls_mpi_write_binary(&rsa.D, key->dBytes, key->dLen) ||
-             mbedtls_mpi_write_binary(&rsa.E, key->eBytes, key->eLen) ?
-             SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+    err = mbedtls_mpi_write_binary(&rsa.P, key->pBytes, key->pLen) ||
+          mbedtls_mpi_write_binary(&rsa.Q, key->qBytes, key->qLen) ||
+          mbedtls_mpi_write_binary(&rsa.D, key->dBytes, key->dLen) ||
+          mbedtls_mpi_write_binary(&rsa.E, key->eBytes, key->eLen) ?
+          SEOS_ERROR_ABORTED : SEOS_SUCCESS;
 
 exit:
     mbedtls_rsa_free(&rsa);
 
-    return retval;
+    return err;
 }
 
 static seos_err_t
@@ -297,7 +297,7 @@ make_RsaPub(
     SeosCryptoApi_Key_RsaRub*       pubKey,
     const SeosCryptoApi_Key_RsaRrv* prvKey)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
+    seos_err_t err = SEOS_ERROR_GENERIC;
     mbedtls_mpi P, Q, N;
 
     mbedtls_mpi_init(&P);
@@ -307,27 +307,27 @@ make_RsaPub(
     if (mbedtls_mpi_read_binary(&P, prvKey->pBytes, prvKey->pLen) != 0 ||
         mbedtls_mpi_read_binary(&Q, prvKey->qBytes, prvKey->qLen) != 0)
     {
-        retval = SEOS_ERROR_INVALID_PARAMETER;
+        err = SEOS_ERROR_INVALID_PARAMETER;
         goto exit;
     }
     else if (mbedtls_mpi_mul_mpi(&N, &P, &Q) != 0)
     {
-        retval = SEOS_ERROR_ABORTED;
+        err = SEOS_ERROR_ABORTED;
         goto exit;
     }
 
     memcpy(pubKey->eBytes, prvKey->eBytes, prvKey->eLen);
     pubKey->eLen = prvKey->eLen;
     pubKey->nLen = mbedtls_mpi_size(&N);
-    retval = mbedtls_mpi_write_binary(&N, pubKey->nBytes, pubKey->nLen) ?
-             SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+    err = mbedtls_mpi_write_binary(&N, pubKey->nBytes, pubKey->nLen) ?
+          SEOS_ERROR_ABORTED : SEOS_SUCCESS;
 
 exit:
     mbedtls_mpi_free(&P);
     mbedtls_mpi_free(&Q);
     mbedtls_mpi_free(&N);
 
-    return retval;
+    return err;
 }
 
 // ----------------------------- SECP256r1 Keys --------------------------------
@@ -337,7 +337,7 @@ generate_SECP256r1Prv(
     SeosCryptoApi_Key_Secp256r1Prv* key,
     SeosCryptoLib_Rng*              rng)
 {
-    seos_err_t retval;
+    seos_err_t err;
     mbedtls_ecp_group grp;
     mbedtls_mpi d;
 
@@ -347,19 +347,19 @@ generate_SECP256r1Prv(
     if (mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1) != 0 ||
         mbedtls_ecp_gen_privkey(&grp, &d, SeosCryptoRng_getBytesMbedtls, rng) != 0)
     {
-        retval = SEOS_ERROR_ABORTED;
+        err = SEOS_ERROR_ABORTED;
         goto exit;
     }
 
     key->dLen = mbedtls_mpi_size(&d);
-    retval = mbedtls_mpi_write_binary(&d, key->dBytes, key->dLen) ?
-             SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+    err = mbedtls_mpi_write_binary(&d, key->dBytes, key->dLen) ?
+          SEOS_ERROR_ABORTED : SEOS_SUCCESS;
 
 exit:
     mbedtls_mpi_free(&d);
     mbedtls_ecp_group_free(&grp);
 
-    return retval;
+    return err;
 }
 
 static seos_err_t
@@ -367,7 +367,7 @@ make_SECP256r1Pub(
     SeosCryptoApi_Key_Secp256r1Pub*       pubKey,
     const SeosCryptoApi_Key_Secp256r1Prv* prvKey)
 {
-    seos_err_t retval;
+    seos_err_t err;
     mbedtls_ecp_group grp;
     mbedtls_mpi d;
     mbedtls_ecp_point Q;
@@ -378,28 +378,28 @@ make_SECP256r1Pub(
 
     if (mbedtls_mpi_read_binary(&d, prvKey->dBytes, prvKey->dLen) != 0)
     {
-        retval = SEOS_ERROR_INVALID_PARAMETER;
+        err = SEOS_ERROR_INVALID_PARAMETER;
         goto exit;
     }
     else if (mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1) != 0 ||
              mbedtls_ecp_mul(&grp, &Q, &d, &grp.G, NULL, NULL) != 0)
     {
-        retval = SEOS_ERROR_ABORTED;
+        err = SEOS_ERROR_ABORTED;
         goto exit;
     }
 
     pubKey->qxLen = mbedtls_mpi_size(&Q.X);
     pubKey->qyLen = mbedtls_mpi_size(&Q.Y);
-    retval = mbedtls_mpi_write_binary(&Q.X, pubKey->qxBytes, pubKey->qxLen) ||
-             mbedtls_mpi_write_binary(&Q.Y, pubKey->qyBytes, pubKey->qyLen) ?
-             SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+    err = mbedtls_mpi_write_binary(&Q.X, pubKey->qxBytes, pubKey->qxLen) ||
+          mbedtls_mpi_write_binary(&Q.Y, pubKey->qyBytes, pubKey->qyLen) ?
+          SEOS_ERROR_ABORTED : SEOS_SUCCESS;
 
 exit:
     mbedtls_ecp_point_free(&Q);
     mbedtls_mpi_free(&d);
     mbedtls_ecp_group_free(&grp);
 
-    return retval;
+    return err;
 }
 
 // -----------------------------------------------------------------------------
@@ -456,7 +456,7 @@ generateImpl(
     SeosCryptoLib_Rng*            rng,
     const SeosCryptoApi_Key_Spec* spec)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
+    seos_err_t err = SEOS_ERROR_GENERIC;
 
     switch (spec->key.type)
     {
@@ -512,21 +512,21 @@ generateImpl(
         if (SeosCryptoApi_Key_SPECTYPE_PARAMS == spec->type)
         {
             memcpy(&key->params, &spec->key.params, sizeof(SeosCryptoApi_Key_DhParams));
-            retval = SEOS_SUCCESS;
+            err = SEOS_SUCCESS;
         }
         else
         {
-            retval = generate_DHParams(rng, bits, &key->params);
+            err = generate_DHParams(rng, bits, &key->params);
         }
-        return (retval == SEOS_SUCCESS) ?
-               generate_DHPrv(key, rng) : retval;
+        return (err == SEOS_SUCCESS) ?
+               generate_DHPrv(key, rng) : err;
     }
 
     default:
         return SEOS_ERROR_NOT_SUPPORTED;
     }
 
-    return retval;
+    return err;
 }
 
 static seos_err_t
@@ -674,7 +674,7 @@ getParamsImpl(
     void*                    keyParams,
     size_t*                  paramSize)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
+    seos_err_t err = SEOS_ERROR_GENERIC;
     size_t size;
     void* params = NULL;
 
@@ -693,17 +693,17 @@ getParamsImpl(
 
     if (*paramSize < size)
     {
-        retval = SEOS_ERROR_BUFFER_TOO_SMALL;
+        err = SEOS_ERROR_BUFFER_TOO_SMALL;
     }
     else
     {
         memcpy(keyParams, params, size);
-        retval = SEOS_SUCCESS;
+        err = SEOS_SUCCESS;
     }
 
     *paramSize = size;
 
-    return retval;
+    return err;
 }
 
 static seos_err_t
@@ -712,7 +712,7 @@ loadParamsImpl(
     void*                         keyParams,
     size_t*                       paramSize)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
+    seos_err_t err = SEOS_ERROR_GENERIC;
     size_t size;
 
     switch (name)
@@ -727,7 +727,7 @@ loadParamsImpl(
         size = sizeof(SeosCryptoApi_Key_EccParams);
         if (*paramSize < size)
         {
-            retval = SEOS_ERROR_BUFFER_TOO_SMALL;
+            err = SEOS_ERROR_BUFFER_TOO_SMALL;
         }
         else
         {
@@ -740,13 +740,13 @@ loadParamsImpl(
             params->nLen = mbedtls_mpi_size(&grp.N);
             params->gxLen = mbedtls_mpi_size(&grp.G.X);
             params->gyLen = mbedtls_mpi_size(&grp.G.Y);
-            retval = mbedtls_mpi_write_binary(&grp.A, params->aBytes, params->aLen) != 0 ||
-                     mbedtls_mpi_write_binary(&grp.B, params->bBytes, params->bLen) != 0 ||
-                     mbedtls_mpi_write_binary(&grp.P, params->pBytes, params->pLen) != 0 ||
-                     mbedtls_mpi_write_binary(&grp.N, params->nBytes, params->nLen) != 0 ||
-                     mbedtls_mpi_write_binary(&grp.G.X, params->gxBytes, params->gxLen) != 0 ||
-                     mbedtls_mpi_write_binary(&grp.G.Y, params->gyBytes, params->gyLen) ?
-                     SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+            err = mbedtls_mpi_write_binary(&grp.A, params->aBytes, params->aLen) != 0 ||
+                  mbedtls_mpi_write_binary(&grp.B, params->bBytes, params->bLen) != 0 ||
+                  mbedtls_mpi_write_binary(&grp.P, params->pBytes, params->pLen) != 0 ||
+                  mbedtls_mpi_write_binary(&grp.N, params->nBytes, params->nLen) != 0 ||
+                  mbedtls_mpi_write_binary(&grp.G.X, params->gxBytes, params->gxLen) != 0 ||
+                  mbedtls_mpi_write_binary(&grp.G.Y, params->gyBytes, params->gyLen) ?
+                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
             mbedtls_ecp_group_free(&grp);
         }
         break;
@@ -757,7 +757,7 @@ loadParamsImpl(
 
     *paramSize = size;
 
-    return retval;
+    return err;
 }
 
 static seos_err_t
@@ -781,23 +781,23 @@ SeosCryptoKey_generate(
     SeosCryptoLib_Rng*            rng,
     const SeosCryptoApi_Key_Spec* spec)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
+    seos_err_t err = SEOS_ERROR_GENERIC;
 
     if (NULL == self || NULL == rng || NULL == memIf || NULL == spec)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((retval = initImpl(self, memIf, spec->key.type,
-                           &spec->key.attribs)) == SEOS_SUCCESS)
+    if ((err = initImpl(self, memIf, spec->key.type,
+                        &spec->key.attribs)) == SEOS_SUCCESS)
     {
-        if ((retval = generateImpl(self, rng, spec)) != SEOS_SUCCESS)
+        if ((err = generateImpl(self, rng, spec)) != SEOS_SUCCESS)
         {
             freeImpl(self, memIf);
         }
     }
 
-    return retval;
+    return err;
 }
 
 seos_err_t
@@ -807,7 +807,7 @@ SeosCryptoKey_makePublic(
     const SeosCryptoLib_Key*         prvKey,
     const SeosCryptoApi_Key_Attribs* attribs)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
+    seos_err_t err = SEOS_ERROR_GENERIC;
     SeosCryptoApi_Key_Type type;
 
     if (NULL == self || NULL == memIf || NULL == prvKey || NULL == attribs)
@@ -830,15 +830,15 @@ SeosCryptoKey_makePublic(
         return SEOS_ERROR_NOT_SUPPORTED;
     }
 
-    if ((retval = initImpl(self, memIf, type, attribs)) == SEOS_SUCCESS)
+    if ((err = initImpl(self, memIf, type, attribs)) == SEOS_SUCCESS)
     {
-        if ((retval = makeImpl(self, prvKey)) != SEOS_SUCCESS)
+        if ((err = makeImpl(self, prvKey)) != SEOS_SUCCESS)
         {
             freeImpl(self, memIf);
         }
     }
 
-    return retval;
+    return err;
 }
 
 seos_err_t
@@ -848,7 +848,7 @@ SeosCryptoKey_import(
     const SeosCryptoLib_Key*      wrapKey,
     const SeosCryptoApi_Key_Data* keyData)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
+    seos_err_t err = SEOS_ERROR_GENERIC;
 
     if (NULL == self || NULL == memIf || NULL == keyData)
     {
@@ -860,16 +860,16 @@ SeosCryptoKey_import(
         return SEOS_ERROR_NOT_SUPPORTED;
     }
 
-    if ((retval = initImpl(self, memIf, keyData->type,
-                           &keyData->attribs)) == SEOS_SUCCESS)
+    if ((err = initImpl(self, memIf, keyData->type,
+                        &keyData->attribs)) == SEOS_SUCCESS)
     {
-        if ((retval = importImpl(self, wrapKey, keyData)) != SEOS_SUCCESS)
+        if ((err = importImpl(self, wrapKey, keyData)) != SEOS_SUCCESS)
         {
             freeImpl(self, memIf);
         }
     }
 
-    return retval;
+    return err;
 }
 
 seos_err_t

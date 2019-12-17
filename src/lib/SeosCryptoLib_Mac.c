@@ -42,20 +42,20 @@ freeImpl(
     const SeosCryptoApi_MemIf* memIf)
 {
     UNUSED_VAR(memIf);
-    seos_err_t retval = SEOS_ERROR_GENERIC;
+    seos_err_t err = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
     case SeosCryptoApi_Mac_ALG_HMAC_MD5:
     case SeosCryptoApi_Mac_ALG_HMAC_SHA256:
         mbedtls_md_free(&self->mbedtls.md);
-        retval = SEOS_SUCCESS;
+        err = SEOS_SUCCESS;
         break;
     default:
-        retval = SEOS_ERROR_NOT_SUPPORTED;
+        err = SEOS_ERROR_NOT_SUPPORTED;
     }
 
-    return retval;
+    return err;
 }
 
 static seos_err_t
@@ -64,20 +64,20 @@ startImpl(
     const void*        secret,
     const size_t       secretSize)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
+    seos_err_t err = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
     case SeosCryptoApi_Mac_ALG_HMAC_MD5:
     case SeosCryptoApi_Mac_ALG_HMAC_SHA256:
-        retval = mbedtls_md_hmac_starts(&self->mbedtls.md, secret, secretSize) ?
-                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+        err = mbedtls_md_hmac_starts(&self->mbedtls.md, secret, secretSize) ?
+              SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
     default:
-        retval = SEOS_ERROR_NOT_SUPPORTED;
+        err = SEOS_ERROR_NOT_SUPPORTED;
     }
 
-    return retval;
+    return err;
 }
 
 static seos_err_t
@@ -86,20 +86,20 @@ processImpl(
     const void*        data,
     const size_t       dataSize)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
+    seos_err_t err = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
     case SeosCryptoApi_Mac_ALG_HMAC_MD5:
     case SeosCryptoApi_Mac_ALG_HMAC_SHA256:
-        retval = mbedtls_md_hmac_update(&self->mbedtls.md, data, dataSize) ?
-                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+        err = mbedtls_md_hmac_update(&self->mbedtls.md, data, dataSize) ?
+              SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
     default:
-        retval = SEOS_ERROR_NOT_SUPPORTED;
+        err = SEOS_ERROR_NOT_SUPPORTED;
     }
 
-    return retval;
+    return err;
 }
 
 static seos_err_t
@@ -108,39 +108,39 @@ finalizeImpl(
     void*              mac,
     size_t*            macSize)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
+    seos_err_t err = SEOS_ERROR_GENERIC;
 
-    retval = SEOS_SUCCESS;
+    err = SEOS_SUCCESS;
     switch (self->algorithm)
     {
     case SeosCryptoApi_Mac_ALG_HMAC_MD5:
         if (*macSize < SeosCryptoApi_Mac_SIZE_HMAC_MD5)
         {
-            retval = SEOS_ERROR_BUFFER_TOO_SMALL;
+            err = SEOS_ERROR_BUFFER_TOO_SMALL;
         }
         *macSize = SeosCryptoApi_Mac_SIZE_HMAC_MD5;
         break;
     case SeosCryptoApi_Mac_ALG_HMAC_SHA256:
         if (*macSize < SeosCryptoApi_Mac_SIZE_HMAC_SHA256)
         {
-            retval = SEOS_ERROR_BUFFER_TOO_SMALL;
+            err = SEOS_ERROR_BUFFER_TOO_SMALL;
         }
         *macSize = SeosCryptoApi_Mac_SIZE_HMAC_SHA256;
         break;
     default:
-        retval = SEOS_ERROR_NOT_SUPPORTED;
+        err = SEOS_ERROR_NOT_SUPPORTED;
     }
 
-    if (SEOS_SUCCESS == retval)
+    if (SEOS_SUCCESS == err)
     {
         // We do not need to reset anything here, as the internal state machine
         // will force the user to call start() again first, which re-sets the
         // hmac and the underlying digest context.
-        retval = mbedtls_md_hmac_finish(&self->mbedtls.md, mac) ?
-                 SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+        err = mbedtls_md_hmac_finish(&self->mbedtls.md, mac) ?
+              SEOS_ERROR_ABORTED : SEOS_SUCCESS;
     }
 
-    return retval;
+    return err;
 }
 
 // Public Functions ------------------------------------------------------------
@@ -184,18 +184,18 @@ SeosCryptoMac_start(
     const void*        secret,
     const size_t       secretSize)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
+    seos_err_t err = SEOS_ERROR_GENERIC;
 
     if (NULL == self || NULL == secret || 0 == secretSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    retval = self->started || self->processed ?
-             SEOS_ERROR_ABORTED : startImpl(self, secret, secretSize);
-    self->started |= (SEOS_SUCCESS == retval);
+    err = self->started || self->processed ?
+          SEOS_ERROR_ABORTED : startImpl(self, secret, secretSize);
+    self->started |= (SEOS_SUCCESS == err);
 
-    return retval;
+    return err;
 }
 
 seos_err_t
@@ -204,18 +204,18 @@ SeosCryptoMac_process(
     const void*        data,
     const size_t       dataSize)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
+    seos_err_t err = SEOS_ERROR_GENERIC;
 
     if (NULL == self || NULL == data || 0 == dataSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    retval = !self->started ?
-             SEOS_ERROR_ABORTED : processImpl(self, data, dataSize);
-    self->processed |= (SEOS_SUCCESS == retval);
+    err = !self->started ?
+          SEOS_ERROR_ABORTED : processImpl(self, data, dataSize);
+    self->processed |= (SEOS_SUCCESS == err);
 
-    return retval;
+    return err;
 }
 
 seos_err_t
@@ -224,23 +224,23 @@ SeosCryptoMac_finalize(
     void*              mac,
     size_t*            macSize)
 {
-    seos_err_t retval = SEOS_ERROR_GENERIC;
+    seos_err_t err = SEOS_ERROR_GENERIC;
 
     if (NULL == self || NULL == mac || NULL == macSize || 0 == *macSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    retval = !self->started || !self->processed ?
-             SEOS_ERROR_ABORTED : finalizeImpl(self, mac, macSize);
+    err = !self->started || !self->processed ?
+          SEOS_ERROR_ABORTED : finalizeImpl(self, mac, macSize);
 
     // Finalize also resets the underlying algorithms, so that we can re-use the
     // MAC object again
-    if (retval == SEOS_SUCCESS)
+    if (err == SEOS_SUCCESS)
     {
         self->started = false;
         self->processed = false;
     }
 
-    return retval;
+    return err;
 }

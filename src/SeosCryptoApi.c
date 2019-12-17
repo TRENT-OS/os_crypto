@@ -397,8 +397,8 @@ SeosCryptoApi_Agreement_agree(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return CALL_SAFE(wrap, Agreement_agree, wrap->agreement,
-                     UNWRAP_SAFE(pubKey, key), shared, sharedSize);
+    return CALL_SAFE(wrap, Agreement_agree, wrap->agreement, UNWRAP_SAFE(pubKey,
+                     key), shared, sharedSize);
 }
 
 // -------------------------------- Key API ------------------------------------
