@@ -2,11 +2,12 @@
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 
-#include "SeosCryptoCtx.h"
 #include "SeosCryptoApi.h"
 #include "SeosCryptoLib.h"
 #include "SeosCryptoRpcClient.h"
 #include "SeosCryptoRpcServer.h"
+
+#include "SeosCryptoVtable.h"
 
 #include <string.h>
 

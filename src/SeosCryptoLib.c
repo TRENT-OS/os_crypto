@@ -10,7 +10,7 @@
 #include "lib/SeosCryptoLib_Signature.h"
 #include "lib/SeosCryptoLib_Agreement.h"
 
-#include "SeosCryptoCtx.h"
+#include "SeosCryptoVtable.h"
 #include "SeosCryptoLib.h"
 
 #include "LibDebug/Debug.h"
@@ -943,7 +943,7 @@ SeosCryptoLib_Cipher_finalize(
 
 // ------------------------------- init/free -----------------------------------
 
-static const SeosCryptoApi_Vtable SeosCryptoLib_vtable =
+static const SeosCryptoVtable SeosCryptoLib_vtable =
 {
     .Rng_getBytes        = SeosCryptoLib_Rng_getBytes,
     .Rng_reseed          = SeosCryptoLib_Rng_reseed,
@@ -981,7 +981,7 @@ static const SeosCryptoApi_Vtable SeosCryptoLib_vtable =
 seos_err_t
 SeosCryptoLib_init(
     SeosCryptoLib*                  self,
-    const SeosCryptoApi_Vtable**    vtable,
+    const SeosCryptoVtable**        vtable,
     const SeosCryptoApi_MemIf*      memIf,
     const SeosCryptoApi_Lib_Config* cfg)
 {

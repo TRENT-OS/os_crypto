@@ -47,7 +47,7 @@ typedef struct
 seos_err_t
 SeosCryptoLib_init(
     SeosCryptoLib*                  self,
-    const SeosCryptoApi_Vtable**    vtable,
+    const SeosCryptoVtable**        vtable,
     const SeosCryptoApi_MemIf*      memIf,
     const SeosCryptoApi_Lib_Config* cfg);
 

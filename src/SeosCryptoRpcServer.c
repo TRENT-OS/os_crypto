@@ -5,7 +5,8 @@
 #if defined(SEOS_CRYPTO_WITH_RPC_SERVER)
 
 #include "SeosCryptoRpcServer.h"
-#include "SeosCryptoCtx.h"
+
+#include "SeosCryptoVtable.h"
 
 #include "LibDebug/Debug.h"
 

@@ -38,7 +38,7 @@ SeosCryptoRpcClient;
 seos_err_t
 SeosCryptoRpcClient_init(
     SeosCryptoRpcClient*                  self,
-    const SeosCryptoApi_Vtable**          vtable,
+    const SeosCryptoVtable**              vtable,
     const SeosCryptoApi_RpcClient_Config* cfg);
 
 seos_err_t

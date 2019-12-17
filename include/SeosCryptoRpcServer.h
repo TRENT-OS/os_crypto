@@ -26,7 +26,7 @@ typedef struct
     /**
      * Function table implementing crypto functionality
      */
-    const SeosCryptoApi_Vtable* vtable;
+    const SeosCryptoVtable* vtable;
     void* context;
 } SeosCryptoRpcServer;
 
