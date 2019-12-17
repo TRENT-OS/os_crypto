@@ -47,8 +47,8 @@ SeosCryptoLib_removeHandle(
 
 // -------------------------------- RNG API ------------------------------------
 
-seos_err_t
-SeosCryptoLib_Rng_getBytes(
+static seos_err_t
+Rng_getBytes(
     SeosCryptoApi*               api,
     const SeosCryptoApi_Rng_Flag flags,
     void*                        buf,
@@ -64,8 +64,8 @@ SeosCryptoLib_Rng_getBytes(
     return SeosCryptoRng_getBytes(&self->cryptoRng, flags, buf, bufLen);
 }
 
-seos_err_t
-SeosCryptoLib_Rng_reseed(
+static seos_err_t
+Rng_reseed(
     SeosCryptoApi* api,
     const void*    seed,
     const size_t   seedLen)
@@ -82,8 +82,8 @@ SeosCryptoLib_Rng_reseed(
 
 // -------------------------------- MAC API ------------------------------------
 
-seos_err_t
-SeosCryptoLib_Mac_init(
+static seos_err_t
+Mac_init(
     SeosCryptoApi*              api,
     SeosCryptoLib_Mac**         pMacObj,
     const SeosCryptoApi_Mac_Alg algorithm)
@@ -121,8 +121,8 @@ err0:
     return retval;
 }
 
-seos_err_t
-SeosCryptoLib_Mac_free(
+static seos_err_t
+Mac_free(
     SeosCryptoApi*     api,
     SeosCryptoLib_Mac* macObj)
 {
@@ -152,8 +152,8 @@ SeosCryptoLib_Mac_free(
     return retval;
 }
 
-seos_err_t
-SeosCryptoLib_Mac_start(
+static seos_err_t
+Mac_start(
     SeosCryptoApi*     api,
     SeosCryptoLib_Mac* macObj,
     const void*        secret,
@@ -171,8 +171,8 @@ SeosCryptoLib_Mac_start(
            SeosCryptoMac_start(macObj, secret, secretSize);
 }
 
-seos_err_t
-SeosCryptoLib_Mac_process(
+static seos_err_t
+Mac_process(
     SeosCryptoApi*     api,
     SeosCryptoLib_Mac* macObj,
     const void*        data,
@@ -190,8 +190,8 @@ SeosCryptoLib_Mac_process(
            SeosCryptoMac_process(macObj, data, dataLen);
 }
 
-seos_err_t
-SeosCryptoLib_Mac_finalize(
+static seos_err_t
+Mac_finalize(
     SeosCryptoApi*     api,
     SeosCryptoLib_Mac* macObj,
     void*              mac,
@@ -211,8 +211,8 @@ SeosCryptoLib_Mac_finalize(
 
 // ------------------------------ Digest API -----------------------------------
 
-seos_err_t
-SeosCryptoLib_Digest_init(
+static seos_err_t
+Digest_init(
     SeosCryptoApi*                 api,
     SeosCryptoLib_Digest**         pDigObj,
     const SeosCryptoApi_Digest_Alg algorithm)
@@ -251,8 +251,8 @@ err0:
     return retval;
 }
 
-seos_err_t
-SeosCryptoLib_Digest_free(
+static seos_err_t
+Digest_free(
     SeosCryptoApi*        api,
     SeosCryptoLib_Digest* digObj)
 {
@@ -282,8 +282,8 @@ SeosCryptoLib_Digest_free(
     return retval;
 }
 
-seos_err_t
-SeosCryptoLib_Digest_clone(
+static seos_err_t
+Digest_clone(
     SeosCryptoApi*              api,
     SeosCryptoLib_Digest*       dstDigObj,
     const SeosCryptoLib_Digest* srcDigObj)
@@ -301,8 +301,8 @@ SeosCryptoLib_Digest_clone(
            SeosCryptoDigest_clone(dstDigObj, srcDigObj);
 }
 
-seos_err_t
-SeosCryptoLib_Digest_process(
+static seos_err_t
+Digest_process(
     SeosCryptoApi*        api,
     SeosCryptoLib_Digest* digObj,
     const void*           data,
@@ -320,8 +320,8 @@ SeosCryptoLib_Digest_process(
            SeosCryptoDigest_process(digObj, data, dataLen);
 }
 
-seos_err_t
-SeosCryptoLib_Digest_finalize(
+static seos_err_t
+Digest_finalize(
     SeosCryptoApi*        api,
     SeosCryptoLib_Digest* digObj,
     void*                 digest,
@@ -341,8 +341,8 @@ SeosCryptoLib_Digest_finalize(
 
 // ----------------------------- Signature API ---------------------------------
 
-seos_err_t
-SeosCryptoLib_Signature_init(
+static seos_err_t
+Signature_init(
     SeosCryptoApi*                    api,
     SeosCryptoLib_Signature**         pSigObj,
     const SeosCryptoApi_Signature_Alg algorithm,
@@ -384,8 +384,8 @@ err0:
     return retval;
 }
 
-seos_err_t
-SeosCryptoLib_Signature_free(
+static seos_err_t
+Signature_free(
     SeosCryptoApi*           api,
     SeosCryptoLib_Signature* sigObj)
 {
@@ -415,8 +415,8 @@ SeosCryptoLib_Signature_free(
     return retval;
 }
 
-seos_err_t
-SeosCryptoLib_Signature_sign(
+static seos_err_t
+Signature_sign(
     SeosCryptoApi*           api,
     SeosCryptoLib_Signature* sigObj,
     const void*              hash,
@@ -443,8 +443,8 @@ SeosCryptoLib_Signature_sign(
                                     hashSize, signature, signatureSize);
 }
 
-seos_err_t
-SeosCryptoLib_Signature_verify(
+static seos_err_t
+Signature_verify(
     SeosCryptoApi*           api,
     SeosCryptoLib_Signature* sigObj,
     const void*              hash,
@@ -467,8 +467,8 @@ SeosCryptoLib_Signature_verify(
 
 // ----------------------------- Agreement API ---------------------------------
 
-seos_err_t
-SeosCryptoLib_Agreement_init(
+static seos_err_t
+Agreement_init(
     SeosCryptoApi*                    api,
     SeosCryptoLib_Agreement**         pAgrObj,
     const SeosCryptoApi_Agreement_Alg algorithm,
@@ -511,8 +511,8 @@ err0:
     return retval;
 }
 
-seos_err_t
-SeosCryptoLib_Agreement_free(
+static seos_err_t
+Agreement_free(
     SeosCryptoApi*           api,
     SeosCryptoLib_Agreement* agrObj)
 {
@@ -539,8 +539,8 @@ SeosCryptoLib_Agreement_free(
     return retval;
 }
 
-seos_err_t
-SeosCryptoLib_Agreement_agree(
+static seos_err_t
+Agreement_agree(
     SeosCryptoApi*           api,
     SeosCryptoLib_Agreement* agrObj,
     const SeosCryptoLib_Key* pubKey,
@@ -561,8 +561,9 @@ SeosCryptoLib_Agreement_agree(
 }
 
 // -------------------------------- Key API ------------------------------------
-seos_err_t
-SeosCryptoLib_Key_generate(
+
+static seos_err_t
+Key_generate(
     SeosCryptoApi*                api,
     SeosCryptoLib_Key**           pKeyObj,
     const SeosCryptoApi_Key_Spec* spec)
@@ -604,8 +605,8 @@ err0:
     return retval;
 }
 
-seos_err_t
-SeosCryptoLib_Key_import(
+static seos_err_t
+Key_import(
     SeosCryptoApi*                api,
     SeosCryptoLib_Key**           pKeyObj,
     const SeosCryptoLib_Key*      wrapKeyObj,
@@ -653,8 +654,8 @@ err0:
     return retval;
 }
 
-seos_err_t
-SeosCryptoLib_Key_makePublic(
+static seos_err_t
+Key_makePublic(
     SeosCryptoApi*                   api,
     SeosCryptoLib_Key**              pPubKeyObj,
     const SeosCryptoLib_Key*         prvKeyObj,
@@ -699,8 +700,8 @@ err0:
     return retval;
 }
 
-seos_err_t
-SeosCryptoLib_Key_export(
+static seos_err_t
+Key_export(
     SeosCryptoApi*           api,
     const SeosCryptoLib_Key* keyObj,
     const SeosCryptoLib_Key* wrapKeyObj,
@@ -728,8 +729,8 @@ SeosCryptoLib_Key_export(
     }
 }
 
-seos_err_t
-SeosCryptoLib_Key_getParams(
+static seos_err_t
+Key_getParams(
     SeosCryptoApi*           api,
     const SeosCryptoLib_Key* keyObj,
     void*                    keyParams,
@@ -747,8 +748,8 @@ SeosCryptoLib_Key_getParams(
            SeosCryptoKey_getParams(keyObj, keyParams, paramSize);
 }
 
-seos_err_t
-SeosCryptoLib_Key_loadParams(
+static seos_err_t
+Key_loadParams(
     SeosCryptoApi*                api,
     const SeosCryptoApi_Key_Param name,
     void*                         keyParams,
@@ -762,8 +763,8 @@ SeosCryptoLib_Key_loadParams(
     return SeosCryptoKey_loadParams(name, keyParams, paramSize);
 }
 
-seos_err_t
-SeosCryptoLib_Key_free(
+static seos_err_t
+Key_free(
     SeosCryptoApi*     api,
     SeosCryptoLib_Key* keyObj)
 {
@@ -795,8 +796,8 @@ SeosCryptoLib_Key_free(
 
 // ------------------------------ Cipher API -----------------------------------
 
-seos_err_t
-SeosCryptoLib_Cipher_init(
+static seos_err_t
+Cipher_init(
     SeosCryptoApi*                 api,
     SeosCryptoLib_Cipher**         pCipherObj,
     const SeosCryptoApi_Cipher_Alg algorithm,
@@ -844,8 +845,8 @@ err0:
     return retval;
 }
 
-seos_err_t
-SeosCryptoLib_Cipher_free(
+static seos_err_t
+Cipher_free(
     SeosCryptoApi*        api,
     SeosCryptoLib_Cipher* cipherObj)
 {
@@ -875,8 +876,8 @@ SeosCryptoLib_Cipher_free(
     return retval;
 }
 
-seos_err_t
-SeosCryptoLib_Cipher_process(
+static seos_err_t
+Cipher_process(
     SeosCryptoApi*        api,
     SeosCryptoLib_Cipher* cipherObj,
     const void*           input,
@@ -903,8 +904,8 @@ SeosCryptoLib_Cipher_process(
                                     outputSize);
 }
 
-seos_err_t
-SeosCryptoLib_Cipher_start(
+static seos_err_t
+Cipher_start(
     SeosCryptoApi*        api,
     SeosCryptoLib_Cipher* cipherObj,
     const void*           input,
@@ -922,8 +923,8 @@ SeosCryptoLib_Cipher_start(
            SeosCryptoCipher_start(cipherObj, input, inputSize);
 }
 
-seos_err_t
-SeosCryptoLib_Cipher_finalize(
+static seos_err_t
+Cipher_finalize(
     SeosCryptoApi*        api,
     SeosCryptoLib_Cipher* cipherObj,
     void*                 buf,
@@ -945,37 +946,37 @@ SeosCryptoLib_Cipher_finalize(
 
 static const SeosCryptoVtable SeosCryptoLib_vtable =
 {
-    .Rng_getBytes        = SeosCryptoLib_Rng_getBytes,
-    .Rng_reseed          = SeosCryptoLib_Rng_reseed,
-    .Mac_init            = SeosCryptoLib_Mac_init,
-    .Mac_free            = SeosCryptoLib_Mac_free,
-    .Mac_start           = SeosCryptoLib_Mac_start,
-    .Mac_process         = SeosCryptoLib_Mac_process,
-    .Mac_finalize        = SeosCryptoLib_Mac_finalize,
-    .Digest_init         = SeosCryptoLib_Digest_init,
-    .Digest_free         = SeosCryptoLib_Digest_free,
-    .Digest_clone        = SeosCryptoLib_Digest_clone,
-    .Digest_process      = SeosCryptoLib_Digest_process,
-    .Digest_finalize     = SeosCryptoLib_Digest_finalize,
-    .Key_generate        = SeosCryptoLib_Key_generate,
-    .Key_makePublic      = SeosCryptoLib_Key_makePublic,
-    .Key_import          = SeosCryptoLib_Key_import,
-    .Key_export          = SeosCryptoLib_Key_export,
-    .Key_getParams       = SeosCryptoLib_Key_getParams,
-    .Key_loadParams      = SeosCryptoLib_Key_loadParams,
-    .Key_free            = SeosCryptoLib_Key_free,
-    .Signature_init      = SeosCryptoLib_Signature_init,
-    .Signature_free      = SeosCryptoLib_Signature_free,
-    .Signature_sign      = SeosCryptoLib_Signature_sign,
-    .Signature_verify    = SeosCryptoLib_Signature_verify,
-    .Agreement_init      = SeosCryptoLib_Agreement_init,
-    .Agreement_free      = SeosCryptoLib_Agreement_free,
-    .Agreement_agree     = SeosCryptoLib_Agreement_agree,
-    .Cipher_init         = SeosCryptoLib_Cipher_init,
-    .Cipher_free         = SeosCryptoLib_Cipher_free,
-    .Cipher_process      = SeosCryptoLib_Cipher_process,
-    .Cipher_start        = SeosCryptoLib_Cipher_start,
-    .Cipher_finalize     = SeosCryptoLib_Cipher_finalize,
+    .Rng_getBytes        = Rng_getBytes,
+    .Rng_reseed          = Rng_reseed,
+    .Mac_init            = Mac_init,
+    .Mac_free            = Mac_free,
+    .Mac_start           = Mac_start,
+    .Mac_process         = Mac_process,
+    .Mac_finalize        = Mac_finalize,
+    .Digest_init         = Digest_init,
+    .Digest_free         = Digest_free,
+    .Digest_clone        = Digest_clone,
+    .Digest_process      = Digest_process,
+    .Digest_finalize     = Digest_finalize,
+    .Key_generate        = Key_generate,
+    .Key_makePublic      = Key_makePublic,
+    .Key_import          = Key_import,
+    .Key_export          = Key_export,
+    .Key_getParams       = Key_getParams,
+    .Key_loadParams      = Key_loadParams,
+    .Key_free            = Key_free,
+    .Signature_init      = Signature_init,
+    .Signature_free      = Signature_free,
+    .Signature_sign      = Signature_sign,
+    .Signature_verify    = Signature_verify,
+    .Agreement_init      = Agreement_init,
+    .Agreement_free      = Agreement_free,
+    .Agreement_agree     = Agreement_agree,
+    .Cipher_init         = Cipher_init,
+    .Cipher_free         = Cipher_free,
+    .Cipher_process      = Cipher_process,
+    .Cipher_start        = Cipher_start,
+    .Cipher_finalize     = Cipher_finalize,
 };
 
 seos_err_t
