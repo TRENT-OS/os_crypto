@@ -15,43 +15,9 @@
 // We call a function from a VTABLE; part of this may not be implemented, so we
 // want to make sure we only call a function pointer if it is not NULL.
 #define CALL_SAFE(w, func, ...)                             \
-    !isValidHandle(w) ? SEOS_ERROR_INVALID_HANDLE :         \
+    (NULL == w) ? SEOS_ERROR_INVALID_PARAMETER :            \
     (NULL == w->vtable->func) ? SEOS_ERROR_NOT_SUPPORTED :  \
     w->vtable->func(w->context, __VA_ARGS__)                \
-
-// At the moment we manage one handle only.
-SeosCryptoRpcServer* handle = NULL;
-
-static inline bool
-isValidHandle(
-    SeosCryptoRpcServer* self)
-{
-    return handle != NULL && self == handle;
-}
-
-static inline bool
-registerHandle(
-    SeosCryptoRpcServer* self)
-{
-    bool retval = true;
-
-    if (handle != NULL)
-    {
-        retval = false;
-    }
-    else
-    {
-        handle = self;
-    }
-    return retval;
-}
-
-static inline void
-deregisterHandle(
-    SeosCryptoRpcServer* self)
-{
-    handle = NULL;
-}
 
 // -------------------------------- RNG API ------------------------------------
 
@@ -419,12 +385,6 @@ SeosCryptoRpcServer_init(
     self->dataPort = cfg->dataPort;
     self->vtable   = impl->vtable;
     self->context  = impl->context;
-
-    if (!registerHandle(self))
-    {
-        SeosCryptoRpcServer_free(self);
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
-    }
 
     return SEOS_SUCCESS;
 }
