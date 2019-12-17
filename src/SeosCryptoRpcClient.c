@@ -18,15 +18,15 @@
 
 static seos_err_t
 Rng_getBytes(
-    SeosCryptoApi*               api,
+    void*                        ctx,
     const SeosCryptoApi_Rng_Flag flags,
     void*                        buf,
     const size_t                 bufSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
-    if (NULL == api || NULL == buf)
+    if (NULL == ctx || NULL == buf)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -46,13 +46,13 @@ Rng_getBytes(
 
 static seos_err_t
 Rng_reseed(
-    SeosCryptoApi* api,
-    const void*    seed,
-    const size_t   seedSize)
+    void*        ctx,
+    const void*  seed,
+    const size_t seedSize)
 {
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
-    if (NULL == api || NULL == seed)
+    if (NULL == ctx || NULL == seed)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -69,13 +69,13 @@ Rng_reseed(
 
 static seos_err_t
 Mac_init(
-    SeosCryptoApi*              api,
+    void*                       ctx,
     SeosCryptoLib_Mac**         pMacHandle,
     const SeosCryptoApi_Mac_Alg algorithm)
 {
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
-    if (NULL == api || NULL == pMacHandle)
+    if (NULL == ctx || NULL == pMacHandle)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -85,12 +85,12 @@ Mac_init(
 
 static seos_err_t
 Mac_free(
-    SeosCryptoApi*     api,
+    void*              ctx,
     SeosCryptoLib_Mac* macHandle)
 {
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
-    if (NULL == api)
+    if (NULL == ctx)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -100,14 +100,14 @@ Mac_free(
 
 static seos_err_t
 Mac_start(
-    SeosCryptoApi*     api,
+    void*              ctx,
     SeosCryptoLib_Mac* macHandle,
     const void*        secret,
     const size_t       secretSize)
 {
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
-    if (NULL == api || NULL == secret)
+    if (NULL == ctx || NULL == secret)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -122,14 +122,14 @@ Mac_start(
 
 static seos_err_t
 Mac_process(
-    SeosCryptoApi*     api,
+    void*              ctx,
     SeosCryptoLib_Mac* macHandle,
     const void*        data,
     const size_t       dataSize)
 {
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
-    if (NULL == api || NULL == data)
+    if (NULL == ctx || NULL == data)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -144,15 +144,15 @@ Mac_process(
 
 static seos_err_t
 Mac_finalize(
-    SeosCryptoApi*     api,
+    void*              ctx,
     SeosCryptoLib_Mac* macHandle,
     void*              mac,
     size_t*            macSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
-    if (NULL == api || NULL == mac || NULL == macSize)
+    if (NULL == ctx || NULL == mac || NULL == macSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -174,13 +174,13 @@ Mac_finalize(
 
 static seos_err_t
 Digest_init(
-    SeosCryptoApi*                 api,
+    void*                          ctx,
     SeosCryptoLib_Digest**         pDigestHandle,
     const SeosCryptoApi_Digest_Alg algorithm)
 {
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
-    if (NULL == api || NULL == pDigestHandle)
+    if (NULL == ctx || NULL == pDigestHandle)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -190,12 +190,12 @@ Digest_init(
 
 static seos_err_t
 Digest_free(
-    SeosCryptoApi*        api,
+    void*                 ctx,
     SeosCryptoLib_Digest* digestHandle)
 {
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
-    if (NULL == api)
+    if (NULL == ctx)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -205,13 +205,13 @@ Digest_free(
 
 static seos_err_t
 Digest_clone(
-    SeosCryptoApi*              api,
+    void*                       ctx,
     SeosCryptoLib_Digest*       dstDigHandle,
     const SeosCryptoLib_Digest* srcDigHandle)
 {
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
-    if (NULL == api)
+    if (NULL == ctx)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -222,14 +222,14 @@ Digest_clone(
 
 static seos_err_t
 Digest_process(
-    SeosCryptoApi*        api,
+    void*                 ctx,
     SeosCryptoLib_Digest* digestHandle,
     const void*           data,
     const size_t          dataSize)
 {
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
-    if (NULL == api || NULL == data)
+    if (NULL == ctx || NULL == data)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -244,15 +244,15 @@ Digest_process(
 
 static seos_err_t
 Digest_finalize(
-    SeosCryptoApi*        api,
+    void*                 ctx,
     SeosCryptoLib_Digest* digestHandle,
     void*                 digest,
     size_t*               digestSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
-    if (NULL == api || NULL == digest || NULL == digestSize)
+    if (NULL == ctx || NULL == digest || NULL == digestSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -274,16 +274,16 @@ Digest_finalize(
 
 static seos_err_t
 Signature_init(
-    SeosCryptoApi*                    api,
+    void*                             ctx,
     SeosCryptoLib_Signature**         pSigObj,
     const SeosCryptoApi_Signature_Alg algorithm,
     const SeosCryptoApi_Digest_Alg    digest,
     const SeosCryptoLib_Key*          prvKey,
     const SeosCryptoLib_Key*          pubKey)
 {
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
-    if (NULL == api || NULL == pSigObj)
+    if (NULL == ctx || NULL == pSigObj)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -294,12 +294,12 @@ Signature_init(
 
 static seos_err_t
 Signature_free(
-    SeosCryptoApi*           api,
+    void*                    ctx,
     SeosCryptoLib_Signature* sigObj)
 {
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
-    if (NULL == api)
+    if (NULL == ctx)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -309,7 +309,7 @@ Signature_free(
 
 static seos_err_t
 Signature_sign(
-    SeosCryptoApi*           api,
+    void*                    ctx,
     SeosCryptoLib_Signature* sigObj,
     const void*              hash,
     const size_t             hashSize,
@@ -317,9 +317,9 @@ Signature_sign(
     size_t*                  signatureSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
-    if (NULL == api || NULL == hash || NULL == signature || NULL == signatureSize)
+    if (NULL == ctx || NULL == hash || NULL == signature || NULL == signatureSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -344,16 +344,16 @@ Signature_sign(
 
 static seos_err_t
 Signature_verify(
-    SeosCryptoApi*           api,
+    void*                    ctx,
     SeosCryptoLib_Signature* sigObj,
     const void*              hash,
     const size_t             hashSize,
     const void*              signature,
     const size_t             signatureSize)
 {
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
-    if (NULL == api || NULL == hash || NULL == signature)
+    if (NULL == ctx || NULL == hash || NULL == signature)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -372,14 +372,14 @@ Signature_verify(
 
 static seos_err_t
 Agreement_init(
-    SeosCryptoApi*                    api,
+    void*                             ctx,
     SeosCryptoLib_Agreement**         pAgrObj,
     const SeosCryptoApi_Agreement_Alg algorithm,
     const SeosCryptoLib_Key*          prvKey)
 {
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
-    if (NULL == api || NULL == pAgrObj)
+    if (NULL == ctx || NULL == pAgrObj)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -390,12 +390,12 @@ Agreement_init(
 
 static seos_err_t
 Agreement_free(
-    SeosCryptoApi*           api,
+    void*                    ctx,
     SeosCryptoLib_Agreement* agrObj)
 {
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
-    if (NULL == api)
+    if (NULL == ctx)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -405,16 +405,16 @@ Agreement_free(
 
 static seos_err_t
 Agreement_agree(
-    SeosCryptoApi*           api,
+    void*                    ctx,
     SeosCryptoLib_Agreement* agrObj,
     const SeosCryptoLib_Key* pubKey,
     void*                    shared,
     size_t*                  sharedSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
-    if (NULL == api || NULL == shared || NULL == sharedSize)
+    if (NULL == ctx || NULL == shared || NULL == sharedSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -436,11 +436,11 @@ Agreement_agree(
 
 static seos_err_t
 Key_generate(
-    SeosCryptoApi*                api,
+    void*                         ctx,
     SeosCryptoLib_Key**           pKeyObj,
     const SeosCryptoApi_Key_Spec* spec)
 {
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
     if (NULL == self || NULL == pKeyObj || NULL == spec)
     {
@@ -453,12 +453,12 @@ Key_generate(
 
 static seos_err_t
 Key_makePublic(
-    SeosCryptoApi*                   api,
+    void*                            ctx,
     SeosCryptoLib_Key**              pPubKeyHandle,
     const SeosCryptoLib_Key*         prvKeyHandle,
     const SeosCryptoApi_Key_Attribs* attribs)
 {
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
     if (NULL == self || NULL == pPubKeyHandle || NULL == attribs)
     {
@@ -472,12 +472,12 @@ Key_makePublic(
 
 static seos_err_t
 Key_import(
-    SeosCryptoApi*                api,
+    void*                         ctx,
     SeosCryptoLib_Key**           pKeyObj,
     const SeosCryptoLib_Key*      wrapKeyObj,
     const SeosCryptoApi_Key_Data* keyData)
 {
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
     if (NULL == self || NULL == pKeyObj || NULL == keyData)
     {
@@ -490,12 +490,12 @@ Key_import(
 
 static seos_err_t
 Key_export(
-    SeosCryptoApi*           api,
+    void*                    ctx,
     const SeosCryptoLib_Key* keyObj,
     const SeosCryptoLib_Key* wrapKeyObj,
     SeosCryptoApi_Key_Data*  keyData)
 {
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
     seos_err_t err = SEOS_ERROR_GENERIC;
 
     if (NULL == self || NULL == keyData)
@@ -514,12 +514,12 @@ Key_export(
 
 static seos_err_t
 Key_getParams(
-    SeosCryptoApi*           api,
+    void*                    ctx,
     const SeosCryptoLib_Key* keyObj,
     void*                    keyParams,
     size_t*                  paramSize)
 {
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
     seos_err_t err = SEOS_ERROR_GENERIC;
 
     if (NULL == self || NULL == keyParams || NULL == paramSize)
@@ -542,12 +542,12 @@ Key_getParams(
 
 static seos_err_t
 Key_loadParams(
-    SeosCryptoApi*                api,
+    void*                         ctx,
     const SeosCryptoApi_Key_Param name,
     void*                         keyParams,
     size_t*                       paramSize)
 {
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
     seos_err_t err = SEOS_ERROR_GENERIC;
 
     if (NULL == self || NULL == keyParams || NULL == paramSize)
@@ -570,10 +570,10 @@ Key_loadParams(
 
 static seos_err_t
 Key_free(
-    SeosCryptoApi*     api,
+    void*              ctx,
     SeosCryptoLib_Key* keyObj)
 {
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
     if (NULL == self)
     {
@@ -587,14 +587,14 @@ Key_free(
 
 static seos_err_t
 Cipher_init(
-    SeosCryptoApi*                 api,
+    void*                          ctx,
     SeosCryptoLib_Cipher**         pCipherObj,
     const SeosCryptoApi_Cipher_Alg algorithm,
     const SeosCryptoLib_Key*       key,
     const void*                    iv,
     const size_t                   ivSize)
 {
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
     if (NULL == self || NULL == pCipherObj)
     {
@@ -616,10 +616,10 @@ Cipher_init(
 
 static seos_err_t
 Cipher_free(
-    SeosCryptoApi*        api,
+    void*                 ctx,
     SeosCryptoLib_Cipher* cipherObj)
 {
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
     if (NULL == self)
     {
@@ -631,7 +631,7 @@ Cipher_free(
 
 static seos_err_t
 Cipher_process(
-    SeosCryptoApi*        api,
+    void*                 ctx,
     SeosCryptoLib_Cipher* cipherObj,
     const void*           input,
     const size_t          inputSize,
@@ -639,7 +639,7 @@ Cipher_process(
     size_t*               outputSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
     if (NULL == self || NULL == input || NULL == output || NULL == outputSize)
     {
@@ -666,12 +666,12 @@ Cipher_process(
 
 static seos_err_t
 Cipher_start(
-    SeosCryptoApi*        api,
+    void*                 ctx,
     SeosCryptoLib_Cipher* cipherObj,
     const void*           data,
     const size_t          dataSize)
 {
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
     if (NULL == self)
     {
@@ -692,13 +692,13 @@ Cipher_start(
 
 static seos_err_t
 Cipher_finalize(
-    SeosCryptoApi*        api,
+    void*                 ctx,
     SeosCryptoLib_Cipher* cipherObj,
     void*                 tag,
     size_t*               tagSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
     if (NULL == self || NULL == tag || NULL == tagSize)
     {

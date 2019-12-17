@@ -18,14 +18,14 @@
 
 typedef seos_err_t
 (*SeosCryptoVtable_Rng_getBytesT)(
-    SeosCryptoApi*,
+    void*,
     unsigned int,
     void*,
     const size_t);
 
 typedef seos_err_t
 (*SeosCryptoVtable_Rng_reseedT)(
-    SeosCryptoApi*,
+    void*,
     const void*,
     const size_t);
 
@@ -33,32 +33,32 @@ typedef seos_err_t
 
 typedef seos_err_t
 (*SeosCryptoVtable_Mac_initT)(
-    SeosCryptoApi*,
+    void*,
     SeosCryptoLib_Mac**,
     const SeosCryptoApi_Mac_Alg);
 
 typedef seos_err_t
 (*SeosCryptoVtable_Mac_freeT)(
-    SeosCryptoApi*,
+    void*,
     SeosCryptoLib_Mac*);
 
 typedef seos_err_t
 (*SeosCryptoVtable_Mac_startT)(
-    SeosCryptoApi*,
+    void*,
     SeosCryptoLib_Mac*,
     const void*,
     const size_t);
 
 typedef seos_err_t
 (*SeosCryptoVtable_Mac_processT)(
-    SeosCryptoApi*,
+    void*,
     SeosCryptoLib_Mac*,
     const void*,
     const size_t);
 
 typedef seos_err_t
 (*SeosCryptoVtable_Mac_finalizeT)(
-    SeosCryptoApi*,
+    void*,
     SeosCryptoLib_Mac*,
     void*,
     size_t*);
@@ -67,31 +67,31 @@ typedef seos_err_t
 
 typedef seos_err_t
 (*SeosCryptoVtable_Digest_initT)(
-    SeosCryptoApi*,
+    void*,
     SeosCryptoLib_Digest**,
     const SeosCryptoApi_Digest_Alg);
 
 typedef seos_err_t
 (*SeosCryptoVtable_Digest_freeT)(
-    SeosCryptoApi*,
+    void*,
     SeosCryptoLib_Digest*);
 
 typedef seos_err_t
 (*SeosCryptoVtable_Digest_cloneT)(
-    SeosCryptoApi*,
+    void*,
     SeosCryptoLib_Digest*,
     const SeosCryptoLib_Digest*);
 
 typedef seos_err_t
 (*SeosCryptoVtable_Digest_processT)(
-    SeosCryptoApi*,
+    void*,
     SeosCryptoLib_Digest*,
     const void*,
     const size_t);
 
 typedef seos_err_t
 (*SeosCryptoVtable_Digest_finalizeT)(
-    SeosCryptoApi*,
+    void*,
     SeosCryptoLib_Digest*,
     void*,
     size_t*);
@@ -100,46 +100,46 @@ typedef seos_err_t
 
 typedef seos_err_t
 (*SeosCryptoVtable_Key_generateT)(
-    SeosCryptoApi*,
+    void*,
     SeosCryptoLib_Key**,
     const SeosCryptoApi_Key_Spec*);
 
 typedef seos_err_t
 (*SeosCryptoVtable_Key_importT)(
-    SeosCryptoApi*,
+    void*,
     SeosCryptoLib_Key**,
     const SeosCryptoLib_Key*,
     const SeosCryptoApi_Key_Data*);
 
 typedef seos_err_t
 (*SeosCryptoVtable_Key_makePublicT)(
-    SeosCryptoApi*,
+    void*,
     SeosCryptoLib_Key**,
     const SeosCryptoLib_Key*,
     const SeosCryptoApi_Key_Attribs*);
 
 typedef seos_err_t
 (*SeosCryptoVtable_Key_exportT)(
-    SeosCryptoApi*,
+    void*,
     const SeosCryptoLib_Key*,
     const SeosCryptoLib_Key*,
     SeosCryptoApi_Key_Data*);
 
 typedef seos_err_t
 (*SeosCryptoVtable_Key_getParamsT)(
-    SeosCryptoApi*,
+    void*,
     const SeosCryptoLib_Key*,
     void*,
     size_t*);
 
 typedef seos_err_t
 (*SeosCryptoVtable_Key_freeT)(
-    SeosCryptoApi*,
+    void*,
     SeosCryptoLib_Key*);
 
 typedef seos_err_t
 (*SeosCryptoVtable_Key_loadParamsT)(
-    SeosCryptoApi*,
+    void*,
     const SeosCryptoApi_Key_Param,
     void*,
     size_t*);
@@ -148,7 +148,7 @@ typedef seos_err_t
 
 typedef seos_err_t
 (*SeosCryptoVtable_Signature_initT)(
-    SeosCryptoApi*,
+    void*,
     SeosCryptoLib_Signature**,
     const SeosCryptoApi_Signature_Alg,
     const SeosCryptoApi_Digest_Alg,
@@ -157,12 +157,12 @@ typedef seos_err_t
 
 typedef seos_err_t
 (*SeosCryptoVtable_Signature_freeT)(
-    SeosCryptoApi*,
+    void*,
     SeosCryptoLib_Signature* );
 
 typedef seos_err_t
 (*SeosCryptoVtable_Signature_signT)(
-    SeosCryptoApi*,
+    void*,
     SeosCryptoLib_Signature*,
     const void*,
     const size_t,
@@ -171,7 +171,7 @@ typedef seos_err_t
 
 typedef seos_err_t
 (*SeosCryptoVtable_Signature_verifyT)(
-    SeosCryptoApi*,
+    void*,
     SeosCryptoLib_Signature*,
     const void*,
     const size_t,
@@ -182,19 +182,19 @@ typedef seos_err_t
 
 typedef seos_err_t
 (*SeosCryptoVtable_Agreement_initT)(
-    SeosCryptoApi*,
+    void*,
     SeosCryptoLib_Agreement**,
     const SeosCryptoApi_Agreement_Alg,
     const SeosCryptoLib_Key*);
 
 typedef seos_err_t
 (*SeosCryptoVtable_Agreement_freeT)(
-    SeosCryptoApi*,
+    void*,
     SeosCryptoLib_Agreement*);
 
 typedef seos_err_t
 (*SeosCryptoVtable_Agreement_agreeT)(
-    SeosCryptoApi*,
+    void*,
     SeosCryptoLib_Agreement*,
     const SeosCryptoLib_Key*,
     void*,
@@ -204,7 +204,7 @@ typedef seos_err_t
 
 typedef seos_err_t
 (*SeosCryptoVtable_Cipher_initT)(
-    SeosCryptoApi*,
+    void*,
     SeosCryptoLib_Cipher**,
     const SeosCryptoApi_Cipher_Alg,
     const SeosCryptoLib_Key*,
@@ -213,12 +213,12 @@ typedef seos_err_t
 
 typedef seos_err_t
 (*SeosCryptoVtable_Cipher_freeT)(
-    SeosCryptoApi*,
+    void*,
     SeosCryptoLib_Cipher*);
 
 typedef seos_err_t
 (*SeosCryptoVtable_Cipher_processT)(
-    SeosCryptoApi*,
+    void*,
     SeosCryptoLib_Cipher*,
     const void*,
     const size_t,
@@ -227,14 +227,14 @@ typedef seos_err_t
 
 typedef seos_err_t
 (*SeosCryptoVtable_Cipher_startT)(
-    SeosCryptoApi*,
+    void*,
     SeosCryptoLib_Cipher*,
     const void*,
     const size_t);
 
 typedef seos_err_t
 (*SeosCryptoVtable_Cipher_finalizeT)(
-    SeosCryptoApi*,
+    void*,
     SeosCryptoLib_Cipher*,
     void*,
     size_t*);

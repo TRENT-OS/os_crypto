@@ -81,14 +81,14 @@ createObjectList(
 
 static seos_err_t
 Rng_getBytes(
-    SeosCryptoApi*               api,
+    void*                        ctx,
     const SeosCryptoApi_Rng_Flag flags,
     void*                        buf,
     const size_t                 bufSize)
 {
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
 
-    if (NULL == api)
+    if (NULL == ctx)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -102,13 +102,13 @@ Rng_getBytes(
 
 static seos_err_t
 Rng_reseed(
-    SeosCryptoApi* api,
-    const void*    seed,
-    const size_t   seedSize)
+    void*        ctx,
+    const void*  seed,
+    const size_t seedSize)
 {
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
 
-    if (NULL == api)
+    if (NULL == ctx)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -124,14 +124,14 @@ Rng_reseed(
 
 static seos_err_t
 Mac_init(
-    SeosCryptoApi*              api,
+    void*                       ctx,
     SeosCryptoLib_Mac**         pMacObj,
     const SeosCryptoApi_Mac_Alg algorithm)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
 
-    if (NULL == api || NULL == pMacObj)
+    if (NULL == ctx || NULL == pMacObj)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -163,14 +163,14 @@ err0:
 
 static seos_err_t
 Mac_free(
-    SeosCryptoApi*     api,
+    void*              ctx,
     SeosCryptoLib_Mac* macObj)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
     size_t pos;
 
-    if (NULL == api)
+    if (NULL == ctx)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -190,14 +190,14 @@ Mac_free(
 
 static seos_err_t
 Mac_start(
-    SeosCryptoApi*     api,
+    void*              ctx,
     SeosCryptoLib_Mac* macObj,
     const void*        secret,
     const size_t       secretSize)
 {
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
 
-    if (NULL == api)
+    if (NULL == ctx)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -212,14 +212,14 @@ Mac_start(
 
 static seos_err_t
 Mac_process(
-    SeosCryptoApi*     api,
+    void*              ctx,
     SeosCryptoLib_Mac* macObj,
     const void*        data,
     const size_t       dataSize)
 {
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
 
-    if (NULL == api)
+    if (NULL == ctx)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -234,14 +234,14 @@ Mac_process(
 
 static seos_err_t
 Mac_finalize(
-    SeosCryptoApi*     api,
+    void*              ctx,
     SeosCryptoLib_Mac* macObj,
     void*              mac,
     size_t*            macSize)
 {
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
 
-    if (NULL == api || NULL == macSize)
+    if (NULL == ctx || NULL == macSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -258,14 +258,14 @@ Mac_finalize(
 
 static seos_err_t
 Digest_init(
-    SeosCryptoApi*                 api,
+    void*                          ctx,
     SeosCryptoLib_Digest**         pDigObj,
     const SeosCryptoApi_Digest_Alg algorithm)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
 
-    if (NULL == api || NULL == pDigObj)
+    if (NULL == ctx || NULL == pDigObj)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -297,14 +297,14 @@ err0:
 
 static seos_err_t
 Digest_free(
-    SeosCryptoApi*        api,
+    void*                 ctx,
     SeosCryptoLib_Digest* digObj)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
     size_t pos;
 
-    if (NULL == api)
+    if (NULL == ctx)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -324,13 +324,13 @@ Digest_free(
 
 static seos_err_t
 Digest_clone(
-    SeosCryptoApi*              api,
+    void*                       ctx,
     SeosCryptoLib_Digest*       dstDigObj,
     const SeosCryptoLib_Digest* srcDigObj)
 {
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
 
-    if (NULL == api)
+    if (NULL == ctx)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -343,14 +343,14 @@ Digest_clone(
 
 static seos_err_t
 Digest_process(
-    SeosCryptoApi*        api,
+    void*                 ctx,
     SeosCryptoLib_Digest* digObj,
     const void*           data,
     const size_t          dataSize)
 {
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
 
-    if (NULL == api)
+    if (NULL == ctx)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -365,14 +365,14 @@ Digest_process(
 
 static seos_err_t
 Digest_finalize(
-    SeosCryptoApi*        api,
+    void*                 ctx,
     SeosCryptoLib_Digest* digObj,
     void*                 digest,
     size_t*               digestSize)
 {
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
 
-    if (NULL == api || NULL == digestSize)
+    if (NULL == ctx || NULL == digestSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -389,7 +389,7 @@ Digest_finalize(
 
 static seos_err_t
 Signature_init(
-    SeosCryptoApi*                    api,
+    void*                             ctx,
     SeosCryptoLib_Signature**         pSigObj,
     const SeosCryptoApi_Signature_Alg algorithm,
     const SeosCryptoApi_Digest_Alg    digest,
@@ -397,9 +397,9 @@ Signature_init(
     const SeosCryptoLib_Key*          pubKey)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
 
-    if (NULL == api || NULL == pSigObj)
+    if (NULL == ctx || NULL == pSigObj)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -431,14 +431,14 @@ err0:
 
 static seos_err_t
 Signature_free(
-    SeosCryptoApi*           api,
+    void*                    ctx,
     SeosCryptoLib_Signature* sigObj)
 {
     seos_err_t err = SEOS_SUCCESS;
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
     size_t pos;
 
-    if (NULL == api)
+    if (NULL == ctx)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -458,16 +458,16 @@ Signature_free(
 
 static seos_err_t
 Signature_sign(
-    SeosCryptoApi*           api,
+    void*                    ctx,
     SeosCryptoLib_Signature* sigObj,
     const void*              hash,
     const size_t             hashSize,
     void*                    signature,
     size_t*                  signatureSize)
 {
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
 
-    if (NULL == api || NULL == hash || NULL == signatureSize)
+    if (NULL == ctx || NULL == hash || NULL == signatureSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -486,16 +486,16 @@ Signature_sign(
 
 static seos_err_t
 Signature_verify(
-    SeosCryptoApi*           api,
+    void*                    ctx,
     SeosCryptoLib_Signature* sigObj,
     const void*              hash,
     const size_t             hashSize,
     const void*              signature,
     const size_t             signatureSize)
 {
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
 
-    if (NULL == api)
+    if (NULL == ctx)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -513,15 +513,15 @@ Signature_verify(
 
 static seos_err_t
 Agreement_init(
-    SeosCryptoApi*                    api,
+    void*                             ctx,
     SeosCryptoLib_Agreement**         pAgrObj,
     const SeosCryptoApi_Agreement_Alg algorithm,
     const SeosCryptoLib_Key*          prvKey)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
 
-    if (NULL == api || NULL == pAgrObj)
+    if (NULL == ctx || NULL == pAgrObj)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -558,14 +558,14 @@ err0:
 
 static seos_err_t
 Agreement_free(
-    SeosCryptoApi*           api,
+    void*                    ctx,
     SeosCryptoLib_Agreement* agrObj)
 {
     seos_err_t err = SEOS_SUCCESS;
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
     size_t pos;
 
-    if (NULL == api)
+    if (NULL == ctx)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -585,15 +585,15 @@ Agreement_free(
 
 static seos_err_t
 Agreement_agree(
-    SeosCryptoApi*           api,
+    void*                    ctx,
     SeosCryptoLib_Agreement* agrObj,
     const SeosCryptoLib_Key* pubKey,
     void*                    shared,
     size_t*                  sharedSize)
 {
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
 
-    if (NULL == api || NULL == sharedSize)
+    if (NULL == ctx || NULL == sharedSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -613,14 +613,14 @@ Agreement_agree(
 
 static seos_err_t
 Key_generate(
-    SeosCryptoApi*                api,
+    void*                         ctx,
     SeosCryptoLib_Key**           pKeyObj,
     const SeosCryptoApi_Key_Spec* spec)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
 
-    if (NULL == api || NULL == pKeyObj)
+    if (NULL == ctx || NULL == pKeyObj)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -652,15 +652,15 @@ err0:
 
 static seos_err_t
 Key_import(
-    SeosCryptoApi*                api,
+    void*                         ctx,
     SeosCryptoLib_Key**           pKeyObj,
     const SeosCryptoLib_Key*      wrapKeyObj,
     const SeosCryptoApi_Key_Data* keyData)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
 
-    if (NULL == api || NULL == pKeyObj)
+    if (NULL == ctx || NULL == pKeyObj)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -696,15 +696,15 @@ err0:
 
 static seos_err_t
 Key_makePublic(
-    SeosCryptoApi*                   api,
+    void*                            ctx,
     SeosCryptoLib_Key**              pPubKeyObj,
     const SeosCryptoLib_Key*         prvKeyObj,
     const SeosCryptoApi_Key_Attribs* attribs)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
 
-    if (NULL == api || NULL == pPubKeyObj)
+    if (NULL == ctx || NULL == pPubKeyObj)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -740,14 +740,14 @@ err0:
 
 static seos_err_t
 Key_export(
-    SeosCryptoApi*           api,
+    void*                    ctx,
     const SeosCryptoLib_Key* keyObj,
     const SeosCryptoLib_Key* wrapKeyObj,
     SeosCryptoApi_Key_Data*  keyData)
 {
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
 
-    if (NULL == api)
+    if (NULL == ctx)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -762,14 +762,14 @@ Key_export(
 
 static seos_err_t
 Key_getParams(
-    SeosCryptoApi*           api,
+    void*                    ctx,
     const SeosCryptoLib_Key* keyObj,
     void*                    keyParams,
     size_t*                  paramSize)
 {
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
 
-    if (NULL == api || NULL == paramSize)
+    if (NULL == ctx || NULL == paramSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -784,12 +784,12 @@ Key_getParams(
 
 static seos_err_t
 Key_loadParams(
-    SeosCryptoApi*                api,
+    void*                         ctx,
     const SeosCryptoApi_Key_Param name,
     void*                         keyParams,
     size_t*                       paramSize)
 {
-    if (NULL == api || NULL == paramSize)
+    if (NULL == ctx || NULL == paramSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -803,14 +803,14 @@ Key_loadParams(
 
 static seos_err_t
 Key_free(
-    SeosCryptoApi*     api,
+    void*              ctx,
     SeosCryptoLib_Key* keyObj)
 {
     seos_err_t err = SEOS_SUCCESS;
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
     size_t pos;
 
-    if (NULL == api)
+    if (NULL == ctx)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -832,7 +832,7 @@ Key_free(
 
 static seos_err_t
 Cipher_init(
-    SeosCryptoApi*                 api,
+    void*                          ctx,
     SeosCryptoLib_Cipher**         pCipherObj,
     const SeosCryptoApi_Cipher_Alg algorithm,
     const SeosCryptoLib_Key*       key,
@@ -840,9 +840,9 @@ Cipher_init(
     const size_t                   ivSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
 
-    if (NULL == api || NULL == pCipherObj)
+    if (NULL == ctx || NULL == pCipherObj)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -883,14 +883,14 @@ err0:
 
 static seos_err_t
 Cipher_free(
-    SeosCryptoApi*        api,
+    void*                 ctx,
     SeosCryptoLib_Cipher* cipherObj)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
     size_t pos;
 
-    if (NULL == api)
+    if (NULL == ctx)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -910,16 +910,16 @@ Cipher_free(
 
 static seos_err_t
 Cipher_process(
-    SeosCryptoApi*        api,
+    void*                 ctx,
     SeosCryptoLib_Cipher* cipherObj,
     const void*           input,
     const size_t          inputSize,
     void*                 output,
     size_t*               outputSize)
 {
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
 
-    if (NULL == api || NULL == input || NULL == outputSize)
+    if (NULL == ctx || NULL == input || NULL == outputSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -938,14 +938,14 @@ Cipher_process(
 
 static seos_err_t
 Cipher_start(
-    SeosCryptoApi*        api,
+    void*                 ctx,
     SeosCryptoLib_Cipher* cipherObj,
     const void*           ad,
     const size_t          adSize)
 {
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
 
-    if (NULL == api)
+    if (NULL == ctx)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -960,14 +960,14 @@ Cipher_start(
 
 static seos_err_t
 Cipher_finalize(
-    SeosCryptoApi*        api,
+    void*                 ctx,
     SeosCryptoLib_Cipher* cipherObj,
     void*                 output,
     size_t*               outputSize)
 {
-    SeosCryptoLib* self = (SeosCryptoLib*) api;
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
 
-    if (NULL == api || NULL == outputSize)
+    if (NULL == ctx || NULL == outputSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
