@@ -93,7 +93,7 @@ Rng_getBytes(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoRng_getBytes(&self->cryptoRng, flags, buf, bufLen);
+    return SeosCryptoLib_Rng_getBytes(&self->cryptoRng, flags, buf, bufLen);
 }
 
 static seos_err_t
@@ -109,7 +109,7 @@ Rng_reseed(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoRng_reSeed(&self->cryptoRng, seed, seedLen);
+    return SeosCryptoLib_Rng_reSeed(&self->cryptoRng, seed, seedLen);
 }
 
 // -------------------------------- MAC API ------------------------------------
@@ -133,8 +133,8 @@ Mac_init(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((err = SeosCryptoMac_init(*pMacObj, &self->memIf,
-                                  algorithm)) != SEOS_SUCCESS)
+    if ((err = SeosCryptoLib_Mac_init(*pMacObj, &self->memIf,
+                                      algorithm)) != SEOS_SUCCESS)
     {
         goto err0;
     }
@@ -146,7 +146,7 @@ Mac_init(
     return err;
 
 err1:
-    SeosCryptoMac_free(*pMacObj, &self->memIf);
+    SeosCryptoLib_Mac_free(*pMacObj, &self->memIf);
 err0:
     self->memIf.free(*pMacObj);
 
@@ -171,7 +171,7 @@ Mac_free(
         return SEOS_ERROR_INVALID_HANDLE;
     }
 
-    if ((err = SeosCryptoMac_free(macObj, &self->memIf)) == SEOS_SUCCESS)
+    if ((err = SeosCryptoLib_Mac_free(macObj, &self->memIf)) == SEOS_SUCCESS)
     {
         removeObject(&self->macObjects, pos);
         self->memIf.free(macObj);
@@ -195,7 +195,7 @@ Mac_start(
     }
 
     return !hasObject(&self->macObjects, macObj) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoMac_start(macObj, secret, secretSize);
+           SeosCryptoLib_Mac_start(macObj, secret, secretSize);
 }
 
 static seos_err_t
@@ -213,7 +213,7 @@ Mac_process(
     }
 
     return !hasObject(&self->macObjects, macObj) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoMac_process(macObj, data, dataLen);
+           SeosCryptoLib_Mac_process(macObj, data, dataLen);
 }
 
 static seos_err_t
@@ -231,7 +231,7 @@ Mac_finalize(
     }
 
     return !hasObject(&self->macObjects, macObj) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoMac_finalize(macObj, mac, macSize);
+           SeosCryptoLib_Mac_finalize(macObj, mac, macSize);
 }
 
 // ------------------------------ Digest API -----------------------------------
@@ -255,8 +255,8 @@ Digest_init(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((err = SeosCryptoDigest_init(*pDigObj, &self->memIf,
-                                     algorithm)) != SEOS_SUCCESS)
+    if ((err = SeosCryptoLib_Digest_init(*pDigObj, &self->memIf,
+                                         algorithm)) != SEOS_SUCCESS)
     {
         goto err0;
     }
@@ -268,7 +268,7 @@ Digest_init(
     return err;
 
 err1:
-    SeosCryptoDigest_free(*pDigObj, &self->memIf);
+    SeosCryptoLib_Digest_free(*pDigObj, &self->memIf);
 err0:
     self->memIf.free(*pDigObj);
 
@@ -293,7 +293,7 @@ Digest_free(
         return SEOS_ERROR_INVALID_HANDLE;
     }
 
-    if ((err = SeosCryptoDigest_free(digObj, &self->memIf)) == SEOS_SUCCESS)
+    if ((err = SeosCryptoLib_Digest_free(digObj, &self->memIf)) == SEOS_SUCCESS)
     {
         removeObject(&self->digestObjects, pos);
         self->memIf.free(digObj);
@@ -318,7 +318,7 @@ Digest_clone(
     return !hasObject(&self->digestObjects, dstDigObj) ||
            !hasObject(&self->digestObjects, srcDigObj) ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoDigest_clone(dstDigObj, srcDigObj);
+           SeosCryptoLib_Digest_clone(dstDigObj, srcDigObj);
 }
 
 static seos_err_t
@@ -336,7 +336,7 @@ Digest_process(
     }
 
     return !hasObject(&self->digestObjects, digObj) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoDigest_process(digObj, data, dataLen);
+           SeosCryptoLib_Digest_process(digObj, data, dataLen);
 }
 
 static seos_err_t
@@ -354,7 +354,7 @@ Digest_finalize(
     }
 
     return !hasObject(&self->digestObjects, digObj) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoDigest_finalize(digObj, digest, digestSize);
+           SeosCryptoLib_Digest_finalize(digObj, digest, digestSize);
 }
 
 // ----------------------------- Signature API ---------------------------------
@@ -381,8 +381,8 @@ Signature_init(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((err = SeosCryptoSignature_init(*pSigObj, &self->memIf, algorithm,
-                                        digest, prvKey, pubKey)) != SEOS_SUCCESS)
+    if ((err = SeosCryptoLib_Signature_init(*pSigObj, &self->memIf, algorithm,
+                                            digest, prvKey, pubKey)) != SEOS_SUCCESS)
     {
         goto err0;
     }
@@ -394,7 +394,7 @@ Signature_init(
     return err;
 
 err1:
-    SeosCryptoSignature_free(*pSigObj, &self->memIf);
+    SeosCryptoLib_Signature_free(*pSigObj, &self->memIf);
 err0:
     self->memIf.free(*pSigObj);
 
@@ -419,7 +419,7 @@ Signature_free(
         return SEOS_ERROR_INVALID_HANDLE;
     }
 
-    if ((err = SeosCryptoSignature_free(sigObj, &self->memIf)) == SEOS_SUCCESS)
+    if ((err = SeosCryptoLib_Signature_free(sigObj, &self->memIf)) == SEOS_SUCCESS)
     {
         removeObject(&self->signatureObjects, pos);
         self->memIf.free(sigObj);
@@ -451,8 +451,8 @@ Signature_sign(
     // Make local copy of input buffer, to allow overlapping hash/signature buffers
     memcpy(self->buffer, hash, hashSize);
     return !hasObject(&self->signatureObjects, sigObj) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoSignature_sign(sigObj, &self->cryptoRng, self->buffer,
-                                    hashSize, signature, signatureSize);
+           SeosCryptoLib_Signature_sign(sigObj, &self->cryptoRng, self->buffer,
+                                        hashSize, signature, signatureSize);
 }
 
 static seos_err_t
@@ -472,8 +472,8 @@ Signature_verify(
     }
 
     return !hasObject(&self->signatureObjects, sigObj) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoSignature_verify(sigObj, &self->cryptoRng, hash, hashSize, signature,
-                                      signatureSize);
+           SeosCryptoLib_Signature_verify(sigObj, &self->cryptoRng, hash, hashSize,
+                                          signature, signatureSize);
 }
 
 // ----------------------------- Agreement API ---------------------------------
@@ -502,8 +502,8 @@ Agreement_init(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((err = SeosCryptoAgreement_init(*pAgrObj, &self->memIf, algorithm,
-                                        prvKey)) != SEOS_SUCCESS)
+    if ((err = SeosCryptoLib_Agreement_init(*pAgrObj, &self->memIf, algorithm,
+                                            prvKey)) != SEOS_SUCCESS)
     {
         goto err0;
     }
@@ -516,7 +516,7 @@ Agreement_init(
     return err;
 
 err1:
-    SeosCryptoAgreement_free(*pAgrObj, &self->memIf);
+    SeosCryptoLib_Agreement_free(*pAgrObj, &self->memIf);
 err0:
     self->memIf.free(*pAgrObj);
 
@@ -541,7 +541,7 @@ Agreement_free(
         return SEOS_ERROR_INVALID_HANDLE;
     }
 
-    if ((err = SeosCryptoAgreement_free(agrObj, &self->memIf)) == SEOS_SUCCESS)
+    if ((err = SeosCryptoLib_Agreement_free(agrObj, &self->memIf)) == SEOS_SUCCESS)
     {
         removeObject(&self->agreementObjects, pos);
         self->memIf.free(agrObj);
@@ -568,7 +568,8 @@ Agreement_agree(
     return !hasObject(&self->agreementObjects, agrObj) ||
            !hasObject(&self->keyObjects, pubKey) ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoAgreement_agree(agrObj, &self->cryptoRng, pubKey, shared, sharedSize);
+           SeosCryptoLib_Agreement_agree(agrObj, &self->cryptoRng, pubKey, shared,
+                                         sharedSize);
 }
 
 // -------------------------------- Key API ------------------------------------
@@ -592,8 +593,8 @@ Key_generate(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((err = SeosCryptoKey_generate(*pKeyObj, &self->memIf, &self->cryptoRng,
-                                      spec)) != SEOS_SUCCESS)
+    if ((err = SeosCryptoLib_Key_generate(*pKeyObj, &self->memIf, &self->cryptoRng,
+                                          spec)) != SEOS_SUCCESS)
     {
         goto err0;
     }
@@ -605,7 +606,7 @@ Key_generate(
     return err;
 
 err1:
-    SeosCryptoKey_free(*pKeyObj, &self->memIf);
+    SeosCryptoLib_Key_free(*pKeyObj, &self->memIf);
 err0:
     self->memIf.free(*pKeyObj);
 
@@ -636,8 +637,8 @@ Key_import(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((err = SeosCryptoKey_import(*pKeyObj, &self->memIf, wrapKeyObj,
-                                    keyData)) != SEOS_SUCCESS)
+    if ((err = SeosCryptoLib_Key_import(*pKeyObj, &self->memIf, wrapKeyObj,
+                                        keyData)) != SEOS_SUCCESS)
     {
         goto err0;
     }
@@ -649,7 +650,7 @@ Key_import(
     return err;
 
 err1:
-    SeosCryptoKey_free(*pKeyObj, &self->memIf);
+    SeosCryptoLib_Key_free(*pKeyObj, &self->memIf);
 err0:
     self->memIf.free(*pKeyObj);
 
@@ -680,8 +681,8 @@ Key_makePublic(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((err = SeosCryptoKey_makePublic(*pPubKeyObj, &self->memIf, prvKeyObj,
-                                        attribs)) != SEOS_SUCCESS)
+    if ((err = SeosCryptoLib_Key_makePublic(*pPubKeyObj, &self->memIf, prvKeyObj,
+                                            attribs)) != SEOS_SUCCESS)
     {
         goto err0;
     }
@@ -693,7 +694,7 @@ Key_makePublic(
     return err;
 
 err1:
-    SeosCryptoKey_free(*pPubKeyObj, &self->memIf);
+    SeosCryptoLib_Key_free(*pPubKeyObj, &self->memIf);
 err0:
     self->memIf.free(*pPubKeyObj);
 
@@ -719,7 +720,7 @@ Key_export(
     }
 
     return !hasObject(&self->keyObjects, keyObj) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoKey_export(keyObj, wrapKeyObj, keyData);
+           SeosCryptoLib_Key_export(keyObj, wrapKeyObj, keyData);
 }
 
 static seos_err_t
@@ -737,7 +738,7 @@ Key_getParams(
     }
 
     return !hasObject(&self->keyObjects, keyObj) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoKey_getParams(keyObj, keyParams, paramSize);
+           SeosCryptoLib_Key_getParams(keyObj, keyParams, paramSize);
 }
 
 static seos_err_t
@@ -752,7 +753,7 @@ Key_loadParams(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoKey_loadParams(name, keyParams, paramSize);
+    return SeosCryptoLib_Key_loadParams(name, keyParams, paramSize);
 }
 
 static seos_err_t
@@ -773,7 +774,7 @@ Key_free(
         return SEOS_ERROR_INVALID_HANDLE;
     }
 
-    if ((err = SeosCryptoKey_free(keyObj, &self->memIf)) == SEOS_SUCCESS)
+    if ((err = SeosCryptoLib_Key_free(keyObj, &self->memIf)) == SEOS_SUCCESS)
     {
         removeObject(&self->keyObjects, pos);
         self->memIf.free(keyObj);
@@ -810,8 +811,8 @@ Cipher_init(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((err = SeosCryptoCipher_init(*pCipherObj, &self->memIf, algorithm, key,
-                                     iv, ivLen)) != SEOS_SUCCESS)
+    if ((err = SeosCryptoLib_Cipher_init(*pCipherObj, &self->memIf, algorithm, key,
+                                         iv, ivLen)) != SEOS_SUCCESS)
     {
         goto err0;
     }
@@ -824,7 +825,7 @@ Cipher_init(
     return err;
 
 err1:
-    SeosCryptoCipher_free(*pCipherObj, &self->memIf);
+    SeosCryptoLib_Cipher_free(*pCipherObj, &self->memIf);
 err0:
     self->memIf.free(*pCipherObj);
 
@@ -850,7 +851,7 @@ Cipher_free(
         return SEOS_ERROR_INVALID_HANDLE;
     }
 
-    if ((err = SeosCryptoCipher_free(cipherObj, &self->memIf)) == SEOS_SUCCESS)
+    if ((err = SeosCryptoLib_Cipher_free(cipherObj, &self->memIf)) == SEOS_SUCCESS)
     {
         removeObject(&self->cipherObjects, pos);
         self->memIf.free(cipherObj);
@@ -882,8 +883,8 @@ Cipher_process(
     // Make local copy of input buffer, to allow overlapping input/output buffers
     memcpy(self->buffer, input, inputSize);
     return !hasObject(&self->cipherObjects, cipherObj) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoCipher_process(cipherObj, self->buffer, inputSize, output,
-                                    outputSize);
+           SeosCryptoLib_Cipher_process(cipherObj, self->buffer, inputSize, output,
+                                        outputSize);
 }
 
 static seos_err_t
@@ -901,7 +902,7 @@ Cipher_start(
     }
 
     return !hasObject(&self->cipherObjects, cipherObj) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoCipher_start(cipherObj, input, inputSize);
+           SeosCryptoLib_Cipher_start(cipherObj, input, inputSize);
 }
 
 static seos_err_t
@@ -919,7 +920,7 @@ Cipher_finalize(
     }
 
     return !hasObject(&self->cipherObjects, cipherObj) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoCipher_finalize(cipherObj, buf, bufSize);
+           SeosCryptoLib_Cipher_finalize(cipherObj, buf, bufSize);
 }
 
 // ------------------------------- init/free -----------------------------------
@@ -1004,9 +1005,9 @@ SeosCryptoLib_init(
         goto err4;
     }
 
-    if ((err = SeosCryptoRng_init(&self->cryptoRng, &self->memIf,
-                                  (const SeosCryptoApi_Rng_EntropyFunc*)
-                                  cfg->rng.entropy, cfg->rng.context)) != SEOS_SUCCESS)
+    if ((err = SeosCryptoLib_Rng_init(&self->cryptoRng, &self->memIf,
+                                      (const SeosCryptoApi_Rng_EntropyFunc*)
+                                      cfg->rng.entropy, cfg->rng.context)) != SEOS_SUCCESS)
     {
         goto err5;
     }
@@ -1033,7 +1034,7 @@ seos_err_t
 SeosCryptoLib_free(
     SeosCryptoLib* self)
 {
-    SeosCryptoRng_free(&self->cryptoRng, &self->memIf);
+    SeosCryptoLib_Rng_free(&self->cryptoRng, &self->memIf);
 
     freeObjectList(&self->agreementObjects);
     freeObjectList(&self->signatureObjects);

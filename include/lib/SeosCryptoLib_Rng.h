@@ -22,35 +22,35 @@
 
 // Internal types/defines/enums ------------------------------------------------
 
-struct SeosCryptoLib_Rng
+typedef struct
 {
     mbedtls_ctr_drbg_context drbg;
-};
+} SeosCryptoLib_Rng;
 
 // Internal functions ----------------------------------------------------------
 
 seos_err_t
-SeosCryptoRng_init(
+SeosCryptoLib_Rng_init(
     SeosCryptoLib_Rng*                   self,
     const SeosCryptoApi_MemIf*           memIf,
     const SeosCryptoApi_Rng_EntropyFunc* entropyFunc,
     void*                                entropyCtx);
 
 seos_err_t
-SeosCryptoRng_getBytes(
+SeosCryptoLib_Rng_getBytes(
     SeosCryptoLib_Rng*           self,
     const SeosCryptoApi_Rng_Flag flags,
     void*                        buf,
     const size_t                 bufSize);
 
 seos_err_t
-SeosCryptoRng_reSeed(
+SeosCryptoLib_Rng_reSeed(
     SeosCryptoLib_Rng* self,
     const void*        seed,
     const size_t       seedLen);
 
 seos_err_t
-SeosCryptoRng_free(
+SeosCryptoLib_Rng_free(
     SeosCryptoLib_Rng*         self,
     const SeosCryptoApi_MemIf* memIf);
 
@@ -66,14 +66,15 @@ SeosCryptoRng_free(
  *
  */
 INLINE int
-SeosCryptoRng_getBytesMbedtls(
+SeosCryptoLib_Rng_getBytesMbedtls(
     void*          self,
     unsigned char* buf,
     size_t         bufSize)
 {
     // Simple wrapper for mbedTLS, to allow the buffered use of the getRandomData()
     // function as is common, but also to directly pass a function to mbedTLS
-    return SeosCryptoRng_getBytes(self, 0, buf, bufSize) == SEOS_SUCCESS ? 0 : 1;
+    return SeosCryptoLib_Rng_getBytes(self, 0, buf,
+                                      bufSize) == SEOS_SUCCESS ? 0 : 1;
 }
 
 /** @} */

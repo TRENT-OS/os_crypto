@@ -89,15 +89,15 @@ generate_DHParams(
     mbedtls_mpi_init(&P);
 
     // Generator is fixed
-    mbedtls_mpi_lset(&G, SeosCryptoKey_DH_GENERATOR);
+    mbedtls_mpi_lset(&G, SeosCryptoLib_Key_DH_GENERATOR);
 
     // Generate a "safe prime" P such that Q=(P-1)/2 is also prime. Then make
     // sure that for this prime P our generator generates the full group and
     // not just a sub-group. We only need to check in two steps, see below.
-    for (retries = SeosCryptoKey_DH_GEN_RETRIES; retries > 0; retries--)
+    for (retries = SeosCryptoLib_Key_DH_GEN_RETRIES; retries > 0; retries--)
     {
         if (!mbedtls_mpi_gen_prime(&P, bits, MBEDTLS_MPI_GEN_PRIME_FLAG_DH,
-                                   SeosCryptoRng_getBytesMbedtls, rng))
+                                   SeosCryptoLib_Rng_getBytesMbedtls, rng))
         {
             // Check 1: g^2 mod P != 1
             mbedtls_mpi_lset(&T, 2);
@@ -165,11 +165,11 @@ generate_DHPrv(
     }
 
     // Generate an X as large as possible as private scalar
-    for (retries = SeosCryptoKey_DH_GEN_RETRIES; retries > 0; retries--)
+    for (retries = SeosCryptoLib_Key_DH_GEN_RETRIES; retries > 0; retries--)
     {
         // Create random X and make sure it is smaller than P
         if (mbedtls_mpi_fill_random(&X, mbedtls_mpi_size(&P),
-                                    SeosCryptoRng_getBytesMbedtls, rng) != 0)
+                                    SeosCryptoLib_Rng_getBytesMbedtls, rng) != 0)
         {
             continue;
         }
@@ -269,8 +269,8 @@ generate_RsaPrv(
 
     mbedtls_rsa_init(&rsa, MBEDTLS_RSA_PKCS_V15, MBEDTLS_MD_NONE);
 
-    if (mbedtls_rsa_gen_key(&rsa, SeosCryptoRng_getBytesMbedtls, rng, bits,
-                            SeosCryptoKey_RSA_EXPONENT) != 0)
+    if (mbedtls_rsa_gen_key(&rsa, SeosCryptoLib_Rng_getBytesMbedtls, rng, bits,
+                            SeosCryptoLib_Key_RSA_EXPONENT) != 0)
     {
         err = SEOS_ERROR_ABORTED;
         goto exit;
@@ -345,7 +345,7 @@ generate_SECP256r1Prv(
     mbedtls_mpi_init(&d);
 
     if (mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1) != 0 ||
-        mbedtls_ecp_gen_privkey(&grp, &d, SeosCryptoRng_getBytesMbedtls, rng) != 0)
+        mbedtls_ecp_gen_privkey(&grp, &d, SeosCryptoLib_Rng_getBytesMbedtls, rng) != 0)
     {
         err = SEOS_ERROR_ABORTED;
         goto exit;
@@ -471,7 +471,7 @@ generateImpl(
             return SEOS_ERROR_INVALID_PARAMETER;
         }
         key->len = spec->key.params.bits >> 3;
-        return SeosCryptoRng_getBytes(rng, 0, key->bytes, key->len);
+        return SeosCryptoLib_Rng_getBytes(rng, 0, key->bytes, key->len);
     }
 
     case SeosCryptoApi_Key_TYPE_RSA_PRV:
@@ -684,8 +684,8 @@ getParamsImpl(
     case SeosCryptoApi_Key_TYPE_DH_PRV:
         size = sizeof(SeosCryptoApi_Key_DhParams);
         params = (self->type == SeosCryptoApi_Key_TYPE_DH_PUB) ?
-                 &SeosCryptoKey_getDhPub(self)->params :
-                 &SeosCryptoKey_getDhPrv(self)->params;
+                 &SeosCryptoLib_Key_getDhPub(self)->params :
+                 &SeosCryptoLib_Key_getDhPrv(self)->params;
         break;
     default:
         return SEOS_ERROR_NOT_SUPPORTED;
@@ -775,7 +775,7 @@ freeImpl(
 // Public functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoKey_generate(
+SeosCryptoLib_Key_generate(
     SeosCryptoLib_Key*            self,
     const SeosCryptoApi_MemIf*    memIf,
     SeosCryptoLib_Rng*            rng,
@@ -801,7 +801,7 @@ SeosCryptoKey_generate(
 }
 
 seos_err_t
-SeosCryptoKey_makePublic(
+SeosCryptoLib_Key_makePublic(
     SeosCryptoLib_Key*               self,
     const SeosCryptoApi_MemIf*       memIf,
     const SeosCryptoLib_Key*         prvKey,
@@ -842,7 +842,7 @@ SeosCryptoKey_makePublic(
 }
 
 seos_err_t
-SeosCryptoKey_import(
+SeosCryptoLib_Key_import(
     SeosCryptoLib_Key*            self,
     const SeosCryptoApi_MemIf*    memIf,
     const SeosCryptoLib_Key*      wrapKey,
@@ -873,7 +873,7 @@ SeosCryptoKey_import(
 }
 
 seos_err_t
-SeosCryptoKey_export(
+SeosCryptoLib_Key_export(
     const SeosCryptoLib_Key* self,
     const SeosCryptoLib_Key* wrapKey,
     SeosCryptoApi_Key_Data*  keyData)
@@ -897,7 +897,7 @@ SeosCryptoKey_export(
 }
 
 seos_err_t
-SeosCryptoKey_getParams(
+SeosCryptoLib_Key_getParams(
     const SeosCryptoLib_Key* self,
     void*                    keyParams,
     size_t*                  paramSize)
@@ -911,7 +911,7 @@ SeosCryptoKey_getParams(
 }
 
 seos_err_t
-SeosCryptoKey_loadParams(
+SeosCryptoLib_Key_loadParams(
     const SeosCryptoApi_Key_Param name,
     void*                         keyParams,
     size_t*                       paramSize)
@@ -925,7 +925,7 @@ SeosCryptoKey_loadParams(
 }
 
 seos_err_t
-SeosCryptoKey_free(
+SeosCryptoLib_Key_free(
     SeosCryptoLib_Key*         self,
     const SeosCryptoApi_MemIf* memIf)
 {
@@ -940,11 +940,11 @@ SeosCryptoKey_free(
 // Conversion functions --------------------------------------------------------
 
 seos_err_t
-SeosCryptoKey_writeRsaPub(
+SeosCryptoLib_Key_writeRsaPub(
     const SeosCryptoLib_Key* key,
     mbedtls_rsa_context*     rsa)
 {
-    SeosCryptoApi_Key_RsaRub* pubKey = SeosCryptoKey_getRsaPub(key);
+    SeosCryptoApi_Key_RsaRub* pubKey = SeosCryptoLib_Key_getRsaPub(key);
     return (mbedtls_rsa_import_raw(rsa,
                                    pubKey->nBytes, pubKey->nLen,
                                    NULL, 0, NULL, 0, NULL, 0,
@@ -955,11 +955,11 @@ SeosCryptoKey_writeRsaPub(
 }
 
 seos_err_t
-SeosCryptoKey_writeRsaPrv(
+SeosCryptoLib_Key_writeRsaPrv(
     const SeosCryptoLib_Key* key,
     mbedtls_rsa_context*     rsa)
 {
-    SeosCryptoApi_Key_RsaRrv* prvKey = SeosCryptoKey_getRsaPrv(key);
+    SeosCryptoApi_Key_RsaRrv* prvKey = SeosCryptoLib_Key_getRsaPrv(key);
     return (mbedtls_rsa_import_raw(rsa,
                                    NULL, 0,
                                    prvKey->pBytes, prvKey->pLen,
@@ -972,11 +972,11 @@ SeosCryptoKey_writeRsaPrv(
 }
 
 seos_err_t
-SeosCryptoKey_writeDhPub(
+SeosCryptoLib_Key_writeDhPub(
     const SeosCryptoLib_Key* key,
     mbedtls_dhm_context*     dh)
 {
-    SeosCryptoApi_Key_DhPub* dhKey = SeosCryptoKey_getDhPub(key);
+    SeosCryptoApi_Key_DhPub* dhKey = SeosCryptoLib_Key_getDhPub(key);
     return mbedtls_mpi_read_binary(&dh->P, dhKey->params.pBytes,
                                    dhKey->params.pLen) != 0
            || mbedtls_mpi_read_binary(&dh->G, dhKey->params.gBytes,
@@ -987,11 +987,11 @@ SeosCryptoKey_writeDhPub(
 }
 
 seos_err_t
-SeosCryptoKey_writeDhPrv(
+SeosCryptoLib_Key_writeDhPrv(
     const SeosCryptoLib_Key* key,
     mbedtls_dhm_context*     dh)
 {
-    SeosCryptoApi_Key_DhPrv* dhKey = SeosCryptoKey_getDhPrv(key);
+    SeosCryptoApi_Key_DhPrv* dhKey = SeosCryptoLib_Key_getDhPrv(key);
     return mbedtls_mpi_read_binary(&dh->P, dhKey->params.pBytes,
                                    dhKey->params.pLen) != 0
            || mbedtls_mpi_read_binary(&dh->G, dhKey->params.gBytes,
@@ -1002,11 +1002,11 @@ SeosCryptoKey_writeDhPrv(
 }
 
 seos_err_t
-SeosCryptoKey_writeSecp256r1Pub(
+SeosCryptoLib_Key_writeSecp256r1Pub(
     const SeosCryptoLib_Key* key,
     mbedtls_ecdh_context*    ecdh)
 {
-    SeosCryptoApi_Key_Secp256r1Pub* ecKey = SeosCryptoKey_getSecp256r1Pub(key);
+    SeosCryptoApi_Key_Secp256r1Pub* ecKey = SeosCryptoLib_Key_getSecp256r1Pub(key);
     return mbedtls_mpi_read_binary(&ecdh->Qp.X, ecKey->qxBytes, ecKey->qxLen) != 0
            || mbedtls_mpi_read_binary(&ecdh->Qp.Y, ecKey->qyBytes, ecKey->qyLen) != 0
            || mbedtls_mpi_lset(&ecdh->Qp.Z, 1) != 0
@@ -1015,11 +1015,11 @@ SeosCryptoKey_writeSecp256r1Pub(
 }
 
 seos_err_t
-SeosCryptoKey_writeSecp256r1Prv(
+SeosCryptoLib_Key_writeSecp256r1Prv(
     const SeosCryptoLib_Key* key,
     mbedtls_ecdh_context*    ecdh)
 {
-    SeosCryptoApi_Key_Secp256r1Prv* ecKey = SeosCryptoKey_getSecp256r1Prv(key);
+    SeosCryptoApi_Key_Secp256r1Prv* ecKey = SeosCryptoLib_Key_getSecp256r1Prv(key);
     return mbedtls_ecp_group_load(&ecdh->grp, MBEDTLS_ECP_DP_SECP256R1) != 0
            || mbedtls_mpi_read_binary(&ecdh->d, ecKey->dBytes, ecKey->dLen) != 0
            || mbedtls_ecp_check_privkey(&ecdh->grp, &ecdh->d) != 0 ?

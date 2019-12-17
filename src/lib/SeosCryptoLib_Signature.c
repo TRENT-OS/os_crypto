@@ -86,7 +86,7 @@ setKeyImpl(
             {
                 return SEOS_ERROR_INVALID_PARAMETER;
             }
-            err = SeosCryptoKey_writeRsaPub(self->pubKey, &self->mbedtls.rsa);
+            err = SeosCryptoLib_Key_writeRsaPub(self->pubKey, &self->mbedtls.rsa);
         }
         if (SEOS_SUCCESS == err && NULL != self->prvKey)
         {
@@ -94,7 +94,7 @@ setKeyImpl(
             {
                 return SEOS_ERROR_INVALID_PARAMETER;
             }
-            err = SeosCryptoKey_writeRsaPrv(self->prvKey, &self->mbedtls.rsa);
+            err = SeosCryptoLib_Key_writeRsaPrv(self->prvKey, &self->mbedtls.rsa);
         }
         break;
     default:
@@ -113,7 +113,7 @@ verifyHashImpl(
     const void*              signature,
     const size_t             signatureSize)
 {
-    void* rngFunc = (NULL != rng) ? SeosCryptoRng_getBytesMbedtls : NULL;
+    void* rngFunc = (NULL != rng) ? SeosCryptoLib_Rng_getBytesMbedtls : NULL;
     seos_err_t err = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
@@ -149,7 +149,7 @@ signHashImpl(
     void*                    signature,
     size_t*                  signatureSize)
 {
-    void* rngFunc = (NULL != rng) ? SeosCryptoRng_getBytesMbedtls : NULL;
+    void* rngFunc = (NULL != rng) ? SeosCryptoLib_Rng_getBytesMbedtls : NULL;
     seos_err_t err = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
@@ -181,7 +181,7 @@ signHashImpl(
 // Public Functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoSignature_init(
+SeosCryptoLib_Signature_init(
     SeosCryptoLib_Signature*          self,
     const SeosCryptoApi_MemIf*        memIf,
     const SeosCryptoApi_Signature_Alg algorithm,
@@ -221,7 +221,7 @@ err0:
 }
 
 seos_err_t
-SeosCryptoSignature_free(
+SeosCryptoLib_Signature_free(
     SeosCryptoLib_Signature*   self,
     const SeosCryptoApi_MemIf* memIf)
 {
@@ -234,7 +234,7 @@ SeosCryptoSignature_free(
 }
 
 seos_err_t
-SeosCryptoSignature_sign(
+SeosCryptoLib_Signature_sign(
     SeosCryptoLib_Signature* self,
     SeosCryptoLib_Rng*       rng,
     const void*              hash,
@@ -254,7 +254,7 @@ SeosCryptoSignature_sign(
 }
 
 seos_err_t
-SeosCryptoSignature_verify(
+SeosCryptoLib_Signature_verify(
     SeosCryptoLib_Signature* self,
     SeosCryptoLib_Rng*       rng,
     const void*              hash,

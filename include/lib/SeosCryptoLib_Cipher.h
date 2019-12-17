@@ -46,7 +46,7 @@ struct SeosCryptoLib_Cipher
 // Internal functions ----------------------------------------------------------
 
 seos_err_t
-SeosCryptoCipher_init(
+SeosCryptoLib_Cipher_init(
     SeosCryptoLib_Cipher*          self,
     const SeosCryptoApi_MemIf*     memIf,
     const SeosCryptoApi_Cipher_Alg algorithm,
@@ -55,18 +55,18 @@ SeosCryptoCipher_init(
     size_t                         ivLen);
 
 seos_err_t
-SeosCryptoCipher_free(
+SeosCryptoLib_Cipher_free(
     SeosCryptoLib_Cipher*      self,
     const SeosCryptoApi_MemIf* memIf);
 
 seos_err_t
-SeosCryptoCipher_start(
+SeosCryptoLib_Cipher_start(
     SeosCryptoLib_Cipher* self,
     const void*           input,
     const size_t          inputSize);
 
 seos_err_t
-SeosCryptoCipher_process(
+SeosCryptoLib_Cipher_process(
     SeosCryptoLib_Cipher* self,
     const void*           input,
     const size_t          inputSize,
@@ -74,7 +74,7 @@ SeosCryptoCipher_process(
     size_t*               outputSize);
 
 seos_err_t
-SeosCryptoCipher_finalize(
+SeosCryptoLib_Cipher_finalize(
     SeosCryptoLib_Cipher* self,
     void*                 output,
     size_t*               outputSize);

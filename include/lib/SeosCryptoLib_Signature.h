@@ -13,6 +13,7 @@
 #pragma once
 
 #include "SeosCryptoApi.h"
+#include "lib/SeosCryptoLib_Rng.h"
 
 #include "mbedtls/rsa.h"
 
@@ -39,7 +40,7 @@ struct SeosCryptoLib_Signature
 // Internal functions ----------------------------------------------------------
 
 seos_err_t
-SeosCryptoSignature_init(
+SeosCryptoLib_Signature_init(
     SeosCryptoLib_Signature*          self,
     const SeosCryptoApi_MemIf*        memIf,
     const SeosCryptoApi_Signature_Alg algorithm,
@@ -48,12 +49,12 @@ SeosCryptoSignature_init(
     const SeosCryptoLib_Key*          pubKey);
 
 seos_err_t
-SeosCryptoSignature_free(
+SeosCryptoLib_Signature_free(
     SeosCryptoLib_Signature*   self,
     const SeosCryptoApi_MemIf* memIf);
 
 seos_err_t
-SeosCryptoSignature_sign(
+SeosCryptoLib_Signature_sign(
     SeosCryptoLib_Signature* self,
     SeosCryptoLib_Rng*       rng,
     const void*              hash,
@@ -62,7 +63,7 @@ SeosCryptoSignature_sign(
     size_t*                  signatureSize);
 
 seos_err_t
-SeosCryptoSignature_verify(
+SeosCryptoLib_Signature_verify(
     SeosCryptoLib_Signature* self,
     SeosCryptoLib_Rng*       rng,
     const void*              hash,

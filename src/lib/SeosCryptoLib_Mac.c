@@ -146,7 +146,7 @@ finalizeImpl(
 // Public Functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoMac_init(
+SeosCryptoLib_Mac_init(
     SeosCryptoLib_Mac*          self,
     const SeosCryptoApi_MemIf*  memIf,
     const SeosCryptoApi_Mac_Alg algorithm)
@@ -166,7 +166,7 @@ SeosCryptoMac_init(
 }
 
 seos_err_t
-SeosCryptoMac_free(
+SeosCryptoLib_Mac_free(
     SeosCryptoLib_Mac*         self,
     const SeosCryptoApi_MemIf* memIf)
 {
@@ -179,7 +179,7 @@ SeosCryptoMac_free(
 }
 
 seos_err_t
-SeosCryptoMac_start(
+SeosCryptoLib_Mac_start(
     SeosCryptoLib_Mac* self,
     const void*        secret,
     const size_t       secretSize)
@@ -199,7 +199,7 @@ SeosCryptoMac_start(
 }
 
 seos_err_t
-SeosCryptoMac_process(
+SeosCryptoLib_Mac_process(
     SeosCryptoLib_Mac* self,
     const void*        data,
     const size_t       dataSize)
@@ -219,7 +219,7 @@ SeosCryptoMac_process(
 }
 
 seos_err_t
-SeosCryptoMac_finalize(
+SeosCryptoLib_Mac_finalize(
     SeosCryptoLib_Mac* self,
     void*              mac,
     size_t*            macSize)

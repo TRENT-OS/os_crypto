@@ -150,7 +150,7 @@ cloneImpl(
 // Public Functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoDigest_init(
+SeosCryptoLib_Digest_init(
     SeosCryptoLib_Digest*          self,
     const SeosCryptoApi_MemIf*     memIf,
     const SeosCryptoApi_Digest_Alg algorithm)
@@ -169,7 +169,7 @@ SeosCryptoDigest_init(
 }
 
 seos_err_t
-SeosCryptoDigest_free(
+SeosCryptoLib_Digest_free(
     SeosCryptoLib_Digest*      self,
     const SeosCryptoApi_MemIf* memIf)
 {
@@ -182,7 +182,7 @@ SeosCryptoDigest_free(
 }
 
 seos_err_t
-SeosCryptoDigest_clone(
+SeosCryptoLib_Digest_clone(
     SeosCryptoLib_Digest*       self,
     const SeosCryptoLib_Digest* source)
 {
@@ -197,7 +197,7 @@ SeosCryptoDigest_clone(
 }
 
 seos_err_t
-SeosCryptoDigest_process(
+SeosCryptoLib_Digest_process(
     SeosCryptoLib_Digest* self,
     const void*           data,
     const size_t          len)
@@ -216,7 +216,7 @@ SeosCryptoDigest_process(
 }
 
 seos_err_t
-SeosCryptoDigest_finalize(
+SeosCryptoLib_Digest_finalize(
     SeosCryptoLib_Digest* self,
     void*                 digest,
     size_t*               digestSize)

@@ -9,7 +9,7 @@
 #include <string.h>
 
 seos_err_t
-SeosCryptoRng_init(
+SeosCryptoLib_Rng_init(
     SeosCryptoLib_Rng*                   self,
     const SeosCryptoApi_MemIf*           memIf,
     const SeosCryptoApi_Rng_EntropyFunc* entropyFunc,
@@ -44,7 +44,7 @@ err0:
 }
 
 seos_err_t
-SeosCryptoRng_getBytes(
+SeosCryptoLib_Rng_getBytes(
     SeosCryptoLib_Rng*           self,
     const SeosCryptoApi_Rng_Flag flags,
     void*                        buf,
@@ -64,7 +64,7 @@ SeosCryptoRng_getBytes(
 }
 
 seos_err_t
-SeosCryptoRng_reSeed(
+SeosCryptoLib_Rng_reSeed(
     SeosCryptoLib_Rng* self,
     const void*        seed,
     const size_t       seedLen)
@@ -84,7 +84,7 @@ SeosCryptoRng_reSeed(
 }
 
 seos_err_t
-SeosCryptoRng_free(
+SeosCryptoLib_Rng_free(
     SeosCryptoLib_Rng*         self,
     const SeosCryptoApi_MemIf* memIf)
 {

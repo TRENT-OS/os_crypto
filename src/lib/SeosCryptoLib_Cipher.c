@@ -90,7 +90,7 @@ setKeyImpl(
     case SeosCryptoApi_Cipher_ALG_AES_GCM_ENC:
     case SeosCryptoApi_Cipher_ALG_AES_GCM_DEC:
         if (SeosCryptoApi_Key_TYPE_AES != self->key->type ||
-            (aesKey = SeosCryptoKey_getAes(self->key)) == NULL)
+            (aesKey = SeosCryptoLib_Key_getAes(self->key)) == NULL)
         {
             return SEOS_ERROR_INVALID_PARAMETER;
         }
@@ -352,7 +352,7 @@ finalizeImpl(
 // Public functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoCipher_init(
+SeosCryptoLib_Cipher_init(
     SeosCryptoLib_Cipher*          self,
     const SeosCryptoApi_MemIf*     memIf,
     const SeosCryptoApi_Cipher_Alg algorithm,
@@ -396,7 +396,7 @@ err0:
 }
 
 seos_err_t
-SeosCryptoCipher_free(
+SeosCryptoLib_Cipher_free(
     SeosCryptoLib_Cipher*      self,
     const SeosCryptoApi_MemIf* memIf)
 {
@@ -409,7 +409,7 @@ SeosCryptoCipher_free(
 }
 
 seos_err_t
-SeosCryptoCipher_start(
+SeosCryptoLib_Cipher_start(
     SeosCryptoLib_Cipher* self,
     const void*           input,
     const size_t          inputSize)
@@ -428,7 +428,7 @@ SeosCryptoCipher_start(
 }
 
 seos_err_t
-SeosCryptoCipher_process(
+SeosCryptoLib_Cipher_process(
     SeosCryptoLib_Cipher* self,
     const void*           input,
     const size_t          inputSize,
@@ -453,7 +453,7 @@ SeosCryptoCipher_process(
 }
 
 seos_err_t
-SeosCryptoCipher_finalize(
+SeosCryptoLib_Cipher_finalize(
     SeosCryptoLib_Cipher* self,
     void*                 buf,
     size_t*               bufSize)

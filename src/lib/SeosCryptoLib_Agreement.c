@@ -73,12 +73,12 @@ setKeyImpl(
     case SeosCryptoApi_Agreement_ALG_DH:
         err = (self->prvKey->type != SeosCryptoApi_Key_TYPE_DH_PRV) ?
               SEOS_ERROR_INVALID_PARAMETER :
-              SeosCryptoKey_writeDhPrv(self->prvKey, &self->mbedtls.dh);
+              SeosCryptoLib_Key_writeDhPrv(self->prvKey, &self->mbedtls.dh);
         break;
     case SeosCryptoApi_Agreement_ALG_ECDH:
         err = (self->prvKey->type != SeosCryptoApi_Key_TYPE_SECP256R1_PRV) ?
               SEOS_ERROR_INVALID_PARAMETER :
-              SeosCryptoKey_writeSecp256r1Prv(self->prvKey, &self->mbedtls.ecdh);
+              SeosCryptoLib_Key_writeSecp256r1Prv(self->prvKey, &self->mbedtls.ecdh);
         break;
     default:
         err = SEOS_ERROR_NOT_SUPPORTED;
@@ -95,14 +95,14 @@ agreeImpl(
     void*                    buf,
     size_t*                  bufSize)
 {
-    void* rngFunc = (NULL != rng) ? SeosCryptoRng_getBytesMbedtls : NULL;
+    void* rngFunc = (NULL != rng) ? SeosCryptoLib_Rng_getBytesMbedtls : NULL;
     seos_err_t err = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
     case SeosCryptoApi_Agreement_ALG_DH:
         if ((pubKey->type != SeosCryptoApi_Key_TYPE_DH_PUB)
-            || SeosCryptoKey_writeDhPub(pubKey, &self->mbedtls.dh) != SEOS_SUCCESS)
+            || SeosCryptoLib_Key_writeDhPub(pubKey, &self->mbedtls.dh) != SEOS_SUCCESS)
         {
             err = SEOS_ERROR_INVALID_PARAMETER;
         }
@@ -120,8 +120,8 @@ agreeImpl(
         break;
     case SeosCryptoApi_Agreement_ALG_ECDH:
         if ((pubKey->type != SeosCryptoApi_Key_TYPE_SECP256R1_PUB)
-            || SeosCryptoKey_writeSecp256r1Pub(pubKey,
-                                               &self->mbedtls.ecdh) != SEOS_SUCCESS)
+            || SeosCryptoLib_Key_writeSecp256r1Pub(pubKey,
+                                                   &self->mbedtls.ecdh) != SEOS_SUCCESS)
         {
             err = SEOS_ERROR_INVALID_PARAMETER;
         }
@@ -147,7 +147,7 @@ agreeImpl(
 // Public Functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoAgreement_init(
+SeosCryptoLib_Agreement_init(
     SeosCryptoLib_Agreement*          self,
     const SeosCryptoApi_MemIf*        memIf,
     const SeosCryptoApi_Agreement_Alg algorithm,
@@ -186,7 +186,7 @@ exit:
 }
 
 seos_err_t
-SeosCryptoAgreement_agree(
+SeosCryptoLib_Agreement_agree(
     SeosCryptoLib_Agreement* self,
     SeosCryptoLib_Rng*       rng,
     const SeosCryptoLib_Key* pubKey,
@@ -202,7 +202,7 @@ SeosCryptoAgreement_agree(
 }
 
 seos_err_t
-SeosCryptoAgreement_free(
+SeosCryptoLib_Agreement_free(
     SeosCryptoLib_Agreement*   self,
     const SeosCryptoApi_MemIf* memIf)
 {

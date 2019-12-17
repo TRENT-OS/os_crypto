@@ -13,6 +13,7 @@
 #pragma once
 
 #include "SeosCryptoApi.h"
+#include "lib/SeosCryptoLib_Rng.h"
 
 #include "mbedtls/dhm.h"
 #include "mbedtls/ecdh.h"
@@ -36,14 +37,14 @@ struct SeosCryptoLib_Agreement
 // Internal functions ----------------------------------------------------------
 
 seos_err_t
-SeosCryptoAgreement_init(
+SeosCryptoLib_Agreement_init(
     SeosCryptoLib_Agreement*          self,
     const SeosCryptoApi_MemIf*        memIf,
     const SeosCryptoApi_Agreement_Alg algorithm,
     const SeosCryptoLib_Key*          privateKey);
 
 seos_err_t
-SeosCryptoAgreement_agree(
+SeosCryptoLib_Agreement_agree(
     SeosCryptoLib_Agreement* self,
     SeosCryptoLib_Rng*       rng,
     const SeosCryptoLib_Key* pubKey,
@@ -51,7 +52,7 @@ SeosCryptoAgreement_agree(
     size_t*                  sharedSize);
 
 seos_err_t
-SeosCryptoAgreement_free(
+SeosCryptoLib_Agreement_free(
     SeosCryptoLib_Agreement*   self,
     const SeosCryptoApi_MemIf* memIf);
 
