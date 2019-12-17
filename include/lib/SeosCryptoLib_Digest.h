@@ -67,7 +67,7 @@ seos_err_t
 SeosCryptoLib_Digest_process(
     SeosCryptoLib_Digest* self,
     const void*           data,
-    const size_t          dataLen);
+    const size_t          dataSize);
 
 seos_err_t
 SeosCryptoLib_Digest_finalize(

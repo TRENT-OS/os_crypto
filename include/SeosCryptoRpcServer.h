@@ -48,12 +48,12 @@ seos_err_t
 SeosCryptoRpcServer_Rng_getBytes(
     SeosCryptoApi_Ptr api,
     unsigned int      flags,
-    size_t            dataLen);
+    size_t            dataSize);
 
 seos_err_t
 SeosCryptoRpcServer_Rng_reseed(
     SeosCryptoApi_Ptr api,
-    size_t            seedLen);
+    size_t            seedSize);
 
 // -------------------------------- MAC API ------------------------------------
 
@@ -114,7 +114,7 @@ seos_err_t
 SeosCryptoRpcServer_Digest_process(
     SeosCryptoApi_Ptr        api,
     SeosCryptoLib_Digest_Ptr digPtr,
-    size_t                   inLen);
+    size_t                   inSize);
 
 seos_err_t
 SeosCryptoRpcServer_Digest_finalize(
@@ -232,7 +232,7 @@ SeosCryptoRpcServer_Cipher_init(
     SeosCryptoLib_Cipher_Ptr* pCipherPtr,
     SeosCryptoApi_Cipher_Alg  algorithm,
     SeosCryptoLib_Key_CPtr    keyPtr,
-    size_t                    ivLen);
+    size_t                    ivSize);
 
 seos_err_t
 SeosCryptoRpcServer_Cipher_free(
@@ -243,7 +243,7 @@ seos_err_t
 SeosCryptoRpcServer_Cipher_process(
     SeosCryptoApi_Ptr        api,
     SeosCryptoLib_Cipher_Ptr cipherPtr,
-    size_t                   inputLen,
+    size_t                   inputSize,
     size_t*                  outputSize);
 
 seos_err_t

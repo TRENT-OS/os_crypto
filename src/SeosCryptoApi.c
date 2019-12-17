@@ -161,11 +161,6 @@ SeosCryptoApi_Rng_getBytes(
     void*                        buf,
     const size_t                 bufSize)
 {
-    if (bufSize > SeosCryptoLib_SIZE_BUFFER)
-    {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
-    }
-
     return CALL_SAFE(ctx, Rng_getBytes, flags, buf, bufSize);
 }
 
@@ -173,14 +168,9 @@ seos_err_t
 SeosCryptoApi_Rng_reseed(
     SeosCryptoApi* ctx,
     const void*    seed,
-    const size_t   seedLen)
+    const size_t   seedSize)
 {
-    if (seedLen > SeosCryptoLib_SIZE_BUFFER)
-    {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
-    }
-
-    return CALL_SAFE(ctx, Rng_reseed, seed, seedLen);
+    return CALL_SAFE(ctx, Rng_reseed, seed, seedSize);
 }
 
 // ------------------------------- MAC API -------------------------------------
@@ -209,11 +199,6 @@ SeosCryptoApi_Mac_start(
     const void*        secret,
     const size_t       secretSize)
 {
-    if (secretSize > SeosCryptoLib_SIZE_BUFFER)
-    {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
-    }
-
     return CALL_SAFE(wrap, Mac_start, wrap->mac, secret, secretSize);
 }
 
@@ -223,11 +208,6 @@ SeosCryptoApi_Mac_process(
     const void*        data,
     const size_t       dataSize)
 {
-    if (dataSize > SeosCryptoLib_SIZE_BUFFER)
-    {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
-    }
-
     return CALL_SAFE(wrap, Mac_process, wrap->mac, data, dataSize);
 }
 
@@ -237,11 +217,6 @@ SeosCryptoApi_Mac_finalize(
     void*              mac,
     size_t*            macSize)
 {
-    if (NULL != macSize && *macSize > SeosCryptoLib_SIZE_BUFFER)
-    {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
-    }
-
     return CALL_SAFE(wrap, Mac_finalize, wrap->mac, mac, macSize);
 }
 
@@ -278,14 +253,9 @@ seos_err_t
 SeosCryptoApi_Digest_process(
     SeosCryptoApi_Digest* wrap,
     const void*           data,
-    const size_t          dataLen)
+    const size_t          dataSize)
 {
-    if (dataLen > SeosCryptoLib_SIZE_BUFFER)
-    {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
-    }
-
-    return CALL_SAFE(wrap, Digest_process, wrap->digest, data, dataLen);
+    return CALL_SAFE(wrap, Digest_process, wrap->digest, data, dataSize);
 }
 
 seos_err_t
@@ -294,11 +264,6 @@ SeosCryptoApi_Digest_finalize(
     void*                 digest,
     size_t*               digestSize)
 {
-    if (NULL != digestSize && *digestSize > SeosCryptoLib_SIZE_BUFFER)
-    {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
-    }
-
     return CALL_SAFE(wrap, Digest_finalize, wrap->digest, digest, digestSize);
 }
 
@@ -334,13 +299,6 @@ SeosCryptoApi_Signature_sign(
     void*                    signature,
     size_t*                  signatureSize)
 {
-    // They use the same buffer, but sequentially
-    if (hashSize > SeosCryptoLib_SIZE_BUFFER
-        || (NULL != signatureSize && *signatureSize > SeosCryptoLib_SIZE_BUFFER))
-    {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
-    }
-
     return CALL_SAFE(wrap, Signature_sign, wrap->signature, hash, hashSize,
                      signature, signatureSize);
 }
@@ -353,12 +311,6 @@ SeosCryptoApi_Signature_verify(
     const void*              signature,
     const size_t             signatureSize)
 {
-    // They use the same buffer, but in parallel
-    if (hashSize + signatureSize > SeosCryptoLib_SIZE_BUFFER)
-    {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
-    }
-
     return CALL_SAFE(wrap, Signature_verify, wrap->signature, hash, hashSize,
                      signature, signatureSize);
 }
@@ -392,11 +344,6 @@ SeosCryptoApi_Agreement_agree(
     void*                    shared,
     size_t*                  sharedSize)
 {
-    if (NULL != sharedSize && *sharedSize > SeosCryptoLib_SIZE_BUFFER)
-    {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
-    }
-
     return CALL_SAFE(wrap, Agreement_agree, wrap->agreement, UNWRAP_SAFE(pubKey,
                      key), shared, sharedSize);
 }
@@ -460,11 +407,6 @@ SeosCryptoApi_Key_getParams(
     void*                    keyParams,
     size_t*                  paramSize)
 {
-    if (NULL != paramSize && *paramSize > SeosCryptoLib_SIZE_BUFFER)
-    {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
-    }
-
     return CALL_SAFE(wrap, Key_getParams, wrap->key, keyParams, paramSize);
 }
 
@@ -482,11 +424,6 @@ SeosCryptoApi_Key_loadParams(
     void*                         keyParams,
     size_t*                       paramSize)
 {
-    if (NULL != paramSize && *paramSize > SeosCryptoLib_SIZE_BUFFER)
-    {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
-    }
-
     return CALL_SAFE(api, Key_loadParams, name, keyParams, paramSize);
 }
 
@@ -499,17 +436,12 @@ SeosCryptoApi_Cipher_init(
     const SeosCryptoApi_Cipher_Alg algorithm,
     const SeosCryptoApi_Key*       symKey,
     const void*                    iv,
-    const size_t                   ivLen)
+    const size_t                   ivSize)
 {
-    if (ivLen > SeosCryptoLib_SIZE_BUFFER)
-    {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
-    }
-
     INIT_SAFE(wrap, api);
 
     return CALL_SAFE(wrap, Cipher_init, &wrap->cipher, algorithm,
-                     UNWRAP_SAFE(symKey, key), iv, ivLen);
+                     UNWRAP_SAFE(symKey, key), iv, ivSize);
 }
 
 seos_err_t
@@ -522,19 +454,12 @@ SeosCryptoApi_Cipher_free(
 seos_err_t
 SeosCryptoApi_Cipher_process(
     SeosCryptoApi_Cipher* wrap,
-    const void*           data,
-    const size_t          dataSize,
+    const void*           input,
+    const size_t          inputSize,
     void*                 output,
     size_t*               outputSize)
 {
-    // They use the same buffer, but sequentially
-    if (dataSize > SeosCryptoLib_SIZE_BUFFER ||
-        (NULL != outputSize && *outputSize > SeosCryptoLib_SIZE_BUFFER))
-    {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
-    }
-
-    return CALL_SAFE(wrap, Cipher_process, wrap->cipher, data, dataSize, output,
+    return CALL_SAFE(wrap, Cipher_process, wrap->cipher, input, inputSize, output,
                      outputSize);
 }
 
@@ -544,11 +469,6 @@ SeosCryptoApi_Cipher_start(
     const void*           ad,
     const size_t          adSize)
 {
-    if (adSize > SeosCryptoLib_SIZE_BUFFER)
-    {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
-    }
-
     return CALL_SAFE(wrap, Cipher_start, wrap->cipher, ad, adSize);
 }
 
@@ -558,10 +478,5 @@ SeosCryptoApi_Cipher_finalize(
     void*                 output,
     size_t*               outputSize)
 {
-    if (NULL != outputSize && *outputSize > SeosCryptoLib_SIZE_BUFFER)
-    {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
-    }
-
     return CALL_SAFE(wrap, Cipher_finalize, wrap->cipher, output, outputSize);
 }

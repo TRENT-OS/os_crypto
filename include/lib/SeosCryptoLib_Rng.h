@@ -47,7 +47,7 @@ seos_err_t
 SeosCryptoLib_Rng_reSeed(
     SeosCryptoLib_Rng* self,
     const void*        seed,
-    const size_t       seedLen);
+    const size_t       seedSize);
 
 seos_err_t
 SeosCryptoLib_Rng_free(

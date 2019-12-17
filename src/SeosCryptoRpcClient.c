@@ -21,7 +21,7 @@ Rng_getBytes(
     SeosCryptoApi*               api,
     const SeosCryptoApi_Rng_Flag flags,
     void*                        buf,
-    const size_t                 bufLen)
+    const size_t                 bufSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
@@ -30,15 +30,15 @@ Rng_getBytes(
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
+    else if (bufSize > SeosCryptoApi_SIZE_DATAPORT)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
 
     if ((err = SeosCryptoRpcServer_Rng_getBytes(self->api, flags,
-                                                bufLen)) == SEOS_SUCCESS)
+                                                bufSize)) == SEOS_SUCCESS)
     {
-        if (bufLen > SeosCryptoApi_SIZE_DATAPORT)
-        {
-            return SEOS_ERROR_INSUFFICIENT_SPACE;
-        }
-        memcpy(buf, self->dataPort, bufLen);
+        memcpy(buf, self->dataPort, bufSize);
     }
 
     return err;
@@ -48,7 +48,7 @@ static seos_err_t
 Rng_reseed(
     SeosCryptoApi* api,
     const void*    seed,
-    const size_t   seedLen)
+    const size_t   seedSize)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -56,13 +56,13 @@ Rng_reseed(
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if (seedLen > SeosCryptoApi_SIZE_DATAPORT)
+    else if (seedSize > SeosCryptoApi_SIZE_DATAPORT)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    memcpy(self->dataPort, seed, seedLen);
-    return SeosCryptoRpcServer_Rng_reseed(self->api, seedLen);
+    memcpy(self->dataPort, seed, seedSize);
+    return SeosCryptoRpcServer_Rng_reseed(self->api, seedSize);
 }
 
 // ------------------------------- MAC API -------------------------------------
@@ -107,7 +107,7 @@ Mac_start(
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
-    if (NULL == api || NULL == secret || 0 == secretSize)
+    if (NULL == api || NULL == secret)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -125,21 +125,21 @@ Mac_process(
     SeosCryptoApi*     api,
     SeosCryptoLib_Mac* macHandle,
     const void*        data,
-    const size_t       dataLen)
+    const size_t       dataSize)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
-    if (NULL == api || NULL == data || 0 == dataLen)
+    if (NULL == api || NULL == data)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if (dataLen > SeosCryptoApi_SIZE_DATAPORT)
+    else if (dataSize > SeosCryptoApi_SIZE_DATAPORT)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    memcpy(self->dataPort, data, dataLen);
-    return SeosCryptoRpcServer_Mac_process(self->api, macHandle, dataLen);
+    memcpy(self->dataPort, data, dataSize);
+    return SeosCryptoRpcServer_Mac_process(self->api, macHandle, dataSize);
 }
 
 static seos_err_t
@@ -156,14 +156,14 @@ Mac_finalize(
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
+    else if (*macSize > SeosCryptoApi_SIZE_DATAPORT)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
 
     if ((err = SeosCryptoRpcServer_Mac_finalize(self->api, macHandle,
                                                 macSize)) == SEOS_SUCCESS)
     {
-        if (*macSize > SeosCryptoApi_SIZE_DATAPORT)
-        {
-            return SEOS_ERROR_INSUFFICIENT_SPACE;
-        }
         memcpy(mac, self->dataPort, *macSize);
     }
 
@@ -225,21 +225,21 @@ Digest_process(
     SeosCryptoApi*        api,
     SeosCryptoLib_Digest* digestHandle,
     const void*           data,
-    const size_t          dataLen)
+    const size_t          dataSize)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
-    if (NULL == api || NULL == data || 0 == dataLen)
+    if (NULL == api || NULL == data)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if (dataLen > SeosCryptoApi_SIZE_DATAPORT)
+    else if (dataSize > SeosCryptoApi_SIZE_DATAPORT)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    memcpy(self->dataPort, data, dataLen);
-    return SeosCryptoRpcServer_Digest_process(self->api, digestHandle, dataLen);
+    memcpy(self->dataPort, data, dataSize);
+    return SeosCryptoRpcServer_Digest_process(self->api, digestHandle, dataSize);
 }
 
 static seos_err_t
@@ -256,14 +256,14 @@ Digest_finalize(
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
+    else if (*digestSize > SeosCryptoApi_SIZE_DATAPORT)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
 
     if ((err = SeosCryptoRpcServer_Digest_finalize(self->api, digestHandle,
                                                    digestSize)) == SEOS_SUCCESS)
     {
-        if (*digestSize > SeosCryptoApi_SIZE_DATAPORT)
-        {
-            return SEOS_ERROR_INSUFFICIENT_SPACE;
-        }
         memcpy(digest, self->dataPort, *digestSize);
     }
 
@@ -327,15 +327,15 @@ Signature_sign(
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
+    else if (*signatureSize > SeosCryptoApi_SIZE_DATAPORT)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
 
     memcpy(self->dataPort, hash, hashSize);
     if ((err = SeosCryptoRpcServer_Signature_sign(self->api, sigObj,
                                                   hashSize, signatureSize)) == SEOS_SUCCESS)
     {
-        if (*signatureSize > SeosCryptoApi_SIZE_DATAPORT)
-        {
-            return SEOS_ERROR_INSUFFICIENT_SPACE;
-        }
         memcpy(signature, self->dataPort, *signatureSize);
     }
 
@@ -418,14 +418,14 @@ Agreement_agree(
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
+    else if (*sharedSize > SeosCryptoApi_SIZE_DATAPORT)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
 
     if ((err = SeosCryptoRpcServer_Agreement_agree(self->api, agrObj,
                                                    pubKey, sharedSize)) == SEOS_SUCCESS)
     {
-        if (*sharedSize > SeosCryptoApi_SIZE_DATAPORT)
-        {
-            return SEOS_ERROR_INSUFFICIENT_SPACE;
-        }
         memcpy(shared, self->dataPort, *sharedSize);
     }
 
@@ -526,14 +526,14 @@ Key_getParams(
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
+    else if (*paramSize > SeosCryptoApi_SIZE_DATAPORT)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
 
     if ((err = SeosCryptoRpcServer_Key_getParams(self->api,  keyObj,
                                                  paramSize)) == SEOS_SUCCESS)
     {
-        if (*paramSize > SeosCryptoApi_SIZE_DATAPORT)
-        {
-            return SEOS_ERROR_INSUFFICIENT_SPACE;
-        }
         memcpy(keyParams, self->dataPort, *paramSize);
     }
 
@@ -554,14 +554,14 @@ Key_loadParams(
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
+    else if (*paramSize > SeosCryptoApi_SIZE_DATAPORT)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
 
     if ((err = SeosCryptoRpcServer_Key_loadParams(self->api, name,
                                                   paramSize)) == SEOS_SUCCESS)
     {
-        if (*paramSize > SeosCryptoApi_SIZE_DATAPORT)
-        {
-            return SEOS_ERROR_INSUFFICIENT_SPACE;
-        }
         memcpy(keyParams, self->dataPort, *paramSize);
     }
 
@@ -592,7 +592,7 @@ Cipher_init(
     const SeosCryptoApi_Cipher_Alg algorithm,
     const SeosCryptoLib_Key*       key,
     const void*                    iv,
-    const size_t                   ivLen)
+    const size_t                   ivSize)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -603,15 +603,15 @@ Cipher_init(
 
     if (iv != NULL)
     {
-        if (ivLen > SeosCryptoApi_SIZE_DATAPORT)
+        if (ivSize > SeosCryptoApi_SIZE_DATAPORT)
         {
             return SEOS_ERROR_INSUFFICIENT_SPACE;
         }
-        memcpy(self->dataPort, iv, ivLen);
+        memcpy(self->dataPort, iv, ivSize);
     }
 
     return SeosCryptoRpcServer_Cipher_init(self->api, pCipherObj, algorithm,
-                                           key, ivLen);
+                                           key, ivSize);
 }
 
 static seos_err_t
@@ -649,15 +649,15 @@ Cipher_process(
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
+    else if (*outputSize > SeosCryptoApi_SIZE_DATAPORT)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
 
     memcpy(self->dataPort, input, inputSize);
     if ((err = SeosCryptoRpcServer_Cipher_process(self->api, cipherObj,
                                                   inputSize, outputSize)) == SEOS_SUCCESS)
     {
-        if (*outputSize > SeosCryptoApi_SIZE_DATAPORT)
-        {
-            return SEOS_ERROR_INSUFFICIENT_SPACE;
-        }
         memcpy(output, self->dataPort, *outputSize);
     }
 
@@ -669,7 +669,7 @@ Cipher_start(
     SeosCryptoApi*        api,
     SeosCryptoLib_Cipher* cipherObj,
     const void*           data,
-    const size_t          dataLen)
+    const size_t          dataSize)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) api;
 
@@ -680,14 +680,14 @@ Cipher_start(
 
     if (NULL != data)
     {
-        if (dataLen > SeosCryptoApi_SIZE_DATAPORT)
+        if (dataSize > SeosCryptoApi_SIZE_DATAPORT)
         {
             return SEOS_ERROR_INSUFFICIENT_SPACE;
         }
-        memcpy(self->dataPort, data, dataLen);
+        memcpy(self->dataPort, data, dataSize);
     }
 
-    return SeosCryptoRpcServer_Cipher_start(self->api, cipherObj, dataLen);
+    return SeosCryptoRpcServer_Cipher_start(self->api, cipherObj, dataSize);
 }
 
 static seos_err_t
@@ -713,10 +713,6 @@ Cipher_finalize(
     if ((err = SeosCryptoRpcServer_Cipher_finalize(self->api, cipherObj,
                                                    tagSize)) == SEOS_SUCCESS)
     {
-        if (*tagSize > SeosCryptoApi_SIZE_DATAPORT)
-        {
-            return SEOS_ERROR_INSUFFICIENT_SPACE;
-        }
         memcpy(tag, self->dataPort, *tagSize);
     }
 

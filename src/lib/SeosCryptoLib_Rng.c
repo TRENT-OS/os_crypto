@@ -67,15 +67,15 @@ seos_err_t
 SeosCryptoLib_Rng_reSeed(
     SeosCryptoLib_Rng* self,
     const void*        seed,
-    const size_t       seedLen)
+    const size_t       seedSize)
 {
-    if (NULL == seed || 0 == seedLen)
+    if (NULL == seed || 0 == seedSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
     // Update RNG state with additional seed data
-    if (mbedtls_ctr_drbg_update_ret(&self->drbg, seed, seedLen) != 0)
+    if (mbedtls_ctr_drbg_update_ret(&self->drbg, seed, seedSize) != 0)
     {
         return SEOS_ERROR_ABORTED;
     }

@@ -52,7 +52,7 @@ SeosCryptoLib_Cipher_init(
     const SeosCryptoApi_Cipher_Alg algorithm,
     const SeosCryptoLib_Key*       key,
     const void*                    iv,
-    size_t                         ivLen);
+    size_t                         ivSize);
 
 seos_err_t
 SeosCryptoLib_Cipher_free(

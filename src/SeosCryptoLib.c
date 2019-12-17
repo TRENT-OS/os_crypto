@@ -84,7 +84,7 @@ Rng_getBytes(
     SeosCryptoApi*               api,
     const SeosCryptoApi_Rng_Flag flags,
     void*                        buf,
-    const size_t                 bufLen)
+    const size_t                 bufSize)
 {
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
@@ -92,15 +92,19 @@ Rng_getBytes(
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
+    else if (bufSize > SeosCryptoLib_SIZE_BUFFER)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
 
-    return SeosCryptoLib_Rng_getBytes(&self->cryptoRng, flags, buf, bufLen);
+    return SeosCryptoLib_Rng_getBytes(&self->cryptoRng, flags, buf, bufSize);
 }
 
 static seos_err_t
 Rng_reseed(
     SeosCryptoApi* api,
     const void*    seed,
-    const size_t   seedLen)
+    const size_t   seedSize)
 {
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
@@ -108,8 +112,12 @@ Rng_reseed(
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
+    else if (seedSize > SeosCryptoLib_SIZE_BUFFER)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
 
-    return SeosCryptoLib_Rng_reSeed(&self->cryptoRng, seed, seedLen);
+    return SeosCryptoLib_Rng_reSeed(&self->cryptoRng, seed, seedSize);
 }
 
 // -------------------------------- MAC API ------------------------------------
@@ -193,6 +201,10 @@ Mac_start(
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
+    else if (secretSize > SeosCryptoLib_SIZE_BUFFER)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
 
     return !hasObject(&self->macObjects, macObj) ? SEOS_ERROR_INVALID_HANDLE :
            SeosCryptoLib_Mac_start(macObj, secret, secretSize);
@@ -203,7 +215,7 @@ Mac_process(
     SeosCryptoApi*     api,
     SeosCryptoLib_Mac* macObj,
     const void*        data,
-    const size_t       dataLen)
+    const size_t       dataSize)
 {
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
@@ -211,9 +223,13 @@ Mac_process(
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
+    else if (dataSize > SeosCryptoLib_SIZE_BUFFER)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
 
     return !hasObject(&self->macObjects, macObj) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_Mac_process(macObj, data, dataLen);
+           SeosCryptoLib_Mac_process(macObj, data, dataSize);
 }
 
 static seos_err_t
@@ -225,9 +241,13 @@ Mac_finalize(
 {
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
-    if (NULL == api)
+    if (NULL == api || NULL == macSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else if (*macSize > SeosCryptoLib_SIZE_BUFFER)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
     return !hasObject(&self->macObjects, macObj) ? SEOS_ERROR_INVALID_HANDLE :
@@ -326,7 +346,7 @@ Digest_process(
     SeosCryptoApi*        api,
     SeosCryptoLib_Digest* digObj,
     const void*           data,
-    const size_t          dataLen)
+    const size_t          dataSize)
 {
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
@@ -334,9 +354,13 @@ Digest_process(
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
+    else if (dataSize > SeosCryptoLib_SIZE_BUFFER)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
 
     return !hasObject(&self->digestObjects, digObj) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_Digest_process(digObj, data, dataLen);
+           SeosCryptoLib_Digest_process(digObj, data, dataSize);
 }
 
 static seos_err_t
@@ -348,9 +372,13 @@ Digest_finalize(
 {
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
-    if (NULL == api)
+    if (NULL == api || NULL == digestSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else if (*digestSize > SeosCryptoLib_SIZE_BUFFER)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
     return !hasObject(&self->digestObjects, digObj) ? SEOS_ERROR_INVALID_HANDLE :
@@ -439,11 +467,12 @@ Signature_sign(
 {
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
-    if (NULL == api || NULL == hash)
+    if (NULL == api || NULL == hash || NULL == signatureSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if (hashSize > SeosCryptoLib_SIZE_BUFFER)
+    else if (hashSize > SeosCryptoLib_SIZE_BUFFER ||
+             *signatureSize > SeosCryptoLib_SIZE_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -469,6 +498,10 @@ Signature_verify(
     if (NULL == api)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else if (hashSize + signatureSize > SeosCryptoLib_SIZE_BUFFER)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
     return !hasObject(&self->signatureObjects, sigObj) ? SEOS_ERROR_INVALID_HANDLE :
@@ -560,9 +593,13 @@ Agreement_agree(
 {
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
-    if (NULL == api)
+    if (NULL == api || NULL == sharedSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else if (*sharedSize > SeosCryptoLib_SIZE_BUFFER)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
     return !hasObject(&self->agreementObjects, agrObj) ||
@@ -732,9 +769,13 @@ Key_getParams(
 {
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
-    if (NULL == api)
+    if (NULL == api || NULL == paramSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else if (*paramSize > SeosCryptoLib_SIZE_BUFFER)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
     return !hasObject(&self->keyObjects, keyObj) ? SEOS_ERROR_INVALID_HANDLE :
@@ -748,9 +789,13 @@ Key_loadParams(
     void*                         keyParams,
     size_t*                       paramSize)
 {
-    if (NULL == api)
+    if (NULL == api || NULL == paramSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else if (*paramSize > SeosCryptoLib_SIZE_BUFFER)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
     return SeosCryptoLib_Key_loadParams(name, keyParams, paramSize);
@@ -792,7 +837,7 @@ Cipher_init(
     const SeosCryptoApi_Cipher_Alg algorithm,
     const SeosCryptoLib_Key*       key,
     const void*                    iv,
-    const size_t                   ivLen)
+    const size_t                   ivSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
     SeosCryptoLib* self = (SeosCryptoLib*) api;
@@ -800,6 +845,10 @@ Cipher_init(
     if (NULL == api || NULL == pCipherObj)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else if (ivSize > SeosCryptoLib_SIZE_BUFFER)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
     else if (!hasObject(&self->keyObjects, key))
     {
@@ -812,7 +861,7 @@ Cipher_init(
     }
 
     if ((err = SeosCryptoLib_Cipher_init(*pCipherObj, &self->memIf, algorithm, key,
-                                         iv, ivLen)) != SEOS_SUCCESS)
+                                         iv, ivSize)) != SEOS_SUCCESS)
     {
         goto err0;
     }
@@ -845,8 +894,7 @@ Cipher_free(
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-
-    if ((pos = findObject(&self->cipherObjects, cipherObj)) == -1)
+    else if ((pos = findObject(&self->cipherObjects, cipherObj)) == -1)
     {
         return SEOS_ERROR_INVALID_HANDLE;
     }
@@ -871,11 +919,12 @@ Cipher_process(
 {
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
-    if (NULL == api || NULL == input)
+    if (NULL == api || NULL == input || NULL == outputSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if (inputSize > SeosCryptoLib_SIZE_BUFFER)
+    else if (inputSize > SeosCryptoLib_SIZE_BUFFER ||
+             *outputSize > SeosCryptoLib_SIZE_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -891,8 +940,8 @@ static seos_err_t
 Cipher_start(
     SeosCryptoApi*        api,
     SeosCryptoLib_Cipher* cipherObj,
-    const void*           input,
-    const size_t          inputSize)
+    const void*           ad,
+    const size_t          adSize)
 {
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
@@ -900,27 +949,35 @@ Cipher_start(
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
+    else if (adSize > SeosCryptoLib_SIZE_BUFFER)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
 
     return !hasObject(&self->cipherObjects, cipherObj) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_Cipher_start(cipherObj, input, inputSize);
+           SeosCryptoLib_Cipher_start(cipherObj, ad, adSize);
 }
 
 static seos_err_t
 Cipher_finalize(
     SeosCryptoApi*        api,
     SeosCryptoLib_Cipher* cipherObj,
-    void*                 buf,
-    size_t*               bufSize)
+    void*                 output,
+    size_t*               outputSize)
 {
     SeosCryptoLib* self = (SeosCryptoLib*) api;
 
-    if (NULL == api)
+    if (NULL == api || NULL == outputSize)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
+    else if (*outputSize > SeosCryptoLib_SIZE_BUFFER)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
 
     return !hasObject(&self->cipherObjects, cipherObj) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_Cipher_finalize(cipherObj, buf, bufSize);
+           SeosCryptoLib_Cipher_finalize(cipherObj, output, outputSize);
 }
 
 // ------------------------------- init/free -----------------------------------

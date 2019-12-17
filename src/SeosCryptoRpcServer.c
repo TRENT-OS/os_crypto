@@ -35,10 +35,10 @@ SeosCryptoRpcServer_Rng_getBytes(
 seos_err_t
 SeosCryptoRpcServer_Rng_reseed(
     SeosCryptoApi_Ptr api,
-    size_t            seedLen)
+    size_t            seedSize)
 {
     SeosCryptoRpcServer* self = api->server.context;
-    return CALL_SAFE(self, Rng_reseed, self->dataPort, seedLen);
+    return CALL_SAFE(self, Rng_reseed, self->dataPort, seedSize);
 }
 
 // ------------------------------ Digest API -----------------------------------
@@ -129,10 +129,10 @@ seos_err_t
 SeosCryptoRpcServer_Digest_process(
     SeosCryptoApi_Ptr        api,
     SeosCryptoLib_Digest_Ptr digestObj,
-    size_t                   inLen)
+    size_t                   inSize)
 {
     SeosCryptoRpcServer* self = api->server.context;
-    return CALL_SAFE(self, Digest_process, digestObj, self->dataPort, inLen);
+    return CALL_SAFE(self, Digest_process, digestObj, self->dataPort, inSize);
 }
 
 seos_err_t
@@ -316,11 +316,11 @@ SeosCryptoRpcServer_Cipher_init(
     SeosCryptoLib_Cipher_Ptr* pCipherObj,
     SeosCryptoApi_Cipher_Alg  algorithm,
     SeosCryptoLib_Key_CPtr    key,
-    size_t                    ivLen)
+    size_t                    ivSize)
 {
     SeosCryptoRpcServer* self = api->server.context;
     return CALL_SAFE(self, Cipher_init, pCipherObj, algorithm, key, self->dataPort,
-                     ivLen);
+                     ivSize);
 }
 
 seos_err_t
@@ -336,13 +336,13 @@ seos_err_t
 SeosCryptoRpcServer_Cipher_process(
     SeosCryptoApi_Ptr        api,
     SeosCryptoLib_Cipher_Ptr cipherObj,
-    size_t                   inputLen,
+    size_t                   inputSize,
     size_t*                  outputSize)
 {
     SeosCryptoRpcServer* self = api->server.context;
     *outputSize = (*outputSize <= SeosCryptoApi_SIZE_DATAPORT) ? *outputSize :
                   SeosCryptoApi_SIZE_DATAPORT;
-    return CALL_SAFE(self, Cipher_process, cipherObj, self->dataPort, inputLen,
+    return CALL_SAFE(self, Cipher_process, cipherObj, self->dataPort, inputSize,
                      self->dataPort, outputSize);
 }
 

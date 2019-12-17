@@ -131,7 +131,7 @@ static seos_err_t
 setIvImpl(
     SeosCryptoLib_Cipher* self,
     const void*           iv,
-    const size_t          ivLen)
+    const size_t          ivSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 
@@ -139,28 +139,28 @@ setIvImpl(
     {
     case SeosCryptoApi_Cipher_ALG_AES_CBC_ENC:
     case SeosCryptoApi_Cipher_ALG_AES_CBC_DEC:
-        err = (iv == NULL || ivLen != SeosCryptoApi_Cipher_SIZE_AES_CBC_IV) ?
+        err = (iv == NULL || ivSize != SeosCryptoApi_Cipher_SIZE_AES_CBC_IV) ?
               SEOS_ERROR_INVALID_PARAMETER : SEOS_SUCCESS;
         break;
     case SeosCryptoApi_Cipher_ALG_AES_ECB_ENC:
     case SeosCryptoApi_Cipher_ALG_AES_ECB_DEC:
-        err = (ivLen != 0) ? SEOS_ERROR_INVALID_PARAMETER : SEOS_SUCCESS;
+        err = (ivSize != 0) ? SEOS_ERROR_INVALID_PARAMETER : SEOS_SUCCESS;
         break;
     case SeosCryptoApi_Cipher_ALG_AES_GCM_ENC:
     case SeosCryptoApi_Cipher_ALG_AES_GCM_DEC:
         // We only support 96 bits of IV for GCM
-        err = (iv == NULL || ivLen == 0) ? SEOS_ERROR_INVALID_PARAMETER :
-              (ivLen != SeosCryptoApi_Cipher_SIZE_AES_GCM_IV) ? SEOS_ERROR_NOT_SUPPORTED :
+        err = (iv == NULL || ivSize == 0) ? SEOS_ERROR_INVALID_PARAMETER :
+              (ivSize != SeosCryptoApi_Cipher_SIZE_AES_GCM_IV) ? SEOS_ERROR_NOT_SUPPORTED :
               SEOS_SUCCESS;
         break;
     default:
         err = SEOS_ERROR_NOT_SUPPORTED;
     }
 
-    if (ivLen > 0 && err == SEOS_SUCCESS)
+    if (ivSize > 0 && err == SEOS_SUCCESS)
     {
-        self->ivLen = ivLen;
-        memcpy(self->iv, iv, ivLen);
+        self->ivLen = ivSize;
+        memcpy(self->iv, iv, ivSize);
     }
 
     return err;
@@ -253,7 +253,7 @@ static seos_err_t
 startImpl(
     SeosCryptoLib_Cipher* self,
     const void*           ad,
-    const size_t          adLen)
+    const size_t          adSize)
 {
     int mode;
 
@@ -271,7 +271,7 @@ startImpl(
 
     return self->started || self->processed || self->finalized ||
            mbedtls_gcm_starts(&self->mbedtls.gcm, mode, self->iv, self->ivLen,
-                              adLen > 0 ? ad : NULL, adLen) != 0 ?
+                              adSize > 0 ? ad : NULL, adSize) != 0 ?
            SEOS_ERROR_ABORTED : SEOS_SUCCESS;
 }
 
@@ -358,7 +358,7 @@ SeosCryptoLib_Cipher_init(
     const SeosCryptoApi_Cipher_Alg algorithm,
     const SeosCryptoLib_Key*       key,
     const void*                    iv,
-    const size_t                   ivLen)
+    const size_t                   ivSize)
 {
     seos_err_t err;
 
@@ -374,7 +374,7 @@ SeosCryptoLib_Cipher_init(
     self->inputLen   = 0;
     // Use these to keep track that everything is being called in proper order
     self->started    = false;
-    self->processed    = false;
+    self->processed  = false;
     self->finalized  = false;
 
     if ((err = initImpl(self, memIf)) != SEOS_SUCCESS)
@@ -382,7 +382,7 @@ SeosCryptoLib_Cipher_init(
         return err;
     }
 
-    if ((err = setIvImpl(self, iv, ivLen)) != SEOS_SUCCESS
+    if ((err = setIvImpl(self, iv, ivSize)) != SEOS_SUCCESS
         || (err = setKeyImpl(self)) != SEOS_SUCCESS)
     {
         goto err0;
