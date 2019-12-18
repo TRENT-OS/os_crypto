@@ -77,340 +77,340 @@ SeosCryptoRpcServer_free(SeosCryptoRpcServer* self)
 // -------------------------------- RNG API ------------------------------------
 
 seos_err_t
-SeosCryptoRpcServer_rngGetBytes(SeosCryptoRpcServer* self,
-                                unsigned int         flags,
-                                size_t               bufSize)
+SeosCryptoRpcServer_Rng_getBytes(SeosCryptoRpcServer* self,
+                                 unsigned int         flags,
+                                 size_t               bufSize)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_rngGetBytes(self->seosCryptoApi, flags, self->serverDataport,
-                                     bufSize);
+           SeosCryptoLib_Rng_getBytes(self->seosCryptoApi, flags, self->serverDataport,
+                                      bufSize);
 }
 
 seos_err_t
-SeosCryptoRpcServer_rngReSeed(SeosCryptoRpcServer* self,
-                              size_t               seedLen)
+SeosCryptoRpcServer_Rng_reseed(SeosCryptoRpcServer* self,
+                               size_t               seedLen)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_rngReSeed(self->seosCryptoApi, self->serverDataport, seedLen);
+           SeosCryptoLib_Rng_reseed(self->seosCryptoApi, self->serverDataport, seedLen);
 }
 
 
 // ------------------------------ Digest API -----------------------------------
 
 seos_err_t
-SeosCryptoRpcServer_macInit(SeosCryptoRpcServer*  self,
-                            SeosCryptoApi_Mac*    pMacHandle,
-                            SeosCryptoApi_Mac_Alg algorithm)
+SeosCryptoRpcServer_Mac_init(SeosCryptoRpcServer*  self,
+                             SeosCryptoApi_Mac*    pMacHandle,
+                             SeosCryptoApi_Mac_Alg algorithm)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_macInit(self->seosCryptoApi, pMacHandle, algorithm);
+           SeosCryptoLib_Mac_init(self->seosCryptoApi, pMacHandle, algorithm);
 }
 
 seos_err_t
-SeosCryptoRpcServer_macFree(SeosCryptoRpcServer* self,
-                            SeosCryptoApi_Mac    macHandle)
+SeosCryptoRpcServer_Mac_free(SeosCryptoRpcServer* self,
+                             SeosCryptoApi_Mac    macHandle)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_macFree(self->seosCryptoApi, macHandle);
+           SeosCryptoLib_Mac_free(self->seosCryptoApi, macHandle);
 }
 
 seos_err_t
-SeosCryptoRpcServer_macStart(SeosCryptoRpcServer* self,
-                             SeosCryptoApi_Mac    macHandle,
-                             size_t               secretSize)
+SeosCryptoRpcServer_Mac_start(SeosCryptoRpcServer* self,
+                              SeosCryptoApi_Mac    macHandle,
+                              size_t               secretSize)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_macStart(self->seosCryptoApi, macHandle,
-                                  self->serverDataport, secretSize);
+           SeosCryptoLib_Mac_start(self->seosCryptoApi, macHandle,
+                                   self->serverDataport, secretSize);
 }
 
 seos_err_t
-SeosCryptoRpcServer_macProcess(SeosCryptoRpcServer* self,
-                               SeosCryptoApi_Mac    macHandle,
-                               size_t               dataSize)
-{
-    return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_macProcess(self->seosCryptoApi, macHandle,
-                                    self->serverDataport, dataSize);
-}
-
-seos_err_t
-SeosCryptoRpcServer_macFinalize(SeosCryptoRpcServer* self,
+SeosCryptoRpcServer_Mac_process(SeosCryptoRpcServer* self,
                                 SeosCryptoApi_Mac    macHandle,
-                                size_t*              macSize)
+                                size_t               dataSize)
+{
+    return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
+           SeosCryptoLib_Mac_process(self->seosCryptoApi, macHandle,
+                                     self->serverDataport, dataSize);
+}
+
+seos_err_t
+SeosCryptoRpcServer_Mac_finalize(SeosCryptoRpcServer* self,
+                                 SeosCryptoApi_Mac    macHandle,
+                                 size_t*              macSize)
 {
     *macSize = (*macSize <= SeosCryptoApi_SIZE_DATAPORT) ? *macSize :
                SeosCryptoApi_SIZE_DATAPORT;
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_macFinalize(self->seosCryptoApi, macHandle,
-                                     self->serverDataport, macSize);
+           SeosCryptoLib_Mac_finalize(self->seosCryptoApi, macHandle,
+                                      self->serverDataport, macSize);
 }
 
 // ------------------------------ Digest API -----------------------------------
 
 seos_err_t
-SeosCryptoRpcServer_digestInit(SeosCryptoRpcServer*     self,
-                               SeosCryptoApi_Digest*    pDigestHandle,
-                               SeosCryptoApi_Digest_Alg algorithm)
+SeosCryptoRpcServer_Digest_init(SeosCryptoRpcServer*     self,
+                                SeosCryptoApi_Digest*    pDigestHandle,
+                                SeosCryptoApi_Digest_Alg algorithm)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_digestInit(self->seosCryptoApi, pDigestHandle, algorithm);
+           SeosCryptoLib_Digest_init(self->seosCryptoApi, pDigestHandle, algorithm);
 }
 
 seos_err_t
-SeosCryptoRpcServer_digestFree(SeosCryptoRpcServer* self,
-                               SeosCryptoApi_Digest digestHandle)
+SeosCryptoRpcServer_Digest_free(SeosCryptoRpcServer* self,
+                                SeosCryptoApi_Digest digestHandle)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_digestFree(self->seosCryptoApi, digestHandle);
+           SeosCryptoLib_Digest_free(self->seosCryptoApi, digestHandle);
 }
 
 seos_err_t
-SeosCryptoRpcServer_digestClone(SeosCryptoRpcServer* self,
-                                SeosCryptoApi_Digest dstDigHandle,
-                                SeosCryptoApi_Digest srcDigHandle)
+SeosCryptoRpcServer_Digest_clone(SeosCryptoRpcServer* self,
+                                 SeosCryptoApi_Digest dstDigHandle,
+                                 SeosCryptoApi_Digest srcDigHandle)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_digestClone(self->seosCryptoApi, dstDigHandle, srcDigHandle);
+           SeosCryptoLib_Digest_clone(self->seosCryptoApi, dstDigHandle, srcDigHandle);
 }
 
 seos_err_t
-SeosCryptoRpcServer_digestProcess(SeosCryptoRpcServer* self,
-                                  SeosCryptoApi_Digest digestHandle,
-                                  size_t               inLen)
-{
-    return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_digestProcess(self->seosCryptoApi, digestHandle,
-                                       self->serverDataport, inLen);
-}
-
-seos_err_t
-SeosCryptoRpcServer_digestFinalize(SeosCryptoRpcServer* self,
+SeosCryptoRpcServer_Digest_process(SeosCryptoRpcServer* self,
                                    SeosCryptoApi_Digest digestHandle,
-                                   size_t*              digestSize)
+                                   size_t               inLen)
+{
+    return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
+           SeosCryptoLib_Digest_process(self->seosCryptoApi, digestHandle,
+                                        self->serverDataport, inLen);
+}
+
+seos_err_t
+SeosCryptoRpcServer_Digest_finalize(SeosCryptoRpcServer* self,
+                                    SeosCryptoApi_Digest digestHandle,
+                                    size_t*              digestSize)
 {
     *digestSize = (*digestSize <= SeosCryptoApi_SIZE_DATAPORT) ? *digestSize :
                   SeosCryptoApi_SIZE_DATAPORT;
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_digestFinalize(self->seosCryptoApi, digestHandle,
-                                        self->serverDataport, digestSize);
+           SeosCryptoLib_Digest_finalize(self->seosCryptoApi, digestHandle,
+                                         self->serverDataport, digestSize);
 }
 
 // -------------------------------- Key API ------------------------------------
 
 seos_err_t
-SeosCryptoRpcServer_keyGenerate(SeosCryptoRpcServer* self,
-                                SeosCryptoApi_Key*   pKeyHandle)
+SeosCryptoRpcServer_Key_generate(SeosCryptoRpcServer* self,
+                                 SeosCryptoApi_Key*   pKeyHandle)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_keyGenerate(self->seosCryptoApi, pKeyHandle,
-                                     self->serverDataport);
+           SeosCryptoLib_Key_generate(self->seosCryptoApi, pKeyHandle,
+                                      self->serverDataport);
 }
 
 seos_err_t
-SeosCryptoRpcServer_keyMakePublic(SeosCryptoRpcServer* self,
-                                  SeosCryptoApi_Key*   pPubKeyHandle,
-                                  SeosCryptoApi_Key    prvKeyHandle)
+SeosCryptoRpcServer_Key_makePublic(SeosCryptoRpcServer* self,
+                                   SeosCryptoApi_Key*   pPubKeyHandle,
+                                   SeosCryptoApi_Key    prvKeyHandle)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_keyMakePublic(self->seosCryptoApi, pPubKeyHandle, prvKeyHandle,
-                                       self->serverDataport);
+           SeosCryptoLib_Key_makePublic(self->seosCryptoApi, pPubKeyHandle, prvKeyHandle,
+                                        self->serverDataport);
 }
 
 seos_err_t
-SeosCryptoRpcServer_keyImport(SeosCryptoRpcServer* self,
-                              SeosCryptoApi_Key*   pKeyHandle,
-                              SeosCryptoApi_Key    wrapKeyHandle)
+SeosCryptoRpcServer_Key_import(SeosCryptoRpcServer* self,
+                               SeosCryptoApi_Key*   pKeyHandle,
+                               SeosCryptoApi_Key    wrapKeyHandle)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_keyImport(self->seosCryptoApi, pKeyHandle, wrapKeyHandle,
-                                   self->serverDataport);
+           SeosCryptoLib_Key_import(self->seosCryptoApi, pKeyHandle, wrapKeyHandle,
+                                    self->serverDataport);
 }
 
 seos_err_t
-SeosCryptoRpcServer_keyExport(SeosCryptoRpcServer* self,
-                              SeosCryptoApi_Key    keyHandle,
-                              SeosCryptoApi_Key    wrapKeyHandle)
+SeosCryptoRpcServer_Key_export(SeosCryptoRpcServer* self,
+                               SeosCryptoApi_Key    keyHandle,
+                               SeosCryptoApi_Key    wrapKeyHandle)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_keyExport(self->seosCryptoApi, keyHandle, wrapKeyHandle,
-                                   self->serverDataport);
+           SeosCryptoLib_Key_export(self->seosCryptoApi, keyHandle, wrapKeyHandle,
+                                    self->serverDataport);
 }
 
 seos_err_t
-SeosCryptoRpcServer_keyGetParams(SeosCryptoRpcServer* self,
-                                 SeosCryptoApi_Key    keyHandle,
-                                 size_t*              paramSize)
+SeosCryptoRpcServer_Key_getParams(SeosCryptoRpcServer* self,
+                                  SeosCryptoApi_Key    keyHandle,
+                                  size_t*              paramSize)
 {
     *paramSize = (*paramSize <= SeosCryptoApi_SIZE_DATAPORT) ? *paramSize :
                  SeosCryptoApi_SIZE_DATAPORT;
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_keyGetParams(self->seosCryptoApi, keyHandle,
-                                      self->serverDataport, paramSize);
-}
-
-seos_err_t
-SeosCryptoRpcServer_keyLoadParams(SeosCryptoRpcServer*    self,
-                                  SeosCryptoApi_Key_Param name,
-                                  size_t*                 paramSize)
-{
-    *paramSize = (*paramSize <= SeosCryptoApi_SIZE_DATAPORT) ? *paramSize :
-                 SeosCryptoApi_SIZE_DATAPORT;
-    return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_keyLoadParams(self->seosCryptoApi, name,
+           SeosCryptoLib_Key_getParams(self->seosCryptoApi, keyHandle,
                                        self->serverDataport, paramSize);
 }
 
 seos_err_t
-SeosCryptoRpcServer_keyFree(SeosCryptoRpcServer* self,
-                            SeosCryptoApi_Key    keyHandle)
+SeosCryptoRpcServer_Key_loadParams(SeosCryptoRpcServer*    self,
+                                   SeosCryptoApi_Key_Param name,
+                                   size_t*                 paramSize)
+{
+    *paramSize = (*paramSize <= SeosCryptoApi_SIZE_DATAPORT) ? *paramSize :
+                 SeosCryptoApi_SIZE_DATAPORT;
+    return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
+           SeosCryptoLib_Key_loadParams(self->seosCryptoApi, name,
+                                        self->serverDataport, paramSize);
+}
+
+seos_err_t
+SeosCryptoRpcServer_Key_free(SeosCryptoRpcServer* self,
+                             SeosCryptoApi_Key    keyHandle)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_keyFree(self->seosCryptoApi, keyHandle);
+           SeosCryptoLib_Key_free(self->seosCryptoApi, keyHandle);
 }
 
 // ----------------------------- Agreement API ---------------------------------
 
 seos_err_t
-SeosCryptoRpcServer_agreementInit(SeosCryptoRpcServer*        self,
-                                  SeosCryptoApi_Agreement*    pAgrHandle,
-                                  SeosCryptoApi_Agreement_Alg algorithm,
-                                  SeosCryptoApi_Key           prvHandle)
+SeosCryptoRpcServer_Agreement_init(SeosCryptoRpcServer*        self,
+                                   SeosCryptoApi_Agreement*    pAgrHandle,
+                                   SeosCryptoApi_Agreement_Alg algorithm,
+                                   SeosCryptoApi_Key           prvHandle)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_agreementInit(self->seosCryptoApi, pAgrHandle, algorithm,
-                                       prvHandle);
+           SeosCryptoLib_Agreement_init(self->seosCryptoApi, pAgrHandle, algorithm,
+                                        prvHandle);
 }
 
 seos_err_t
-SeosCryptoRpcServer_agreementAgree(SeosCryptoRpcServer*    self,
-                                   SeosCryptoApi_Agreement agrHandle,
-                                   SeosCryptoApi_Key       pubHandle,
-                                   size_t*                 sharedSize)
+SeosCryptoRpcServer_Agreement_agree(SeosCryptoRpcServer*    self,
+                                    SeosCryptoApi_Agreement agrHandle,
+                                    SeosCryptoApi_Key       pubHandle,
+                                    size_t*                 sharedSize)
 {
     *sharedSize = (*sharedSize <= SeosCryptoApi_SIZE_DATAPORT) ? *sharedSize :
                   SeosCryptoApi_SIZE_DATAPORT;
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_agreementAgree(self->seosCryptoApi, agrHandle,
-                                        pubHandle, self->serverDataport, sharedSize);
+           SeosCryptoLib_Agreement_agree(self->seosCryptoApi, agrHandle,
+                                         pubHandle, self->serverDataport, sharedSize);
 }
 
 seos_err_t
-SeosCryptoRpcServer_agreementFree(SeosCryptoRpcServer*    self,
-                                  SeosCryptoApi_Agreement agrHandle)
+SeosCryptoRpcServer_Agreement_free(SeosCryptoRpcServer*    self,
+                                   SeosCryptoApi_Agreement agrHandle)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_agreementFree(self->seosCryptoApi, agrHandle);
+           SeosCryptoLib_Agreement_free(self->seosCryptoApi, agrHandle);
 }
 
 // ----------------------------- Signature API ---------------------------------
 
 seos_err_t
-SeosCryptoRpcServer_signatureInit(SeosCryptoRpcServer*              self,
-                                  SeosCryptoApi_Signature*          pSigHandle,
-                                  const SeosCryptoApi_Signature_Alg algorithm,
-                                  const SeosCryptoApi_Digest_Alg    digest,
-                                  SeosCryptoApi_Key                 prvHandle,
-                                  SeosCryptoApi_Key                 pubHandle)
+SeosCryptoRpcServer_Signature_init(SeosCryptoRpcServer*              self,
+                                   SeosCryptoApi_Signature*          pSigHandle,
+                                   const SeosCryptoApi_Signature_Alg algorithm,
+                                   const SeosCryptoApi_Digest_Alg    digest,
+                                   SeosCryptoApi_Key                 prvHandle,
+                                   SeosCryptoApi_Key                 pubHandle)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_signatureInit(self->seosCryptoApi, pSigHandle, algorithm, digest,
-                                       prvHandle, pubHandle);
+           SeosCryptoLib_Signature_init(self->seosCryptoApi, pSigHandle, algorithm, digest,
+                                        prvHandle, pubHandle);
 }
 
 seos_err_t
-SeosCryptoRpcServer_signatureVerify(SeosCryptoRpcServer*    self,
-                                    SeosCryptoApi_Signature sigHandle,
-                                    size_t                  hashSize,
-                                    size_t                  signatureSize)
+SeosCryptoRpcServer_Signature_verify(SeosCryptoRpcServer*    self,
+                                     SeosCryptoApi_Signature sigHandle,
+                                     size_t                  hashSize,
+                                     size_t                  signatureSize)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_signatureVerify(self->seosCryptoApi, sigHandle,
-                                         self->serverDataport,
-                                         hashSize, self->serverDataport + hashSize, signatureSize);
+           SeosCryptoLib_Signature_verify(self->seosCryptoApi, sigHandle,
+                                          self->serverDataport,
+                                          hashSize, self->serverDataport + hashSize, signatureSize);
 }
 
 seos_err_t
-SeosCryptoRpcServer_signatureSign(SeosCryptoRpcServer*    self,
-                                  SeosCryptoApi_Signature sigHandle,
-                                  size_t                  hashSize,
-                                  size_t*                 signatureSize)
+SeosCryptoRpcServer_Signature_sign(SeosCryptoRpcServer*    self,
+                                   SeosCryptoApi_Signature sigHandle,
+                                   size_t                  hashSize,
+                                   size_t*                 signatureSize)
 {
     *signatureSize = (*signatureSize <= SeosCryptoApi_SIZE_DATAPORT) ?
                      *signatureSize :
                      SeosCryptoApi_SIZE_DATAPORT;
     return !isValidHandle(self) ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_signatureSign(self->seosCryptoApi, sigHandle,
-                                       self->serverDataport, hashSize,
-                                       self->serverDataport, signatureSize);
+           SeosCryptoLib_Signature_sign(self->seosCryptoApi, sigHandle,
+                                        self->serverDataport, hashSize,
+                                        self->serverDataport, signatureSize);
 }
 
 seos_err_t
-SeosCryptoRpcServer_signatureFree(SeosCryptoRpcServer*    self,
-                                  SeosCryptoApi_Signature sigHandle)
+SeosCryptoRpcServer_Signature_free(SeosCryptoRpcServer*    self,
+                                   SeosCryptoApi_Signature sigHandle)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_signatureFree(self->seosCryptoApi, sigHandle);
+           SeosCryptoLib_Signature_free(self->seosCryptoApi, sigHandle);
 }
 
 // ------------------------------- Cipher API ----------------------------------
 
 seos_err_t
-SeosCryptoRpcServer_cipherInit(SeosCryptoRpcServer*     self,
-                               SeosCryptoApi_Cipher*    pCipherHandle,
-                               SeosCryptoApi_Cipher_Alg algorithm,
-                               SeosCryptoApi_Key        keyHandle,
-                               size_t                   ivLen)
+SeosCryptoRpcServer_Cipher_init(SeosCryptoRpcServer*     self,
+                                SeosCryptoApi_Cipher*    pCipherHandle,
+                                SeosCryptoApi_Cipher_Alg algorithm,
+                                SeosCryptoApi_Key        keyHandle,
+                                size_t                   ivLen)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_cipherInit(self->seosCryptoApi, pCipherHandle, algorithm,
-                                    keyHandle,
-                                    self->serverDataport, ivLen);
+           SeosCryptoLib_Cipher_init(self->seosCryptoApi, pCipherHandle, algorithm,
+                                     keyHandle,
+                                     self->serverDataport, ivLen);
 }
 
 seos_err_t
-SeosCryptoRpcServer_cipherFree(SeosCryptoRpcServer* self,
-                               SeosCryptoApi_Cipher cipherHandle)
+SeosCryptoRpcServer_Cipher_free(SeosCryptoRpcServer* self,
+                                SeosCryptoApi_Cipher cipherHandle)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_cipherFree(self->seosCryptoApi, cipherHandle);
+           SeosCryptoLib_Cipher_free(self->seosCryptoApi, cipherHandle);
 }
 
 seos_err_t
-SeosCryptoRpcServer_cipherProcess(SeosCryptoRpcServer* self,
-                                  SeosCryptoApi_Cipher cipherHandle,
-                                  size_t               inputLen,
-                                  size_t*              outputSize)
+SeosCryptoRpcServer_Cipher_process(SeosCryptoRpcServer* self,
+                                   SeosCryptoApi_Cipher cipherHandle,
+                                   size_t               inputLen,
+                                   size_t*              outputSize)
 {
     *outputSize = (*outputSize <= SeosCryptoApi_SIZE_DATAPORT) ? *outputSize :
                   SeosCryptoApi_SIZE_DATAPORT;
     return !isValidHandle(self) ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_cipherProcess(self->seosCryptoApi, cipherHandle,
-                                       self->serverDataport, inputLen,
-                                       self->serverDataport, outputSize);
+           SeosCryptoLib_Cipher_process(self->seosCryptoApi, cipherHandle,
+                                        self->serverDataport, inputLen,
+                                        self->serverDataport, outputSize);
 }
 
 seos_err_t
-SeosCryptoRpcServer_cipherStart(SeosCryptoRpcServer* self,
-                                SeosCryptoApi_Cipher cipherHandle,
-                                size_t               len)
+SeosCryptoRpcServer_Cipher_start(SeosCryptoRpcServer* self,
+                                 SeosCryptoApi_Cipher cipherHandle,
+                                 size_t               len)
 {
     return !isValidHandle(self) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_cipherStart(self->seosCryptoApi, cipherHandle,
-                                     self->serverDataport,
-                                     len);
+           SeosCryptoLib_Cipher_start(self->seosCryptoApi, cipherHandle,
+                                      self->serverDataport,
+                                      len);
 }
 
 seos_err_t
-SeosCryptoRpcServer_cipherFinalize(SeosCryptoRpcServer* self,
-                                   SeosCryptoApi_Cipher cipherHandle,
-                                   size_t*              tagSize)
+SeosCryptoRpcServer_Cipher_finalize(SeosCryptoRpcServer* self,
+                                    SeosCryptoApi_Cipher cipherHandle,
+                                    size_t*              tagSize)
 {
     *tagSize = (*tagSize <= SeosCryptoApi_SIZE_DATAPORT) ? *tagSize :
                SeosCryptoApi_SIZE_DATAPORT;
     return !isValidHandle(self) ?  SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_cipherFinalize(self->seosCryptoApi, cipherHandle,
-                                        self->serverDataport, tagSize);
+           SeosCryptoLib_Cipher_finalize(self->seosCryptoApi, cipherHandle,
+                                         self->serverDataport, tagSize);
 }
