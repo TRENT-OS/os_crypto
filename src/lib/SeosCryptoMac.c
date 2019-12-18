@@ -2,9 +2,10 @@
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 
-#include "SeosCryptoMac.h"
+#include "lib/SeosCryptoMac.h"
 
 #include "LibDebug/Debug.h"
+#include "compiler.h"
 
 #include <string.h>
 
@@ -12,17 +13,17 @@
 
 static seos_err_t
 initImpl(SeosCryptoMac*             self,
-         const SeosCrypto_MemIf*    memIf)
+         const SeosCryptoApi_MemIf* memIf)
 {
     UNUSED_VAR(memIf);
     mbedtls_md_type_t type;
 
     switch (self->algorithm)
     {
-    case SeosCryptoMac_Algorithm_HMAC_MD5:
+    case SeosCryptoApi_Mac_ALG_HMAC_MD5:
         type = MBEDTLS_MD_MD5;
         break;
-    case SeosCryptoMac_Algorithm_HMAC_SHA256:
+    case SeosCryptoApi_Mac_ALG_HMAC_SHA256:
         type = MBEDTLS_MD_SHA256;
         break;
     default:
@@ -36,15 +37,15 @@ initImpl(SeosCryptoMac*             self,
 
 static seos_err_t
 freeImpl(SeosCryptoMac*             self,
-         const SeosCrypto_MemIf*    memIf)
+         const SeosCryptoApi_MemIf* memIf)
 {
     UNUSED_VAR(memIf);
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
-    case SeosCryptoMac_Algorithm_HMAC_MD5:
-    case SeosCryptoMac_Algorithm_HMAC_SHA256:
+    case SeosCryptoApi_Mac_ALG_HMAC_MD5:
+    case SeosCryptoApi_Mac_ALG_HMAC_SHA256:
         mbedtls_md_free(&self->mbedtls.md);
         retval = SEOS_SUCCESS;
         break;
@@ -56,16 +57,16 @@ freeImpl(SeosCryptoMac*             self,
 }
 
 static seos_err_t
-startImpl(SeosCryptoMac*  self,
-          const void*     secret,
-          const size_t    secretSize)
+startImpl(SeosCryptoMac* self,
+          const void*    secret,
+          const size_t   secretSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
-    case SeosCryptoMac_Algorithm_HMAC_MD5:
-    case SeosCryptoMac_Algorithm_HMAC_SHA256:
+    case SeosCryptoApi_Mac_ALG_HMAC_MD5:
+    case SeosCryptoApi_Mac_ALG_HMAC_SHA256:
         retval = mbedtls_md_hmac_starts(&self->mbedtls.md, secret, secretSize) ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
@@ -77,16 +78,16 @@ startImpl(SeosCryptoMac*  self,
 }
 
 static seos_err_t
-processImpl(SeosCryptoMac*  self,
-            const void*     data,
-            const size_t    dataSize)
+processImpl(SeosCryptoMac* self,
+            const void*    data,
+            const size_t   dataSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
-    case SeosCryptoMac_Algorithm_HMAC_MD5:
-    case SeosCryptoMac_Algorithm_HMAC_SHA256:
+    case SeosCryptoApi_Mac_ALG_HMAC_MD5:
+    case SeosCryptoApi_Mac_ALG_HMAC_SHA256:
         retval = mbedtls_md_hmac_update(&self->mbedtls.md, data, dataSize) ?
                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
@@ -98,28 +99,28 @@ processImpl(SeosCryptoMac*  self,
 }
 
 static seos_err_t
-finalizeImpl(SeosCryptoMac*     self,
-             void*              mac,
-             size_t*            macSize)
+finalizeImpl(SeosCryptoMac* self,
+             void*          mac,
+             size_t*        macSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
     retval = SEOS_SUCCESS;
     switch (self->algorithm)
     {
-    case SeosCryptoMac_Algorithm_HMAC_MD5:
-        if (*macSize < SeosCryptoMac_Size_HMAC_MD5)
+    case SeosCryptoApi_Mac_ALG_HMAC_MD5:
+        if (*macSize < SeosCryptoApi_Mac_SIZE_HMAC_MD5)
         {
             retval = SEOS_ERROR_BUFFER_TOO_SMALL;
         }
-        *macSize = SeosCryptoMac_Size_HMAC_MD5;
+        *macSize = SeosCryptoApi_Mac_SIZE_HMAC_MD5;
         break;
-    case SeosCryptoMac_Algorithm_HMAC_SHA256:
-        if (*macSize < SeosCryptoMac_Size_HMAC_SHA256)
+    case SeosCryptoApi_Mac_ALG_HMAC_SHA256:
+        if (*macSize < SeosCryptoApi_Mac_SIZE_HMAC_SHA256)
         {
             retval = SEOS_ERROR_BUFFER_TOO_SMALL;
         }
-        *macSize = SeosCryptoMac_Size_HMAC_SHA256;
+        *macSize = SeosCryptoApi_Mac_SIZE_HMAC_SHA256;
         break;
     default:
         retval = SEOS_ERROR_NOT_SUPPORTED;
@@ -140,9 +141,9 @@ finalizeImpl(SeosCryptoMac*     self,
 // Public Functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoMac_init(SeosCryptoMac*                   self,
-                   const SeosCrypto_MemIf*          memIf,
-                   const SeosCryptoMac_Algorithm    algorithm)
+SeosCryptoMac_init(SeosCryptoMac*              self,
+                   const SeosCryptoApi_MemIf*  memIf,
+                   const SeosCryptoApi_Mac_Alg algorithm)
 {
     if (NULL == memIf || NULL == self)
     {
@@ -159,8 +160,8 @@ SeosCryptoMac_init(SeosCryptoMac*                   self,
 }
 
 seos_err_t
-SeosCryptoMac_free(SeosCryptoMac*            self,
-                   const SeosCrypto_MemIf*   memIf)
+SeosCryptoMac_free(SeosCryptoMac*             self,
+                   const SeosCryptoApi_MemIf* memIf)
 {
     if (NULL == memIf || NULL == self)
     {
@@ -171,9 +172,9 @@ SeosCryptoMac_free(SeosCryptoMac*            self,
 }
 
 seos_err_t
-SeosCryptoMac_start(SeosCryptoMac*      self,
-                    const void*         secret,
-                    const size_t        secretSize)
+SeosCryptoMac_start(SeosCryptoMac* self,
+                    const void*    secret,
+                    const size_t   secretSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -190,9 +191,9 @@ SeosCryptoMac_start(SeosCryptoMac*      self,
 }
 
 seos_err_t
-SeosCryptoMac_process(SeosCryptoMac*    self,
-                      const void*       data,
-                      const size_t      dataSize)
+SeosCryptoMac_process(SeosCryptoMac* self,
+                      const void*    data,
+                      const size_t   dataSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 
@@ -209,9 +210,9 @@ SeosCryptoMac_process(SeosCryptoMac*    self,
 }
 
 seos_err_t
-SeosCryptoMac_finalize(SeosCryptoMac*   self,
-                       void*            mac,
-                       size_t*          macSize)
+SeosCryptoMac_finalize(SeosCryptoMac* self,
+                       void*          mac,
+                       size_t*        macSize)
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
 

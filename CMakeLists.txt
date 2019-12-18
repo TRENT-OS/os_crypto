@@ -5,16 +5,16 @@ project(seos_crypto C)
 add_library(
     ${PROJECT_NAME} STATIC
 
-    "src/SeosCrypto.c"
-    "src/SeosCryptoAgreement.c"
-    "src/SeosCryptoRng.c"
-    "src/SeosCryptoDigest.c"
-    "src/SeosCryptoMac.c"
-    "src/SeosCryptoCipher.c"
-    "src/SeosCryptoSignature.c"
-    "src/SeosCryptoKey.c"
+    "src/SeosCryptoLib.c"
     "src/SeosCryptoApi.c"
-    "src/SeosCryptoClient.c"
+    "src/SeosCryptoRpcClient.c"
+    "src/lib/SeosCryptoAgreement.c"
+    "src/lib/SeosCryptoRng.c"
+    "src/lib/SeosCryptoDigest.c"
+    "src/lib/SeosCryptoMac.c"
+    "src/lib/SeosCryptoCipher.c"
+    "src/lib/SeosCryptoSignature.c"
+    "src/lib/SeosCryptoKey.c"
 )
 if (ENABLE_LINT)
         set(CMAKE_C_CPPCHECK "cppcheck;--enable=warning;--inline-suppr")
