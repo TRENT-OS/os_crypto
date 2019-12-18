@@ -26,12 +26,12 @@ typedef struct
 {
     SeosCryptoApi_MemIf memIf;
     SeosCryptoLib_Rng cryptoRng;
-    PointerVector keyHandleVector;
-    PointerVector macHandleVector;
-    PointerVector digestHandleVector;
-    PointerVector cipherHandleVector;
-    PointerVector signatureHandleVector;
-    PointerVector agreementHandleVector;
+    PointerVector keyObjects;
+    PointerVector macObjects;
+    PointerVector digestObjects;
+    PointerVector cipherObjects;
+    PointerVector signatureObjects;
+    PointerVector agreementObjects;
     /**
      * When we have a function that takes an input buffer and produces an output
      * buffer, we copy the inputs to this buffer internally, so the caller can

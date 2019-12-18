@@ -21,15 +21,15 @@
 
 // -1 = not found
 static size_t
-SeosCryptoLib_findHandle(
+findObject(
     PointerVector* v,
-    const void*    handle)
+    const void*    obj)
 {
     size_t vectorSize = PointerVector_getSize(v);
 
     for (size_t i = 0; i < vectorSize; i++)
     {
-        if (handle == PointerVector_getElementAt(v, i))
+        if (obj == PointerVector_getElementAt(v, i))
         {
             return i;
         }
@@ -37,12 +37,44 @@ SeosCryptoLib_findHandle(
     return -1;
 }
 
+static bool
+hasObject(
+    PointerVector* v,
+    const void*    obj)
+{
+    return (obj == NULL) ? false : findObject(v, obj) != -1;
+}
+
 static void
-SeosCryptoLib_removeHandle(
-    PointerVector* v, size_t pos)
+removeObject(
+    PointerVector* v,
+    size_t         pos)
 {
     PointerVector_replaceElementAt(v, pos, PointerVector_getBack(v));
     PointerVector_popBack(v);
+}
+
+static seos_err_t
+addObject(
+    PointerVector* v,
+    void*          obj)
+{
+    return !PointerVector_pushBack(v, obj) ?
+           SEOS_ERROR_INSUFFICIENT_SPACE : SEOS_SUCCESS;
+}
+
+static void
+freeObjectList(
+    PointerVector* v)
+{
+    PointerVector_dtor(v);
+}
+
+static seos_err_t
+createObjectList(
+    PointerVector* v)
+{
+    return !PointerVector_ctor(v, 1) ? SEOS_ERROR_INSUFFICIENT_SPACE : SEOS_SUCCESS;
 }
 
 // -------------------------------- RNG API ------------------------------------
@@ -95,7 +127,8 @@ Mac_init(
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if ((*pMacObj = self->memIf.malloc(sizeof(SeosCryptoLib_Mac))) == NULL)
+
+    if ((*pMacObj = self->memIf.malloc(sizeof(SeosCryptoLib_Mac))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -105,13 +138,12 @@ Mac_init(
     {
         goto err0;
     }
-    else if (!PointerVector_pushBack(&self->macHandleVector, *pMacObj))
+    else if ((retval = addObject(&self->macObjects, *pMacObj)) != SEOS_SUCCESS)
     {
-        retval = SEOS_ERROR_INSUFFICIENT_SPACE;
         goto err1;
     }
 
-    return SEOS_SUCCESS;
+    return retval;
 
 err1:
     SeosCryptoMac_free(*pMacObj, &self->memIf);
@@ -128,25 +160,21 @@ Mac_free(
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoLib* self = (SeosCryptoLib*) api;
-    size_t handlePos;
+    size_t pos;
 
     if (NULL == api)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-
-    if ((handlePos = SeosCryptoLib_findHandle(&self->macHandleVector,
-                                              macObj)) != -1)
+    else if ((pos = findObject(&self->macObjects, macObj)) == -1)
     {
-        if ((retval = SeosCryptoMac_free(macObj, &self->memIf)) == SEOS_SUCCESS)
-        {
-            SeosCryptoLib_removeHandle(&self->macHandleVector, handlePos);
-            self->memIf.free(macObj);
-        }
+        return SEOS_ERROR_INVALID_HANDLE;
     }
-    else
+
+    if ((retval = SeosCryptoMac_free(macObj, &self->memIf)) == SEOS_SUCCESS)
     {
-        retval = SEOS_ERROR_INVALID_HANDLE;
+        removeObject(&self->macObjects, pos);
+        self->memIf.free(macObj);
     }
 
     return retval;
@@ -166,8 +194,7 @@ Mac_start(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoLib_findHandle(&self->macHandleVector, macObj) == -1 ?
-           SEOS_ERROR_INVALID_HANDLE :
+    return !hasObject(&self->macObjects, macObj) ? SEOS_ERROR_INVALID_HANDLE :
            SeosCryptoMac_start(macObj, secret, secretSize);
 }
 
@@ -185,8 +212,7 @@ Mac_process(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoLib_findHandle(&self->macHandleVector, macObj) == -1 ?
-           SEOS_ERROR_INVALID_HANDLE :
+    return !hasObject(&self->macObjects, macObj) ? SEOS_ERROR_INVALID_HANDLE :
            SeosCryptoMac_process(macObj, data, dataLen);
 }
 
@@ -204,8 +230,7 @@ Mac_finalize(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoLib_findHandle(&self->macHandleVector, macObj) == -1 ?
-           SEOS_ERROR_INVALID_HANDLE :
+    return !hasObject(&self->macObjects, macObj) ? SEOS_ERROR_INVALID_HANDLE :
            SeosCryptoMac_finalize(macObj, mac, macSize);
 }
 
@@ -224,8 +249,8 @@ Digest_init(
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if ((*pDigObj = self->memIf.malloc(
-                             sizeof(SeosCryptoLib_Digest))) == NULL)
+
+    if ((*pDigObj = self->memIf.malloc(sizeof(SeosCryptoLib_Digest))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -235,13 +260,12 @@ Digest_init(
     {
         goto err0;
     }
-    else if (!PointerVector_pushBack(&self->digestHandleVector, *pDigObj))
+    else if ((retval = addObject(&self->digestObjects, *pDigObj)) != SEOS_SUCCESS)
     {
-        retval = SEOS_ERROR_INSUFFICIENT_SPACE;
         goto err1;
     }
 
-    return SEOS_SUCCESS;
+    return retval;
 
 err1:
     SeosCryptoDigest_free(*pDigObj, &self->memIf);
@@ -258,25 +282,21 @@ Digest_free(
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoLib* self = (SeosCryptoLib*) api;
-    size_t handlePos;
+    size_t pos;
 
     if (NULL == api)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-
-    if ((handlePos = SeosCryptoLib_findHandle(&self->digestHandleVector,
-                                              digObj)) != -1)
+    else if ((pos = findObject(&self->digestObjects, digObj)) == -1)
     {
-        if ((retval = SeosCryptoDigest_free(digObj, &self->memIf)) == SEOS_SUCCESS)
-        {
-            SeosCryptoLib_removeHandle(&self->digestHandleVector, handlePos);
-            self->memIf.free(digObj);
-        }
+        return SEOS_ERROR_INVALID_HANDLE;
     }
-    else
+
+    if ((retval = SeosCryptoDigest_free(digObj, &self->memIf)) == SEOS_SUCCESS)
     {
-        retval = SEOS_ERROR_INVALID_HANDLE;
+        removeObject(&self->digestObjects, pos);
+        self->memIf.free(digObj);
     }
 
     return retval;
@@ -295,8 +315,8 @@ Digest_clone(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoLib_findHandle(&self->digestHandleVector, dstDigObj) == -1 ||
-           SeosCryptoLib_findHandle(&self->digestHandleVector, srcDigObj) == -1 ?
+    return !hasObject(&self->digestObjects, dstDigObj) ||
+           !hasObject(&self->digestObjects, srcDigObj) ?
            SEOS_ERROR_INVALID_HANDLE :
            SeosCryptoDigest_clone(dstDigObj, srcDigObj);
 }
@@ -315,8 +335,7 @@ Digest_process(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoLib_findHandle(&self->digestHandleVector, digObj) == -1 ?
-           SEOS_ERROR_INVALID_HANDLE :
+    return !hasObject(&self->digestObjects, digObj) ? SEOS_ERROR_INVALID_HANDLE :
            SeosCryptoDigest_process(digObj, data, dataLen);
 }
 
@@ -334,8 +353,7 @@ Digest_finalize(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoLib_findHandle(&self->digestHandleVector, digObj) == -1 ?
-           SEOS_ERROR_INVALID_HANDLE :
+    return !hasObject(&self->digestObjects, digObj) ? SEOS_ERROR_INVALID_HANDLE :
            SeosCryptoDigest_finalize(digObj, digest, digestSize);
 }
 
@@ -357,8 +375,8 @@ Signature_init(
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if ((*pSigObj = self->memIf.malloc(sizeof(SeosCryptoLib_Signature))) ==
-             NULL)
+
+    if ((*pSigObj = self->memIf.malloc(sizeof(SeosCryptoLib_Signature))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -368,13 +386,13 @@ Signature_init(
     {
         goto err0;
     }
-    else if (!PointerVector_pushBack(&self->signatureHandleVector, *pSigObj))
+    else if ((retval = addObject(&self->signatureObjects,
+                                 *pSigObj)) != SEOS_SUCCESS)
     {
-        retval = SEOS_ERROR_INSUFFICIENT_SPACE;
         goto err1;
     }
 
-    return SEOS_SUCCESS;
+    return retval;
 
 err1:
     SeosCryptoSignature_free(*pSigObj, &self->memIf);
@@ -391,25 +409,21 @@ Signature_free(
 {
     seos_err_t retval = SEOS_SUCCESS;
     SeosCryptoLib* self = (SeosCryptoLib*) api;
-    size_t handlePos;
+    size_t pos;
 
     if (NULL == api)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-
-    if ((handlePos = SeosCryptoLib_findHandle(&self->signatureHandleVector,
-                                              sigObj)) != -1)
+    else if ((pos = findObject(&self->signatureObjects, sigObj)) == -1)
     {
-        if ((retval = SeosCryptoSignature_free(sigObj, &self->memIf)) != SEOS_SUCCESS)
-        {
-            SeosCryptoLib_removeHandle(&self->signatureHandleVector, handlePos);
-            self->memIf.free(sigObj);
-        }
+        return SEOS_ERROR_INVALID_HANDLE;
     }
-    else
+
+    if ((retval = SeosCryptoSignature_free(sigObj, &self->memIf)) == SEOS_SUCCESS)
     {
-        retval = SEOS_ERROR_INVALID_HANDLE;
+        removeObject(&self->signatureObjects, pos);
+        self->memIf.free(sigObj);
     }
 
     return retval;
@@ -437,8 +451,7 @@ Signature_sign(
 
     // Make local copy of input buffer, to allow overlapping hash/signature buffers
     memcpy(self->buffer, hash, hashSize);
-    return SeosCryptoLib_findHandle(&self->signatureHandleVector, sigObj) == -1 ?
-           SEOS_ERROR_INVALID_HANDLE :
+    return !hasObject(&self->signatureObjects, sigObj) ? SEOS_ERROR_INVALID_HANDLE :
            SeosCryptoSignature_sign(sigObj, &self->cryptoRng, self->buffer,
                                     hashSize, signature, signatureSize);
 }
@@ -459,8 +472,7 @@ Signature_verify(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoLib_findHandle(&self->signatureHandleVector, sigObj) == -1 ?
-           SEOS_ERROR_INVALID_HANDLE :
+    return !hasObject(&self->signatureObjects, sigObj) ? SEOS_ERROR_INVALID_HANDLE :
            SeosCryptoSignature_verify(sigObj, &self->cryptoRng, hash, hashSize, signature,
                                       signatureSize);
 }
@@ -481,12 +493,12 @@ Agreement_init(
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if (SeosCryptoLib_findHandle(&self->keyHandleVector, prvKey) == -1)
+    else if (!hasObject(&self->keyObjects, prvKey))
     {
         return SEOS_ERROR_INVALID_HANDLE;
     }
-    else if ((*pAgrObj = self->memIf.malloc(
-                             sizeof(SeosCryptoLib_Agreement))) == NULL)
+
+    if ((*pAgrObj = self->memIf.malloc(sizeof(SeosCryptoLib_Agreement))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -496,9 +508,9 @@ Agreement_init(
     {
         goto err0;
     }
-    else if (!PointerVector_pushBack(&self->agreementHandleVector, *pAgrObj))
+    else if ((retval = addObject(&self->agreementObjects,
+                                 *pAgrObj)) != SEOS_SUCCESS)
     {
-        retval = SEOS_ERROR_INSUFFICIENT_SPACE;
         goto err1;
     }
 
@@ -508,6 +520,7 @@ err1:
     SeosCryptoAgreement_free(*pAgrObj, &self->memIf);
 err0:
     self->memIf.free(*pAgrObj);
+
     return retval;
 }
 
@@ -518,21 +531,20 @@ Agreement_free(
 {
     seos_err_t retval = SEOS_SUCCESS;
     SeosCryptoLib* self = (SeosCryptoLib*) api;
-    size_t handlePos;
+    size_t pos;
 
     if (NULL == api)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    if ((handlePos = SeosCryptoLib_findHandle(&self->agreementHandleVector,
-                                              agrObj)) == -1)
+    else if ((pos = findObject(&self->agreementObjects, agrObj)) == -1)
     {
         return SEOS_ERROR_INVALID_HANDLE;
     }
 
-    if ((retval = SeosCryptoAgreement_free(agrObj, &self->memIf)) != SEOS_SUCCESS)
+    if ((retval = SeosCryptoAgreement_free(agrObj, &self->memIf)) == SEOS_SUCCESS)
     {
-        SeosCryptoLib_removeHandle(&self->agreementHandleVector, handlePos);
+        removeObject(&self->agreementObjects, pos);
         self->memIf.free(agrObj);
     }
 
@@ -554,8 +566,8 @@ Agreement_agree(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return (SeosCryptoLib_findHandle(&self->agreementHandleVector, agrObj) == -1)
-           || (SeosCryptoLib_findHandle(&self->keyHandleVector, pubKey) == -1) ?
+    return !hasObject(&self->agreementObjects, agrObj) ||
+           !hasObject(&self->keyObjects, pubKey) ?
            SEOS_ERROR_INVALID_HANDLE :
            SeosCryptoAgreement_agree(agrObj, &self->cryptoRng, pubKey, shared, sharedSize);
 }
@@ -575,24 +587,19 @@ Key_generate(
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if (SeosCryptoLib_findHandle(&self->keyHandleVector, *pKeyObj) != -1)
-    {
-        return SEOS_ERROR_INVALID_HANDLE;
-    }
 
     if ((*pKeyObj = self->memIf.malloc(sizeof(SeosCryptoLib_Key))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    retval = SeosCryptoKey_generate(*pKeyObj, &self->memIf, &self->cryptoRng, spec);
-    if (retval != SEOS_SUCCESS)
+    if ((retval = SeosCryptoKey_generate(*pKeyObj, &self->memIf, &self->cryptoRng,
+                                         spec)) != SEOS_SUCCESS)
     {
         goto err0;
     }
-    else if (!PointerVector_pushBack(&self->keyHandleVector, *pKeyObj))
+    else if ((retval = addObject(&self->keyObjects, *pKeyObj)) != SEOS_SUCCESS)
     {
-        retval = SEOS_ERROR_INSUFFICIENT_SPACE;
         goto err1;
     }
 
@@ -602,6 +609,7 @@ err1:
     SeosCryptoKey_free(*pKeyObj, &self->memIf);
 err0:
     self->memIf.free(*pKeyObj);
+
     return retval;
 }
 
@@ -619,12 +627,7 @@ Key_import(
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if (SeosCryptoLib_findHandle(&self->keyHandleVector, *pKeyObj) != -1)
-    {
-        return SEOS_ERROR_INVALID_HANDLE;
-    }
-    else if (NULL != wrapKeyObj &&
-             (SeosCryptoLib_findHandle(&self->keyHandleVector, wrapKeyObj) == -1))
+    else if (NULL != wrapKeyObj && !hasObject(&self->keyObjects, wrapKeyObj))
     {
         return SEOS_ERROR_INVALID_HANDLE;
     }
@@ -639,9 +642,8 @@ Key_import(
     {
         goto err0;
     }
-    else if (!PointerVector_pushBack(&self->keyHandleVector, *pKeyObj))
+    else if ((retval = addObject(&self->keyObjects, *pKeyObj)) != SEOS_SUCCESS)
     {
-        retval = SEOS_ERROR_INSUFFICIENT_SPACE;
         goto err1;
     }
 
@@ -651,6 +653,7 @@ err1:
     SeosCryptoKey_free(*pKeyObj, &self->memIf);
 err0:
     self->memIf.free(*pKeyObj);
+
     return retval;
 }
 
@@ -668,8 +671,7 @@ Key_makePublic(
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if (SeosCryptoLib_findHandle(&self->keyHandleVector, *pPubKeyObj) != -1 ||
-             SeosCryptoLib_findHandle(&self->keyHandleVector, prvKeyObj) == -1)
+    else if (!hasObject(&self->keyObjects, prvKeyObj))
     {
         return SEOS_ERROR_INVALID_HANDLE;
     }
@@ -679,15 +681,13 @@ Key_makePublic(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    retval = SeosCryptoKey_makePublic(*pPubKeyObj, &self->memIf, prvKeyObj,
-                                      attribs);
-    if (retval != SEOS_SUCCESS)
+    if ((retval = SeosCryptoKey_makePublic(*pPubKeyObj, &self->memIf, prvKeyObj,
+                                           attribs)) != SEOS_SUCCESS)
     {
         goto err0;
     }
-    else if (!PointerVector_pushBack(&self->keyHandleVector, *pPubKeyObj))
+    else if ((retval = addObject(&self->keyObjects, *pPubKeyObj)) != SEOS_SUCCESS)
     {
-        retval = SEOS_ERROR_INSUFFICIENT_SPACE;
         goto err1;
     }
 
@@ -697,6 +697,7 @@ err1:
     SeosCryptoKey_free(*pPubKeyObj, &self->memIf);
 err0:
     self->memIf.free(*pPubKeyObj);
+
     return retval;
 }
 
@@ -713,20 +714,13 @@ Key_export(
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
+    else if (NULL != wrapKeyObj && (!hasObject(&self->keyObjects, wrapKeyObj)))
+    {
+        return SEOS_ERROR_INVALID_HANDLE;
+    }
 
-    if (NULL == wrapKeyObj)
-    {
-        return (SeosCryptoLib_findHandle(&self->keyHandleVector, keyObj) == -1) ?
-               SEOS_ERROR_INVALID_HANDLE :
-               SeosCryptoKey_export(keyObj, wrapKeyObj, keyData);
-    }
-    else
-    {
-        return ((SeosCryptoLib_findHandle(&self->keyHandleVector, keyObj) == -1)
-                || (SeosCryptoLib_findHandle(&self->keyHandleVector, wrapKeyObj) == -1)) ?
-               SEOS_ERROR_INVALID_HANDLE :
-               SeosCryptoKey_export(keyObj, wrapKeyObj, keyData);
-    }
+    return !hasObject(&self->keyObjects, keyObj) ? SEOS_ERROR_INVALID_HANDLE :
+           SeosCryptoKey_export(keyObj, wrapKeyObj, keyData);
 }
 
 static seos_err_t
@@ -743,8 +737,7 @@ Key_getParams(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return (SeosCryptoLib_findHandle(&self->keyHandleVector, keyObj) == -1) ?
-           SEOS_ERROR_INVALID_HANDLE :
+    return !hasObject(&self->keyObjects, keyObj) ? SEOS_ERROR_INVALID_HANDLE :
            SeosCryptoKey_getParams(keyObj, keyParams, paramSize);
 }
 
@@ -770,25 +763,21 @@ Key_free(
 {
     seos_err_t retval = SEOS_SUCCESS;
     SeosCryptoLib* self = (SeosCryptoLib*) api;
-    size_t handlePos;
+    size_t pos;
 
     if (NULL == api)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-
-    if ((handlePos = SeosCryptoLib_findHandle(&self->keyHandleVector,
-                                              keyObj)) != -1)
+    else if ((pos = findObject(&self->keyObjects, keyObj)) == -1)
     {
-        if ((retval = SeosCryptoKey_free(keyObj, &self->memIf)) == SEOS_SUCCESS)
-        {
-            SeosCryptoLib_removeHandle(&self->keyHandleVector, handlePos);
-            self->memIf.free(keyObj);
-        }
+        return SEOS_ERROR_INVALID_HANDLE;
     }
-    else
+
+    if ((retval = SeosCryptoKey_free(keyObj, &self->memIf)) == SEOS_SUCCESS)
     {
-        retval = SEOS_ERROR_INVALID_HANDLE;
+        removeObject(&self->keyObjects, pos);
+        self->memIf.free(keyObj);
     }
 
     return retval;
@@ -812,27 +801,25 @@ Cipher_init(
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if (SeosCryptoLib_findHandle(&self->keyHandleVector, key) == -1)
+    else if (!hasObject(&self->keyObjects, key))
     {
         return SEOS_ERROR_INVALID_HANDLE;
     }
 
     if ((*pCipherObj = self->memIf.malloc(sizeof(SeosCryptoLib_Cipher))) ==  NULL)
     {
-        retval = SEOS_ERROR_INSUFFICIENT_SPACE;
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
-    else
+
+    if ((retval = SeosCryptoCipher_init(*pCipherObj, &self->memIf, algorithm, key,
+                                        iv, ivLen)) != SEOS_SUCCESS)
     {
-        if ((retval = SeosCryptoCipher_init(*pCipherObj, &self->memIf, algorithm, key,
-                                            iv, ivLen)) != SEOS_SUCCESS)
-        {
-            goto err0;
-        }
-        else if (!PointerVector_pushBack(&self->cipherHandleVector, *pCipherObj))
-        {
-            retval = SEOS_ERROR_INSUFFICIENT_SPACE;
-            goto err1;
-        }
+        goto err0;
+    }
+    else if ((retval = addObject(&self->cipherObjects,
+                                 *pCipherObj)) != SEOS_SUCCESS)
+    {
+        goto err1;
     }
 
     return retval;
@@ -852,25 +839,22 @@ Cipher_free(
 {
     seos_err_t retval = SEOS_ERROR_GENERIC;
     SeosCryptoLib* self = (SeosCryptoLib*) api;
-    size_t handlePos;
+    size_t pos;
 
     if (NULL == api)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((handlePos = SeosCryptoLib_findHandle(&self->cipherHandleVector,
-                                              cipherObj)) != -1)
+    if ((pos = findObject(&self->cipherObjects, cipherObj)) == -1)
     {
-        if ((retval = SeosCryptoCipher_free(cipherObj, &self->memIf)) == SEOS_SUCCESS)
-        {
-            SeosCryptoLib_removeHandle(&self->cipherHandleVector, handlePos);
-            self->memIf.free(cipherObj);
-        }
+        return SEOS_ERROR_INVALID_HANDLE;
     }
-    else
+
+    if ((retval = SeosCryptoCipher_free(cipherObj, &self->memIf)) == SEOS_SUCCESS)
     {
-        retval = SEOS_ERROR_INVALID_HANDLE;
+        removeObject(&self->cipherObjects, pos);
+        self->memIf.free(cipherObj);
     }
 
     return retval;
@@ -898,8 +882,7 @@ Cipher_process(
 
     // Make local copy of input buffer, to allow overlapping input/output buffers
     memcpy(self->buffer, input, inputSize);
-    return (SeosCryptoLib_findHandle(&self->cipherHandleVector, cipherObj) == -1) ?
-           SEOS_ERROR_INVALID_HANDLE :
+    return !hasObject(&self->cipherObjects, cipherObj) ? SEOS_ERROR_INVALID_HANDLE :
            SeosCryptoCipher_process(cipherObj, self->buffer, inputSize, output,
                                     outputSize);
 }
@@ -918,8 +901,7 @@ Cipher_start(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return (SeosCryptoLib_findHandle(&self->cipherHandleVector, cipherObj) == -1) ?
-           SEOS_ERROR_INVALID_HANDLE :
+    return !hasObject(&self->cipherObjects, cipherObj) ? SEOS_ERROR_INVALID_HANDLE :
            SeosCryptoCipher_start(cipherObj, input, inputSize);
 }
 
@@ -937,8 +919,7 @@ Cipher_finalize(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return (SeosCryptoLib_findHandle(&self->cipherHandleVector, cipherObj) == -1) ?
-           SEOS_ERROR_INVALID_HANDLE :
+    return !hasObject(&self->cipherObjects, cipherObj) ? SEOS_ERROR_INVALID_HANDLE :
            SeosCryptoCipher_finalize(cipherObj, buf, bufSize);
 }
 
@@ -999,33 +980,28 @@ SeosCryptoLib_init(
     self->memIf = *memIf;
     *vtable = &SeosCryptoLib_vtable;
 
-    if (!PointerVector_ctor(&self->digestHandleVector, 1))
+    if ((retval = createObjectList(&self->digestObjects)) != SEOS_SUCCESS)
     {
-        return SEOS_ERROR_ABORTED;
+        return retval;
     }
-    else if (!PointerVector_ctor(&self->macHandleVector, 1))
+    else if ((retval = createObjectList(&self->macObjects)) != SEOS_SUCCESS)
     {
-        retval = SEOS_ERROR_ABORTED;
         goto err0;
     }
-    else if (!PointerVector_ctor(&self->keyHandleVector, 1))
+    else if ((retval = createObjectList(&self->keyObjects)) != SEOS_SUCCESS)
     {
-        retval = SEOS_ERROR_ABORTED;
         goto err1;
     }
-    else if (!PointerVector_ctor(&self->cipherHandleVector, 1))
+    else if ((retval = createObjectList(&self->cipherObjects) != SEOS_SUCCESS))
     {
-        retval = SEOS_ERROR_ABORTED;
         goto err2;
     }
-    else if (!PointerVector_ctor(&self->signatureHandleVector, 1))
+    else if ((retval = createObjectList(&self->signatureObjects) != SEOS_SUCCESS))
     {
-        retval = SEOS_ERROR_ABORTED;
         goto err3;
     }
-    else if (!PointerVector_ctor(&self->agreementHandleVector, 1))
+    else if ((retval = createObjectList(&self->agreementObjects) != SEOS_SUCCESS))
     {
-        retval = SEOS_ERROR_ABORTED;
         goto err4;
     }
 
@@ -1039,17 +1015,17 @@ SeosCryptoLib_init(
     return retval;
 
 err5:
-    PointerVector_dtor(&self->agreementHandleVector);
+    freeObjectList(&self->agreementObjects);
 err4:
-    PointerVector_dtor(&self->signatureHandleVector);
+    freeObjectList(&self->signatureObjects);
 err3:
-    PointerVector_dtor(&self->cipherHandleVector);
+    freeObjectList(&self->cipherObjects);
 err2:
-    PointerVector_dtor(&self->keyHandleVector);
+    freeObjectList(&self->keyObjects);
 err1:
-    PointerVector_dtor(&self->macHandleVector);
+    freeObjectList(&self->macObjects);
 err0:
-    PointerVector_dtor(&self->digestHandleVector);
+    freeObjectList(&self->digestObjects);
 
     return retval;
 }
@@ -1060,12 +1036,12 @@ SeosCryptoLib_free(
 {
     SeosCryptoRng_free(&self->cryptoRng, &self->memIf);
 
-    PointerVector_dtor(&self->agreementHandleVector);
-    PointerVector_dtor(&self->signatureHandleVector);
-    PointerVector_dtor(&self->cipherHandleVector);
-    PointerVector_dtor(&self->keyHandleVector);
-    PointerVector_dtor(&self->macHandleVector);
-    PointerVector_dtor(&self->digestHandleVector);
+    freeObjectList(&self->agreementObjects);
+    freeObjectList(&self->signatureObjects);
+    freeObjectList(&self->cipherObjects);
+    freeObjectList(&self->keyObjects);
+    freeObjectList(&self->macObjects);
+    freeObjectList(&self->digestObjects);
 
     return SEOS_SUCCESS;
 }
