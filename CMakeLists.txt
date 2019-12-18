@@ -1,13 +1,24 @@
+#
 # SEOS Crypto Library
+#
+# We have three library targets:
+# 1. SEOS_CRYPTO:
+#    Provides only functionality of the crypto library behind calls to the API.
+# 2. SEOS_CRYPTO_WITH_RPC_CLIENT:
+#    Provides library functionality to execute crypto locally, but also allows
+#    to operate crypto API in RPC client mode, where calls to the API are
+#    transparently mapped to an RPC interface and executed in a separate component
+#    (e.g., the CryptoServer)
+# 3. SEOS_CRYPTO_WITH_RPC_SEVER:
+#    Provides library functionality to execute crypto locally, but also allows
+#    to instantiate the crypto API as RPC server easily, which can then be used
+#    to serve RPC requests from a crypto API RPC client.
+#
 
-project(seos_crypto C)
-
-add_library(
-    ${PROJECT_NAME} STATIC
-
+# These are the sources we ALWAYS compile, for all targets
+set(SHARED_LIB_SOURCES
     "src/SeosCryptoLib.c"
     "src/SeosCryptoApi.c"
-    "src/SeosCryptoRpcClient.c"
     "src/lib/SeosCryptoLib_Agreement.c"
     "src/lib/SeosCryptoLib_Rng.c"
     "src/lib/SeosCryptoLib_Digest.c"
@@ -16,79 +27,81 @@ add_library(
     "src/lib/SeosCryptoLib_Signature.c"
     "src/lib/SeosCryptoLib_Key.c"
 )
-if (ENABLE_LINT)
-        set(CMAKE_C_CPPCHECK "cppcheck;--enable=warning;--inline-suppr")
-        set(CMAKE_C_CLANG_TIDY "clang-tidy;-checks=*")
-endif()
 
-# when building for the x64 architecture, some warnings are
-# reported (i.e. printf formatting) that the code is full of,
-# and that are otherwise not reported, so as a quick fix we
-# remove the -Werror in this build situation
+# These are the 3rd party sources, holding the actual algorithms
+set(MBEDTLS_SOURCES
+    # UTILS ----------------------------------------------------------------
+    "3rdParty/mbedtls/library/platform_util.c"
+    "3rdParty/mbedtls/library/bignum.c"
+    # DIGEST ---------------------------------------------------------------
+    "3rdParty/mbedtls/library/md.c"
+    "3rdParty/mbedtls/library/md_wrap.c"
+    "3rdParty/mbedtls/library/md5.c"
+    "3rdParty/mbedtls/library/sha1.c"
+    "3rdParty/mbedtls/library/sha256.c"
+    # RNG ------------------------------------------------------------------
+    "3rdParty/mbedtls/library/ctr_drbg.c"
+    # CIPHER ---------------------------------------------------------------
+    "3rdParty/mbedtls/library/cipher.c"
+    "3rdParty/mbedtls/library/cipher_wrap.c"
+    "3rdParty/mbedtls/library/aes.c"
+    "3rdParty/mbedtls/library/gcm.c"
+    # AGREEMENT ------------------------------------------------------------
+    "3rdParty/mbedtls/library/dhm.c"
+    "3rdParty/mbedtls/library/ecdh.c"
+    "3rdParty/mbedtls/library/ecp.c"
+    "3rdParty/mbedtls/library/ecp_curves.c"
+    # SIGNATURE ------------------------------------------------------------
+    "3rdParty/mbedtls/library/oid.c"
+    "3rdParty/mbedtls/library/rsa.c"
+    "3rdParty/mbedtls/library/rsa_internal.c"
+    # Temporary: For mbedTLS
+    "3rdParty/mbedtls/library/asn1parse.c"
+    "3rdParty/mbedtls/library/pem.c"
+    "3rdParty/mbedtls/library/base64.c"
+)
+
+set(PRIVATE_TARGET_COMPILE_DEFINITIONS
+    MBEDTLS_CONFIG_FILE="${CMAKE_CURRENT_SOURCE_DIR}/configs/MbedTLS_Config.h"
+)
+
+set(PUBLIC_TARGET_COMPILE_DEFINITIONS)
+
+set(PRIVATE_TARGET_COMPILE_OTIONS)
+
+set(PUBLIC_TARGET_COMPILE_OTIONS
+    -Wall
+)
+
+# when building for the x64 architecture, some warnings are reported (i.e. printf
+# formatting) that the code is full of, and that are otherwise not reported, so as
+# a quick fix we don't add -Werror when compiling in this situation
 if(NO_KERNEL_BUILD)
-    # when building for the x64 architecture, some warnings are
-    # reported (i.e. printf formatting) that the code is full of,
-    # and that are otherwise not reported, so as a quick fix we
-    # remove the -Werror in this build situation
-    target_compile_options(${PROJECT_NAME}
-        PUBLIC
-            -Wall
+    # since PAGE_SIZE is normally defined as part of musllibc (which is missing
+    # here) we have to define it
+    set(PRIVATE_TARGET_COMPILE_DEFINITIONS
+        ${PRIVATE_TARGET_COMPILE_DEFINITIONS}
+        PAGE_SIZE=${PAGE_SIZE_VALUE}
     )
-
-    # since PAGE_SIZE is normally defined as part of musllibc
-    # (which is missing here) we have to define it
-    target_compile_definitions(${PROJECT_NAME} PRIVATE PAGE_SIZE=${PAGE_SIZE_VALUE})
 else()
-    target_compile_options(${PROJECT_NAME}
-        PUBLIC
-            -Wall
-            -Werror
+    set(PUBLIC_TARGET_COMPILE_OTIONS
+        ${PUBLIC_TARGET_COMPILE_OTIONS}
+        -Werror
     )
 endif(NO_KERNEL_BUILD)
 
-if (SEOS_CRYPTO_IMPL_MBEDTLS)
-    list(APPEND PRIVATE_TARGET_COMPILE_DEFINITIONS
-        MBEDTLS_CONFIG_FILE="${CMAKE_CURRENT_SOURCE_DIR}/configs/MbedTLS_Config.h"
-    )
-    target_include_directories(${PROJECT_NAME}
-        # TODO: Should be made PRIVATE in the future, currently we need the
-        # includes from mbedTLS for their data structures
-        PUBLIC
-        "3rdParty/mbedtls/include"
-    )
-    target_sources(${PROJECT_NAME}
-        PRIVATE
-        # UTILS ----------------------------------------------------------------
-        "3rdParty/mbedtls/library/platform_util.c"
-        "3rdParty/mbedtls/library/bignum.c"
-        # DIGEST ---------------------------------------------------------------
-        "3rdParty/mbedtls/library/md.c"
-        "3rdParty/mbedtls/library/md_wrap.c"
-        "3rdParty/mbedtls/library/md5.c"
-        "3rdParty/mbedtls/library/sha1.c"
-        "3rdParty/mbedtls/library/sha256.c"
-        # RNG ------------------------------------------------------------------
-        "3rdParty/mbedtls/library/ctr_drbg.c"
-        # CIPHER ---------------------------------------------------------------
-        "3rdParty/mbedtls/library/cipher.c"
-        "3rdParty/mbedtls/library/cipher_wrap.c"
-        "3rdParty/mbedtls/library/aes.c"
-        "3rdParty/mbedtls/library/gcm.c"
-        # AGREEMENT ------------------------------------------------------------
-        "3rdParty/mbedtls/library/dhm.c"
-        "3rdParty/mbedtls/library/ecdh.c"
-        "3rdParty/mbedtls/library/ecp.c"
-        "3rdParty/mbedtls/library/ecp_curves.c"
-        # SIGNATURE ------------------------------------------------------------
-        "3rdParty/mbedtls/library/oid.c"
-        "3rdParty/mbedtls/library/rsa.c"
-        "3rdParty/mbedtls/library/rsa_internal.c"
-        # Temporary: For mbedTLS
-        "3rdParty/mbedtls/library/asn1parse.c"
-        "3rdParty/mbedtls/library/pem.c"
-        "3rdParty/mbedtls/library/base64.c"
-    )
+if (ENABLE_LINT)
+    set(CMAKE_C_CPPCHECK "cppcheck;--enable=warning;--inline-suppr")
+    set(CMAKE_C_CLANG_TIDY "clang-tidy;-checks=*")
 endif()
+
+#------------------------------------------------------------------------------
+
+project(seos_crypto C)
+
+add_library(${PROJECT_NAME} STATIC
+    ${SHARED_LIB_SOURCES}
+    ${MBEDTLS_SOURCES})
 
 target_compile_definitions(${PROJECT_NAME}
     PUBLIC
@@ -97,9 +110,17 @@ target_compile_definitions(${PROJECT_NAME}
         ${PRIVATE_TARGET_COMPILE_DEFINITIONS}
 )
 
+target_compile_options(${PROJECT_NAME}
+    PUBLIC
+        ${PUBLIC_TARGET_COMPILE_OPTIONS}
+    PRIVATE
+        ${PRIVATE_TARGET_COMPILE_OPTIONS}
+)
+
 target_include_directories(${PROJECT_NAME}
     PUBLIC
         "include"
+        "3rdParty/mbedtls/include"
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -107,26 +128,86 @@ target_link_libraries(${PROJECT_NAME}
     seos_libs
 )
 
+#------------------------------------------------------------------------------
+
+project(seos_crypto_with_rpc_client C)
+
+add_library(${PROJECT_NAME} STATIC
+    ${SHARED_LIB_SOURCES}
+    "src/SeosCryptoRpcClient.c"
+    ${MBEDTLS_SOURCES})
+
+target_compile_definitions(${PROJECT_NAME}
+    PUBLIC
+        ${PUBLIC_TARGET_COMPILE_DEFINITIONS}
+    PRIVATE
+        ${PRIVATE_TARGET_COMPILE_DEFINITIONS}
+)
+
+target_compile_options(${PROJECT_NAME}
+    PUBLIC
+        ${PUBLIC_TARGET_COMPILE_OPTIONS}
+    PRIVATE
+        ${PRIVATE_TARGET_COMPILE_OPTIONS}
+        -DSEOS_CRYPTO_WITH_RPC_CLIENT
+)
+
+target_include_directories(${PROJECT_NAME}
+    PUBLIC
+        "include"
+        "3rdParty/mbedtls/include"
+)
+
+target_link_libraries(${PROJECT_NAME}
+    seos_core_api
+    seos_libs
+)
+
+#------------------------------------------------------------------------------
+
+project(seos_crypto_with_rpc_server C)
+
+add_library(${PROJECT_NAME} STATIC
+    ${SHARED_LIB_SOURCES}
+    "src/SeosCryptoRpcServer.c"
+    ${MBEDTLS_SOURCES})
+
+target_compile_definitions(${PROJECT_NAME}
+    PUBLIC
+        ${PUBLIC_TARGET_COMPILE_DEFINITIONS}
+    PRIVATE
+        ${PRIVATE_TARGET_COMPILE_DEFINITIONS}
+)
+
+target_compile_options(${PROJECT_NAME}
+    PUBLIC
+        ${PUBLIC_TARGET_COMPILE_OPTIONS}
+    PRIVATE
+        ${PRIVATE_TARGET_COMPILE_OPTIONS}
+        -DSEOS_CRYPTO_WITH_RPC_SERVER
+)
+
+target_include_directories(${PROJECT_NAME}
+    PUBLIC
+        "include"
+        "3rdParty/mbedtls/include"
+)
+
+target_link_libraries(${PROJECT_NAME}
+    seos_core_api
+    seos_libs
+)
+
+#------------------------------------------------------------------------------
+
 # if invoked from the SEOS sandbox, provide a documentation build target
 if (COMMAND seos_create_doxygen_target)
 
-    get_target_property(
-        SEOS_CORE_API_INCLUDES
-        seos_core_api
-        INTERFACE_INCLUDE_DIRECTORIES)
-
-    find_file(
-        SEOS_CRYPTO_API_HEADER
-        SeosCryptoApi.h
-        PATHS ${SEOS_CORE_API_INCLUDES}
-        CMAKE_FIND_ROOT_PATH_BOTH)
-
     seos_create_doxygen_target( seos_crypto_doc
-        # pre-step: link the API file SeosCryptoApi.h from seos_core_api in
-        #           order to produce a complete doxygen documentation
-        "ln -sf ${SEOS_CRYPTO_API_HEADER} ${CMAKE_CURRENT_SOURCE_DIR}/include"
-        # post-step: remove the link to SeosCryptoApi.h
-        "rm ${CMAKE_CURRENT_SOURCE_DIR}/include/SeosCryptoApi.h"
-        )
+        # API header is documented as part of seos_core_api, so we do nothing
+        "echo"
+        # API header is documented as part of seos_core_api, so we do nothing
+        "echo"
+    )
 
 endif()

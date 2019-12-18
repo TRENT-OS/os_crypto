@@ -1,10 +1,12 @@
 /**
  * Copyright (C) 2019, Hensoldt Cyber GmbH
- *
  */
+
 #include "SeosCryptoCtx.h"
 #include "SeosCryptoApi.h"
 #include "SeosCryptoLib.h"
+#include "SeosCryptoRpcClient.h"
+#include "SeosCryptoRpcServer.h"
 
 #include <string.h>
 
@@ -15,8 +17,8 @@
 // is actually implemented.
 #define CALL_SAFE(w, func, ...)                                 \
     (NULL == w) ? SEOS_ERROR_INVALID_PARAMETER :                \
-    (NULL == w->api->vtable->func) ? SEOS_ERROR_NOT_SUPPORTED : \
-    w->api->vtable->func(w->api, __VA_ARGS__)                   \
+    (NULL == w->impl.vtable->func) ? SEOS_ERROR_NOT_SUPPORTED : \
+    w->impl.vtable->func(w->impl.context, __VA_ARGS__)          \
 
 // Initialize a wrapped object from existing API pointer
 #define INIT_SAFE(w, ctx) {                                     \
@@ -24,31 +26,136 @@
             return SEOS_ERROR_INVALID_PARAMETER;                \
         }                                                       \
         memset(w, 0, sizeof(*w));                               \
-        w->api = ctx;                                           \
+        w->impl = ctx->impl;                                    \
 }
 
 // ------------------------------- Init/Free -----------------------------------
 
 seos_err_t
 SeosCryptoApi_init(
-    SeosCryptoApi_Context* ctx,
-    SeosCryptoApi_Config* cfg)
+    SeosCryptoApi*              ctx,
+    const SeosCryptoApi_Config* cfg)
 {
-    return SEOS_SUCCESS;
+    seos_err_t err;
+
+    if (NULL == ctx || NULL == cfg || NULL == cfg->mem.malloc
+        || NULL == cfg->mem.free)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    memset(ctx, 0, sizeof(*ctx));
+
+    ctx->mode = cfg->mode;
+
+    switch (cfg->mode)
+    {
+    case SeosCryptoApi_Mode_LIBRARY:
+        if ((ctx->impl.context = cfg->mem.malloc(sizeof(SeosCryptoLib))) == NULL)
+        {
+            return SEOS_ERROR_INSUFFICIENT_SPACE;
+        }
+        if ((err = SeosCryptoLib_init(ctx->impl.context, &ctx->impl.vtable, &cfg->mem,
+                                      &cfg->impl.lib)) != SEOS_SUCCESS)
+        {
+            goto err0;
+        }
+        break;
+#if defined(SEOS_CRYPTO_WITH_RPC_CLIENT)
+    case SeosCryptoApi_Mode_RPC_CLIENT:
+        if ((ctx->impl.context = cfg->mem.malloc(sizeof(SeosCryptoRpcClient))) == NULL)
+        {
+            return SEOS_ERROR_INSUFFICIENT_SPACE;
+        }
+        if ((err = SeosCryptoRpcClient_init(ctx->impl.context, &ctx->impl.vtable,
+                                            &cfg->impl.client)) !=  SEOS_SUCCESS)
+        {
+            goto err0;
+        }
+        break;
+#endif /* SEOS_CRYPTO_WITH_RPC_CLIENT */
+#if defined(SEOS_CRYPTO_WITH_RPC_SERVER)
+    case SeosCryptoApi_Mode_RPC_SERVER_WITH_LIBRARY:
+        if ((ctx->impl.context = cfg->mem.malloc(sizeof(SeosCryptoLib))) == NULL)
+        {
+            return SEOS_ERROR_INSUFFICIENT_SPACE;
+        }
+        if ((err = SeosCryptoLib_init(ctx->impl.context, &ctx->impl.vtable, &cfg->mem,
+                                      &cfg->impl.lib)) != SEOS_SUCCESS)
+        {
+            goto err0;
+        }
+        if ((ctx->server.context = cfg->mem.malloc(sizeof(SeosCryptoRpcServer))) ==
+            NULL)
+        {
+            err = SEOS_ERROR_INSUFFICIENT_SPACE;
+            goto err0;
+        }
+        if ((err = SeosCryptoRpcServer_init(ctx->server.context, &ctx->impl,
+                                            &cfg->server)) != SEOS_SUCCESS)
+        {
+            goto err1;
+        }
+        break;
+#endif /* SEOS_CRYPTO_WITH_RPC_SERVER */
+    default:
+        err = SEOS_ERROR_NOT_SUPPORTED;
+    }
+
+    return err;
+
+#if defined(SEOS_CRYPTO_WITH_RPC_SERVER)
+err1:
+    free(ctx->server.context);
+#endif /* SEOS_CRYPTO_WITH_RPC_SERVER */
+err0:
+    free(ctx->impl.context);
+
+    return err;
 }
 
 seos_err_t
 SeosCryptoApi_free(
-    SeosCryptoApi_Context* ctx)
+    SeosCryptoApi* ctx)
 {
-    return SEOS_SUCCESS;
+    seos_err_t err;
+
+    if (NULL == ctx)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    switch (ctx->mode)
+    {
+    case SeosCryptoApi_Mode_LIBRARY:
+        err = SeosCryptoLib_free(ctx->impl.context);
+        free(ctx->impl.context);
+        break;
+#if defined(SEOS_CRYPTO_WITH_RPC_CLIENT)
+    case SeosCryptoApi_Mode_RPC_CLIENT:
+        err = SeosCryptoRpcClient_free(ctx->impl.context);
+        free(ctx->impl.context);
+        break;
+#endif /* SEOS_CRYPTO_WITH_RPC_CLIENT */
+#if defined(SEOS_CRYPTO_WITH_RPC_SERVER)
+    case SeosCryptoApi_Mode_RPC_SERVER_WITH_LIBRARY:
+        SeosCryptoLib_free(ctx->impl.context);
+        free(ctx->impl.context);
+        err = SeosCryptoRpcServer_free(ctx->server.context);
+        free(ctx->server.context);
+        break;
+#endif /* SEOS_CRYPTO_WITH_RPC_SERVER */
+    default:
+        return SEOS_ERROR_NOT_SUPPORTED;
+    }
+    return err;
 }
 
 // -------------------------------- RNG API ------------------------------------
 
 seos_err_t
 SeosCryptoApi_Rng_getBytes(
-    SeosCryptoApi_Context*       ctx,
+    SeosCryptoApi*               ctx,
     const SeosCryptoApi_Rng_Flag flags,
     void*                        buf,
     const size_t                 bufSize)
@@ -58,30 +165,28 @@ SeosCryptoApi_Rng_getBytes(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->Rng_getBytes(ctx, flags, buf, bufSize);
+    return CALL_SAFE(ctx, Rng_getBytes, flags, buf, bufSize);
 }
 
 seos_err_t
 SeosCryptoApi_Rng_reseed(
-    SeosCryptoApi_Context* ctx,
-    const void*            seed,
-    const size_t           seedLen)
+    SeosCryptoApi* ctx,
+    const void*    seed,
+    const size_t   seedLen)
 {
     if (seedLen > SeosCryptoLib_SIZE_BUFFER)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return (NULL == ctx) ? SEOS_ERROR_INVALID_PARAMETER :
-           ctx->vtable->Rng_reseed(ctx, seed, seedLen);
+    return CALL_SAFE(ctx, Rng_reseed, seed, seedLen);
 }
 
 // ------------------------------- MAC API -------------------------------------
 
 seos_err_t
 SeosCryptoApi_Mac_init(
-    SeosCryptoApi_Context*      api,
+    SeosCryptoApi*              api,
     SeosCryptoApi_Mac*          wrap,
     const SeosCryptoApi_Mac_Alg algorithm)
 {
@@ -143,7 +248,7 @@ SeosCryptoApi_Mac_finalize(
 
 seos_err_t
 SeosCryptoApi_Digest_init(
-    SeosCryptoApi_Context*         api,
+    SeosCryptoApi*                 api,
     SeosCryptoApi_Digest*          wrap,
     const SeosCryptoApi_Digest_Alg algorithm)
 {
@@ -200,7 +305,7 @@ SeosCryptoApi_Digest_finalize(
 
 seos_err_t
 SeosCryptoApi_Signature_init(
-    SeosCryptoApi_Context*            api,
+    SeosCryptoApi*                    api,
     SeosCryptoApi_Signature*          wrap,
     const SeosCryptoApi_Signature_Alg algorithm,
     const SeosCryptoApi_Digest_Alg    digest,
@@ -261,7 +366,7 @@ SeosCryptoApi_Signature_verify(
 
 seos_err_t
 SeosCryptoApi_Agreement_init(
-    SeosCryptoApi_Context*            api,
+    SeosCryptoApi*                    api,
     SeosCryptoApi_Agreement*          wrap,
     const SeosCryptoApi_Agreement_Alg algorithm,
     const SeosCryptoApi_Key*          prvKey)
@@ -299,7 +404,7 @@ SeosCryptoApi_Agreement_agree(
 
 seos_err_t
 SeosCryptoApi_Key_generate(
-    SeosCryptoApi_Context*        api,
+    SeosCryptoApi*                api,
     SeosCryptoApi_Key*            wrap,
     const SeosCryptoApi_Key_Spec* spec)
 {
@@ -310,7 +415,7 @@ SeosCryptoApi_Key_generate(
 
 seos_err_t
 SeosCryptoApi_Key_import(
-    SeosCryptoApi_Context*        api,
+    SeosCryptoApi*                api,
     SeosCryptoApi_Key*            wrap,
     const SeosCryptoApi_Key*      wrapKey,
     const SeosCryptoApi_Key_Data* keyData)
@@ -332,7 +437,7 @@ SeosCryptoApi_Key_makePublic(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    INIT_SAFE(wrap, prvKey->api);
+    INIT_SAFE(wrap, prvKey);
 
     return CALL_SAFE(wrap, Key_makePublic, &wrap->key, UNWRAP_SAFE(prvKey, key),
                      attribs);
@@ -371,7 +476,7 @@ SeosCryptoApi_Key_free(
 
 seos_err_t
 SeosCryptoApi_Key_loadParams(
-    SeosCryptoApi_Context*        api,
+    SeosCryptoApi*                api,
     const SeosCryptoApi_Key_Param name,
     void*                         keyParams,
     size_t*                       paramSize)
@@ -381,16 +486,14 @@ SeosCryptoApi_Key_loadParams(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return (NULL == api) ? SEOS_ERROR_INVALID_PARAMETER :
-           (NULL == api->vtable->Key_loadParams) ? SEOS_ERROR_NOT_SUPPORTED :
-           api->vtable->Key_loadParams(api, name, keyParams, paramSize);
+    return CALL_SAFE(api, Key_loadParams, name, keyParams, paramSize);
 }
 
 // ------------------------------ Cipher API -----------------------------------
 
 seos_err_t
 SeosCryptoApi_Cipher_init(
-    SeosCryptoApi_Context*         api,
+    SeosCryptoApi*                 api,
     SeosCryptoApi_Cipher*          wrap,
     const SeosCryptoApi_Cipher_Alg algorithm,
     const SeosCryptoApi_Key*       symKey,
