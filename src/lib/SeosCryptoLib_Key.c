@@ -877,14 +877,16 @@ SeosCryptoLib_Key_export(
     const SeosCryptoLib_Key* self,
     SeosCryptoApi_Key_Data*  keyData)
 {
+    /*
+     * Keys do have an "exportable" attribute. However, this is only meaningful
+     * when trying to export key data out of the component (via RPC). Anyone who
+     * has access to the memory of the LIBRARY instance can trivally read key data
+     * anyways, even if the library refuses to export it. Therefore, the check
+     * for "exportability" is done by the RPC server and not here!
+     */
     if (NULL == self || NULL == keyData)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
-    }
-
-    if (!(self->attribs.flags & SeosCryptoApi_Key_FLAG_EXPORTABLE_RAW))
-    {
-        return SEOS_ERROR_OPERATION_DENIED;
     }
 
     return exportImpl(self, keyData);

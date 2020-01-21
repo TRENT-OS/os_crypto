@@ -183,8 +183,24 @@ SeosCryptoRpcServer_Key_export(
     SeosCryptoApi_Ptr      api,
     SeosCryptoLib_Key_CPtr keyObj)
 {
+    seos_err_t err;
+    SeosCryptoApi_Key_Attribs attribs;
     SeosCryptoRpcServer* self = api->server.context;
-    return CALL_SAFE(self, Key_export, keyObj, self->dataPort);
+
+    /*
+     * The 'exportable' attribute of a key is only meaningful with relation to
+     * an attempt of sending key material out of the component. For this, the
+     * only way is to use this RPC call so this is where this attribute is
+     * checked.
+     */
+    if ((err = CALL_SAFE(self, Key_getAttribs, keyObj, &attribs)) != SEOS_SUCCESS)
+    {
+        return err;
+    }
+
+    return !attribs.exportable ?
+           SEOS_ERROR_OPERATION_DENIED :
+           CALL_SAFE(self, Key_export, keyObj, self->dataPort);
 }
 
 seos_err_t
