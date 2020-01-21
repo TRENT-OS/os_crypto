@@ -6,7 +6,7 @@
  *
  * @file SeosCryptoLib_Rng.h
  *
-  * @brief Crypto library implementation of RNG functions
+ * @brief Crypto library implementation of RNG functions
  *
  */
 
