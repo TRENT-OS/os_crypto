@@ -349,11 +349,6 @@ Signature_init(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((*pSigObj = self->memIf.malloc(sizeof(SeosCryptoLib_Signature))) == NULL)
-    {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
-    }
-
     if (prvKey != NULL && !PtrVector_hasPtr(&self->keyObjects, prvKey))
     {
         return SEOS_ERROR_INVALID_HANDLE;
@@ -361,6 +356,11 @@ Signature_init(
     else if (pubKey != NULL && !PtrVector_hasPtr(&self->keyObjects, pubKey))
     {
         return SEOS_ERROR_INVALID_HANDLE;
+    }
+
+    if ((*pSigObj = self->memIf.malloc(sizeof(SeosCryptoLib_Signature))) == NULL)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
     if ((err = SeosCryptoLib_Signature_init(*pSigObj, &self->memIf, algorithm,
