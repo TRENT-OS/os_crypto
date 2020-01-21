@@ -123,6 +123,12 @@ typedef seos_err_t
     size_t*);
 
 typedef seos_err_t
+(*SeosCryptoVtable_Key_getAttribsT)(
+    void*,
+    const SeosCryptoLib_Key*,
+    SeosCryptoApi_Key_Attribs*);
+
+typedef seos_err_t
 (*SeosCryptoVtable_Key_freeT)(
     void*,
     SeosCryptoLib_Key*);
@@ -250,6 +256,7 @@ struct SeosCryptoVtable
     SeosCryptoVtable_Key_importT Key_import;
     SeosCryptoVtable_Key_exportT Key_export;
     SeosCryptoVtable_Key_getParamsT Key_getParams;
+    SeosCryptoVtable_Key_getAttribsT Key_getAttribs;
     SeosCryptoVtable_Key_loadParamsT Key_loadParams;
     SeosCryptoVtable_Key_freeT Key_free;
     SeosCryptoVtable_Signature_initT Signature_init;

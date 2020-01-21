@@ -90,6 +90,11 @@ SeosCryptoLib_Key_getParams(
     size_t*                  paramSize);
 
 seos_err_t
+SeosCryptoLib_Key_getAttribs(
+    const SeosCryptoLib_Key*   self,
+    SeosCryptoApi_Key_Attribs* attribs);
+
+seos_err_t
 SeosCryptoLib_Key_loadParams(
     const SeosCryptoApi_Key_Param name,
     void*                         keyParams,

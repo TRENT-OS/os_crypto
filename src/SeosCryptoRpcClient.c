@@ -528,10 +528,33 @@ Key_getParams(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((err = SeosCryptoRpcServer_Key_getParams(self->api,  keyObj,
+    if ((err = SeosCryptoRpcServer_Key_getParams(self->api, keyObj,
                                                  paramSize)) == SEOS_SUCCESS)
     {
         memcpy(keyParams, self->dataPort, *paramSize);
+    }
+
+    return err;
+}
+
+static seos_err_t
+Key_getAttribs(
+    void*                      ctx,
+    const SeosCryptoLib_Key*   keyObj,
+    SeosCryptoApi_Key_Attribs* attribs)
+{
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
+    seos_err_t err = SEOS_ERROR_GENERIC;
+
+    if (NULL == self || NULL == attribs)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    if ((err = SeosCryptoRpcServer_Key_getAttribs(self->api,
+                                                  keyObj)) == SEOS_SUCCESS)
+    {
+        memcpy(attribs, self->dataPort, sizeof(SeosCryptoApi_Key_Attribs));
     }
 
     return err;
@@ -737,6 +760,7 @@ static const SeosCryptoVtable SeosCryptoRpcClient_vtable =
     .Key_import          = Key_import,
     .Key_export          = Key_export,
     .Key_getParams       = Key_getParams,
+    .Key_getAttribs      = Key_getAttribs,
     .Key_loadParams      = Key_loadParams,
     .Key_free            = Key_free,
     .Signature_init      = Signature_init,

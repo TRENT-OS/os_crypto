@@ -156,6 +156,11 @@ SeosCryptoRpcServer_Key_getParams(
     size_t*                paramSize);
 
 seos_err_t
+SeosCryptoRpcServer_Key_getAttribs(
+    SeosCryptoApi_Ptr      api,
+    SeosCryptoLib_Key_CPtr keyPtr);
+
+seos_err_t
 SeosCryptoRpcServer_Key_loadParams(
     SeosCryptoApi_Ptr       api,
     SeosCryptoApi_Key_Param name,

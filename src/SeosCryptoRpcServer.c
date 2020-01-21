@@ -200,6 +200,15 @@ SeosCryptoRpcServer_Key_getParams(
 }
 
 seos_err_t
+SeosCryptoRpcServer_Key_getAttribs(
+    SeosCryptoApi_Ptr      api,
+    SeosCryptoLib_Key_CPtr keyObj)
+{
+    SeosCryptoRpcServer* self = api->server.context;
+    return CALL_SAFE(self, Key_getAttribs, keyObj, self->dataPort);
+}
+
+seos_err_t
 SeosCryptoRpcServer_Key_loadParams(
     SeosCryptoApi_Ptr       api,
     SeosCryptoApi_Key_Param name,

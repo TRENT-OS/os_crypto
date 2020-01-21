@@ -738,6 +738,24 @@ Key_getParams(
 }
 
 static seos_err_t
+Key_getAttribs(
+    void*                      ctx,
+    const SeosCryptoLib_Key*   keyObj,
+    SeosCryptoApi_Key_Attribs* attribs)
+{
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
+
+    if (NULL == ctx || NULL == attribs)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    return !PtrVector_hasPtr(&self->keyObjects, keyObj) ?
+           SEOS_ERROR_INVALID_HANDLE :
+           SeosCryptoLib_Key_getAttribs(keyObj, attribs);
+}
+
+static seos_err_t
 Key_loadParams(
     void*                         ctx,
     const SeosCryptoApi_Key_Param name,
@@ -960,6 +978,7 @@ static const SeosCryptoVtable SeosCryptoLib_vtable =
     .Key_import          = Key_import,
     .Key_export          = Key_export,
     .Key_getParams       = Key_getParams,
+    .Key_getAttribs      = Key_getAttribs,
     .Key_loadParams      = Key_loadParams,
     .Key_free            = Key_free,
     .Signature_init      = Signature_init,

@@ -407,6 +407,14 @@ SeosCryptoApi_Key_getParams(
 }
 
 seos_err_t
+SeosCryptoApi_Key_getAttribs(
+    const SeosCryptoApi_Key*   wrap,
+    SeosCryptoApi_Key_Attribs* attribs)
+{
+    return CALL_SAFE(wrap, Key_getAttribs, wrap->key, attribs);
+}
+
+seos_err_t
 SeosCryptoApi_Key_free(
     SeosCryptoApi_Key* wrap)
 {

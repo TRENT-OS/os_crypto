@@ -705,6 +705,15 @@ getParamsImpl(
 }
 
 static seos_err_t
+getAttribsImpl(
+    const SeosCryptoLib_Key*   self,
+    SeosCryptoApi_Key_Attribs* attribs)
+{
+    memcpy(attribs, &self->attribs, sizeof(SeosCryptoApi_Key_Attribs));
+    return SEOS_SUCCESS;
+}
+
+static seos_err_t
 loadParamsImpl(
     const SeosCryptoApi_Key_Param name,
     void*                         keyParams,
@@ -893,6 +902,19 @@ SeosCryptoLib_Key_getParams(
     }
 
     return getParamsImpl(self, keyParams, paramSize);
+}
+
+seos_err_t
+SeosCryptoLib_Key_getAttribs(
+    const SeosCryptoLib_Key*   self,
+    SeosCryptoApi_Key_Attribs* attribs)
+{
+    if (NULL == self || NULL == attribs)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    return getAttribsImpl(self, attribs);
 }
 
 seos_err_t
