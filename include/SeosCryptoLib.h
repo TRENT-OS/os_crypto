@@ -14,9 +14,8 @@
 
 #include "SeosCryptoApi.h"
 
+#include "util/PtrVector.h"
 #include "lib/SeosCryptoLib_Rng.h"
-
-#include "LibUtil/PointerVector.h"
 
 // Internal types/defines/enums ------------------------------------------------
 
@@ -26,12 +25,12 @@ typedef struct
 {
     SeosCryptoApi_MemIf memIf;
     SeosCryptoLib_Rng cryptoRng;
-    PointerVector keyObjects;
-    PointerVector macObjects;
-    PointerVector digestObjects;
-    PointerVector cipherObjects;
-    PointerVector signatureObjects;
-    PointerVector agreementObjects;
+    PtrVector keyObjects;
+    PtrVector macObjects;
+    PtrVector digestObjects;
+    PtrVector cipherObjects;
+    PtrVector signatureObjects;
+    PtrVector agreementObjects;
     /**
      * When we have a function that takes an input buffer and produces an output
      * buffer, we copy the inputs to this buffer internally, so the caller can

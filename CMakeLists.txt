@@ -19,6 +19,7 @@
 set(SHARED_LIB_SOURCES
     "src/SeosCryptoLib.c"
     "src/SeosCryptoApi.c"
+    "src/util/PtrVector.c"
     "src/lib/SeosCryptoLib_Agreement.c"
     "src/lib/SeosCryptoLib_Rng.c"
     "src/lib/SeosCryptoLib_Digest.c"
