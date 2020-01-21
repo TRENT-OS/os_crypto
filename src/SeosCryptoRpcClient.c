@@ -783,8 +783,7 @@ SeosCryptoRpcClient_init(
     const SeosCryptoVtable**              vtable,
     const SeosCryptoApi_RpcClient_Config* cfg)
 {
-    if (NULL == self || NULL == vtable || NULL == cfg || NULL == cfg->dataPort
-        || NULL == cfg->api)
+    if (NULL == self || NULL == vtable || NULL == cfg || NULL == cfg->dataPort)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -792,6 +791,8 @@ SeosCryptoRpcClient_init(
     memset(self, 0, sizeof(*self));
 
     self->dataPort  = cfg->dataPort;
+    // API ptr can be NULL, if RpcServer can call into CryptoServer to get the
+    // pointer to its context. Checks are thus delegated to the RpcServer
     self->api       = cfg->api;
 
     *vtable  = &SeosCryptoRpcClient_vtable;

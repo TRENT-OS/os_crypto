@@ -13,9 +13,29 @@
 #include <string.h>
 #include <stdlib.h>
 
+/*
+ * The usual procedure to do RPC communication is for the client to tell the
+ * server the address where an initilized API RPC-server context is found.
+ * However, in the context of the CryptoServer we would like to avoid that,
+ * so that an attacker cannot access the API contexts of other clients by
+ * trying out other addresses.
+ *
+ * To protect against such an attack, we instead use a callback to ask the host
+ * component of the Crypto RPC server (i.e., the CryptoServer) to look up the
+ * correct context, ignoring any addresses given by the client. The CryptoServer
+ * keeps track of all contexts and knows how to map them based on the sender ID
+ * passed when using a CAMKES interface.
+  */
+extern SeosCryptoApi*
+SeosCryptoRpcServer_getSeosCryptoApi(void) __attribute__((weak));
+
 // Get the SeosCryptoRpcServer pointer from the API pointer and make sure it is
-// actually non-NULL.
+// actually non-NULL. Please note that here the API pointer (passed by the RpcClient)
+// is overwritten, whenever SeosCryptoRpcServer_getSeosCryptoApi() is defined!!
 #define GET_SELF(s, a) {                                \
+    if (NULL != SeosCryptoRpcServer_getSeosCryptoApi) { \
+        a = SeosCryptoRpcServer_getSeosCryptoApi();     \
+    }                                                   \
     if(NULL != a) {                                     \
         s = ((SeosCryptoRpcServer*) a->server.context); \
     } else {                                            \
