@@ -172,21 +172,19 @@ SeosCryptoRpcServer_Key_makePublic(
 seos_err_t
 SeosCryptoRpcServer_Key_import(
     SeosCryptoApi_Ptr      api,
-    SeosCryptoLib_Key_Ptr* pKeyObj,
-    SeosCryptoLib_Key_CPtr wrapKeyObj)
+    SeosCryptoLib_Key_Ptr* pKeyObj)
 {
     SeosCryptoRpcServer* self = api->server.context;
-    return CALL_SAFE(self, Key_import, pKeyObj, wrapKeyObj, self->dataPort);
+    return CALL_SAFE(self, Key_import, pKeyObj, self->dataPort);
 }
 
 seos_err_t
 SeosCryptoRpcServer_Key_export(
     SeosCryptoApi_Ptr      api,
-    SeosCryptoLib_Key_CPtr keyObj,
-    SeosCryptoLib_Key_CPtr wrapKeyObj)
+    SeosCryptoLib_Key_CPtr keyObj)
 {
     SeosCryptoRpcServer* self = api->server.context;
-    return CALL_SAFE(self, Key_export, keyObj, wrapKeyObj, self->dataPort);
+    return CALL_SAFE(self, Key_export, keyObj, self->dataPort);
 }
 
 seos_err_t

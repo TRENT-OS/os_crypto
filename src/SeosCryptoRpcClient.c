@@ -474,7 +474,6 @@ static seos_err_t
 Key_import(
     void*                         ctx,
     SeosCryptoLib_Key**           pKeyObj,
-    const SeosCryptoLib_Key*      wrapKeyObj,
     const SeosCryptoApi_Key_Data* keyData)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
@@ -485,14 +484,13 @@ Key_import(
     }
 
     memcpy(self->dataPort, keyData, sizeof(SeosCryptoApi_Key_Data));
-    return SeosCryptoRpcServer_Key_import(self->api, pKeyObj, wrapKeyObj);
+    return SeosCryptoRpcServer_Key_import(self->api, pKeyObj);
 }
 
 static seos_err_t
 Key_export(
     void*                    ctx,
     const SeosCryptoLib_Key* keyObj,
-    const SeosCryptoLib_Key* wrapKeyObj,
     SeosCryptoApi_Key_Data*  keyData)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
@@ -503,8 +501,7 @@ Key_export(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((err = SeosCryptoRpcServer_Key_export(self->api, keyObj,
-                                              wrapKeyObj)) == SEOS_SUCCESS)
+    if ((err = SeosCryptoRpcServer_Key_export(self->api, keyObj)) == SEOS_SUCCESS)
     {
         memcpy(keyData, self->dataPort, sizeof(SeosCryptoApi_Key_Data));
     }

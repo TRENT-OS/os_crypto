@@ -76,13 +76,11 @@ seos_err_t
 SeosCryptoLib_Key_import(
     SeosCryptoLib_Key*            self,
     const SeosCryptoApi_MemIf*    memIf,
-    const SeosCryptoLib_Key*      wrapKey,
     const SeosCryptoApi_Key_Data* keyData);
 
 seos_err_t
 SeosCryptoLib_Key_export(
     const SeosCryptoLib_Key* self,
-    const SeosCryptoLib_Key* wrapKey,
     SeosCryptoApi_Key_Data*  keyData);
 
 seos_err_t

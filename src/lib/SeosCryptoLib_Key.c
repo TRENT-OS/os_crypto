@@ -550,7 +550,6 @@ makeImpl(
 static seos_err_t
 importImpl(
     SeosCryptoLib_Key*            self,
-    const SeosCryptoLib_Key*      wrapKey,
     const SeosCryptoApi_Key_Data* key)
 {
     size_t bits;
@@ -658,7 +657,6 @@ importImpl(
 static seos_err_t
 exportImpl(
     const SeosCryptoLib_Key* self,
-    const SeosCryptoLib_Key* wrapKey,
     SeosCryptoApi_Key_Data*  keyData)
 {
     memcpy(&keyData->data, self->data, self->size);
@@ -845,7 +843,6 @@ seos_err_t
 SeosCryptoLib_Key_import(
     SeosCryptoLib_Key*            self,
     const SeosCryptoApi_MemIf*    memIf,
-    const SeosCryptoLib_Key*      wrapKey,
     const SeosCryptoApi_Key_Data* keyData)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
@@ -854,16 +851,10 @@ SeosCryptoLib_Key_import(
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    else if (NULL != wrapKey)
-    {
-        // Wrapping is not yet supported
-        return SEOS_ERROR_NOT_SUPPORTED;
-    }
-
     if ((err = initImpl(self, memIf, keyData->type,
                         &keyData->attribs)) == SEOS_SUCCESS)
     {
-        if ((err = importImpl(self, wrapKey, keyData)) != SEOS_SUCCESS)
+        if ((err = importImpl(self, keyData)) != SEOS_SUCCESS)
         {
             freeImpl(self, memIf);
         }
@@ -875,17 +866,11 @@ SeosCryptoLib_Key_import(
 seos_err_t
 SeosCryptoLib_Key_export(
     const SeosCryptoLib_Key* self,
-    const SeosCryptoLib_Key* wrapKey,
     SeosCryptoApi_Key_Data*  keyData)
 {
     if (NULL == self || NULL == keyData)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
-    }
-    else if (NULL != wrapKey)
-    {
-        // Wrapping is not yet supported
-        return SEOS_ERROR_NOT_SUPPORTED;
     }
 
     if (!(self->attribs.flags & SeosCryptoApi_Key_FLAG_EXPORTABLE_RAW))
@@ -893,7 +878,7 @@ SeosCryptoLib_Key_export(
         return SEOS_ERROR_OPERATION_DENIED;
     }
 
-    return exportImpl(self, wrapKey, keyData);
+    return exportImpl(self, keyData);
 }
 
 seos_err_t

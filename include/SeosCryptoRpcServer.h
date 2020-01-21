@@ -142,14 +142,12 @@ SeosCryptoRpcServer_Key_makePublic(
 seos_err_t
 SeosCryptoRpcServer_Key_import(
     SeosCryptoApi_Ptr      api,
-    SeosCryptoLib_Key_Ptr* pPubKeyPtr,
-    SeosCryptoLib_Key_CPtr wrapKeyPtr);
+    SeosCryptoLib_Key_Ptr* pPubKeyPtr);
 
 seos_err_t
 SeosCryptoRpcServer_Key_export(
     SeosCryptoApi_Ptr      api,
-    SeosCryptoLib_Key_CPtr keyPtr,
-    SeosCryptoLib_Key_CPtr wrapKeyPtr);
+    SeosCryptoLib_Key_CPtr keyPtr);
 
 seos_err_t
 SeosCryptoRpcServer_Key_getParams(

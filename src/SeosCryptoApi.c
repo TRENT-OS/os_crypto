@@ -365,13 +365,11 @@ seos_err_t
 SeosCryptoApi_Key_import(
     SeosCryptoApi*                api,
     SeosCryptoApi_Key*            wrap,
-    const SeosCryptoApi_Key*      wrapKey,
     const SeosCryptoApi_Key_Data* keyData)
 {
     INIT_SAFE(wrap, api);
 
-    return CALL_SAFE(wrap, Key_import, &wrap->key, UNWRAP_SAFE(wrapKey, key),
-                     keyData);
+    return CALL_SAFE(wrap, Key_import, &wrap->key, keyData);
 }
 
 seos_err_t
@@ -394,11 +392,9 @@ SeosCryptoApi_Key_makePublic(
 seos_err_t
 SeosCryptoApi_Key_export(
     const SeosCryptoApi_Key* wrap,
-    const SeosCryptoApi_Key* wrapKey,
     SeosCryptoApi_Key_Data*  keyData)
 {
-    return CALL_SAFE(wrap, Key_export, wrap->key, UNWRAP_SAFE(wrapKey, key),
-                     keyData);
+    return CALL_SAFE(wrap, Key_export, wrap->key, keyData);
 }
 
 seos_err_t

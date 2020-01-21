@@ -616,7 +616,6 @@ static seos_err_t
 Key_import(
     void*                         ctx,
     SeosCryptoLib_Key**           pKeyObj,
-    const SeosCryptoLib_Key*      wrapKeyObj,
     const SeosCryptoApi_Key_Data* keyData)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
@@ -627,17 +626,12 @@ Key_import(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if (NULL != wrapKeyObj && !PtrVector_hasPtr(&self->keyObjects, wrapKeyObj))
-    {
-        return SEOS_ERROR_INVALID_HANDLE;
-    }
-
     if ((*pKeyObj = self->memIf.malloc(sizeof(SeosCryptoLib_Key))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((err = SeosCryptoLib_Key_import(*pKeyObj, &self->memIf, wrapKeyObj,
+    if ((err = SeosCryptoLib_Key_import(*pKeyObj, &self->memIf,
                                         keyData)) != SEOS_SUCCESS)
     {
         goto err0;
@@ -706,7 +700,6 @@ static seos_err_t
 Key_export(
     void*                    ctx,
     const SeosCryptoLib_Key* keyObj,
-    const SeosCryptoLib_Key* wrapKeyObj,
     SeosCryptoApi_Key_Data*  keyData)
 {
     SeosCryptoLib* self = (SeosCryptoLib*) ctx;
@@ -716,14 +709,9 @@ Key_export(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if (NULL != wrapKeyObj  && !PtrVector_hasPtr(&self->keyObjects, wrapKeyObj))
-    {
-        return SEOS_ERROR_INVALID_HANDLE;
-    }
-
-    return !PtrVector_hasPtr(&self->keyObjects,
-                             keyObj) ? SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_Key_export(keyObj, wrapKeyObj, keyData);
+    return !PtrVector_hasPtr(&self->keyObjects, keyObj) ?
+           SEOS_ERROR_INVALID_HANDLE :
+           SeosCryptoLib_Key_export(keyObj, keyData);
 }
 
 static seos_err_t

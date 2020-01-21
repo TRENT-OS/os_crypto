@@ -100,7 +100,6 @@ typedef seos_err_t
 (*SeosCryptoVtable_Key_importT)(
     void*,
     SeosCryptoLib_Key**,
-    const SeosCryptoLib_Key*,
     const SeosCryptoApi_Key_Data*);
 
 typedef seos_err_t
@@ -113,7 +112,6 @@ typedef seos_err_t
 typedef seos_err_t
 (*SeosCryptoVtable_Key_exportT)(
     void*,
-    const SeosCryptoLib_Key*,
     const SeosCryptoLib_Key*,
     SeosCryptoApi_Key_Data*);
 
