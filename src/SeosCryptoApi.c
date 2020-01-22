@@ -3,9 +3,11 @@
  */
 
 #include "SeosCryptoApi.h"
+
 #include "SeosCryptoLib.h"
 #include "SeosCryptoRpcClient.h"
 #include "SeosCryptoRpcServer.h"
+#include "SeosCryptoRouter.h"
 
 #include "SeosCryptoVtable.h"
 
@@ -69,7 +71,18 @@ SeosCryptoApi_init(
             return SEOS_ERROR_INSUFFICIENT_SPACE;
         }
         if ((err = SeosCryptoRpcClient_init(ctx->impl.context, &ctx->impl.vtable,
-                                            &cfg->impl.client)) !=  SEOS_SUCCESS)
+                                            &cfg->impl.client)) != SEOS_SUCCESS)
+        {
+            goto err0;
+        }
+        break;
+    case SeosCryptoApi_Mode_ROUTER:
+        if ((ctx->impl.context = cfg->mem.malloc(sizeof(SeosCryptoRouter))) == NULL)
+        {
+            return SEOS_ERROR_INSUFFICIENT_SPACE;
+        }
+        if ((err = SeosCryptoRouter_init(ctx->impl.context, &ctx->impl.vtable,
+                                         &cfg->mem, &cfg->impl.router)) != SEOS_SUCCESS)
         {
             goto err0;
         }
@@ -135,6 +148,10 @@ SeosCryptoApi_free(
 #if defined(SEOS_CRYPTO_WITH_RPC_CLIENT)
     case SeosCryptoApi_Mode_RPC_CLIENT:
         err = SeosCryptoRpcClient_free(ctx->impl.context);
+        free(ctx->impl.context);
+        break;
+    case SeosCryptoApi_Mode_ROUTER:
+        err = SeosCryptoRouter_free(ctx->impl.context);
         free(ctx->impl.context);
         break;
 #endif /* SEOS_CRYPTO_WITH_RPC_CLIENT */
