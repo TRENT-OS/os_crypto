@@ -30,6 +30,11 @@ typedef seos_err_t
     const SeosCryptoApi_Mac_Alg);
 
 typedef seos_err_t
+(*SeosCryptoVtable_Mac_existsT)(
+    void*,
+    const SeosCryptoLib_Mac*);
+
+typedef seos_err_t
 (*SeosCryptoVtable_Mac_freeT)(
     void*,
     SeosCryptoLib_Mac*);
@@ -62,6 +67,11 @@ typedef seos_err_t
     void*,
     SeosCryptoLib_Digest**,
     const SeosCryptoApi_Digest_Alg);
+
+typedef seos_err_t
+(*SeosCryptoVtable_Digest_existsT)(
+    void*,
+    const SeosCryptoLib_Digest*);
 
 typedef seos_err_t
 (*SeosCryptoVtable_Digest_freeT)(
@@ -129,6 +139,11 @@ typedef seos_err_t
     SeosCryptoApi_Key_Attribs*);
 
 typedef seos_err_t
+(*SeosCryptoVtable_Key_existsT)(
+    void*,
+    const SeosCryptoLib_Key*);
+
+typedef seos_err_t
 (*SeosCryptoVtable_Key_freeT)(
     void*,
     SeosCryptoLib_Key*);
@@ -152,9 +167,14 @@ typedef seos_err_t
     const SeosCryptoLib_Key*);
 
 typedef seos_err_t
+(*SeosCryptoVtable_Signature_existsT)(
+    void*,
+    const SeosCryptoLib_Signature* );
+
+typedef seos_err_t
 (*SeosCryptoVtable_Signature_freeT)(
     void*,
-    SeosCryptoLib_Signature* );
+    SeosCryptoLib_Signature*);
 
 typedef seos_err_t
 (*SeosCryptoVtable_Signature_signT)(
@@ -184,6 +204,11 @@ typedef seos_err_t
     const SeosCryptoLib_Key*);
 
 typedef seos_err_t
+(*SeosCryptoVtable_Agreement_existsT)(
+    void*,
+    const SeosCryptoLib_Agreement*);
+
+typedef seos_err_t
 (*SeosCryptoVtable_Agreement_freeT)(
     void*,
     SeosCryptoLib_Agreement*);
@@ -206,6 +231,11 @@ typedef seos_err_t
     const SeosCryptoLib_Key*,
     const void*,
     const size_t);
+
+typedef seos_err_t
+(*SeosCryptoVtable_Cipher_existsT)(
+    void*,
+    const SeosCryptoLib_Cipher*);
 
 typedef seos_err_t
 (*SeosCryptoVtable_Cipher_freeT)(
@@ -242,11 +272,13 @@ struct SeosCryptoVtable
     SeosCryptoVtable_Rng_getBytesT Rng_getBytes;
     SeosCryptoVtable_Rng_reseedT Rng_reseed;
     SeosCryptoVtable_Mac_initT Mac_init;
+    SeosCryptoVtable_Mac_existsT Mac_exists;
     SeosCryptoVtable_Mac_freeT Mac_free;
     SeosCryptoVtable_Mac_startT Mac_start;
     SeosCryptoVtable_Mac_processT Mac_process;
     SeosCryptoVtable_Mac_finalizeT Mac_finalize;
     SeosCryptoVtable_Digest_initT Digest_init;
+    SeosCryptoVtable_Digest_existsT Digest_exists;
     SeosCryptoVtable_Digest_freeT Digest_free;
     SeosCryptoVtable_Digest_cloneT Digest_clone;
     SeosCryptoVtable_Digest_processT Digest_process;
@@ -258,15 +290,19 @@ struct SeosCryptoVtable
     SeosCryptoVtable_Key_getParamsT Key_getParams;
     SeosCryptoVtable_Key_getAttribsT Key_getAttribs;
     SeosCryptoVtable_Key_loadParamsT Key_loadParams;
+    SeosCryptoVtable_Key_existsT Key_exists;
     SeosCryptoVtable_Key_freeT Key_free;
     SeosCryptoVtable_Signature_initT Signature_init;
+    SeosCryptoVtable_Signature_existsT Signature_exists;
     SeosCryptoVtable_Signature_freeT Signature_free;
     SeosCryptoVtable_Signature_signT Signature_sign;
     SeosCryptoVtable_Signature_verifyT Signature_verify;
     SeosCryptoVtable_Agreement_initT Agreement_init;
+    SeosCryptoVtable_Agreement_existsT Agreement_exists;
     SeosCryptoVtable_Agreement_freeT Agreement_free;
     SeosCryptoVtable_Agreement_agreeT Agreement_agree;
     SeosCryptoVtable_Cipher_initT Cipher_init;
+    SeosCryptoVtable_Cipher_existsT Cipher_exists;
     SeosCryptoVtable_Cipher_freeT Cipher_free;
     SeosCryptoVtable_Cipher_processT Cipher_process;
     SeosCryptoVtable_Cipher_startT Cipher_start;

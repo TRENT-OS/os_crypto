@@ -84,6 +84,17 @@ Mac_init(
 }
 
 static seos_err_t
+Mac_exists(
+    void*                    ctx,
+    const SeosCryptoLib_Mac* macObj)
+{
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
+    return (NULL == self) ?
+           SEOS_ERROR_INVALID_PARAMETER :
+           SeosCryptoRpcServer_Mac_exists(self->api, macObj);
+}
+
+static seos_err_t
 Mac_free(
     void*              ctx,
     SeosCryptoLib_Mac* macObj)
@@ -186,6 +197,17 @@ Digest_init(
     }
 
     return SeosCryptoRpcServer_Digest_init(self->api, pDigestObj, algorithm);
+}
+
+static seos_err_t
+Digest_exists(
+    void*                       ctx,
+    const SeosCryptoLib_Digest* digestObj)
+{
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
+    return (NULL == self) ?
+           SEOS_ERROR_INVALID_PARAMETER :
+           SeosCryptoRpcServer_Digest_exists(self->api, digestObj);
 }
 
 static seos_err_t
@@ -293,6 +315,17 @@ Signature_init(
 }
 
 static seos_err_t
+Signature_exists(
+    void*                          ctx,
+    const SeosCryptoLib_Signature* signatureObj)
+{
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
+    return (NULL == self) ?
+           SEOS_ERROR_INVALID_PARAMETER :
+           SeosCryptoRpcServer_Signature_exists(self->api, signatureObj);
+}
+
+static seos_err_t
 Signature_free(
     void*                    ctx,
     SeosCryptoLib_Signature* sigObj)
@@ -386,6 +419,17 @@ Agreement_init(
 
     return SeosCryptoRpcServer_Agreement_init(self->api, pAgrObj, algorithm,
                                               prvKey);
+}
+
+static seos_err_t
+Agreement_exists(
+    void*                          ctx,
+    const SeosCryptoLib_Agreement* agrObj)
+{
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
+    return (NULL == self) ?
+           SEOS_ERROR_INVALID_PARAMETER :
+           SeosCryptoRpcServer_Agreement_exists(self->api, agrObj);
 }
 
 static seos_err_t
@@ -589,6 +633,17 @@ Key_loadParams(
 }
 
 static seos_err_t
+Key_exists(
+    void*                    ctx,
+    const SeosCryptoLib_Key* keyObj)
+{
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
+    return (NULL == self) ?
+           SEOS_ERROR_INVALID_PARAMETER :
+           SeosCryptoRpcServer_Key_exists(self->api, keyObj);
+}
+
+static seos_err_t
 Key_free(
     void*              ctx,
     SeosCryptoLib_Key* keyObj)
@@ -632,6 +687,17 @@ Cipher_init(
 
     return SeosCryptoRpcServer_Cipher_init(self->api, pCipherObj, algorithm,
                                            key, ivSize);
+}
+
+static seos_err_t
+Cipher_exists(
+    void*                       ctx,
+    const SeosCryptoLib_Cipher* cipherObj)
+{
+    SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
+    return (NULL == self) ?
+           SEOS_ERROR_INVALID_PARAMETER :
+           SeosCryptoRpcServer_Cipher_exists(self->api, cipherObj);
 }
 
 static seos_err_t
@@ -746,11 +812,13 @@ static const SeosCryptoVtable SeosCryptoRpcClient_vtable =
     .Rng_getBytes        = Rng_getBytes,
     .Rng_reseed          = Rng_reseed,
     .Mac_init            = Mac_init,
+    .Mac_exists          = Mac_exists,
     .Mac_free            = Mac_free,
     .Mac_start           = Mac_start,
     .Mac_process         = Mac_process,
     .Mac_finalize        = Mac_finalize,
     .Digest_init         = Digest_init,
+    .Digest_exists       = Digest_exists,
     .Digest_free         = Digest_free,
     .Digest_clone        = Digest_clone,
     .Digest_process      = Digest_process,
@@ -762,15 +830,19 @@ static const SeosCryptoVtable SeosCryptoRpcClient_vtable =
     .Key_getParams       = Key_getParams,
     .Key_getAttribs      = Key_getAttribs,
     .Key_loadParams      = Key_loadParams,
+    .Key_exists          = Key_exists,
     .Key_free            = Key_free,
     .Signature_init      = Signature_init,
+    .Signature_exists    = Signature_exists,
     .Signature_free      = Signature_free,
     .Signature_sign      = Signature_sign,
     .Signature_verify    = Signature_verify,
     .Agreement_init      = Agreement_init,
+    .Agreement_exists    = Agreement_exists,
     .Agreement_free      = Agreement_free,
     .Agreement_agree     = Agreement_agree,
     .Cipher_init         = Cipher_init,
+    .Cipher_exists       = Cipher_exists,
     .Cipher_free         = Cipher_free,
     .Cipher_process      = Cipher_process,
     .Cipher_start        = Cipher_start,

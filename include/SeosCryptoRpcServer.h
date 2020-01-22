@@ -59,12 +59,18 @@ SeosCryptoRpcServer_Rng_reseed(
 // -------------------------------- MAC API ------------------------------------
 
 typedef SeosCryptoLib_Mac* SeosCryptoLib_Mac_Ptr;
+typedef const SeosCryptoLib_Mac* SeosCryptoLib_Mac_CPtr;
 
 seos_err_t
 SeosCryptoRpcServer_Mac_init(
     SeosCryptoApi_Ptr      api,
     SeosCryptoLib_Mac_Ptr* pMacPtr,
     SeosCryptoApi_Mac_Alg  algorithm);
+
+seos_err_t
+SeosCryptoRpcServer_Mac_exists(
+    SeosCryptoApi_Ptr      api,
+    SeosCryptoLib_Mac_CPtr macPtr);
 
 seos_err_t
 SeosCryptoRpcServer_Mac_free(
@@ -99,6 +105,11 @@ SeosCryptoRpcServer_Digest_init(
     SeosCryptoApi_Ptr         api,
     SeosCryptoLib_Digest_Ptr* pDigPtr,
     SeosCryptoApi_Digest_Alg  algorithm);
+
+seos_err_t
+SeosCryptoRpcServer_Digest_exists(
+    SeosCryptoApi_Ptr         api,
+    SeosCryptoLib_Digest_CPtr digestPtr);
 
 seos_err_t
 SeosCryptoRpcServer_Digest_free(
@@ -167,6 +178,11 @@ SeosCryptoRpcServer_Key_loadParams(
     size_t*                 paramSize);
 
 seos_err_t
+SeosCryptoRpcServer_Key_exists(
+    SeosCryptoApi_Ptr      api,
+    SeosCryptoLib_Key_CPtr keyPtr);
+
+seos_err_t
 SeosCryptoRpcServer_Key_free(
     SeosCryptoApi_Ptr     api,
     SeosCryptoLib_Key_Ptr keyPtr);
@@ -174,6 +190,7 @@ SeosCryptoRpcServer_Key_free(
 // ----------------------------- Signature API ---------------------------------
 
 typedef SeosCryptoLib_Signature* SeosCryptoLib_Signature_Ptr;
+typedef const SeosCryptoLib_Signature* SeosCryptoLib_Signature_CPtr;
 
 seos_err_t
 SeosCryptoRpcServer_Signature_init(
@@ -199,6 +216,11 @@ SeosCryptoRpcServer_Signature_sign(
     size_t*                     signatureSize);
 
 seos_err_t
+SeosCryptoRpcServer_Signature_exists(
+    SeosCryptoApi_Ptr            api,
+    SeosCryptoLib_Signature_CPtr obj);
+
+seos_err_t
 SeosCryptoRpcServer_Signature_free(
     SeosCryptoApi_Ptr           api,
     SeosCryptoLib_Signature_Ptr sigPtr);
@@ -206,6 +228,7 @@ SeosCryptoRpcServer_Signature_free(
 // ----------------------------- Agreement API ---------------------------------
 
 typedef SeosCryptoLib_Agreement* SeosCryptoLib_Agreement_Ptr;
+typedef const SeosCryptoLib_Agreement* SeosCryptoLib_Agreement_CPtr;
 
 seos_err_t
 SeosCryptoRpcServer_Agreement_init(
@@ -222,6 +245,11 @@ SeosCryptoRpcServer_Agreement_agree(
     size_t*                     sharedSize);
 
 seos_err_t
+SeosCryptoRpcServer_Agreement_exists(
+    SeosCryptoApi_Ptr            api,
+    SeosCryptoLib_Agreement_CPtr agrPtr);
+
+seos_err_t
 SeosCryptoRpcServer_Agreement_free(
     SeosCryptoApi_Ptr           api,
     SeosCryptoLib_Agreement_Ptr agrPtr);
@@ -229,6 +257,7 @@ SeosCryptoRpcServer_Agreement_free(
 // ------------------------------- Cipher API ----------------------------------
 
 typedef SeosCryptoLib_Cipher* SeosCryptoLib_Cipher_Ptr;
+typedef const SeosCryptoLib_Cipher* SeosCryptoLib_Cipher_CPtr;
 
 seos_err_t
 SeosCryptoRpcServer_Cipher_init(
@@ -237,6 +266,11 @@ SeosCryptoRpcServer_Cipher_init(
     SeosCryptoApi_Cipher_Alg  algorithm,
     SeosCryptoLib_Key_CPtr    keyPtr,
     size_t                    ivSize);
+
+seos_err_t
+SeosCryptoRpcServer_Cipher_exists(
+    SeosCryptoApi_Ptr         api,
+    SeosCryptoLib_Cipher_CPtr cipherPtr);
 
 seos_err_t
 SeosCryptoRpcServer_Cipher_free(

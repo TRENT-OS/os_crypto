@@ -89,6 +89,17 @@ SeosCryptoRpcServer_Mac_init(
 }
 
 seos_err_t
+SeosCryptoRpcServer_Mac_exists(
+    SeosCryptoApi_Ptr      api,
+    SeosCryptoLib_Mac_CPtr macObj)
+{
+    SeosCryptoRpcServer* self;
+
+    GET_SELF(self, api);
+    return CALL(self, Mac_exists, macObj);
+}
+
+seos_err_t
 SeosCryptoRpcServer_Mac_free(
     SeosCryptoApi_Ptr     api,
     SeosCryptoLib_Mac_Ptr macObj)
@@ -150,6 +161,17 @@ SeosCryptoRpcServer_Digest_init(
 
     GET_SELF(self, api);
     return CALL(self, Digest_init, pDigestObj, algorithm);
+}
+
+seos_err_t
+SeosCryptoRpcServer_Digest_exists(
+    SeosCryptoApi_Ptr         api,
+    SeosCryptoLib_Digest_CPtr digestObj)
+{
+    SeosCryptoRpcServer* self;
+
+    GET_SELF(self, api);
+    return CALL(self, Digest_exists, digestObj);
 }
 
 seos_err_t
@@ -307,6 +329,17 @@ SeosCryptoRpcServer_Key_loadParams(
 }
 
 seos_err_t
+SeosCryptoRpcServer_Key_exists(
+    SeosCryptoApi_Ptr      api,
+    SeosCryptoLib_Key_CPtr keyObj)
+{
+    SeosCryptoRpcServer* self;
+
+    GET_SELF(self, api);
+    return CALL(self, Key_exists, keyObj);
+}
+
+seos_err_t
 SeosCryptoRpcServer_Key_free(
     SeosCryptoApi_Ptr     api,
     SeosCryptoLib_Key_Ptr keyObj)
@@ -346,6 +379,17 @@ SeosCryptoRpcServer_Agreement_agree(
 
     GET_SELF(self, api);
     return CALL(self, Agreement_agree, agrObj, pubKey, self->dataPort, sharedSize);
+}
+
+seos_err_t
+SeosCryptoRpcServer_Agreement_exists(
+    SeosCryptoApi_Ptr            api,
+    SeosCryptoLib_Agreement_CPtr agrObj)
+{
+    SeosCryptoRpcServer* self;
+
+    GET_SELF(self, api);
+    return CALL(self, Agreement_exists, agrObj);
 }
 
 seos_err_t
@@ -408,11 +452,21 @@ SeosCryptoRpcServer_Signature_sign(
 }
 
 seos_err_t
+SeosCryptoRpcServer_Signature_exists(
+    SeosCryptoApi_Ptr            api,
+    SeosCryptoLib_Signature_CPtr obj)
+{
+    SeosCryptoRpcServer* self;
+
+    GET_SELF(self, api);
+    return CALL(self, Signature_exists, obj);
+}
+
+seos_err_t
 SeosCryptoRpcServer_Signature_free(
     SeosCryptoApi_Ptr           api,
     SeosCryptoLib_Signature_Ptr obj)
 {
-
     SeosCryptoRpcServer* self;
 
     GET_SELF(self, api);
@@ -434,6 +488,17 @@ SeosCryptoRpcServer_Cipher_init(
     GET_SELF(self, api);
     return CALL(self, Cipher_init, pCipherObj, algorithm, key, self->dataPort,
                 ivSize);
+}
+
+seos_err_t
+SeosCryptoRpcServer_Cipher_exists(
+    SeosCryptoApi_Ptr         api,
+    SeosCryptoLib_Cipher_CPtr cipherObj)
+{
+    SeosCryptoRpcServer* self;
+
+    GET_SELF(self, api);
+    return CALL(self, Cipher_exists, cipherObj);
 }
 
 seos_err_t
