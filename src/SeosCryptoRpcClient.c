@@ -70,23 +70,23 @@ Rng_reseed(
 static seos_err_t
 Mac_init(
     void*                       ctx,
-    SeosCryptoLib_Mac**         pMacHandle,
+    SeosCryptoLib_Mac**         pMacObj,
     const SeosCryptoApi_Mac_Alg algorithm)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
-    if (NULL == ctx || NULL == pMacHandle)
+    if (NULL == ctx || NULL == pMacObj)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoRpcServer_Mac_init(self->api, pMacHandle, algorithm);
+    return SeosCryptoRpcServer_Mac_init(self->api, pMacObj, algorithm);
 }
 
 static seos_err_t
 Mac_free(
     void*              ctx,
-    SeosCryptoLib_Mac* macHandle)
+    SeosCryptoLib_Mac* macObj)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
@@ -95,13 +95,13 @@ Mac_free(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoRpcServer_Mac_free(self->api, macHandle);
+    return SeosCryptoRpcServer_Mac_free(self->api, macObj);
 }
 
 static seos_err_t
 Mac_start(
     void*              ctx,
-    SeosCryptoLib_Mac* macHandle,
+    SeosCryptoLib_Mac* macObj,
     const void*        secret,
     const size_t       secretSize)
 {
@@ -117,13 +117,13 @@ Mac_start(
     }
 
     memcpy(self->dataPort, secret, secretSize);
-    return SeosCryptoRpcServer_Mac_start(self->api, macHandle, secretSize);
+    return SeosCryptoRpcServer_Mac_start(self->api, macObj, secretSize);
 }
 
 static seos_err_t
 Mac_process(
     void*              ctx,
-    SeosCryptoLib_Mac* macHandle,
+    SeosCryptoLib_Mac* macObj,
     const void*        data,
     const size_t       dataSize)
 {
@@ -139,13 +139,13 @@ Mac_process(
     }
 
     memcpy(self->dataPort, data, dataSize);
-    return SeosCryptoRpcServer_Mac_process(self->api, macHandle, dataSize);
+    return SeosCryptoRpcServer_Mac_process(self->api, macObj, dataSize);
 }
 
 static seos_err_t
 Mac_finalize(
     void*              ctx,
-    SeosCryptoLib_Mac* macHandle,
+    SeosCryptoLib_Mac* macObj,
     void*              mac,
     size_t*            macSize)
 {
@@ -161,7 +161,7 @@ Mac_finalize(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((err = SeosCryptoRpcServer_Mac_finalize(self->api, macHandle,
+    if ((err = SeosCryptoRpcServer_Mac_finalize(self->api, macObj,
                                                 macSize)) == SEOS_SUCCESS)
     {
         memcpy(mac, self->dataPort, *macSize);
@@ -175,23 +175,23 @@ Mac_finalize(
 static seos_err_t
 Digest_init(
     void*                          ctx,
-    SeosCryptoLib_Digest**         pDigestHandle,
+    SeosCryptoLib_Digest**         pDigestObj,
     const SeosCryptoApi_Digest_Alg algorithm)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
-    if (NULL == ctx || NULL == pDigestHandle)
+    if (NULL == ctx || NULL == pDigestObj)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoRpcServer_Digest_init(self->api, pDigestHandle, algorithm);
+    return SeosCryptoRpcServer_Digest_init(self->api, pDigestObj, algorithm);
 }
 
 static seos_err_t
 Digest_free(
     void*                 ctx,
-    SeosCryptoLib_Digest* digestHandle)
+    SeosCryptoLib_Digest* digestObj)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
@@ -200,14 +200,14 @@ Digest_free(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoRpcServer_Digest_free(self->api, digestHandle);
+    return SeosCryptoRpcServer_Digest_free(self->api, digestObj);
 }
 
 static seos_err_t
 Digest_clone(
     void*                       ctx,
-    SeosCryptoLib_Digest*       dstDigHandle,
-    const SeosCryptoLib_Digest* srcDigHandle)
+    SeosCryptoLib_Digest*       dstDigObj,
+    const SeosCryptoLib_Digest* srcDigObj)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
@@ -216,14 +216,14 @@ Digest_clone(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return SeosCryptoRpcServer_Digest_clone(self->api, dstDigHandle,
-                                            srcDigHandle);
+    return SeosCryptoRpcServer_Digest_clone(self->api, dstDigObj,
+                                            srcDigObj);
 }
 
 static seos_err_t
 Digest_process(
     void*                 ctx,
-    SeosCryptoLib_Digest* digestHandle,
+    SeosCryptoLib_Digest* digestObj,
     const void*           data,
     const size_t          dataSize)
 {
@@ -239,13 +239,13 @@ Digest_process(
     }
 
     memcpy(self->dataPort, data, dataSize);
-    return SeosCryptoRpcServer_Digest_process(self->api, digestHandle, dataSize);
+    return SeosCryptoRpcServer_Digest_process(self->api, digestObj, dataSize);
 }
 
 static seos_err_t
 Digest_finalize(
     void*                 ctx,
-    SeosCryptoLib_Digest* digestHandle,
+    SeosCryptoLib_Digest* digestObj,
     void*                 digest,
     size_t*               digestSize)
 {
@@ -261,7 +261,7 @@ Digest_finalize(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((err = SeosCryptoRpcServer_Digest_finalize(self->api, digestHandle,
+    if ((err = SeosCryptoRpcServer_Digest_finalize(self->api, digestObj,
                                                    digestSize)) == SEOS_SUCCESS)
     {
         memcpy(digest, self->dataPort, *digestSize);
@@ -454,20 +454,20 @@ Key_generate(
 static seos_err_t
 Key_makePublic(
     void*                            ctx,
-    SeosCryptoLib_Key**              pPubKeyHandle,
-    const SeosCryptoLib_Key*         prvKeyHandle,
+    SeosCryptoLib_Key**              pPubKeyObj,
+    const SeosCryptoLib_Key*         prvKeyObj,
     const SeosCryptoApi_Key_Attribs* attribs)
 {
     SeosCryptoRpcClient* self = (SeosCryptoRpcClient*) ctx;
 
-    if (NULL == self || NULL == pPubKeyHandle || NULL == attribs)
+    if (NULL == self || NULL == pPubKeyObj || NULL == attribs)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
     memcpy(self->dataPort, attribs, sizeof(SeosCryptoApi_Key_Attribs));
-    return SeosCryptoRpcServer_Key_makePublic(self->api, pPubKeyHandle,
-                                              prvKeyHandle);
+    return SeosCryptoRpcServer_Key_makePublic(self->api, pPubKeyObj,
+                                              prvKeyObj);
 }
 
 static seos_err_t
