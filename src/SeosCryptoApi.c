@@ -12,22 +12,22 @@
 #include <string.h>
 
 // A wrapped object could be NULL, if so, just pass NULL
-#define UNWRAP_SAFE(w, obj) ((w) == NULL ? NULL : (w)->obj)
+#define UNWRAP(w, o) ((w) == NULL ? NULL : (w)->o)
 
 // We call a function from a wrapped object's API. Make sure that the API call
 // is actually implemented.
-#define CALL_SAFE(w, func, ...)                                 \
-    (NULL == w) ? SEOS_ERROR_INVALID_PARAMETER :                \
-    (NULL == w->impl.vtable->func) ? SEOS_ERROR_NOT_SUPPORTED : \
-    w->impl.vtable->func(w->impl.context, __VA_ARGS__)          \
+#define CALL_IMPL(w, f, ...)                                 \
+    (NULL == w) ? SEOS_ERROR_INVALID_PARAMETER :             \
+    (NULL == w->impl.vtable->f) ? SEOS_ERROR_NOT_SUPPORTED : \
+    w->impl.vtable->f(w->impl.context, __VA_ARGS__)          \
 
 // Initialize a wrapped object from existing API pointer
-#define INIT_SAFE(w, ctx) {                                     \
-        if (NULL == w || NULL == ctx) {                         \
-            return SEOS_ERROR_INVALID_PARAMETER;                \
-        }                                                       \
-        memset(w, 0, sizeof(*w));                               \
-        w->impl = ctx->impl;                                    \
+#define INIT_WRAPPER(w, c) {                    \
+    if (NULL == w || NULL == c) {               \
+        return SEOS_ERROR_INVALID_PARAMETER;    \
+    }                                           \
+    memset(w, 0, sizeof(*w));                   \
+    w->impl = c->impl;                          \
 }
 
 // ------------------------------- Init/Free -----------------------------------
@@ -161,7 +161,7 @@ SeosCryptoApi_Rng_getBytes(
     void*                        buf,
     const size_t                 bufSize)
 {
-    return CALL_SAFE(ctx, Rng_getBytes, flags, buf, bufSize);
+    return CALL_IMPL(ctx, Rng_getBytes, flags, buf, bufSize);
 }
 
 seos_err_t
@@ -170,7 +170,7 @@ SeosCryptoApi_Rng_reseed(
     const void*    seed,
     const size_t   seedSize)
 {
-    return CALL_SAFE(ctx, Rng_reseed, seed, seedSize);
+    return CALL_IMPL(ctx, Rng_reseed, seed, seedSize);
 }
 
 // ------------------------------- MAC API -------------------------------------
@@ -181,16 +181,15 @@ SeosCryptoApi_Mac_init(
     SeosCryptoApi_Mac*          wrap,
     const SeosCryptoApi_Mac_Alg algorithm)
 {
-    INIT_SAFE(wrap, api);
-
-    return CALL_SAFE(wrap, Mac_init, &wrap->mac, algorithm);
+    INIT_WRAPPER(wrap, api);
+    return CALL_IMPL(wrap, Mac_init, &wrap->mac, algorithm);
 }
 
 seos_err_t
 SeosCryptoApi_Mac_free(
     SeosCryptoApi_Mac* wrap)
 {
-    return CALL_SAFE(wrap, Mac_free, wrap->mac);
+    return CALL_IMPL(wrap, Mac_free, wrap->mac);
 }
 
 seos_err_t
@@ -199,7 +198,7 @@ SeosCryptoApi_Mac_start(
     const void*        secret,
     const size_t       secretSize)
 {
-    return CALL_SAFE(wrap, Mac_start, wrap->mac, secret, secretSize);
+    return CALL_IMPL(wrap, Mac_start, wrap->mac, secret, secretSize);
 }
 
 seos_err_t
@@ -208,7 +207,7 @@ SeosCryptoApi_Mac_process(
     const void*        data,
     const size_t       dataSize)
 {
-    return CALL_SAFE(wrap, Mac_process, wrap->mac, data, dataSize);
+    return CALL_IMPL(wrap, Mac_process, wrap->mac, data, dataSize);
 }
 
 seos_err_t
@@ -217,7 +216,7 @@ SeosCryptoApi_Mac_finalize(
     void*              mac,
     size_t*            macSize)
 {
-    return CALL_SAFE(wrap, Mac_finalize, wrap->mac, mac, macSize);
+    return CALL_IMPL(wrap, Mac_finalize, wrap->mac, mac, macSize);
 }
 
 // ------------------------------ Digest API -----------------------------------
@@ -228,16 +227,15 @@ SeosCryptoApi_Digest_init(
     SeosCryptoApi_Digest*          wrap,
     const SeosCryptoApi_Digest_Alg algorithm)
 {
-    INIT_SAFE(wrap, api);
-
-    return CALL_SAFE(wrap, Digest_init, &wrap->digest, algorithm);
+    INIT_WRAPPER(wrap, api);
+    return CALL_IMPL(wrap, Digest_init, &wrap->digest, algorithm);
 }
 
 seos_err_t
 SeosCryptoApi_Digest_free(
     SeosCryptoApi_Digest* wrap)
 {
-    return CALL_SAFE(wrap, Digest_free, wrap->digest);
+    return CALL_IMPL(wrap, Digest_free, wrap->digest);
 }
 
 seos_err_t
@@ -245,8 +243,7 @@ SeosCryptoApi_Digest_clone(
     SeosCryptoApi_Digest*       wrap,
     const SeosCryptoApi_Digest* srcWrap)
 {
-    return CALL_SAFE(wrap, Digest_clone, wrap->digest, UNWRAP_SAFE(srcWrap,
-                     digest));
+    return CALL_IMPL(wrap, Digest_clone, wrap->digest, UNWRAP(srcWrap, digest));
 }
 
 seos_err_t
@@ -255,7 +252,7 @@ SeosCryptoApi_Digest_process(
     const void*           data,
     const size_t          dataSize)
 {
-    return CALL_SAFE(wrap, Digest_process, wrap->digest, data, dataSize);
+    return CALL_IMPL(wrap, Digest_process, wrap->digest, data, dataSize);
 }
 
 seos_err_t
@@ -264,7 +261,7 @@ SeosCryptoApi_Digest_finalize(
     void*                 digest,
     size_t*               digestSize)
 {
-    return CALL_SAFE(wrap, Digest_finalize, wrap->digest, digest, digestSize);
+    return CALL_IMPL(wrap, Digest_finalize, wrap->digest, digest, digestSize);
 }
 
 // ----------------------------- Signature API ---------------------------------
@@ -278,17 +275,16 @@ SeosCryptoApi_Signature_init(
     const SeosCryptoApi_Key*          prvKey,
     const SeosCryptoApi_Key*          pubKey)
 {
-    INIT_SAFE(wrap, api);
-
-    return CALL_SAFE(wrap, Signature_init, &wrap->signature, algorithm, digest,
-                     UNWRAP_SAFE(prvKey, key), UNWRAP_SAFE(pubKey, key));
+    INIT_WRAPPER(wrap, api);
+    return CALL_IMPL(wrap, Signature_init, &wrap->signature, algorithm, digest,
+                     UNWRAP(prvKey, key), UNWRAP(pubKey, key));
 }
 
 seos_err_t
 SeosCryptoApi_Signature_free(
     SeosCryptoApi_Signature* wrap)
 {
-    return CALL_SAFE(wrap, Signature_free, wrap->signature);
+    return CALL_IMPL(wrap, Signature_free, wrap->signature);
 }
 
 seos_err_t
@@ -299,7 +295,7 @@ SeosCryptoApi_Signature_sign(
     void*                    signature,
     size_t*                  signatureSize)
 {
-    return CALL_SAFE(wrap, Signature_sign, wrap->signature, hash, hashSize,
+    return CALL_IMPL(wrap, Signature_sign, wrap->signature, hash, hashSize,
                      signature, signatureSize);
 }
 
@@ -311,7 +307,7 @@ SeosCryptoApi_Signature_verify(
     const void*              signature,
     const size_t             signatureSize)
 {
-    return CALL_SAFE(wrap, Signature_verify, wrap->signature, hash, hashSize,
+    return CALL_IMPL(wrap, Signature_verify, wrap->signature, hash, hashSize,
                      signature, signatureSize);
 }
 
@@ -324,17 +320,16 @@ SeosCryptoApi_Agreement_init(
     const SeosCryptoApi_Agreement_Alg algorithm,
     const SeosCryptoApi_Key*          prvKey)
 {
-    INIT_SAFE(wrap, api);
-
-    return CALL_SAFE(wrap, Agreement_init, &wrap->agreement, algorithm,
-                     UNWRAP_SAFE(prvKey, key));
+    INIT_WRAPPER(wrap, api);
+    return CALL_IMPL(wrap, Agreement_init, &wrap->agreement, algorithm,
+                     UNWRAP(prvKey, key));
 }
 
 seos_err_t
 SeosCryptoApi_Agreement_free(
     SeosCryptoApi_Agreement* wrap)
 {
-    return CALL_SAFE(wrap, Agreement_free, wrap->agreement);
+    return CALL_IMPL(wrap, Agreement_free, wrap->agreement);
 }
 
 seos_err_t
@@ -344,8 +339,8 @@ SeosCryptoApi_Agreement_agree(
     void*                    shared,
     size_t*                  sharedSize)
 {
-    return CALL_SAFE(wrap, Agreement_agree, wrap->agreement, UNWRAP_SAFE(pubKey,
-                     key), shared, sharedSize);
+    return CALL_IMPL(wrap, Agreement_agree, wrap->agreement, UNWRAP(pubKey, key),
+                     shared, sharedSize);
 }
 
 // -------------------------------- Key API ------------------------------------
@@ -356,9 +351,8 @@ SeosCryptoApi_Key_generate(
     SeosCryptoApi_Key*            wrap,
     const SeosCryptoApi_Key_Spec* spec)
 {
-    INIT_SAFE(wrap, api);
-
-    return CALL_SAFE(wrap, Key_generate, &wrap->key, spec);
+    INIT_WRAPPER(wrap, api);
+    return CALL_IMPL(wrap, Key_generate, &wrap->key, spec);
 }
 
 seos_err_t
@@ -367,9 +361,8 @@ SeosCryptoApi_Key_import(
     SeosCryptoApi_Key*            wrap,
     const SeosCryptoApi_Key_Data* keyData)
 {
-    INIT_SAFE(wrap, api);
-
-    return CALL_SAFE(wrap, Key_import, &wrap->key, keyData);
+    INIT_WRAPPER(wrap, api);
+    return CALL_IMPL(wrap, Key_import, &wrap->key, keyData);
 }
 
 seos_err_t
@@ -378,14 +371,8 @@ SeosCryptoApi_Key_makePublic(
     const SeosCryptoApi_Key*         prvKey,
     const SeosCryptoApi_Key_Attribs* attribs)
 {
-    if (NULL == prvKey)
-    {
-        return SEOS_ERROR_INVALID_PARAMETER;
-    }
-
-    INIT_SAFE(wrap, prvKey);
-
-    return CALL_SAFE(wrap, Key_makePublic, &wrap->key, UNWRAP_SAFE(prvKey, key),
+    INIT_WRAPPER(wrap, prvKey);
+    return CALL_IMPL(wrap, Key_makePublic, &wrap->key, UNWRAP(prvKey, key),
                      attribs);
 }
 
@@ -394,7 +381,7 @@ SeosCryptoApi_Key_export(
     const SeosCryptoApi_Key* wrap,
     SeosCryptoApi_Key_Data*  keyData)
 {
-    return CALL_SAFE(wrap, Key_export, wrap->key, keyData);
+    return CALL_IMPL(wrap, Key_export, wrap->key, keyData);
 }
 
 seos_err_t
@@ -403,7 +390,7 @@ SeosCryptoApi_Key_getParams(
     void*                    keyParams,
     size_t*                  paramSize)
 {
-    return CALL_SAFE(wrap, Key_getParams, wrap->key, keyParams, paramSize);
+    return CALL_IMPL(wrap, Key_getParams, wrap->key, keyParams, paramSize);
 }
 
 seos_err_t
@@ -411,14 +398,14 @@ SeosCryptoApi_Key_getAttribs(
     const SeosCryptoApi_Key*   wrap,
     SeosCryptoApi_Key_Attribs* attribs)
 {
-    return CALL_SAFE(wrap, Key_getAttribs, wrap->key, attribs);
+    return CALL_IMPL(wrap, Key_getAttribs, wrap->key, attribs);
 }
 
 seos_err_t
 SeosCryptoApi_Key_free(
     SeosCryptoApi_Key* wrap)
 {
-    return CALL_SAFE(wrap, Key_free, wrap->key);
+    return CALL_IMPL(wrap, Key_free, wrap->key);
 }
 
 seos_err_t
@@ -428,7 +415,7 @@ SeosCryptoApi_Key_loadParams(
     void*                         keyParams,
     size_t*                       paramSize)
 {
-    return CALL_SAFE(api, Key_loadParams, name, keyParams, paramSize);
+    return CALL_IMPL(api, Key_loadParams, name, keyParams, paramSize);
 }
 
 // ------------------------------ Cipher API -----------------------------------
@@ -442,17 +429,16 @@ SeosCryptoApi_Cipher_init(
     const void*                    iv,
     const size_t                   ivSize)
 {
-    INIT_SAFE(wrap, api);
-
-    return CALL_SAFE(wrap, Cipher_init, &wrap->cipher, algorithm,
-                     UNWRAP_SAFE(symKey, key), iv, ivSize);
+    INIT_WRAPPER(wrap, api);
+    return CALL_IMPL(wrap, Cipher_init, &wrap->cipher, algorithm, UNWRAP(symKey,
+                     key), iv, ivSize);
 }
 
 seos_err_t
 SeosCryptoApi_Cipher_free(
     SeosCryptoApi_Cipher* wrap)
 {
-    return CALL_SAFE(wrap, Cipher_free, wrap->cipher);
+    return CALL_IMPL(wrap, Cipher_free, wrap->cipher);
 }
 
 seos_err_t
@@ -463,7 +449,7 @@ SeosCryptoApi_Cipher_process(
     void*                 output,
     size_t*               outputSize)
 {
-    return CALL_SAFE(wrap, Cipher_process, wrap->cipher, input, inputSize, output,
+    return CALL_IMPL(wrap, Cipher_process, wrap->cipher, input, inputSize, output,
                      outputSize);
 }
 
@@ -473,7 +459,7 @@ SeosCryptoApi_Cipher_start(
     const void*           ad,
     const size_t          adSize)
 {
-    return CALL_SAFE(wrap, Cipher_start, wrap->cipher, ad, adSize);
+    return CALL_IMPL(wrap, Cipher_start, wrap->cipher, ad, adSize);
 }
 
 seos_err_t
@@ -482,5 +468,5 @@ SeosCryptoApi_Cipher_finalize(
     void*                 output,
     size_t*               outputSize)
 {
-    return CALL_SAFE(wrap, Cipher_finalize, wrap->cipher, output, outputSize);
+    return CALL_IMPL(wrap, Cipher_finalize, wrap->cipher, output, outputSize);
 }
