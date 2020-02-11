@@ -435,6 +435,23 @@ SeosCryptoApi_Key_loadParams(
     return CALL_IMPL(api, Key_loadParams, name, keyParams, paramSize);
 }
 
+seos_err_t
+SeosCryptoApi_Key_migrate(
+    SeosCryptoApi*                    api,
+    SeosCryptoApi_Key*                wrap,
+    const SeosCryptoApi_Key_RemotePtr ptr)
+{
+    if (NULL == ptr)
+    {
+        return SEOS_ERROR_INVALID_HANDLE;
+    }
+
+    INIT_WRAPPER(wrap, api);
+    wrap->key = ptr;
+
+    return SEOS_SUCCESS;
+}
+
 // ------------------------------ Cipher API -----------------------------------
 
 seos_err_t
