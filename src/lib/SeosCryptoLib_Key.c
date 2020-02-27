@@ -563,7 +563,7 @@ importImpl(
             return SEOS_ERROR_INVALID_PARAMETER;
         }
         bits = getMpiLen(key->data.rsa.pub.nBytes, key->data.rsa.pub.nLen);
-        if (bits < (SeosCryptoApi_Key_SIZE_AES_MIN * 8)
+        if (bits < (SeosCryptoApi_Key_SIZE_RSA_MIN * 8)
             || bits > (SeosCryptoApi_Key_SIZE_RSA_MAX * 8))
         {
             return SEOS_ERROR_NOT_SUPPORTED;
@@ -580,7 +580,7 @@ importImpl(
         }
         bits = getMpiLen(key->data.rsa.prv.pBytes, key->data.rsa.prv.pLen)
                + getMpiLen(key->data.rsa.prv.qBytes, key->data.rsa.prv.qLen);
-        if (bits < (SeosCryptoApi_Key_SIZE_AES_MIN * 8)
+        if (bits < (SeosCryptoApi_Key_SIZE_RSA_MIN * 8)
             || bits > (SeosCryptoApi_Key_SIZE_RSA_MAX * 8))
         {
             return SEOS_ERROR_NOT_SUPPORTED;
