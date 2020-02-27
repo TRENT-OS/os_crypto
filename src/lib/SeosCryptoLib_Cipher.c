@@ -5,8 +5,6 @@
 #include "lib/SeosCryptoLib_Cipher.h"
 #include "lib/SeosCryptoLib_Key.h"
 
-#include "LibDebug/Debug.h"
-
 #include <string.h>
 
 // Private static functions ----------------------------------------------------

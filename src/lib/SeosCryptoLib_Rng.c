@@ -4,8 +4,6 @@
 
 #include "lib/SeosCryptoLib_Rng.h"
 
-#include "LibDebug/Debug.h"
-
 #include <string.h>
 
 seos_err_t

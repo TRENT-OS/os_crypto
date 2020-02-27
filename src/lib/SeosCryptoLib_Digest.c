@@ -4,7 +4,6 @@
 
 #include "lib/SeosCryptoLib_Digest.h"
 
-#include "LibDebug/Debug.h"
 #include "compiler.h"
 
 #include <string.h>
