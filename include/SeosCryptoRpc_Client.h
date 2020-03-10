@@ -17,23 +17,16 @@
 
 #include "SeosCryptoApi.h"
 
-// Internal types/defines/enums ------------------------------------------------
+// -------------------------- defines/types/variables --------------------------
 
-typedef struct
-{
-    /**
-     * The client's address of the dataport shared with the server
-     */
-    void* dataPort;
-}
-SeosCryptoRpc_Client;
+typedef struct SeosCryptoRpc_Client SeosCryptoRpc_Client;
 
-// Internal functions ----------------------------------------------------------
+// ------------------------------- Init/Free -----------------------------------
 
 seos_err_t
 SeosCryptoRpc_Client_init(
-    SeosCryptoRpc_Client*                 self,
-    const SeosCryptoVtable**              vtable,
+    SeosCryptoApi_Impl*                   impl,
+    const SeosCryptoApi_MemIf*            memIf,
     const SeosCryptoApi_RpcClient_Config* cfg);
 
 seos_err_t

@@ -22,22 +22,15 @@
 
 #include "util/PtrVector.h"
 
-// Internal types/defines/enums ------------------------------------------------
+// -------------------------- defines/types/variables --------------------------
 
-typedef struct
-{
-    SeosCryptoApi_Impl lib;
-    SeosCryptoApi_Impl client;
-    SeosCryptoApi_MemIf memIf;
-}
-SeosCryptoRouter;
+typedef struct SeosCryptoRouter SeosCryptoRouter;
 
-// Internal functions ----------------------------------------------------------
+// ------------------------------- Init/Free -----------------------------------
 
 seos_err_t
 SeosCryptoRouter_init(
-    SeosCryptoRouter*                  self,
-    const SeosCryptoVtable**           vtable,
+    SeosCryptoApi_Impl*                impl,
     const SeosCryptoApi_MemIf*         memIf,
     const SeosCryptoApi_Router_Config* cfg);
 

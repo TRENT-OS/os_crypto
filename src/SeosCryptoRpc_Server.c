@@ -11,6 +11,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+// -------------------------- defines/types/variables --------------------------
+
 /*
  * Host of SEOS Crypto API RPC server has to provide a client's RPC context.
  * This way, it is up to the host (e.g., the CryptoServer) to implement its own
@@ -21,23 +23,36 @@ SeosCryptoRpc_Server_getSeosCryptoApi(
     void);
 
 // Get SeosTlsRpc_Server context from API
-#define GET_SELF(s) {                                                       \
-        SeosCryptoApi *api;                                                 \
-        if (((api = SeosCryptoRpc_Server_getSeosCryptoApi()) == NULL) ||    \
-            ((s = api->server.context) == NULL) )                           \
-        {                                                                   \
-            return SEOS_ERROR_INVALID_PARAMETER;                            \
-        }                                                                   \
-        if (SeosCryptoApi_Mode_RPC_SERVER_WITH_LIBRARY != api->mode) {      \
-            return SEOS_ERROR_INVALID_STATE;                                \
-        }                                                                   \
+#define GET_SELF(s) {                                                   \
+    SeosCryptoApi *api;                                                 \
+    if (((api = SeosCryptoRpc_Server_getSeosCryptoApi()) == NULL) ||    \
+        ((s = api->server) == NULL) )                                   \
+    {                                                                   \
+        return SEOS_ERROR_INVALID_PARAMETER;                            \
+    }                                                                   \
+    if (SeosCryptoApi_Mode_RPC_SERVER_WITH_LIBRARY != api->mode) {      \
+        return SEOS_ERROR_INVALID_STATE;                                \
+    }                                                                   \
 }
 
 // Call function pointer to LIB, make sure it is defined
-#define CALL(s, f, ...)                     \
-    (NULL == s->vtable->f) ?                \
-    SEOS_ERROR_NOT_SUPPORTED :              \
-    s->vtable->f(s->context, __VA_ARGS__)
+#define CALL(s, f, ...)                                     \
+    (NULL == s->client.vtable->f) ?                         \
+        SEOS_ERROR_NOT_SUPPORTED :                          \
+        s->client.vtable->f(s->client.context, __VA_ARGS__)
+
+struct SeosCryptoRpc_Server
+{
+    /**
+     * The server's address of the dataport shared with the client
+     */
+    void* dataPort;
+    /**
+     * Context and function pointers of CLIENT implementation
+     */
+    SeosCryptoApi_Impl client;
+    SeosCryptoApi_MemIf memIf;
+};
 
 // -------------------------------- RNG API ------------------------------------
 
@@ -512,20 +527,29 @@ SeosCryptoRpc_Server_Cipher_finalize(
 
 seos_err_t
 SeosCryptoRpc_Server_init(
-    SeosCryptoRpc_Server*                 self,
-    const SeosCryptoApi_Impl*             impl,
+    SeosCryptoRpc_Server**                ctx,
+    const SeosCryptoApi_Impl*             client,
+    const SeosCryptoApi_MemIf*            memIf,
     const SeosCryptoApi_RpcServer_Config* cfg)
 {
-    if (NULL == self || NULL == impl || NULL == cfg || NULL == cfg->dataPort)
+    SeosCryptoRpc_Server* svr;
+
+    if (NULL == ctx || NULL == client || NULL == memIf || NULL == cfg
+        || NULL == cfg->dataPort)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    memset(self, 0, sizeof(*self));
+    if ((svr = memIf->malloc(sizeof(SeosCryptoRpc_Server))) == NULL)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
 
-    self->dataPort = cfg->dataPort;
-    self->vtable   = impl->vtable;
-    self->context  = impl->context;
+    *ctx = svr;
+
+    svr->dataPort = cfg->dataPort;
+    svr->memIf    = *memIf;
+    svr->client   = *client;
 
     return SEOS_SUCCESS;
 }
@@ -534,6 +558,13 @@ seos_err_t
 SeosCryptoRpc_Server_free(
     SeosCryptoRpc_Server* self)
 {
+    if (NULL == self)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    self->memIf.free(self);
+
     return SEOS_SUCCESS;
 }
 

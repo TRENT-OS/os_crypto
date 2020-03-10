@@ -13,6 +13,17 @@
 #include <string.h>
 #include <sys/user.h>
 
+// -------------------------- defines/types/variables --------------------------
+
+struct SeosCryptoRpc_Client
+{
+    SeosCryptoApi_MemIf memIf;
+    /**
+     * The client's address of the dataport shared with the server
+     */
+    void* dataPort;
+};
+
 // -------------------------------- RNG API ------------------------------------
 
 static seos_err_t
@@ -764,19 +775,26 @@ static const SeosCryptoVtable SeosCryptoRpc_Client_vtable =
 
 seos_err_t
 SeosCryptoRpc_Client_init(
-    SeosCryptoRpc_Client*                 self,
-    const SeosCryptoVtable**              vtable,
+    SeosCryptoApi_Impl*                   impl,
+    const SeosCryptoApi_MemIf*            memIf,
     const SeosCryptoApi_RpcClient_Config* cfg)
 {
-    if (NULL == self || NULL == vtable || NULL == cfg || NULL == cfg->dataPort)
+    SeosCryptoRpc_Client* self;
+
+    if (NULL == impl || NULL == memIf || NULL == cfg || NULL == cfg->dataPort)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    memset(self, 0, sizeof(*self));
-    self->dataPort  = cfg->dataPort;
+    if ((self = memIf->malloc(sizeof(SeosCryptoRpc_Client))) == NULL)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
 
-    *vtable  = &SeosCryptoRpc_Client_vtable;
+    impl->context  = self;
+    impl->vtable   = &SeosCryptoRpc_Client_vtable;
+    self->dataPort = cfg->dataPort;
+    self->memIf    = *memIf;
 
     return SEOS_SUCCESS;
 }
@@ -785,6 +803,13 @@ seos_err_t
 SeosCryptoRpc_Client_free(
     SeosCryptoRpc_Client* self)
 {
+    if (NULL == self)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    self->memIf.free(self);
+
     return SEOS_SUCCESS;
 }
 

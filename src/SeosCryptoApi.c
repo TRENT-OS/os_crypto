@@ -13,23 +13,25 @@
 
 #include <string.h>
 
+// -------------------------- defines/types/variables --------------------------
+
 // A proxy object could be NULL, if so, just pass NULL
 #define GET_OBJ(p, o) ((p) == NULL ? NULL : (p)->o)
 
 // We call a function from a proxy object's API. Make sure that the API call
 // is actually implemented.
-#define CALL_IMPL(p, f, ...)                                 \
-    (NULL == p) ? SEOS_ERROR_INVALID_PARAMETER :             \
-    (NULL == p->impl.vtable->f) ? SEOS_ERROR_NOT_SUPPORTED : \
-    p->impl.vtable->f(p->impl.context, __VA_ARGS__)          \
+#define CALL_IMPL(p, f, ...)                                        \
+    (NULL == p) ? SEOS_ERROR_INVALID_PARAMETER :                    \
+        (NULL == p->impl.vtable->f) ? SEOS_ERROR_NOT_SUPPORTED :    \
+        p->impl.vtable->f(p->impl.context, __VA_ARGS__)             \
 
 // Initialize a proxy object from existing API pointer
-#define INIT_PROXY(p, c) {                          \
-        if (NULL == p || NULL == c) {               \
-            return SEOS_ERROR_INVALID_PARAMETER;    \
-        }                                           \
-        memset(p, 0, sizeof(*p));                   \
-        p->impl = c->impl;                          \
+#define INIT_PROXY(p, c) {                      \
+    if (NULL == p || NULL == c) {               \
+        return SEOS_ERROR_INVALID_PARAMETER;    \
+    }                                           \
+    memset(p, 0, sizeof(*p));                   \
+    p->impl = c->impl;                          \
 }
 
 // ------------------------------- Init/Free -----------------------------------
@@ -53,11 +55,7 @@ SeosCryptoApi_init(
     switch (cfg->mode)
     {
     case SeosCryptoApi_Mode_LIBRARY:
-        if ((self->impl.context = cfg->mem.malloc(sizeof(SeosCryptoLib))) == NULL)
-        {
-            return SEOS_ERROR_INSUFFICIENT_SPACE;
-        }
-        if ((err = SeosCryptoLib_init(self->impl.context, &self->impl.vtable, &cfg->mem,
+        if ((err = SeosCryptoLib_init(&self->impl, &cfg->mem,
                                       &cfg->impl.lib)) != SEOS_SUCCESS)
         {
             goto err0;
@@ -65,24 +63,15 @@ SeosCryptoApi_init(
         break;
 #if defined(SEOS_CRYPTO_WITH_RPC_CLIENT)
     case SeosCryptoApi_Mode_RPC_CLIENT:
-        if ((self->impl.context = cfg->mem.malloc(sizeof(SeosCryptoRpc_Client))) ==
-            NULL)
-        {
-            return SEOS_ERROR_INSUFFICIENT_SPACE;
-        }
-        if ((err = SeosCryptoRpc_Client_init(self->impl.context, &self->impl.vtable,
+        if ((err = SeosCryptoRpc_Client_init(&self->impl, &cfg->mem,
                                              &cfg->impl.client)) != SEOS_SUCCESS)
         {
             goto err0;
         }
         break;
     case SeosCryptoApi_Mode_ROUTER:
-        if ((self->impl.context = cfg->mem.malloc(sizeof(SeosCryptoRouter))) == NULL)
-        {
-            return SEOS_ERROR_INSUFFICIENT_SPACE;
-        }
-        if ((err = SeosCryptoRouter_init(self->impl.context, &self->impl.vtable,
-                                         &cfg->mem, &cfg->impl.router)) != SEOS_SUCCESS)
+        if ((err = SeosCryptoRouter_init(&self->impl, &cfg->mem,
+                                         &cfg->impl.router)) != SEOS_SUCCESS)
         {
             goto err0;
         }
@@ -90,23 +79,13 @@ SeosCryptoApi_init(
 #endif /* SEOS_CRYPTO_WITH_RPC_CLIENT */
 #if defined(SEOS_CRYPTO_WITH_RPC_SERVER)
     case SeosCryptoApi_Mode_RPC_SERVER_WITH_LIBRARY:
-        if ((self->impl.context = cfg->mem.malloc(sizeof(SeosCryptoLib))) == NULL)
-        {
-            return SEOS_ERROR_INSUFFICIENT_SPACE;
-        }
-        if ((err = SeosCryptoLib_init(self->impl.context, &self->impl.vtable, &cfg->mem,
+        if ((err = SeosCryptoLib_init(&self->impl, &cfg->mem,
                                       &cfg->impl.lib)) != SEOS_SUCCESS)
         {
             goto err0;
         }
-        if ((self->server.context = cfg->mem.malloc(sizeof(SeosCryptoRpc_Server))) ==
-            NULL)
-        {
-            err = SEOS_ERROR_INSUFFICIENT_SPACE;
-            goto err0;
-        }
-        if ((err = SeosCryptoRpc_Server_init(self->server.context, &self->impl,
-                                             &cfg->server)) != SEOS_SUCCESS)
+        if ((err = SeosCryptoRpc_Server_init((SeosCryptoRpc_Server**) &self->server,
+                                             &self->impl, &cfg->mem, &cfg->server)) != SEOS_SUCCESS)
         {
             goto err1;
         }
@@ -120,10 +99,9 @@ SeosCryptoApi_init(
 
 #if defined(SEOS_CRYPTO_WITH_RPC_SERVER)
 err1:
-    free(self->server.context);
+    SeosCryptoLib_free(self->impl.context);
 #endif /* SEOS_CRYPTO_WITH_RPC_SERVER */
 err0:
-    free(self->impl.context);
 
     return err;
 }
@@ -132,8 +110,6 @@ seos_err_t
 SeosCryptoApi_free(
     SeosCryptoApi* self)
 {
-    seos_err_t err;
-
     if (NULL == self)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
@@ -142,31 +118,29 @@ SeosCryptoApi_free(
     switch (self->mode)
     {
     case SeosCryptoApi_Mode_LIBRARY:
-        err = SeosCryptoLib_free(self->impl.context);
-        free(self->impl.context);
-        break;
+        return SeosCryptoLib_free(self->impl.context);
 #if defined(SEOS_CRYPTO_WITH_RPC_CLIENT)
     case SeosCryptoApi_Mode_RPC_CLIENT:
-        err = SeosCryptoRpc_Client_free(self->impl.context);
-        free(self->impl.context);
-        break;
+        return SeosCryptoRpc_Client_free(self->impl.context);
     case SeosCryptoApi_Mode_ROUTER:
-        err = SeosCryptoRouter_free(self->impl.context);
-        free(self->impl.context);
-        break;
+        return SeosCryptoRouter_free(self->impl.context);
 #endif /* SEOS_CRYPTO_WITH_RPC_CLIENT */
 #if defined(SEOS_CRYPTO_WITH_RPC_SERVER)
     case SeosCryptoApi_Mode_RPC_SERVER_WITH_LIBRARY:
-        SeosCryptoLib_free(self->impl.context);
-        free(self->impl.context);
-        err = SeosCryptoRpc_Server_free(self->server.context);
-        free(self->server.context);
-        break;
+    {
+        seos_err_t err;
+        if ((err = SeosCryptoLib_free(self->impl.context)) != SEOS_SUCCESS)
+        {
+            return err;
+        }
+        return SeosCryptoRpc_Server_free(self->server);
+    }
 #endif /* SEOS_CRYPTO_WITH_RPC_SERVER */
     default:
         return SEOS_ERROR_NOT_SUPPORTED;
     }
-    return err;
+
+    return SEOS_ERROR_GENERIC;
 }
 
 // -------------------------------- RNG API ------------------------------------

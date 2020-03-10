@@ -17,34 +17,15 @@
 #include "util/PtrVector.h"
 #include "lib/SeosCryptoLib_Rng.h"
 
-// Internal types/defines/enums ------------------------------------------------
+// -------------------------- defines/types/variables --------------------------
 
-#define SeosCryptoLib_SIZE_BUFFER SeosCryptoApi_SIZE_DATAPORT
+typedef struct SeosCryptoLib SeosCryptoLib;
 
-typedef struct
-{
-    SeosCryptoApi_MemIf memIf;
-    SeosCryptoLib_Rng cryptoRng;
-    PtrVector keyObjects;
-    PtrVector macObjects;
-    PtrVector digestObjects;
-    PtrVector cipherObjects;
-    PtrVector signatureObjects;
-    PtrVector agreementObjects;
-    /**
-     * When we have a function that takes an input buffer and produces an output
-     * buffer, we copy the inputs to this buffer internally, so the caller can
-     * use the identical buffer as input/output.
-     */
-    uint8_t buffer[SeosCryptoLib_SIZE_BUFFER];
-} SeosCryptoLib;
-
-// Internal functions ----------------------------------------------------------
+// ------------------------------- Init/Free -----------------------------------
 
 seos_err_t
 SeosCryptoLib_init(
-    SeosCryptoLib*                  self,
-    const SeosCryptoVtable**        vtable,
+    SeosCryptoApi_Impl*             impl,
     const SeosCryptoApi_MemIf*      memIf,
     const SeosCryptoApi_Lib_Config* cfg);
 

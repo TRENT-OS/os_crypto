@@ -17,6 +17,28 @@
 
 #include <string.h>
 
+// -------------------------- defines/types/variables --------------------------
+
+#define SeosCryptoLib_SIZE_BUFFER SeosCryptoApi_SIZE_DATAPORT
+
+struct SeosCryptoLib
+{
+    SeosCryptoApi_MemIf memIf;
+    SeosCryptoLib_Rng cryptoRng;
+    PtrVector keyObjects;
+    PtrVector macObjects;
+    PtrVector digestObjects;
+    PtrVector cipherObjects;
+    PtrVector signatureObjects;
+    PtrVector agreementObjects;
+    /**
+     * When we have a function that takes an input buffer and produces an output
+     * buffer, we copy the inputs to this buffer internally, so the caller can
+     * use the identical buffer as input/output.
+     */
+    uint8_t buffer[SeosCryptoLib_SIZE_BUFFER];
+};
+
 // -------------------------------- RNG API ------------------------------------
 
 static seos_err_t
@@ -1104,70 +1126,75 @@ static const SeosCryptoVtable SeosCryptoLib_vtable =
 
 seos_err_t
 SeosCryptoLib_init(
-    SeosCryptoLib*                  self,
-    const SeosCryptoVtable**        vtable,
+    SeosCryptoApi_Impl*             impl,
     const SeosCryptoApi_MemIf*      memIf,
     const SeosCryptoApi_Lib_Config* cfg)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
+    SeosCryptoLib* self;
 
-    if (NULL == self || NULL == memIf || NULL == memIf->free
-        || NULL == memIf->malloc || NULL == cfg || NULL == cfg->rng.entropy)
+    if (NULL == impl || NULL == memIf || NULL == cfg || NULL == cfg->rng.entropy)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    memset(self, 0, sizeof(*self));
+    if ((self = memIf->malloc(sizeof(SeosCryptoLib))) == NULL)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
 
-    self->memIf = *memIf;
-    *vtable = &SeosCryptoLib_vtable;
+    impl->context = self;
+    impl->vtable  = &SeosCryptoLib_vtable;
+    self->memIf   = *memIf;
 
     if ((err = PtrVector_init(&self->digestObjects)) != SEOS_SUCCESS)
     {
-        return err;
+        goto err0;
     }
     else if ((err = PtrVector_init(&self->macObjects)) != SEOS_SUCCESS)
     {
-        goto err0;
+        goto err1;
     }
     else if ((err = PtrVector_init(&self->keyObjects)) != SEOS_SUCCESS)
     {
-        goto err1;
+        goto err2;
     }
     else if ((err = PtrVector_init(&self->cipherObjects) != SEOS_SUCCESS))
     {
-        goto err2;
+        goto err3;
     }
     else if ((err = PtrVector_init(&self->signatureObjects) != SEOS_SUCCESS))
     {
-        goto err3;
+        goto err4;
     }
     else if ((err = PtrVector_init(&self->agreementObjects) != SEOS_SUCCESS))
     {
-        goto err4;
+        goto err5;
     }
 
     if ((err = SeosCryptoLib_Rng_init(&self->cryptoRng, &self->memIf,
                                       (const SeosCryptoApi_Rng_EntropyFunc*)
                                       cfg->rng.entropy, cfg->rng.context)) != SEOS_SUCCESS)
     {
-        goto err5;
+        goto err6;
     }
 
-    return err;
+    return SEOS_SUCCESS;
 
-err5:
+err6:
     PtrVector_free(&self->agreementObjects);
-err4:
+err5:
     PtrVector_free(&self->signatureObjects);
-err3:
+err4:
     PtrVector_free(&self->cipherObjects);
-err2:
+err3:
     PtrVector_free(&self->keyObjects);
-err1:
+err2:
     PtrVector_free(&self->macObjects);
-err0:
+err1:
     PtrVector_free(&self->digestObjects);
+err0:
+    memIf->free(self);
 
     return err;
 }
@@ -1176,6 +1203,11 @@ seos_err_t
 SeosCryptoLib_free(
     SeosCryptoLib* self)
 {
+    if (NULL == self)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
     SeosCryptoLib_Rng_free(&self->cryptoRng, &self->memIf);
 
     PtrVector_free(&self->agreementObjects);
@@ -1184,6 +1216,8 @@ SeosCryptoLib_free(
     PtrVector_free(&self->keyObjects);
     PtrVector_free(&self->macObjects);
     PtrVector_free(&self->digestObjects);
+
+    self->memIf.free(self);
 
     return SEOS_SUCCESS;
 }
