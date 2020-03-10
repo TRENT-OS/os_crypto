@@ -36,29 +36,28 @@
 
 seos_err_t
 SeosCryptoApi_init(
-    SeosCryptoApi*              ctx,
+    SeosCryptoApi*              self,
     const SeosCryptoApi_Config* cfg)
 {
     seos_err_t err;
 
-    if (NULL == ctx || NULL == cfg || NULL == cfg->mem.malloc
+    if (NULL == self || NULL == cfg || NULL == cfg->mem.malloc
         || NULL == cfg->mem.free)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    memset(ctx, 0, sizeof(*ctx));
-
-    ctx->mode = cfg->mode;
+    memset(self, 0, sizeof(*self));
+    self->mode = cfg->mode;
 
     switch (cfg->mode)
     {
     case SeosCryptoApi_Mode_LIBRARY:
-        if ((ctx->impl.context = cfg->mem.malloc(sizeof(SeosCryptoLib))) == NULL)
+        if ((self->impl.context = cfg->mem.malloc(sizeof(SeosCryptoLib))) == NULL)
         {
             return SEOS_ERROR_INSUFFICIENT_SPACE;
         }
-        if ((err = SeosCryptoLib_init(ctx->impl.context, &ctx->impl.vtable, &cfg->mem,
+        if ((err = SeosCryptoLib_init(self->impl.context, &self->impl.vtable, &cfg->mem,
                                       &cfg->impl.lib)) != SEOS_SUCCESS)
         {
             goto err0;
@@ -66,22 +65,23 @@ SeosCryptoApi_init(
         break;
 #if defined(SEOS_CRYPTO_WITH_RPC_CLIENT)
     case SeosCryptoApi_Mode_RPC_CLIENT:
-        if ((ctx->impl.context = cfg->mem.malloc(sizeof(SeosCryptoRpc_Client))) == NULL)
+        if ((self->impl.context = cfg->mem.malloc(sizeof(SeosCryptoRpc_Client))) ==
+            NULL)
         {
             return SEOS_ERROR_INSUFFICIENT_SPACE;
         }
-        if ((err = SeosCryptoRpc_Client_init(ctx->impl.context, &ctx->impl.vtable,
+        if ((err = SeosCryptoRpc_Client_init(self->impl.context, &self->impl.vtable,
                                              &cfg->impl.client)) != SEOS_SUCCESS)
         {
             goto err0;
         }
         break;
     case SeosCryptoApi_Mode_ROUTER:
-        if ((ctx->impl.context = cfg->mem.malloc(sizeof(SeosCryptoRouter))) == NULL)
+        if ((self->impl.context = cfg->mem.malloc(sizeof(SeosCryptoRouter))) == NULL)
         {
             return SEOS_ERROR_INSUFFICIENT_SPACE;
         }
-        if ((err = SeosCryptoRouter_init(ctx->impl.context, &ctx->impl.vtable,
+        if ((err = SeosCryptoRouter_init(self->impl.context, &self->impl.vtable,
                                          &cfg->mem, &cfg->impl.router)) != SEOS_SUCCESS)
         {
             goto err0;
@@ -90,22 +90,22 @@ SeosCryptoApi_init(
 #endif /* SEOS_CRYPTO_WITH_RPC_CLIENT */
 #if defined(SEOS_CRYPTO_WITH_RPC_SERVER)
     case SeosCryptoApi_Mode_RPC_SERVER_WITH_LIBRARY:
-        if ((ctx->impl.context = cfg->mem.malloc(sizeof(SeosCryptoLib))) == NULL)
+        if ((self->impl.context = cfg->mem.malloc(sizeof(SeosCryptoLib))) == NULL)
         {
             return SEOS_ERROR_INSUFFICIENT_SPACE;
         }
-        if ((err = SeosCryptoLib_init(ctx->impl.context, &ctx->impl.vtable, &cfg->mem,
+        if ((err = SeosCryptoLib_init(self->impl.context, &self->impl.vtable, &cfg->mem,
                                       &cfg->impl.lib)) != SEOS_SUCCESS)
         {
             goto err0;
         }
-        if ((ctx->server.context = cfg->mem.malloc(sizeof(SeosCryptoRpc_Server))) ==
+        if ((self->server.context = cfg->mem.malloc(sizeof(SeosCryptoRpc_Server))) ==
             NULL)
         {
             err = SEOS_ERROR_INSUFFICIENT_SPACE;
             goto err0;
         }
-        if ((err = SeosCryptoRpc_Server_init(ctx->server.context, &ctx->impl,
+        if ((err = SeosCryptoRpc_Server_init(self->server.context, &self->impl,
                                              &cfg->server)) != SEOS_SUCCESS)
         {
             goto err1;
@@ -120,47 +120,47 @@ SeosCryptoApi_init(
 
 #if defined(SEOS_CRYPTO_WITH_RPC_SERVER)
 err1:
-    free(ctx->server.context);
+    free(self->server.context);
 #endif /* SEOS_CRYPTO_WITH_RPC_SERVER */
 err0:
-    free(ctx->impl.context);
+    free(self->impl.context);
 
     return err;
 }
 
 seos_err_t
 SeosCryptoApi_free(
-    SeosCryptoApi* ctx)
+    SeosCryptoApi* self)
 {
     seos_err_t err;
 
-    if (NULL == ctx)
+    if (NULL == self)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    switch (ctx->mode)
+    switch (self->mode)
     {
     case SeosCryptoApi_Mode_LIBRARY:
-        err = SeosCryptoLib_free(ctx->impl.context);
-        free(ctx->impl.context);
+        err = SeosCryptoLib_free(self->impl.context);
+        free(self->impl.context);
         break;
 #if defined(SEOS_CRYPTO_WITH_RPC_CLIENT)
     case SeosCryptoApi_Mode_RPC_CLIENT:
-        err = SeosCryptoRpc_Client_free(ctx->impl.context);
-        free(ctx->impl.context);
+        err = SeosCryptoRpc_Client_free(self->impl.context);
+        free(self->impl.context);
         break;
     case SeosCryptoApi_Mode_ROUTER:
-        err = SeosCryptoRouter_free(ctx->impl.context);
-        free(ctx->impl.context);
+        err = SeosCryptoRouter_free(self->impl.context);
+        free(self->impl.context);
         break;
 #endif /* SEOS_CRYPTO_WITH_RPC_CLIENT */
 #if defined(SEOS_CRYPTO_WITH_RPC_SERVER)
     case SeosCryptoApi_Mode_RPC_SERVER_WITH_LIBRARY:
-        SeosCryptoLib_free(ctx->impl.context);
-        free(ctx->impl.context);
-        err = SeosCryptoRpc_Server_free(ctx->server.context);
-        free(ctx->server.context);
+        SeosCryptoLib_free(self->impl.context);
+        free(self->impl.context);
+        err = SeosCryptoRpc_Server_free(self->server.context);
+        free(self->server.context);
         break;
 #endif /* SEOS_CRYPTO_WITH_RPC_SERVER */
     default:
@@ -173,21 +173,21 @@ SeosCryptoApi_free(
 
 seos_err_t
 SeosCryptoApi_Rng_getBytes(
-    SeosCryptoApi*               ctx,
+    SeosCryptoApi*               self,
     const SeosCryptoApi_Rng_Flag flags,
     void*                        buf,
     const size_t                 bufSize)
 {
-    return CALL_IMPL(ctx, Rng_getBytes, flags, buf, bufSize);
+    return CALL_IMPL(self, Rng_getBytes, flags, buf, bufSize);
 }
 
 seos_err_t
 SeosCryptoApi_Rng_reseed(
-    SeosCryptoApi* ctx,
+    SeosCryptoApi* self,
     const void*    seed,
     const size_t   seedSize)
 {
-    return CALL_IMPL(ctx, Rng_reseed, seed, seedSize);
+    return CALL_IMPL(self, Rng_reseed, seed, seedSize);
 }
 
 // ------------------------------- MAC API -------------------------------------
