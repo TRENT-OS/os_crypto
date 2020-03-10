@@ -22,11 +22,6 @@
 typedef struct
 {
     /**
-     * Pointer to be used in the RPC call, this pointer is not valid in our address
-     * tell the server which is the correct object in his address space
-     * */
-    SeosCryptoApi* api;
-    /**
      * The client's address of the dataport shared with the server
      */
     void* dataPort;
