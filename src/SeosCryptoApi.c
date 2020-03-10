@@ -5,8 +5,8 @@
 #include "SeosCryptoApi.h"
 
 #include "SeosCryptoLib.h"
-#include "SeosCryptoRpcClient.h"
-#include "SeosCryptoRpcServer.h"
+#include "SeosCryptoRpc_Client.h"
+#include "SeosCryptoRpc_Server.h"
 #include "SeosCryptoRouter.h"
 
 #include "SeosCryptoVtable.h"
@@ -24,12 +24,12 @@
     w->impl.vtable->f(w->impl.context, __VA_ARGS__)          \
 
 // Initialize a wrapped object from existing API pointer
-#define INIT_WRAPPER(w, c) {                    \
-    if (NULL == w || NULL == c) {               \
-        return SEOS_ERROR_INVALID_PARAMETER;    \
-    }                                           \
-    memset(w, 0, sizeof(*w));                   \
-    w->impl = c->impl;                          \
+#define INIT_WRAPPER(w, c) {                        \
+        if (NULL == w || NULL == c) {               \
+            return SEOS_ERROR_INVALID_PARAMETER;    \
+        }                                           \
+        memset(w, 0, sizeof(*w));                   \
+        w->impl = c->impl;                          \
 }
 
 // ------------------------------- Init/Free -----------------------------------
@@ -66,12 +66,12 @@ SeosCryptoApi_init(
         break;
 #if defined(SEOS_CRYPTO_WITH_RPC_CLIENT)
     case SeosCryptoApi_Mode_RPC_CLIENT:
-        if ((ctx->impl.context = cfg->mem.malloc(sizeof(SeosCryptoRpcClient))) == NULL)
+        if ((ctx->impl.context = cfg->mem.malloc(sizeof(SeosCryptoRpc_Client))) == NULL)
         {
             return SEOS_ERROR_INSUFFICIENT_SPACE;
         }
-        if ((err = SeosCryptoRpcClient_init(ctx->impl.context, &ctx->impl.vtable,
-                                            &cfg->impl.client)) != SEOS_SUCCESS)
+        if ((err = SeosCryptoRpc_Client_init(ctx->impl.context, &ctx->impl.vtable,
+                                             &cfg->impl.client)) != SEOS_SUCCESS)
         {
             goto err0;
         }
@@ -99,14 +99,14 @@ SeosCryptoApi_init(
         {
             goto err0;
         }
-        if ((ctx->server.context = cfg->mem.malloc(sizeof(SeosCryptoRpcServer))) ==
+        if ((ctx->server.context = cfg->mem.malloc(sizeof(SeosCryptoRpc_Server))) ==
             NULL)
         {
             err = SEOS_ERROR_INSUFFICIENT_SPACE;
             goto err0;
         }
-        if ((err = SeosCryptoRpcServer_init(ctx->server.context, &ctx->impl,
-                                            &cfg->server)) != SEOS_SUCCESS)
+        if ((err = SeosCryptoRpc_Server_init(ctx->server.context, &ctx->impl,
+                                             &cfg->server)) != SEOS_SUCCESS)
         {
             goto err1;
         }
@@ -147,7 +147,7 @@ SeosCryptoApi_free(
         break;
 #if defined(SEOS_CRYPTO_WITH_RPC_CLIENT)
     case SeosCryptoApi_Mode_RPC_CLIENT:
-        err = SeosCryptoRpcClient_free(ctx->impl.context);
+        err = SeosCryptoRpc_Client_free(ctx->impl.context);
         free(ctx->impl.context);
         break;
     case SeosCryptoApi_Mode_ROUTER:
@@ -159,7 +159,7 @@ SeosCryptoApi_free(
     case SeosCryptoApi_Mode_RPC_SERVER_WITH_LIBRARY:
         SeosCryptoLib_free(ctx->impl.context);
         free(ctx->impl.context);
-        err = SeosCryptoRpcServer_free(ctx->server.context);
+        err = SeosCryptoRpc_Server_free(ctx->server.context);
         free(ctx->server.context);
         break;
 #endif /* SEOS_CRYPTO_WITH_RPC_SERVER */

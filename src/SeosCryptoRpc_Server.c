@@ -4,7 +4,7 @@
 
 #if defined(SEOS_CRYPTO_WITH_RPC_SERVER)
 
-#include "SeosCryptoRpcServer.h"
+#include "SeosCryptoRpc_Server.h"
 
 #include "SeosCryptoVtable.h"
 
@@ -25,22 +25,23 @@
  * correct context, ignoring any addresses given by the client. The CryptoServer
  * keeps track of all contexts and knows how to map them based on the sender ID
  * passed when using a CAMKES interface.
-  */
+ */
 extern SeosCryptoApi*
-SeosCryptoRpcServer_getSeosCryptoApi(void) __attribute__((weak));
+SeosCryptoRpc_Server_getSeosCryptoApi(
+    void) __attribute__((weak));
 
-// Get the SeosCryptoRpcServer pointer from the API pointer and make sure it is
+// Get the SeosCryptoRpc_Server pointer from the API pointer and make sure it is
 // actually non-NULL. Please note that here the API pointer (passed by the RpcClient)
-// is overwritten, whenever SeosCryptoRpcServer_getSeosCryptoApi() is defined!!
-#define GET_SELF(s, a) {                                \
-    if (NULL != SeosCryptoRpcServer_getSeosCryptoApi) { \
-        a = SeosCryptoRpcServer_getSeosCryptoApi();     \
-    }                                                   \
-    if(NULL != a) {                                     \
-        s = ((SeosCryptoRpcServer*) a->server.context); \
-    } else {                                            \
-        return SEOS_ERROR_INVALID_PARAMETER;            \
-    }                                                   \
+// is overwritten, whenever SeosCryptoRpc_Server_getSeosCryptoApi() is defined!!
+#define GET_SELF(s, a) {                                        \
+        if (NULL != SeosCryptoRpc_Server_getSeosCryptoApi) {    \
+            a = SeosCryptoRpc_Server_getSeosCryptoApi();        \
+        }                                                       \
+        if(NULL != a) {                                         \
+            s = ((SeosCryptoRpc_Server*) a->server.context);    \
+        } else {                                                \
+            return SEOS_ERROR_INVALID_PARAMETER;                \
+        }                                                       \
 }
 
 // Call function pointer to LIB, make sure it is defined
@@ -52,23 +53,23 @@ SeosCryptoRpcServer_getSeosCryptoApi(void) __attribute__((weak));
 // -------------------------------- RNG API ------------------------------------
 
 seos_err_t
-SeosCryptoRpcServer_Rng_getBytes(
+SeosCryptoRpc_Server_Rng_getBytes(
     SeosCryptoApi_Ptr api,
     unsigned int      flags,
     size_t            bufSize)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Rng_getBytes, flags, self->dataPort, bufSize);
 }
 
 seos_err_t
-SeosCryptoRpcServer_Rng_reseed(
+SeosCryptoRpc_Server_Rng_reseed(
     SeosCryptoApi_Ptr api,
     size_t            seedSize)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Rng_reseed, self->dataPort, seedSize);
@@ -77,70 +78,70 @@ SeosCryptoRpcServer_Rng_reseed(
 // ------------------------------ Digest API -----------------------------------
 
 seos_err_t
-SeosCryptoRpcServer_Mac_init(
+SeosCryptoRpc_Server_Mac_init(
     SeosCryptoApi_Ptr      api,
     SeosCryptoLib_Mac_Ptr* pMacObj,
     SeosCryptoApi_Mac_Alg  algorithm)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Mac_init, pMacObj, algorithm);
 }
 
 seos_err_t
-SeosCryptoRpcServer_Mac_exists(
+SeosCryptoRpc_Server_Mac_exists(
     SeosCryptoApi_Ptr      api,
     SeosCryptoLib_Mac_CPtr macObj)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Mac_exists, macObj);
 }
 
 seos_err_t
-SeosCryptoRpcServer_Mac_free(
+SeosCryptoRpc_Server_Mac_free(
     SeosCryptoApi_Ptr     api,
     SeosCryptoLib_Mac_Ptr macObj)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Mac_free, macObj);
 }
 
 seos_err_t
-SeosCryptoRpcServer_Mac_start(
+SeosCryptoRpc_Server_Mac_start(
     SeosCryptoApi_Ptr     api,
     SeosCryptoLib_Mac_Ptr macObj,
     size_t                secretSize)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Mac_start, macObj, self->dataPort, secretSize);
 }
 
 seos_err_t
-SeosCryptoRpcServer_Mac_process(
+SeosCryptoRpc_Server_Mac_process(
     SeosCryptoApi_Ptr     api,
     SeosCryptoLib_Mac_Ptr macObj,
     size_t                dataSize)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Mac_process, macObj, self->dataPort, dataSize);
 }
 
 seos_err_t
-SeosCryptoRpcServer_Mac_finalize(
+SeosCryptoRpc_Server_Mac_finalize(
     SeosCryptoApi_Ptr     api,
     SeosCryptoLib_Mac_Ptr macObj,
     size_t*               macSize)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     *macSize = (*macSize <= SeosCryptoApi_SIZE_DATAPORT) ? *macSize :
                SeosCryptoApi_SIZE_DATAPORT;
@@ -152,70 +153,70 @@ SeosCryptoRpcServer_Mac_finalize(
 // ------------------------------ Digest API -----------------------------------
 
 seos_err_t
-SeosCryptoRpcServer_Digest_init(
+SeosCryptoRpc_Server_Digest_init(
     SeosCryptoApi_Ptr         api,
     SeosCryptoLib_Digest_Ptr* pDigestObj,
     SeosCryptoApi_Digest_Alg  algorithm)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Digest_init, pDigestObj, algorithm);
 }
 
 seos_err_t
-SeosCryptoRpcServer_Digest_exists(
+SeosCryptoRpc_Server_Digest_exists(
     SeosCryptoApi_Ptr         api,
     SeosCryptoLib_Digest_CPtr digestObj)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Digest_exists, digestObj);
 }
 
 seos_err_t
-SeosCryptoRpcServer_Digest_free(
+SeosCryptoRpc_Server_Digest_free(
     SeosCryptoApi_Ptr        api,
     SeosCryptoLib_Digest_Ptr digestObj)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Digest_free, digestObj);
 }
 
 seos_err_t
-SeosCryptoRpcServer_Digest_clone(
+SeosCryptoRpc_Server_Digest_clone(
     SeosCryptoApi_Ptr         api,
     SeosCryptoLib_Digest_Ptr  dstDigHandle,
     SeosCryptoLib_Digest_CPtr srcDigHandle)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Digest_clone, dstDigHandle, srcDigHandle);
 }
 
 seos_err_t
-SeosCryptoRpcServer_Digest_process(
+SeosCryptoRpc_Server_Digest_process(
     SeosCryptoApi_Ptr        api,
     SeosCryptoLib_Digest_Ptr digestObj,
     size_t                   inSize)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Digest_process, digestObj, self->dataPort, inSize);
 }
 
 seos_err_t
-SeosCryptoRpcServer_Digest_finalize(
+SeosCryptoRpc_Server_Digest_finalize(
     SeosCryptoApi_Ptr        api,
     SeosCryptoLib_Digest_Ptr digestObj,
     size_t*                  digestSize)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     *digestSize = (*digestSize <= SeosCryptoApi_SIZE_DATAPORT) ? *digestSize :
                   SeosCryptoApi_SIZE_DATAPORT;
@@ -227,47 +228,47 @@ SeosCryptoRpcServer_Digest_finalize(
 // -------------------------------- Key API ------------------------------------
 
 seos_err_t
-SeosCryptoRpcServer_Key_generate(
+SeosCryptoRpc_Server_Key_generate(
     SeosCryptoApi_Ptr      api,
     SeosCryptoLib_Key_Ptr* pKeyObj)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Key_generate, pKeyObj, self->dataPort);
 }
 
 seos_err_t
-SeosCryptoRpcServer_Key_makePublic(
+SeosCryptoRpc_Server_Key_makePublic(
     SeosCryptoApi_Ptr      api,
     SeosCryptoLib_Key_Ptr* pPubKeyHandle,
     SeosCryptoLib_Key_CPtr prvKeyHandle)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Key_makePublic, pPubKeyHandle, prvKeyHandle, self->dataPort);
 }
 
 seos_err_t
-SeosCryptoRpcServer_Key_import(
+SeosCryptoRpc_Server_Key_import(
     SeosCryptoApi_Ptr      api,
     SeosCryptoLib_Key_Ptr* pKeyObj)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Key_import, pKeyObj, self->dataPort);
 }
 
 seos_err_t
-SeosCryptoRpcServer_Key_export(
+SeosCryptoRpc_Server_Key_export(
     SeosCryptoApi_Ptr      api,
     SeosCryptoLib_Key_CPtr keyObj)
 {
     seos_err_t err;
     SeosCryptoApi_Key_Attribs attribs;
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
 
@@ -288,12 +289,12 @@ SeosCryptoRpcServer_Key_export(
 }
 
 seos_err_t
-SeosCryptoRpcServer_Key_getParams(
+SeosCryptoRpc_Server_Key_getParams(
     SeosCryptoApi_Ptr      api,
     SeosCryptoLib_Key_CPtr keyObj,
     size_t*                paramSize)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     *paramSize = (*paramSize <= SeosCryptoApi_SIZE_DATAPORT) ? *paramSize :
                  SeosCryptoApi_SIZE_DATAPORT;
@@ -303,23 +304,23 @@ SeosCryptoRpcServer_Key_getParams(
 }
 
 seos_err_t
-SeosCryptoRpcServer_Key_getAttribs(
+SeosCryptoRpc_Server_Key_getAttribs(
     SeosCryptoApi_Ptr      api,
     SeosCryptoLib_Key_CPtr keyObj)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Key_getAttribs, keyObj, self->dataPort);
 }
 
 seos_err_t
-SeosCryptoRpcServer_Key_loadParams(
+SeosCryptoRpc_Server_Key_loadParams(
     SeosCryptoApi_Ptr       api,
     SeosCryptoApi_Key_Param name,
     size_t*                 paramSize)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     *paramSize = (*paramSize <= SeosCryptoApi_SIZE_DATAPORT) ? *paramSize :
                  SeosCryptoApi_SIZE_DATAPORT;
@@ -329,22 +330,22 @@ SeosCryptoRpcServer_Key_loadParams(
 }
 
 seos_err_t
-SeosCryptoRpcServer_Key_exists(
+SeosCryptoRpc_Server_Key_exists(
     SeosCryptoApi_Ptr      api,
     SeosCryptoLib_Key_CPtr keyObj)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Key_exists, keyObj);
 }
 
 seos_err_t
-SeosCryptoRpcServer_Key_free(
+SeosCryptoRpc_Server_Key_free(
     SeosCryptoApi_Ptr     api,
     SeosCryptoLib_Key_Ptr keyObj)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Key_free, keyObj);
@@ -353,26 +354,26 @@ SeosCryptoRpcServer_Key_free(
 // ----------------------------- Agreement API ---------------------------------
 
 seos_err_t
-SeosCryptoRpcServer_Agreement_init(
+SeosCryptoRpc_Server_Agreement_init(
     SeosCryptoApi_Ptr            api,
     SeosCryptoLib_Agreement_Ptr* pAgrObj,
     SeosCryptoApi_Agreement_Alg  algorithm,
     SeosCryptoLib_Key_CPtr       prvKey)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Agreement_init, pAgrObj, algorithm, prvKey);
 }
 
 seos_err_t
-SeosCryptoRpcServer_Agreement_agree(
+SeosCryptoRpc_Server_Agreement_agree(
     SeosCryptoApi_Ptr           api,
     SeosCryptoLib_Agreement_Ptr agrObj,
     SeosCryptoLib_Key_CPtr      pubKey,
     size_t*                     sharedSize)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     *sharedSize = (*sharedSize <= SeosCryptoApi_SIZE_DATAPORT) ? *sharedSize :
                   SeosCryptoApi_SIZE_DATAPORT;
@@ -382,22 +383,22 @@ SeosCryptoRpcServer_Agreement_agree(
 }
 
 seos_err_t
-SeosCryptoRpcServer_Agreement_exists(
+SeosCryptoRpc_Server_Agreement_exists(
     SeosCryptoApi_Ptr            api,
     SeosCryptoLib_Agreement_CPtr agrObj)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Agreement_exists, agrObj);
 }
 
 seos_err_t
-SeosCryptoRpcServer_Agreement_free(
+SeosCryptoRpc_Server_Agreement_free(
     SeosCryptoApi_Ptr           api,
     SeosCryptoLib_Agreement_Ptr agrObj)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Agreement_free, agrObj);
@@ -406,7 +407,7 @@ SeosCryptoRpcServer_Agreement_free(
 // ----------------------------- Signature API ---------------------------------
 
 seos_err_t
-SeosCryptoRpcServer_Signature_init(
+SeosCryptoRpc_Server_Signature_init(
     SeosCryptoApi_Ptr            api,
     SeosCryptoLib_Signature_Ptr* pObj,
     SeosCryptoApi_Signature_Alg  algorithm,
@@ -414,20 +415,20 @@ SeosCryptoRpcServer_Signature_init(
     SeosCryptoLib_Key_CPtr       prvKey,
     SeosCryptoLib_Key_CPtr       pubKey)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Signature_init, pObj, algorithm, digest, prvKey, pubKey);
 }
 
 seos_err_t
-SeosCryptoRpcServer_Signature_verify(
+SeosCryptoRpc_Server_Signature_verify(
     SeosCryptoApi_Ptr           api,
     SeosCryptoLib_Signature_Ptr obj,
     size_t                      hashSize,
     size_t                      signatureSize)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Signature_verify, obj, self->dataPort, hashSize,
@@ -435,13 +436,13 @@ SeosCryptoRpcServer_Signature_verify(
 }
 
 seos_err_t
-SeosCryptoRpcServer_Signature_sign(
+SeosCryptoRpc_Server_Signature_sign(
     SeosCryptoApi_Ptr           api,
     SeosCryptoLib_Signature_Ptr obj,
     size_t                      hashSize,
     size_t*                     signatureSize)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     *signatureSize = (*signatureSize <= SeosCryptoApi_SIZE_DATAPORT) ?
                      *signatureSize : SeosCryptoApi_SIZE_DATAPORT;
@@ -452,22 +453,22 @@ SeosCryptoRpcServer_Signature_sign(
 }
 
 seos_err_t
-SeosCryptoRpcServer_Signature_exists(
+SeosCryptoRpc_Server_Signature_exists(
     SeosCryptoApi_Ptr            api,
     SeosCryptoLib_Signature_CPtr obj)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Signature_exists, obj);
 }
 
 seos_err_t
-SeosCryptoRpcServer_Signature_free(
+SeosCryptoRpc_Server_Signature_free(
     SeosCryptoApi_Ptr           api,
     SeosCryptoLib_Signature_Ptr obj)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Signature_free, obj);
@@ -476,14 +477,14 @@ SeosCryptoRpcServer_Signature_free(
 // ------------------------------- Cipher API ----------------------------------
 
 seos_err_t
-SeosCryptoRpcServer_Cipher_init(
+SeosCryptoRpc_Server_Cipher_init(
     SeosCryptoApi_Ptr         api,
     SeosCryptoLib_Cipher_Ptr* pCipherObj,
     SeosCryptoApi_Cipher_Alg  algorithm,
     SeosCryptoLib_Key_CPtr    key,
     size_t                    ivSize)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Cipher_init, pCipherObj, algorithm, key, self->dataPort,
@@ -491,35 +492,35 @@ SeosCryptoRpcServer_Cipher_init(
 }
 
 seos_err_t
-SeosCryptoRpcServer_Cipher_exists(
+SeosCryptoRpc_Server_Cipher_exists(
     SeosCryptoApi_Ptr         api,
     SeosCryptoLib_Cipher_CPtr cipherObj)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Cipher_exists, cipherObj);
 }
 
 seos_err_t
-SeosCryptoRpcServer_Cipher_free(
+SeosCryptoRpc_Server_Cipher_free(
     SeosCryptoApi_Ptr        api,
     SeosCryptoLib_Cipher_Ptr cipherObj)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Cipher_free, cipherObj);
 }
 
 seos_err_t
-SeosCryptoRpcServer_Cipher_process(
+SeosCryptoRpc_Server_Cipher_process(
     SeosCryptoApi_Ptr        api,
     SeosCryptoLib_Cipher_Ptr cipherObj,
     size_t                   inputSize,
     size_t*                  outputSize)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     *outputSize = (*outputSize <= SeosCryptoApi_SIZE_DATAPORT) ? *outputSize :
                   SeosCryptoApi_SIZE_DATAPORT;
@@ -530,24 +531,24 @@ SeosCryptoRpcServer_Cipher_process(
 }
 
 seos_err_t
-SeosCryptoRpcServer_Cipher_start(
+SeosCryptoRpc_Server_Cipher_start(
     SeosCryptoApi_Ptr        api,
     SeosCryptoLib_Cipher_Ptr cipherObj,
     size_t                   len)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     GET_SELF(self, api);
     return CALL(self, Cipher_start, cipherObj, self->dataPort, len);
 }
 
 seos_err_t
-SeosCryptoRpcServer_Cipher_finalize(
+SeosCryptoRpc_Server_Cipher_finalize(
     SeosCryptoApi_Ptr        api,
     SeosCryptoLib_Cipher_Ptr cipherObj,
     size_t*                  tagSize)
 {
-    SeosCryptoRpcServer* self;
+    SeosCryptoRpc_Server* self;
 
     *tagSize = (*tagSize <= SeosCryptoApi_SIZE_DATAPORT) ? *tagSize :
                SeosCryptoApi_SIZE_DATAPORT;
@@ -559,8 +560,8 @@ SeosCryptoRpcServer_Cipher_finalize(
 // ------------------------------- init/free -----------------------------------
 
 seos_err_t
-SeosCryptoRpcServer_init(
-    SeosCryptoRpcServer*                  self,
+SeosCryptoRpc_Server_init(
+    SeosCryptoRpc_Server*                 self,
     const SeosCryptoApi_Impl*             impl,
     const SeosCryptoApi_RpcServer_Config* cfg)
 {
@@ -579,8 +580,8 @@ SeosCryptoRpcServer_init(
 }
 
 seos_err_t
-SeosCryptoRpcServer_free(
-    SeosCryptoRpcServer* self)
+SeosCryptoRpc_Server_free(
+    SeosCryptoRpc_Server* self)
 {
     return SEOS_SUCCESS;
 }

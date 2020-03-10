@@ -30,12 +30,12 @@
 
 // Call a function from the a given vtable, check if pointers are non-NULL,
 // including the function pointer
-#define CALL(c, v, f, ...)                                      \
-    (NULL == c) ? SEOS_ERROR_INVALID_PARAMETER :                \
-    (NULL == ((SeosCryptoRouter *)c)->v.vtable->f) ?            \
-        SEOS_ERROR_NOT_SUPPORTED :                              \
-        ((SeosCryptoRouter *)c)->v.vtable->f(                   \
-            ((SeosCryptoRouter *)c)->v.context, ## __VA_ARGS__  \
+#define CALL(c, v, f, ...)                                  \
+    (NULL == c) ? SEOS_ERROR_INVALID_PARAMETER :            \
+    (NULL == ((SeosCryptoRouter *)c)->v.vtable->f) ?        \
+    SEOS_ERROR_NOT_SUPPORTED :                              \
+    ((SeosCryptoRouter *)c)->v.vtable->f(                   \
+        ((SeosCryptoRouter *)c)->v.context, ## __VA_ARGS__  \
         )
 #define CALL_LIB(c, f, ...) \
     CALL(c, lib, f, ## __VA_ARGS__)
@@ -45,16 +45,16 @@
 // Route call to LIB/CLIENT based on location of object
 #define ROUTE_CALL(e, c, f, o, ...)         \
     (CALL_LIB(c, e, o) == SEOS_SUCCESS) ?   \
-      CALL_LIB(c, f, o, ## __VA_ARGS__) :   \
-      CALL_CLI(c, f, o, ## __VA_ARGS__)
+    CALL_LIB(c, f, o, ## __VA_ARGS__) :     \
+    CALL_CLI(c, f, o, ## __VA_ARGS__)
 #define ROUTE_KEY_CALL(c, f, o, ...) \
-    ROUTE_CALL(Key_exists, c, f, o, #### __VA_ARGS__)
+    ROUTE_CALL(Key_exists, c, f, o, ## ## __VA_ARGS__)
 #define ROUTE_CIPHER_CALL(c, f, o, ...) \
-    ROUTE_CALL(Cipher_exists, c, f, o, #### __VA_ARGS__)
+    ROUTE_CALL(Cipher_exists, c, f, o, ## ## __VA_ARGS__)
 #define ROUTE_SIG_CALL(c, f, o, ...) \
-    ROUTE_CALL(Signature_exists, c, f, o, #### __VA_ARGS__)
+    ROUTE_CALL(Signature_exists, c, f, o, ## ## __VA_ARGS__)
 #define ROUTE_AGR_CALL(c, f, o, ...) \
-    ROUTE_CALL(Agreement_exists, c, f, o, #### __VA_ARGS__)
+    ROUTE_CALL(Agreement_exists, c, f, o, ## ## __VA_ARGS__)
 
 // -------------------------------- RNG API ------------------------------------
 
@@ -382,8 +382,8 @@ Key_getParams(
 
 static seos_err_t
 Key_getAttribs(
-    void*                    ctx,
-    const SeosCryptoLib_Key* keyObj,
+    void*                      ctx,
+    const SeosCryptoLib_Key*   keyObj,
     SeosCryptoApi_Key_Attribs* attribs)
 {
     return ROUTE_KEY_CALL(ctx, Key_getAttribs, keyObj, attribs);
@@ -554,13 +554,14 @@ SeosCryptoRouter_init(
     {
         goto err0;
     }
-    if ((self->client.context = memIf->malloc(sizeof(SeosCryptoRpcClient))) == NULL)
+    if ((self->client.context = memIf->malloc(sizeof(SeosCryptoRpc_Client))) ==
+        NULL)
     {
         err = SEOS_ERROR_INSUFFICIENT_SPACE;
         goto err0;
     }
-    if ((err = SeosCryptoRpcClient_init(self->client.context, &self->client.vtable,
-                                        &cfg->client)) != SEOS_SUCCESS)
+    if ((err = SeosCryptoRpc_Client_init(self->client.context, &self->client.vtable,
+                                         &cfg->client)) != SEOS_SUCCESS)
     {
         goto err1;
     }
@@ -572,7 +573,7 @@ SeosCryptoRouter_init(
     return SEOS_SUCCESS;
 
 err1:
-    SeosCryptoRpcClient_free(self->client.context);
+    SeosCryptoRpc_Client_free(self->client.context);
 err0:
     SeosCryptoLib_free(self->lib.context);
 
@@ -585,7 +586,7 @@ SeosCryptoRouter_free(
 {
     seos_err_t err;
 
-    if ((err = SeosCryptoRpcClient_free(self->client.context)) != SEOS_SUCCESS)
+    if ((err = SeosCryptoRpc_Client_free(self->client.context)) != SEOS_SUCCESS)
     {
         return err;
     }

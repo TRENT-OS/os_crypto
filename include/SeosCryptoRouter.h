@@ -17,7 +17,7 @@
 
 #include "SeosCryptoApi.h"
 
-#include "SeosCryptoRpcClient.h"
+#include "SeosCryptoRpc_Client.h"
 #include "SeosCryptoLib.h"
 
 #include "util/PtrVector.h"

@@ -50,8 +50,8 @@ struct SeosCryptoLib_Key
 
 /**
  * Make sure that these structs are smaller than the width of the dataport so
- * that we do not have any problem when passing them from SeosCryptoRpcClient to
- * SeosCryptoRpcServer via camkes-generated RPC calls.
+ * that we do not have any problem when passing them from SeosCryptoRpc_Client to
+ * SeosCryptoRpc_Server via camkes-generated RPC calls.
  */
 Debug_STATIC_ASSERT(sizeof(SeosCryptoApi_Key_Spec) <=
                     SeosCryptoApi_SIZE_DATAPORT);
