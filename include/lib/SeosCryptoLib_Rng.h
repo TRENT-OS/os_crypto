@@ -20,18 +20,15 @@
 
 #include <stddef.h>
 
-// Internal types/defines/enums ------------------------------------------------
+// Exported types/defines/enums ------------------------------------------------
 
-typedef struct
-{
-    mbedtls_ctr_drbg_context drbg;
-} SeosCryptoLib_Rng;
+typedef struct SeosCryptoLib_Rng SeosCryptoLib_Rng;
 
-// Internal functions ----------------------------------------------------------
+// Exported functions ----------------------------------------------------------
 
 seos_err_t
 SeosCryptoLib_Rng_init(
-    SeosCryptoLib_Rng*                   self,
+    SeosCryptoLib_Rng**                  self,
     const SeosCryptoApi_MemIf*           memIf,
     const SeosCryptoApi_Rng_EntropyFunc* entropyFunc,
     void*                                entropyCtx);

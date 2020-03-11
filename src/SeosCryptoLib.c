@@ -17,7 +17,7 @@
 struct SeosCryptoLib
 {
     SeosCryptoApi_MemIf memIf;
-    SeosCryptoLib_Rng cryptoRng;
+    SeosCryptoLib_Rng* rng;
     PtrVector keyObjects;
     PtrVector macObjects;
     PtrVector digestObjects;
@@ -52,7 +52,7 @@ Rng_getBytes(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return SeosCryptoLib_Rng_getBytes(&self->cryptoRng, flags, buf, bufSize);
+    return SeosCryptoLib_Rng_getBytes(self->rng, flags, buf, bufSize);
 }
 
 static seos_err_t
@@ -72,7 +72,7 @@ Rng_reseed(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return SeosCryptoLib_Rng_reSeed(&self->cryptoRng, seed, seedSize);
+    return SeosCryptoLib_Rng_reSeed(self->rng, seed, seedSize);
 }
 
 // -------------------------------- MAC API ------------------------------------
@@ -468,7 +468,7 @@ Signature_sign(
     memcpy(self->buffer, hash, hashSize);
     return !PtrVector_hasPtr(&self->signatureObjects, sigObj) ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_Signature_sign(sigObj, &self->cryptoRng, self->buffer,
+           SeosCryptoLib_Signature_sign(sigObj, self->rng, self->buffer,
                                         hashSize, signature, signatureSize);
 }
 
@@ -494,7 +494,7 @@ Signature_verify(
 
     return !PtrVector_hasPtr(&self->signatureObjects, sigObj) ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_Signature_verify(sigObj, &self->cryptoRng, hash, hashSize,
+           SeosCryptoLib_Signature_verify(sigObj, self->rng, hash, hashSize,
                                           signature, signatureSize);
 }
 
@@ -604,7 +604,7 @@ Agreement_agree(
 
     return !PtrVector_hasPtr(&self->agreementObjects, agrObj) ?
            SEOS_ERROR_INVALID_HANDLE :
-           SeosCryptoLib_Agreement_agree(agrObj, &self->cryptoRng, pubKey, shared,
+           SeosCryptoLib_Agreement_agree(agrObj, self->rng, pubKey, shared,
                                          sharedSize);
 }
 
@@ -629,7 +629,7 @@ Key_generate(
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((err = SeosCryptoLib_Key_generate(*pKeyObj, &self->memIf, &self->cryptoRng,
+    if ((err = SeosCryptoLib_Key_generate(*pKeyObj, &self->memIf, self->rng,
                                           spec)) != SEOS_SUCCESS)
     {
         goto err0;
@@ -1108,7 +1108,7 @@ SeosCryptoLib_init(
         goto err5;
     }
 
-    if ((err = SeosCryptoLib_Rng_init(&self->cryptoRng, &self->memIf,
+    if ((err = SeosCryptoLib_Rng_init(&self->rng, &self->memIf,
                                       (const SeosCryptoApi_Rng_EntropyFunc*)
                                       cfg->rng.entropy, cfg->rng.context)) != SEOS_SUCCESS)
     {
@@ -1144,7 +1144,7 @@ SeosCryptoLib_free(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    SeosCryptoLib_Rng_free(&self->cryptoRng, &self->memIf);
+    SeosCryptoLib_Rng_free(self->rng, &self->memIf);
 
     PtrVector_free(&self->agreementObjects);
     PtrVector_free(&self->signatureObjects);
