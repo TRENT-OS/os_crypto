@@ -624,27 +624,21 @@ Key_generate(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((*pKeyObj = self->memIf.malloc(sizeof(SeosCryptoLib_Key))) == NULL)
+    if ((err = SeosCryptoLib_Key_generate(pKeyObj, &self->memIf, self->rng,
+                                          spec)) != SEOS_SUCCESS)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return err;
     }
 
-    if ((err = SeosCryptoLib_Key_generate(*pKeyObj, &self->memIf, self->rng,
-                                          spec)) != SEOS_SUCCESS)
+    if ((err = PtrVector_add(&self->keyObjects, *pKeyObj)) != SEOS_SUCCESS)
     {
         goto err0;
     }
-    else if ((err = PtrVector_add(&self->keyObjects, *pKeyObj)) != SEOS_SUCCESS)
-    {
-        goto err1;
-    }
 
-    return err;
+    return SEOS_SUCCESS;
 
-err1:
-    SeosCryptoLib_Key_free(*pKeyObj, &self->memIf);
 err0:
-    self->memIf.free(*pKeyObj);
+    SeosCryptoLib_Key_free(*pKeyObj, &self->memIf);
 
     return err;
 }
@@ -663,27 +657,21 @@ Key_import(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((*pKeyObj = self->memIf.malloc(sizeof(SeosCryptoLib_Key))) == NULL)
+    if ((err = SeosCryptoLib_Key_import(pKeyObj, &self->memIf,
+                                        keyData)) != SEOS_SUCCESS)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return err;
     }
 
-    if ((err = SeosCryptoLib_Key_import(*pKeyObj, &self->memIf,
-                                        keyData)) != SEOS_SUCCESS)
+    if ((err = PtrVector_add(&self->keyObjects, *pKeyObj)) != SEOS_SUCCESS)
     {
         goto err0;
     }
-    else if ((err = PtrVector_add(&self->keyObjects, *pKeyObj)) != SEOS_SUCCESS)
-    {
-        goto err1;
-    }
 
-    return err;
+    return SEOS_SUCCESS;
 
-err1:
-    SeosCryptoLib_Key_free(*pKeyObj, &self->memIf);
 err0:
-    self->memIf.free(*pKeyObj);
+    SeosCryptoLib_Key_free(*pKeyObj, &self->memIf);
 
     return err;
 }
@@ -708,29 +696,62 @@ Key_makePublic(
         return SEOS_ERROR_INVALID_HANDLE;
     }
 
-    if ((*pPubKeyObj = self->memIf.malloc(sizeof(SeosCryptoLib_Key))) == NULL)
+    if ((err = SeosCryptoLib_Key_makePublic(pPubKeyObj, &self->memIf, prvKeyObj,
+                                            attribs)) != SEOS_SUCCESS)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return err;
     }
 
-    if ((err = SeosCryptoLib_Key_makePublic(*pPubKeyObj, &self->memIf, prvKeyObj,
-                                            attribs)) != SEOS_SUCCESS)
+    if ((err = PtrVector_add(&self->keyObjects, *pPubKeyObj)) != SEOS_SUCCESS)
     {
         goto err0;
     }
-    else if ((err = PtrVector_add(&self->keyObjects, *pPubKeyObj)) != SEOS_SUCCESS)
+
+    return SEOS_SUCCESS;
+
+err0:
+    SeosCryptoLib_Key_free(*pPubKeyObj, &self->memIf);
+
+    return err;
+}
+
+static seos_err_t
+Key_free(
+    void*              ctx,
+    SeosCryptoLib_Key* keyObj)
+{
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
+
+    if (NULL == ctx)
     {
-        goto err1;
+        return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return err;
+    if (!PtrVector_hasPtr(&self->keyObjects, keyObj))
+    {
+        return SEOS_ERROR_INVALID_HANDLE;
+    }
 
-err1:
-    SeosCryptoLib_Key_free(*pPubKeyObj, &self->memIf);
-err0:
-    self->memIf.free(*pPubKeyObj);
+    PtrVector_remove(&self->keyObjects, keyObj);
 
-    return err;
+    return SeosCryptoLib_Key_free(keyObj, &self->memIf);
+}
+
+static seos_err_t
+Key_exists(
+    void*                    ctx,
+    const SeosCryptoLib_Key* keyObj)
+{
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
+
+    if (NULL == ctx)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    return !PtrVector_hasPtr(&self->keyObjects, keyObj) ?
+           SEOS_ERROR_INVALID_HANDLE :
+           SEOS_SUCCESS;
 }
 
 static seos_err_t
@@ -809,50 +830,6 @@ Key_loadParams(
     }
 
     return SeosCryptoLib_Key_loadParams(name, keyParams, paramSize);
-}
-
-static seos_err_t
-Key_exists(
-    void*                    ctx,
-    const SeosCryptoLib_Key* keyObj)
-{
-    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
-
-    if (NULL == ctx)
-    {
-        return SEOS_ERROR_INVALID_PARAMETER;
-    }
-
-    return !PtrVector_hasPtr(&self->keyObjects, keyObj) ?
-           SEOS_ERROR_INVALID_HANDLE :
-           SEOS_SUCCESS;
-}
-
-static seos_err_t
-Key_free(
-    void*              ctx,
-    SeosCryptoLib_Key* keyObj)
-{
-    seos_err_t err = SEOS_SUCCESS;
-    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
-
-    if (NULL == ctx)
-    {
-        return SEOS_ERROR_INVALID_PARAMETER;
-    }
-
-    if (!PtrVector_hasPtr(&self->keyObjects, keyObj))
-    {
-        return SEOS_ERROR_INVALID_HANDLE;
-    }
-
-    if ((err = SeosCryptoLib_Key_free(keyObj, &self->memIf)) == SEOS_SUCCESS)
-    {
-        PtrVector_remove(&self->keyObjects, keyObj);
-        self->memIf.free(keyObj);
-    }
-
-    return err;
 }
 
 // ------------------------------ Cipher API -----------------------------------

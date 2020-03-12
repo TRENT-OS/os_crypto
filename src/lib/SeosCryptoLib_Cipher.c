@@ -3,7 +3,6 @@
  */
 
 #include "lib/SeosCryptoLib_Cipher.h"
-#include "lib/SeosCryptoLib_Key.h"
 
 #include "mbedtls/rsa.h"
 #include "mbedtls/aes.h"
@@ -132,7 +131,7 @@ setKeyImpl(
     case SeosCryptoApi_Cipher_ALG_AES_CBC_DEC:
     case SeosCryptoApi_Cipher_ALG_AES_GCM_ENC:
     case SeosCryptoApi_Cipher_ALG_AES_GCM_DEC:
-        if (SeosCryptoApi_Key_TYPE_AES != self->key->type ||
+        if (SeosCryptoLib_Key_getType(self->key) != SeosCryptoApi_Key_TYPE_AES ||
             (aesKey = SeosCryptoLib_Key_getAes(self->key)) == NULL)
         {
             return SEOS_ERROR_INVALID_PARAMETER;

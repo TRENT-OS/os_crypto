@@ -12,8 +12,10 @@
 
 #pragma once
 
-#include "SeosCryptoLib.h"
+#include "SeosCryptoApi.h"
+
 #include "lib/SeosCryptoLib_Rng.h"
+#include "lib/SeosCryptoLib_Key.h"
 
 #include <stddef.h>
 
@@ -28,7 +30,7 @@ SeosCryptoLib_Agreement_init(
     SeosCryptoLib_Agreement**         self,
     const SeosCryptoApi_MemIf*        memIf,
     const SeosCryptoApi_Agreement_Alg algorithm,
-    const SeosCryptoLib_Key*          privateKey);
+    const SeosCryptoLib_Key*          prvKey);
 
 seos_err_t
 SeosCryptoLib_Agreement_agree(

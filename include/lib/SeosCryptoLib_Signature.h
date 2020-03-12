@@ -15,6 +15,7 @@
 #include "SeosCryptoApi.h"
 
 #include "lib/SeosCryptoLib_Rng.h"
+#include "lib/SeosCryptoLib_Key.h"
 
 #include <stddef.h>
 

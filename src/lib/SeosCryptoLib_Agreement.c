@@ -4,7 +4,6 @@
 
 #include "lib/SeosCryptoLib_Agreement.h"
 #include "lib/SeosCryptoLib_Rng.h"
-#include "lib/SeosCryptoLib_Key.h"
 
 #include "mbedtls/dhm.h"
 #include "mbedtls/ecdh.h"
@@ -104,12 +103,14 @@ setKeyImpl(
     switch (self->algorithm)
     {
     case SeosCryptoApi_Agreement_ALG_DH:
-        err = (self->prvKey->type != SeosCryptoApi_Key_TYPE_DH_PRV) ?
+        err = (SeosCryptoLib_Key_getType(self->prvKey)
+               != SeosCryptoApi_Key_TYPE_DH_PRV) ?
               SEOS_ERROR_INVALID_PARAMETER :
               SeosCryptoLib_Key_writeDhPrv(self->prvKey, &self->mbedtls.dh);
         break;
     case SeosCryptoApi_Agreement_ALG_ECDH:
-        err = (self->prvKey->type != SeosCryptoApi_Key_TYPE_SECP256R1_PRV) ?
+        err = (SeosCryptoLib_Key_getType(self->prvKey)
+               != SeosCryptoApi_Key_TYPE_SECP256R1_PRV) ?
               SEOS_ERROR_INVALID_PARAMETER :
               SeosCryptoLib_Key_writeSecp256r1Prv(self->prvKey, &self->mbedtls.ecdh);
         break;
@@ -134,7 +135,7 @@ agreeImpl(
     switch (self->algorithm)
     {
     case SeosCryptoApi_Agreement_ALG_DH:
-        if ((pubKey->type != SeosCryptoApi_Key_TYPE_DH_PUB)
+        if ((SeosCryptoLib_Key_getType(pubKey) != SeosCryptoApi_Key_TYPE_DH_PUB)
             || SeosCryptoLib_Key_writeDhPub(pubKey, &self->mbedtls.dh) != SEOS_SUCCESS)
         {
             err = SEOS_ERROR_INVALID_PARAMETER;
@@ -152,7 +153,7 @@ agreeImpl(
         }
         break;
     case SeosCryptoApi_Agreement_ALG_ECDH:
-        if ((pubKey->type != SeosCryptoApi_Key_TYPE_SECP256R1_PUB)
+        if ((SeosCryptoLib_Key_getType(pubKey) != SeosCryptoApi_Key_TYPE_SECP256R1_PUB)
             || SeosCryptoLib_Key_writeSecp256r1Pub(pubKey,
                                                    &self->mbedtls.ecdh) != SEOS_SUCCESS)
         {

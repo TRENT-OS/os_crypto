@@ -14,6 +14,8 @@
 
 #include "SeosCryptoApi.h"
 
+#include "lib/SeosCryptoLib_Key.h"
+
 #include <stddef.h>
 
 // Exported types/defines/enums ------------------------------------------------

@@ -386,17 +386,17 @@ seos_err_t
 SeosCryptoApi_Signature_init(
     SeosCryptoApi_SignatureH*         hSig,
     const SeosCryptoApiH              self,
-    const SeosCryptoApi_Signature_Alg algorithm,
-    const SeosCryptoApi_Digest_Alg    digest,
-    const SeosCryptoApi_Key*          prPrvKey,
-    const SeosCryptoApi_Key*          prPubKey)
+    const SeosCryptoApi_KeyH          hPrvKey,
+    const SeosCryptoApi_KeyH          hPubKey,
+    const SeosCryptoApi_Signature_Alg sigAlgorithm,
+    const SeosCryptoApi_Digest_Alg    digAlgorithm)
 {
     seos_err_t err;
 
     PROXY_INIT(*hSig, self);
     if ((err = PROXY_CALL(*hSig, Signature_init, PROXY_GET_SIG_PTR(*hSig),
-                          algorithm, digest,
-                          GET_OBJ(prPrvKey, key), GET_OBJ(prPubKey, key))) != SEOS_SUCCESS)
+                          sigAlgorithm, digAlgorithm,
+                          PROXY_GET_OBJ(hPrvKey), PROXY_GET_OBJ(hPubKey))) != SEOS_SUCCESS)
     {
         PROXY_FREE(*hSig);
     }
@@ -446,14 +446,14 @@ seos_err_t
 SeosCryptoApi_Agreement_init(
     SeosCryptoApi_AgreementH*         hAgree,
     const SeosCryptoApiH              self,
-    const SeosCryptoApi_Agreement_Alg algorithm,
-    const SeosCryptoApi_Key*          prPrvKey)
+    const SeosCryptoApi_KeyH          hPrvKey,
+    const SeosCryptoApi_Agreement_Alg algorithm)
 {
     seos_err_t err;
 
     PROXY_INIT(*hAgree, self);
     if ((err = PROXY_CALL(*hAgree, Agreement_init, PROXY_GET_AGREE_PTR(*hAgree),
-                          algorithm, GET_OBJ(prPrvKey, key))) != SEOS_SUCCESS)
+                          algorithm, PROXY_GET_OBJ(hPrvKey))) != SEOS_SUCCESS)
     {
         PROXY_FREE(*hAgree);
     }
@@ -476,78 +476,102 @@ SeosCryptoApi_Agreement_free(
 seos_err_t
 SeosCryptoApi_Agreement_agree(
     SeosCryptoApi_AgreementH hAgree,
-    const SeosCryptoApi_Key* prPubKey,
+    const SeosCryptoApi_KeyH hPubKey,
     void*                    shared,
     size_t*                  sharedSize)
 {
     return PROXY_CALL(hAgree, Agreement_agree, PROXY_GET_OBJ(hAgree),
-                      GET_OBJ(prPubKey, key), shared, sharedSize);
+                      PROXY_GET_OBJ(hPubKey), shared, sharedSize);
 }
 
 // -------------------------------- Key API ------------------------------------
 
 seos_err_t
 SeosCryptoApi_Key_generate(
-    SeosCryptoApiH                self,
-    SeosCryptoApi_Key*            prKey,
+    SeosCryptoApi_KeyH*           hKey,
+    const SeosCryptoApiH          self,
     const SeosCryptoApi_Key_Spec* spec)
 {
-    INIT_PROXY(prKey, self);
-    return CALL_IMPL(prKey, Key_generate, &prKey->key, spec);
+    seos_err_t err;
+
+    PROXY_INIT(*hKey, self);
+    if ((err = PROXY_CALL(*hKey, Key_generate, PROXY_GET_KEY_PTR(*hKey),
+                          spec)) != SEOS_SUCCESS)
+    {
+        PROXY_FREE(*hKey);
+    }
+
+    return err;
 }
 
 seos_err_t
 SeosCryptoApi_Key_import(
-    SeosCryptoApiH                self,
-    SeosCryptoApi_Key*            prKey,
+    SeosCryptoApi_KeyH*           hKey,
+    const SeosCryptoApiH          self,
     const SeosCryptoApi_Key_Data* keyData)
 {
-    INIT_PROXY(prKey, self);
-    return CALL_IMPL(prKey, Key_import, &prKey->key, keyData);
+    seos_err_t err;
+
+    PROXY_INIT(*hKey, self);
+    if ((err = PROXY_CALL(*hKey, Key_import, PROXY_GET_KEY_PTR(*hKey),
+                          keyData)) != SEOS_SUCCESS)
+    {
+        PROXY_FREE(*hKey);
+    }
+
+    return err;
 }
 
 seos_err_t
 SeosCryptoApi_Key_makePublic(
-    SeosCryptoApi_Key*               prKey,
-    const SeosCryptoApi_Key*         prPrvKey,
+    SeosCryptoApi_KeyH*              hPubKey,
+    const SeosCryptoApiH             self,
+    const SeosCryptoApi_KeyH         hPrvKey,
     const SeosCryptoApi_Key_Attribs* attribs)
 {
-    INIT_PROXY(prKey, prPrvKey);
-    return CALL_IMPL(prKey, Key_makePublic, &prKey->key, GET_OBJ(prPrvKey, key),
-                     attribs);
-}
+    seos_err_t err;
 
-seos_err_t
-SeosCryptoApi_Key_export(
-    const SeosCryptoApi_Key* prKey,
-    SeosCryptoApi_Key_Data*  keyData)
-{
-    return CALL_IMPL(prKey, Key_export, GET_OBJ(prKey, key), keyData);
-}
+    PROXY_INIT(*hPubKey, self);
+    if ((err = PROXY_CALL(*hPubKey, Key_makePublic, PROXY_GET_KEY_PTR(*hPubKey),
+                          PROXY_GET_OBJ(hPrvKey), attribs)) != SEOS_SUCCESS)
+    {
+        PROXY_FREE(*hPubKey);
+    }
 
-seos_err_t
-SeosCryptoApi_Key_getParams(
-    const SeosCryptoApi_Key* prKey,
-    void*                    keyParams,
-    size_t*                  paramSize)
-{
-    return CALL_IMPL(prKey, Key_getParams, GET_OBJ(prKey, key), keyParams,
-                     paramSize);
-}
-
-seos_err_t
-SeosCryptoApi_Key_getAttribs(
-    const SeosCryptoApi_Key*   prKey,
-    SeosCryptoApi_Key_Attribs* attribs)
-{
-    return CALL_IMPL(prKey, Key_getAttribs, GET_OBJ(prKey, key), attribs);
+    return err;
 }
 
 seos_err_t
 SeosCryptoApi_Key_free(
-    SeosCryptoApi_Key* prKey)
+    SeosCryptoApi_KeyH hKey)
 {
-    return CALL_IMPL(prKey, Key_free, GET_OBJ(prKey, key));
+    return PROXY_CALL(hKey, Key_free, PROXY_GET_OBJ(hKey));
+}
+
+seos_err_t
+SeosCryptoApi_Key_export(
+    const SeosCryptoApi_KeyH hKey,
+    SeosCryptoApi_Key_Data*  keyData)
+{
+    return PROXY_CALL(hKey, Key_export, PROXY_GET_OBJ(hKey), keyData);
+}
+
+seos_err_t
+SeosCryptoApi_Key_getParams(
+    const SeosCryptoApi_KeyH hKey,
+    void*                    keyParams,
+    size_t*                  paramSize)
+{
+    return PROXY_CALL(hKey, Key_getParams, PROXY_GET_OBJ(hKey), keyParams,
+                      paramSize);
+}
+
+seos_err_t
+SeosCryptoApi_Key_getAttribs(
+    const SeosCryptoApi_KeyH   hKey,
+    SeosCryptoApi_Key_Attribs* attribs)
+{
+    return PROXY_CALL(hKey, Key_getAttribs, PROXY_GET_OBJ(hKey), attribs);
 }
 
 seos_err_t
@@ -566,8 +590,8 @@ seos_err_t
 SeosCryptoApi_Cipher_init(
     SeosCryptoApi_CipherH*         hCipher,
     const SeosCryptoApiH           self,
+    const SeosCryptoApi_KeyH       hKey,
     const SeosCryptoApi_Cipher_Alg algorithm,
-    const SeosCryptoApi_Key*       prKey,
     const void*                    iv,
     const size_t                   ivSize)
 {
@@ -575,7 +599,7 @@ SeosCryptoApi_Cipher_init(
 
     PROXY_INIT(*hCipher, self);
     if ((err = PROXY_CALL(*hCipher, Cipher_init, PROXY_GET_CIPHER_PTR(*hCipher),
-                          algorithm, GET_OBJ(prKey, key), iv, ivSize)) != SEOS_SUCCESS)
+                          algorithm, PROXY_GET_OBJ(hKey), iv, ivSize)) != SEOS_SUCCESS)
     {
         PROXY_FREE(*hCipher);
     }

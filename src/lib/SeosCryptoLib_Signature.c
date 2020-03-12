@@ -3,8 +3,6 @@
  */
 
 #include "lib/SeosCryptoLib_Signature.h"
-#include "lib/SeosCryptoLib_Rng.h"
-#include "lib/SeosCryptoLib_Key.h"
 
 #include <stdbool.h>
 
@@ -132,7 +130,7 @@ setKeyImpl(
     case SeosCryptoApi_Signature_ALG_RSA_PKCS1_V21:
         if (NULL != self->pubKey)
         {
-            if (self->pubKey->type != SeosCryptoApi_Key_TYPE_RSA_PUB)
+            if (SeosCryptoLib_Key_getType(self->pubKey) != SeosCryptoApi_Key_TYPE_RSA_PUB)
             {
                 return SEOS_ERROR_INVALID_PARAMETER;
             }
@@ -140,7 +138,7 @@ setKeyImpl(
         }
         if (SEOS_SUCCESS == err && NULL != self->prvKey)
         {
-            if (self->prvKey->type != SeosCryptoApi_Key_TYPE_RSA_PRV)
+            if (SeosCryptoLib_Key_getType(self->prvKey) != SeosCryptoApi_Key_TYPE_RSA_PRV)
             {
                 return SEOS_ERROR_INVALID_PARAMETER;
             }
