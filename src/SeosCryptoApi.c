@@ -525,52 +525,64 @@ SeosCryptoApi_Key_loadParams(
 
 seos_err_t
 SeosCryptoApi_Cipher_init(
-    SeosCryptoApiH                 self,
-    SeosCryptoApi_Cipher*          prCipher,
+    SeosCryptoApi_CipherH*         hCipher,
+    const SeosCryptoApiH           self,
     const SeosCryptoApi_Cipher_Alg algorithm,
     const SeosCryptoApi_Key*       prKey,
     const void*                    iv,
     const size_t                   ivSize)
 {
-    INIT_PROXY(prCipher, self);
-    return CALL_IMPL(prCipher, Cipher_init, &prCipher->cipher, algorithm,
-                     GET_OBJ(prKey, key), iv, ivSize);
+    seos_err_t err;
+
+    PROXY_INIT(*hCipher, self);
+    if ((err = PROXY_CALL(*hCipher, Cipher_init, PROXY_GET_CIPHER_PTR(*hCipher),
+                          algorithm, GET_OBJ(prKey, key), iv, ivSize)) != SEOS_SUCCESS)
+    {
+        PROXY_FREE(*hCipher);
+    }
+
+    return err;
 }
 
 seos_err_t
 SeosCryptoApi_Cipher_free(
-    SeosCryptoApi_Cipher* prCipher)
+    SeosCryptoApi_CipherH hCipher)
 {
-    return CALL_IMPL(prCipher, Cipher_free, GET_OBJ(prCipher, cipher));
+    seos_err_t err;
+
+    err = PROXY_CALL(hCipher, Cipher_free, PROXY_GET_OBJ(hCipher));
+    PROXY_FREE(hCipher);
+
+    return err;
 }
 
 seos_err_t
 SeosCryptoApi_Cipher_process(
-    SeosCryptoApi_Cipher* prCipher,
+    SeosCryptoApi_CipherH hCipher,
     const void*           input,
     const size_t          inputSize,
     void*                 output,
     size_t*               outputSize)
 {
-    return CALL_IMPL(prCipher, Cipher_process, GET_OBJ(prCipher, cipher), input,
-                     inputSize, output, outputSize);
+    return PROXY_CALL(hCipher, Cipher_process, PROXY_GET_OBJ(hCipher), input,
+                      inputSize, output, outputSize);
 }
 
 seos_err_t
 SeosCryptoApi_Cipher_start(
-    SeosCryptoApi_Cipher* prCipher,
+    SeosCryptoApi_CipherH hCipher,
     const void*           ad,
     const size_t          adSize)
 {
-    return CALL_IMPL(prCipher, Cipher_start, GET_OBJ(prCipher, cipher), ad, adSize);
+    return PROXY_CALL(hCipher, Cipher_start, PROXY_GET_OBJ(hCipher), ad, adSize);
 }
 
 seos_err_t
 SeosCryptoApi_Cipher_finalize(
-    SeosCryptoApi_Cipher* prCipher,
+    SeosCryptoApi_CipherH hCipher,
     void*                 output,
     size_t*               outputSize)
 {
-    return CALL_IMPL(prCipher, Cipher_finalize, GET_OBJ(prCipher, cipher), output,
-                     outputSize);
+    return PROXY_CALL(hCipher, Cipher_finalize, PROXY_GET_OBJ(hCipher), output,
+                      outputSize);
 }

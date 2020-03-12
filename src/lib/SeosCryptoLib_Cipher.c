@@ -5,40 +5,86 @@
 #include "lib/SeosCryptoLib_Cipher.h"
 #include "lib/SeosCryptoLib_Key.h"
 
+#include "mbedtls/rsa.h"
+#include "mbedtls/aes.h"
+#include "mbedtls/gcm.h"
+
+#include <stdbool.h>
 #include <string.h>
+
+// Internal types/defines/enums ------------------------------------------------
+
+struct SeosCryptoLib_Cipher
+{
+    union
+    {
+        mbedtls_aes_context aes;
+        mbedtls_rsa_context rsa;
+        mbedtls_gcm_context gcm;
+    }
+    mbedtls;
+    SeosCryptoApi_Cipher_Alg algorithm;
+    const SeosCryptoLib_Key* key;
+    uint8_t iv[SeosCryptoApi_Cipher_SIZE_AES_BLOCK];
+    size_t ivLen;
+    size_t inputLen;
+    bool started;
+    bool processed;
+    bool finalized;
+};
 
 // Private static functions ----------------------------------------------------
 
 static seos_err_t
 initImpl(
-    SeosCryptoLib_Cipher*      self,
-    const SeosCryptoApi_MemIf* memIf)
+    SeosCryptoLib_Cipher**         self,
+    const SeosCryptoApi_MemIf*     memIf,
+    const SeosCryptoApi_Cipher_Alg algorithm,
+    const SeosCryptoLib_Key*       key)
 {
-    UNUSED_VAR(memIf);
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    SeosCryptoLib_Cipher* ciph;
+    seos_err_t err;
 
-    switch (self->algorithm)
+    if ((ciph = memIf->malloc(sizeof(SeosCryptoLib_Cipher))) == NULL)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
+
+    memset(ciph, 0, sizeof(SeosCryptoLib_Cipher));
+    ciph->algorithm  = algorithm;
+    ciph->key        = key;
+    ciph->inputLen   = 0;
+    // Use these to keep track that everything is being called in proper order
+    ciph->started    = false;
+    ciph->processed  = false;
+    ciph->finalized  = false;
+
+    err = SEOS_SUCCESS;
+    switch (ciph->algorithm)
     {
     case SeosCryptoApi_Cipher_ALG_AES_CBC_ENC:
     case SeosCryptoApi_Cipher_ALG_AES_CBC_DEC:
-        mbedtls_aes_init(&self->mbedtls.aes);
-        err = SEOS_SUCCESS;
+        mbedtls_aes_init(&ciph->mbedtls.aes);
         break;
-
     case SeosCryptoApi_Cipher_ALG_AES_ECB_ENC:
     case SeosCryptoApi_Cipher_ALG_AES_ECB_DEC:
-        mbedtls_aes_init(&self->mbedtls.aes);
-        err = SEOS_SUCCESS;
+        mbedtls_aes_init(&ciph->mbedtls.aes);
         break;
-
     case SeosCryptoApi_Cipher_ALG_AES_GCM_DEC:
     case SeosCryptoApi_Cipher_ALG_AES_GCM_ENC:
-        mbedtls_gcm_init(&self->mbedtls.gcm);
-        err = SEOS_SUCCESS;
+        mbedtls_gcm_init(&ciph->mbedtls.gcm);
         break;
     default:
         err = SEOS_ERROR_NOT_SUPPORTED;
     }
+
+    if (err != SEOS_SUCCESS)
+    {
+        memIf->free(ciph);
+    }
+
+    *self = ciph;
+
     return err;
 }
 
@@ -47,9 +93,9 @@ freeImpl(
     SeosCryptoLib_Cipher*      self,
     const SeosCryptoApi_MemIf* memIf)
 {
-    UNUSED_VAR(memIf);
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    seos_err_t err;
 
+    err = SEOS_SUCCESS;
     switch (self->algorithm)
     {
     case SeosCryptoApi_Cipher_ALG_AES_ECB_ENC:
@@ -57,17 +103,16 @@ freeImpl(
     case SeosCryptoApi_Cipher_ALG_AES_CBC_ENC:
     case SeosCryptoApi_Cipher_ALG_AES_CBC_DEC:
         mbedtls_aes_free(&self->mbedtls.aes);
-        err = SEOS_SUCCESS;
         break;
     case SeosCryptoApi_Cipher_ALG_AES_GCM_DEC:
     case SeosCryptoApi_Cipher_ALG_AES_GCM_ENC:
         mbedtls_gcm_free(&self->mbedtls.gcm);
-        err = SEOS_SUCCESS;
         break;
     default:
         err = SEOS_ERROR_NOT_SUPPORTED;
-        break;
     }
+
+    memIf->free(self);
 
     return err;
 }
@@ -351,7 +396,7 @@ finalizeImpl(
 
 seos_err_t
 SeosCryptoLib_Cipher_init(
-    SeosCryptoLib_Cipher*          self,
+    SeosCryptoLib_Cipher**         self,
     const SeosCryptoApi_MemIf*     memIf,
     const SeosCryptoApi_Cipher_Alg algorithm,
     const SeosCryptoLib_Key*       key,
@@ -365,31 +410,15 @@ SeosCryptoLib_Cipher_init(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    memset(self, 0, sizeof(*self));
-
-    self->algorithm  = algorithm;
-    self->key        = key;
-    self->inputLen   = 0;
-    // Use these to keep track that everything is being called in proper order
-    self->started    = false;
-    self->processed  = false;
-    self->finalized  = false;
-
-    if ((err = initImpl(self, memIf)) != SEOS_SUCCESS)
+    if ((err = initImpl(self, memIf, algorithm, key)) == SEOS_SUCCESS)
     {
-        return err;
+        if ((err = setIvImpl(*self, iv, ivSize)) != SEOS_SUCCESS
+            || (err = setKeyImpl(*self)) != SEOS_SUCCESS)
+        {
+            freeImpl(*self, memIf);
+        }
     }
 
-    if ((err = setIvImpl(self, iv, ivSize)) != SEOS_SUCCESS
-        || (err = setKeyImpl(self)) != SEOS_SUCCESS)
-    {
-        goto err0;
-    }
-
-    return SEOS_SUCCESS;
-
-err0:
-    freeImpl(self, memIf);
     return err;
 }
 

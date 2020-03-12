@@ -916,30 +916,45 @@ Cipher_init(
         return SEOS_ERROR_INVALID_HANDLE;
     }
 
-    if ((*pCipherObj = self->memIf.malloc(sizeof(SeosCryptoLib_Cipher))) ==  NULL)
+    if ((err = SeosCryptoLib_Cipher_init(pCipherObj, &self->memIf, algorithm, key,
+                                         iv, ivSize)) != SEOS_SUCCESS)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return err;
     }
 
-    if ((err = SeosCryptoLib_Cipher_init(*pCipherObj, &self->memIf, algorithm, key,
-                                         iv, ivSize)) != SEOS_SUCCESS)
+    if ((err = PtrVector_add(&self->cipherObjects, *pCipherObj)) != SEOS_SUCCESS)
     {
         goto err0;
     }
-    else if ((err = PtrVector_add(&self->cipherObjects,
-                                  *pCipherObj)) != SEOS_SUCCESS)
+
+    return SEOS_SUCCESS;
+
+err0:
+    SeosCryptoLib_Cipher_free(*pCipherObj, &self->memIf);
+
+    return err;
+}
+
+static seos_err_t
+Cipher_free(
+    void*                 ctx,
+    SeosCryptoLib_Cipher* cipherObj)
+{
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
+
+    if (NULL == ctx)
     {
-        goto err1;
+        return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return err;
+    if (!PtrVector_hasPtr(&self->cipherObjects, cipherObj))
+    {
+        return SEOS_ERROR_INVALID_HANDLE;
+    }
 
-err1:
-    SeosCryptoLib_Cipher_free(*pCipherObj, &self->memIf);
-err0:
-    self->memIf.free(*pCipherObj);
+    PtrVector_remove(&self->cipherObjects, cipherObj);
 
-    return err;
+    return SeosCryptoLib_Cipher_free(cipherObj, &self->memIf);
 }
 
 static seos_err_t
@@ -957,33 +972,6 @@ Cipher_exists(
     return !PtrVector_hasPtr(&self->cipherObjects, cipherObj) ?
            SEOS_ERROR_INVALID_HANDLE :
            SEOS_SUCCESS;
-}
-
-static seos_err_t
-Cipher_free(
-    void*                 ctx,
-    SeosCryptoLib_Cipher* cipherObj)
-{
-    seos_err_t err = SEOS_ERROR_GENERIC;
-    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
-
-    if (NULL == ctx)
-    {
-        return SEOS_ERROR_INVALID_PARAMETER;
-    }
-
-    if (!PtrVector_hasPtr(&self->cipherObjects, cipherObj))
-    {
-        return SEOS_ERROR_INVALID_HANDLE;
-    }
-
-    if ((err = SeosCryptoLib_Cipher_free(cipherObj, &self->memIf)) == SEOS_SUCCESS)
-    {
-        PtrVector_remove(&self->cipherObjects, cipherObj);
-        self->memIf.free(cipherObj);
-    }
-
-    return err;
 }
 
 static seos_err_t

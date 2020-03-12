@@ -14,40 +14,17 @@
 
 #include "SeosCryptoApi.h"
 
-#include "mbedtls/rsa.h"
-#include "mbedtls/aes.h"
-#include "mbedtls/gcm.h"
-
-#include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
 
-// Internal types/defines/enums ------------------------------------------------
+// Exported types/defines/enums ------------------------------------------------
 
-struct SeosCryptoLib_Cipher
-{
-    union
-    {
-        mbedtls_aes_context aes;
-        mbedtls_rsa_context rsa;
-        mbedtls_gcm_context gcm;
-    }
-    mbedtls;
-    SeosCryptoApi_Cipher_Alg algorithm;
-    const SeosCryptoLib_Key* key;
-    uint8_t iv[SeosCryptoApi_Cipher_SIZE_AES_BLOCK];
-    size_t ivLen;
-    size_t inputLen;
-    bool started;
-    bool processed;
-    bool finalized;
-};
+typedef struct SeosCryptoLib_Cipher SeosCryptoLib_Cipher;
 
-// Internal functions ----------------------------------------------------------
+// Exported functions ----------------------------------------------------------
 
 seos_err_t
 SeosCryptoLib_Cipher_init(
-    SeosCryptoLib_Cipher*          self,
+    SeosCryptoLib_Cipher**         self,
     const SeosCryptoApi_MemIf*     memIf,
     const SeosCryptoApi_Cipher_Alg algorithm,
     const SeosCryptoLib_Key*       key,
