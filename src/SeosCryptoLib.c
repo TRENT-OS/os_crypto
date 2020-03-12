@@ -244,29 +244,45 @@ Digest_init(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((*pDigObj = self->memIf.malloc(sizeof(SeosCryptoLib_Digest))) == NULL)
+    if ((err = SeosCryptoLib_Digest_init(pDigObj, &self->memIf,
+                                         algorithm)) != SEOS_SUCCESS)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return err;
     }
 
-    if ((err = SeosCryptoLib_Digest_init(*pDigObj, &self->memIf,
-                                         algorithm)) != SEOS_SUCCESS)
+    if ((err = PtrVector_add(&self->digestObjects, *pDigObj)) != SEOS_SUCCESS)
     {
         goto err0;
     }
-    else if ((err = PtrVector_add(&self->digestObjects, *pDigObj)) != SEOS_SUCCESS)
+
+    return SEOS_SUCCESS;
+
+err0:
+    SeosCryptoLib_Digest_free(*pDigObj, &self->memIf);
+
+    return err;
+}
+
+static seos_err_t
+Digest_free(
+    void*                 ctx,
+    SeosCryptoLib_Digest* digObj)
+{
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
+
+    if (NULL == ctx)
     {
-        goto err1;
+        return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return err;
+    if (!PtrVector_hasPtr(&self->digestObjects, digObj))
+    {
+        return SEOS_ERROR_INVALID_HANDLE;
+    }
 
-err1:
-    SeosCryptoLib_Digest_free(*pDigObj, &self->memIf);
-err0:
-    self->memIf.free(*pDigObj);
+    PtrVector_remove(&self->digestObjects, digObj);
 
-    return err;
+    return SeosCryptoLib_Digest_free(digObj, &self->memIf);
 }
 
 static seos_err_t
@@ -284,33 +300,6 @@ Digest_exists(
     return !PtrVector_hasPtr(&self->digestObjects, digestObj) ?
            SEOS_ERROR_INVALID_HANDLE :
            SEOS_SUCCESS;
-}
-
-static seos_err_t
-Digest_free(
-    void*                 ctx,
-    SeosCryptoLib_Digest* digObj)
-{
-    seos_err_t err = SEOS_ERROR_GENERIC;
-    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
-
-    if (NULL == ctx)
-    {
-        return SEOS_ERROR_INVALID_PARAMETER;
-    }
-
-    if (!PtrVector_hasPtr(&self->digestObjects, digObj))
-    {
-        return SEOS_ERROR_INVALID_HANDLE;
-    }
-
-    if ((err = SeosCryptoLib_Digest_free(digObj, &self->memIf)) == SEOS_SUCCESS)
-    {
-        PtrVector_remove(&self->digestObjects, digObj);
-        self->memIf.free(digObj);
-    }
-
-    return err;
 }
 
 static seos_err_t

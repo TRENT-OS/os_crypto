@@ -310,48 +310,61 @@ SeosCryptoApi_Mac_finalize(
 
 seos_err_t
 SeosCryptoApi_Digest_init(
-    SeosCryptoApiH                 self,
-    SeosCryptoApi_Digest*          prDigest,
+    SeosCryptoApi_DigestH*         hDigest,
+    const SeosCryptoApiH           self,
     const SeosCryptoApi_Digest_Alg algorithm)
 {
-    INIT_PROXY(prDigest, self);
-    return CALL_IMPL(prDigest, Digest_init, &prDigest->digest, algorithm);
+    seos_err_t err;
+
+    PROXY_INIT(*hDigest, self);
+    if ((err = PROXY_CALL(*hDigest, Digest_init, PROXY_GET_DIGEST_PTR(*hDigest),
+                          algorithm)) != SEOS_SUCCESS)
+    {
+        PROXY_FREE(*hDigest);
+    }
+
+    return err;
 }
 
 seos_err_t
 SeosCryptoApi_Digest_free(
-    SeosCryptoApi_Digest* prDigest)
+    SeosCryptoApi_DigestH hDigest)
 {
-    return CALL_IMPL(prDigest, Digest_free, GET_OBJ(prDigest, digest));
+    seos_err_t err;
+
+    err = PROXY_CALL(hDigest, Digest_free, PROXY_GET_OBJ(hDigest));
+    PROXY_FREE(hDigest);
+
+    return err;
 }
 
 seos_err_t
 SeosCryptoApi_Digest_clone(
-    SeosCryptoApi_Digest*       prDigest,
-    const SeosCryptoApi_Digest* prSrcDigest)
+    SeosCryptoApi_DigestH       hDstDigest,
+    const SeosCryptoApi_DigestH hSrcDigest)
 {
-    return CALL_IMPL(prDigest, Digest_clone, GET_OBJ(prDigest, digest),
-                     GET_OBJ(prSrcDigest, digest));
+    return PROXY_CALL(hDstDigest, Digest_clone, PROXY_GET_OBJ(hDstDigest),
+                      PROXY_GET_OBJ(hSrcDigest));
 }
 
 seos_err_t
 SeosCryptoApi_Digest_process(
-    SeosCryptoApi_Digest* prDigest,
+    SeosCryptoApi_DigestH hDigest,
     const void*           data,
     const size_t          dataSize)
 {
-    return CALL_IMPL(prDigest, Digest_process, GET_OBJ(prDigest, digest), data,
-                     dataSize);
+    return PROXY_CALL(hDigest, Digest_process, PROXY_GET_OBJ(hDigest), data,
+                      dataSize);
 }
 
 seos_err_t
 SeosCryptoApi_Digest_finalize(
-    SeosCryptoApi_Digest* prDigest,
+    SeosCryptoApi_DigestH hDigest,
     void*                 digest,
     size_t*               digestSize)
 {
-    return CALL_IMPL(prDigest, Digest_finalize, GET_OBJ(prDigest, digest), digest,
-                     digestSize);
+    return PROXY_CALL(hDigest, Digest_finalize, PROXY_GET_OBJ(hDigest), digest,
+                      digestSize);
 }
 
 // ----------------------------- Signature API ---------------------------------
