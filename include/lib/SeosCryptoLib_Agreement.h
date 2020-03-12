@@ -12,33 +12,20 @@
 
 #pragma once
 
-#include "SeosCryptoApi.h"
+#include "SeosCryptoLib.h"
 #include "lib/SeosCryptoLib_Rng.h"
-
-#include "mbedtls/dhm.h"
-#include "mbedtls/ecdh.h"
 
 #include <stddef.h>
 
-// Internal types/defines/enums ------------------------------------------------
+// Exported types/defines/enums ------------------------------------------------
 
-struct SeosCryptoLib_Agreement
-{
-    union
-    {
-        mbedtls_dhm_context dh;
-        mbedtls_ecdh_context ecdh;
-    }
-    mbedtls;
-    SeosCryptoApi_Agreement_Alg algorithm;
-    const SeosCryptoLib_Key* prvKey;
-};
+typedef struct SeosCryptoLib_Agreement SeosCryptoLib_Agreement;
 
-// Internal functions ----------------------------------------------------------
+// Exported functions ----------------------------------------------------------
 
 seos_err_t
 SeosCryptoLib_Agreement_init(
-    SeosCryptoLib_Agreement*          self,
+    SeosCryptoLib_Agreement**         self,
     const SeosCryptoApi_MemIf*        memIf,
     const SeosCryptoApi_Agreement_Alg algorithm,
     const SeosCryptoLib_Key*          privateKey);

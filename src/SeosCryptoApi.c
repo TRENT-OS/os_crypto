@@ -405,32 +405,44 @@ SeosCryptoApi_Signature_verify(
 
 seos_err_t
 SeosCryptoApi_Agreement_init(
-    SeosCryptoApiH                    self,
-    SeosCryptoApi_Agreement*          prAgr,
+    SeosCryptoApi_AgreementH*         hAgree,
+    const SeosCryptoApiH              self,
     const SeosCryptoApi_Agreement_Alg algorithm,
     const SeosCryptoApi_Key*          prPrvKey)
 {
-    INIT_PROXY(prAgr, self);
-    return CALL_IMPL(prAgr, Agreement_init, &prAgr->agreement, algorithm,
-                     GET_OBJ(prPrvKey, key));
+    seos_err_t err;
+
+    PROXY_INIT(*hAgree, self);
+    if ((err = PROXY_CALL(*hAgree, Agreement_init, PROXY_GET_AGREE_PTR(*hAgree),
+                          algorithm, GET_OBJ(prPrvKey, key))) != SEOS_SUCCESS)
+    {
+        PROXY_FREE(*hAgree);
+    }
+
+    return err;
 }
 
 seos_err_t
 SeosCryptoApi_Agreement_free(
-    SeosCryptoApi_Agreement* prAgr)
+    SeosCryptoApi_AgreementH hAgree)
 {
-    return CALL_IMPL(prAgr, Agreement_free, GET_OBJ(prAgr, agreement));
+    seos_err_t err;
+
+    err = PROXY_CALL(hAgree, Agreement_free, PROXY_GET_OBJ(hAgree));
+    PROXY_FREE(hAgree);
+
+    return err;
 }
 
 seos_err_t
 SeosCryptoApi_Agreement_agree(
-    SeosCryptoApi_Agreement* prAgr,
+    SeosCryptoApi_AgreementH hAgree,
     const SeosCryptoApi_Key* prPubKey,
     void*                    shared,
     size_t*                  sharedSize)
 {
-    return CALL_IMPL(prAgr, Agreement_agree, GET_OBJ(prAgr, agreement),
-                     GET_OBJ(prPubKey, key), shared, sharedSize);
+    return PROXY_CALL(hAgree, Agreement_agree, PROXY_GET_OBJ(hAgree),
+                      GET_OBJ(prPubKey, key), shared, sharedSize);
 }
 
 // -------------------------------- Key API ------------------------------------

@@ -6,31 +6,65 @@
 #include "lib/SeosCryptoLib_Rng.h"
 #include "lib/SeosCryptoLib_Key.h"
 
+#include "mbedtls/dhm.h"
+#include "mbedtls/ecdh.h"
+
 #include <string.h>
+
+// Internal types/defines/enums ------------------------------------------------
+
+struct SeosCryptoLib_Agreement
+{
+    union
+    {
+        mbedtls_dhm_context dh;
+        mbedtls_ecdh_context ecdh;
+    }
+    mbedtls;
+    SeosCryptoApi_Agreement_Alg algorithm;
+    const SeosCryptoLib_Key* prvKey;
+};
 
 // Private Functions -----------------------------------------------------------
 
 static seos_err_t
 initImpl(
-    SeosCryptoLib_Agreement*   self,
-    const SeosCryptoApi_MemIf* memIf)
+    SeosCryptoLib_Agreement**         self,
+    const SeosCryptoApi_MemIf*        memIf,
+    const SeosCryptoApi_Agreement_Alg algorithm,
+    const SeosCryptoLib_Key*          prvKey)
 {
-    UNUSED_VAR(memIf);
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    seos_err_t err;
+    SeosCryptoLib_Agreement* agr;
 
-    switch (self->algorithm)
+    if ((agr = memIf->malloc(sizeof(SeosCryptoLib_Agreement))) == NULL)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
+
+    memset(agr, 0, sizeof(SeosCryptoLib_Agreement));
+    agr->algorithm = algorithm;
+    agr->prvKey    = prvKey;
+
+    err = SEOS_SUCCESS;
+    switch (agr->algorithm)
     {
     case SeosCryptoApi_Agreement_ALG_DH:
-        mbedtls_dhm_init(&self->mbedtls.dh);
-        err = SEOS_SUCCESS;
+        mbedtls_dhm_init(&agr->mbedtls.dh);
         break;
     case SeosCryptoApi_Agreement_ALG_ECDH:
-        mbedtls_ecdh_init(&self->mbedtls.ecdh);
-        err = SEOS_SUCCESS;
+        mbedtls_ecdh_init(&agr->mbedtls.ecdh);
         break;
     default:
         err = SEOS_ERROR_NOT_SUPPORTED;
     }
+
+    if (err != SEOS_SUCCESS)
+    {
+        memIf->free(agr);
+    }
+
+    *self = agr;
 
     return err;
 }
@@ -40,9 +74,9 @@ freeImpl(
     SeosCryptoLib_Agreement*   self,
     const SeosCryptoApi_MemIf* memIf)
 {
-    UNUSED_VAR(memIf);
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    seos_err_t err;
 
+    err = SEOS_SUCCESS;
     switch (self->algorithm)
     {
     case SeosCryptoApi_Agreement_ALG_DH:
@@ -51,11 +85,12 @@ freeImpl(
         break;
     case SeosCryptoApi_Agreement_ALG_ECDH:
         mbedtls_ecdh_free(&self->mbedtls.ecdh);
-        err = SEOS_SUCCESS;
         break;
     default:
         err = SEOS_ERROR_NOT_SUPPORTED;
     }
+
+    memIf->free(self);
 
     return err;
 }
@@ -146,41 +181,40 @@ agreeImpl(
 
 seos_err_t
 SeosCryptoLib_Agreement_init(
-    SeosCryptoLib_Agreement*          self,
+    SeosCryptoLib_Agreement**         self,
     const SeosCryptoApi_MemIf*        memIf,
     const SeosCryptoApi_Agreement_Alg algorithm,
     const SeosCryptoLib_Key*          prvKey)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    seos_err_t err;
 
     if (NULL == self || NULL == prvKey || NULL == memIf)
     {
-        err = SEOS_ERROR_INVALID_PARAMETER;
-        goto exit;
+        return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    memset(self, 0, sizeof(*self));
-
-    self->algorithm  = algorithm;
-    self->prvKey = prvKey;
-
-    err = initImpl(self, memIf);
-    if (err != SEOS_SUCCESS)
+    if ((err = initImpl(self, memIf, algorithm, prvKey)) == SEOS_SUCCESS)
     {
-        goto exit;
+        if ((err = setKeyImpl(*self)) != SEOS_SUCCESS)
+        {
+            freeImpl(*self, memIf);
+        }
     }
 
-    err = setKeyImpl(self);
-    if (err != SEOS_SUCCESS)
-    {
-        goto err0;
-    }
-
-    goto exit;
-err0:
-    freeImpl(self, memIf);
-exit:
     return err;
+}
+
+seos_err_t
+SeosCryptoLib_Agreement_free(
+    SeosCryptoLib_Agreement*   self,
+    const SeosCryptoApi_MemIf* memIf)
+{
+    if (NULL == self || NULL == memIf)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    return freeImpl(self, memIf);
 }
 
 seos_err_t
@@ -197,17 +231,4 @@ SeosCryptoLib_Agreement_agree(
     }
 
     return agreeImpl(self, rng, pubKey, shared, sharedSize);
-}
-
-seos_err_t
-SeosCryptoLib_Agreement_free(
-    SeosCryptoLib_Agreement*   self,
-    const SeosCryptoApi_MemIf* memIf)
-{
-    if (NULL == self || NULL == memIf)
-    {
-        return SEOS_ERROR_INVALID_PARAMETER;
-    }
-
-    return freeImpl(self, memIf);
 }
