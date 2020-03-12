@@ -6,19 +6,58 @@
 #include "lib/SeosCryptoLib_Rng.h"
 #include "lib/SeosCryptoLib_Key.h"
 
+#include <stdbool.h>
+
 #include <string.h>
+
+// Internal types/defines/enums ------------------------------------------------
+
+struct SeosCryptoLib_Signature
+{
+    union
+    {
+        mbedtls_rsa_context rsa;
+    }
+    mbedtls;
+    SeosCryptoApi_Signature_Alg algorithm;
+    SeosCryptoApi_Digest_Alg digest;
+    const SeosCryptoLib_Key* prvKey;
+    const SeosCryptoLib_Key* pubKey;
+};
 
 // Private Functions -----------------------------------------------------------
 
 static seos_err_t
 initImpl(
-    SeosCryptoLib_Signature*   self,
-    const SeosCryptoApi_MemIf* memIf)
+    SeosCryptoLib_Signature**         self,
+    const SeosCryptoApi_MemIf*        memIf,
+    const SeosCryptoApi_Signature_Alg algorithm,
+    const SeosCryptoApi_Digest_Alg    digest,
+    const SeosCryptoLib_Key*          prvKey,
+    const SeosCryptoLib_Key*          pubKey)
 {
-    UNUSED_VAR(memIf);
+    seos_err_t err;
+    SeosCryptoLib_Signature* sig;
     int padding;
 
-    switch (self->algorithm)
+    // We can have one of those keys be empty, but not both
+    if (NULL == memIf || NULL == self || (NULL == prvKey && NULL == pubKey))
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    if ((sig = memIf->malloc(sizeof(SeosCryptoLib_Signature))) == NULL)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
+
+    memset(sig, 0, sizeof(SeosCryptoLib_Signature));
+    sig->algorithm = algorithm;
+    sig->digest    = digest;
+    sig->prvKey    = prvKey;
+    sig->pubKey    = pubKey;
+
+    switch (sig->algorithm)
     {
     case SeosCryptoApi_Signature_ALG_RSA_PKCS1_V15:
         padding = MBEDTLS_RSA_PKCS_V15;
@@ -27,24 +66,33 @@ initImpl(
         padding = MBEDTLS_RSA_PKCS_V21;
         break;
     default:
-        return SEOS_ERROR_NOT_SUPPORTED;
+        err = SEOS_ERROR_NOT_SUPPORTED;
+        goto err0;
     }
 
     // Make sure we only get in the digests here which we currently support.
-    switch (self->digest)
+    switch (sig->digest)
     {
     case SeosCryptoApi_Digest_ALG_NONE:
     case SeosCryptoApi_Digest_ALG_MD5:
     case SeosCryptoApi_Digest_ALG_SHA256:
         break;
     default:
-        return SEOS_ERROR_NOT_SUPPORTED;
+        err = SEOS_ERROR_NOT_SUPPORTED;
+        goto err0;
     }
 
     // digest is matched to mbedTLS constants
-    mbedtls_rsa_init(&self->mbedtls.rsa, padding, self->digest);
+    mbedtls_rsa_init(&sig->mbedtls.rsa, padding, sig->digest);
+
+    *self = sig;
 
     return SEOS_SUCCESS;
+
+err0:
+    memIf->free(sig);
+
+    return err;
 }
 
 static seos_err_t
@@ -52,8 +100,9 @@ freeImpl(
     SeosCryptoLib_Signature*   self,
     const SeosCryptoApi_MemIf* memIf)
 {
-    UNUSED_VAR(memIf);
+    seos_err_t err;
 
+    err = SEOS_SUCCESS;
     switch (self->algorithm)
     {
     case SeosCryptoApi_Signature_ALG_RSA_PKCS1_V15:
@@ -61,10 +110,13 @@ freeImpl(
         mbedtls_rsa_free(&self->mbedtls.rsa);
         break;
     default:
-        return SEOS_ERROR_NOT_SUPPORTED;
+
+        err = SEOS_ERROR_NOT_SUPPORTED;
     }
 
-    return SEOS_SUCCESS;
+    memIf->free(self);
+
+    return err;
 }
 
 static seos_err_t
@@ -180,14 +232,14 @@ signHashImpl(
 
 seos_err_t
 SeosCryptoLib_Signature_init(
-    SeosCryptoLib_Signature*          self,
+    SeosCryptoLib_Signature**         self,
     const SeosCryptoApi_MemIf*        memIf,
     const SeosCryptoApi_Signature_Alg algorithm,
     const SeosCryptoApi_Digest_Alg    digest,
     const SeosCryptoLib_Key*          prvKey,
     const SeosCryptoLib_Key*          pubKey)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    seos_err_t err;
 
     // We can have one of those keys be empty, but not both
     if (NULL == memIf || NULL == self || (NULL == prvKey && NULL == pubKey))
@@ -195,26 +247,15 @@ SeosCryptoLib_Signature_init(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    memset(self, 0, sizeof(*self));
-
-    self->algorithm = algorithm;
-    self->digest    = digest;
-    self->prvKey    = prvKey;
-    self->pubKey    = pubKey;
-
-    if ((err = initImpl(self, memIf)) != SEOS_SUCCESS)
+    if ((err = initImpl(self, memIf, algorithm, digest, prvKey,
+                        pubKey)) == SEOS_SUCCESS)
     {
-        return err;
-    }
-    if ((err = setKeyImpl(self)) != SEOS_SUCCESS)
-    {
-        goto err0;
+        if ((err = setKeyImpl(*self)) != SEOS_SUCCESS)
+        {
+            freeImpl(*self, memIf);
+        }
     }
 
-    return SEOS_SUCCESS;
-
-err0:
-    freeImpl(self, memIf);
     return err;
 }
 
@@ -223,7 +264,7 @@ SeosCryptoLib_Signature_free(
     SeosCryptoLib_Signature*   self,
     const SeosCryptoApi_MemIf* memIf)
 {
-    if (NULL == memIf || NULL == self)
+    if (NULL == self || NULL == memIf)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }

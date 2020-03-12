@@ -13,35 +13,20 @@
 #pragma once
 
 #include "SeosCryptoApi.h"
+
 #include "lib/SeosCryptoLib_Rng.h"
 
-#include "mbedtls/rsa.h"
-
-#include "compiler.h"
-
-#include <stdbool.h>
 #include <stddef.h>
 
-// Internal types/defines/enums ------------------------------------------------
+// Exported types/defines/enums ------------------------------------------------
 
-struct SeosCryptoLib_Signature
-{
-    union
-    {
-        mbedtls_rsa_context rsa;
-    }
-    mbedtls;
-    SeosCryptoApi_Signature_Alg algorithm;
-    SeosCryptoApi_Digest_Alg digest;
-    const SeosCryptoLib_Key* prvKey;
-    const SeosCryptoLib_Key* pubKey;
-};
+typedef struct SeosCryptoLib_Signature SeosCryptoLib_Signature;
 
-// Internal functions ----------------------------------------------------------
+// Exported functions ----------------------------------------------------------
 
 seos_err_t
 SeosCryptoLib_Signature_init(
-    SeosCryptoLib_Signature*          self,
+    SeosCryptoLib_Signature**         self,
     const SeosCryptoApi_MemIf*        memIf,
     const SeosCryptoApi_Signature_Alg algorithm,
     const SeosCryptoApi_Digest_Alg    digest,

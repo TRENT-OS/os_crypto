@@ -384,47 +384,60 @@ SeosCryptoApi_Digest_finalize(
 
 seos_err_t
 SeosCryptoApi_Signature_init(
-    SeosCryptoApiH                    self,
-    SeosCryptoApi_Signature*          prSig,
+    SeosCryptoApi_SignatureH*         hSig,
+    const SeosCryptoApiH              self,
     const SeosCryptoApi_Signature_Alg algorithm,
     const SeosCryptoApi_Digest_Alg    digest,
     const SeosCryptoApi_Key*          prPrvKey,
     const SeosCryptoApi_Key*          prPubKey)
 {
-    INIT_PROXY(prSig, self);
-    return CALL_IMPL(prSig, Signature_init, &prSig->signature, algorithm, digest,
-                     GET_OBJ(prPrvKey, key), GET_OBJ(prPubKey, key));
+    seos_err_t err;
+
+    PROXY_INIT(*hSig, self);
+    if ((err = PROXY_CALL(*hSig, Signature_init, PROXY_GET_SIG_PTR(*hSig),
+                          algorithm, digest,
+                          GET_OBJ(prPrvKey, key), GET_OBJ(prPubKey, key))) != SEOS_SUCCESS)
+    {
+        PROXY_FREE(*hSig);
+    }
+
+    return err;
 }
 
 seos_err_t
 SeosCryptoApi_Signature_free(
-    SeosCryptoApi_Signature* prSig)
+    SeosCryptoApi_SignatureH hSig)
 {
-    return CALL_IMPL(prSig, Signature_free, GET_OBJ(prSig, signature));
+    seos_err_t err;
+
+    err = PROXY_CALL(hSig, Signature_free, PROXY_GET_OBJ(hSig));
+    PROXY_FREE(hSig);
+
+    return err;
 }
 
 seos_err_t
 SeosCryptoApi_Signature_sign(
-    SeosCryptoApi_Signature* prSig,
+    SeosCryptoApi_SignatureH hSig,
     const void*              hash,
     const size_t             hashSize,
     void*                    signature,
     size_t*                  signatureSize)
 {
-    return CALL_IMPL(prSig, Signature_sign, GET_OBJ(prSig, signature), hash,
-                     hashSize, signature, signatureSize);
+    return PROXY_CALL(hSig, Signature_sign, PROXY_GET_OBJ(hSig), hash, hashSize,
+                      signature, signatureSize);
 }
 
 seos_err_t
 SeosCryptoApi_Signature_verify(
-    SeosCryptoApi_Signature* prSig,
+    SeosCryptoApi_SignatureH hSig,
     const void*              hash,
     const size_t             hashSize,
     const void*              signature,
     const size_t             signatureSize)
 {
-    return CALL_IMPL(prSig, Signature_verify, GET_OBJ(prSig, signature), hash,
-                     hashSize, signature, signatureSize);
+    return PROXY_CALL(hSig, Signature_verify, PROXY_GET_OBJ(hSig), hash, hashSize,
+                      signature, signatureSize);
 }
 
 // ----------------------------- Agreement API ---------------------------------

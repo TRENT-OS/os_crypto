@@ -385,30 +385,45 @@ Signature_init(
         return SEOS_ERROR_INVALID_HANDLE;
     }
 
-    if ((*pSigObj = self->memIf.malloc(sizeof(SeosCryptoLib_Signature))) == NULL)
+    if ((err = SeosCryptoLib_Signature_init(pSigObj, &self->memIf, algorithm,
+                                            digest, prvKey, pubKey)) != SEOS_SUCCESS)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return err;
     }
 
-    if ((err = SeosCryptoLib_Signature_init(*pSigObj, &self->memIf, algorithm,
-                                            digest, prvKey, pubKey)) != SEOS_SUCCESS)
+    if ((err = PtrVector_add(&self->signatureObjects, *pSigObj)) != SEOS_SUCCESS)
     {
         goto err0;
     }
-    else if ((err = PtrVector_add(&self->signatureObjects,
-                                  *pSigObj)) != SEOS_SUCCESS)
+
+    return err;
+
+err0:
+    SeosCryptoLib_Signature_free(*pSigObj, &self->memIf);
+
+    return err;
+}
+
+static seos_err_t
+Signature_free(
+    void*                    ctx,
+    SeosCryptoLib_Signature* sigObj)
+{
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
+
+    if (NULL == ctx)
     {
-        goto err1;
+        return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return err;
+    if (!PtrVector_hasPtr(&self->signatureObjects, sigObj))
+    {
+        return SEOS_ERROR_INVALID_HANDLE;
+    }
 
-err1:
-    SeosCryptoLib_Signature_free(*pSigObj, &self->memIf);
-err0:
-    self->memIf.free(*pSigObj);
+    PtrVector_remove(&self->signatureObjects, sigObj);
 
-    return err;
+    return SeosCryptoLib_Signature_free(sigObj, &self->memIf);
 }
 
 static seos_err_t
@@ -426,33 +441,6 @@ Signature_exists(
     return !PtrVector_hasPtr(&self->signatureObjects, signatureObj) ?
            SEOS_ERROR_INVALID_HANDLE :
            SEOS_SUCCESS;
-}
-
-static seos_err_t
-Signature_free(
-    void*                    ctx,
-    SeosCryptoLib_Signature* sigObj)
-{
-    seos_err_t err = SEOS_SUCCESS;
-    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
-
-    if (NULL == ctx)
-    {
-        return SEOS_ERROR_INVALID_PARAMETER;
-    }
-
-    if (!PtrVector_hasPtr(&self->signatureObjects, sigObj))
-    {
-        return SEOS_ERROR_INVALID_HANDLE;
-    }
-
-    if ((err = SeosCryptoLib_Signature_free(sigObj, &self->memIf)) == SEOS_SUCCESS)
-    {
-        PtrVector_remove(&self->signatureObjects, sigObj);
-        self->memIf.free(sigObj);
-    }
-
-    return err;
 }
 
 static seos_err_t
