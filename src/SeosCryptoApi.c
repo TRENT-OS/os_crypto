@@ -171,6 +171,30 @@ SeosCryptoApi_getServer(
     return (NULL == self) ? NULL : self->server;
 }
 
+SeosCryptoLib_Object*
+SeosCryptoApi_getObject(
+    const SeosCryptoApi_Proxy* proxy)
+{
+    return (NULL == proxy) ? NULL : proxy->obj;
+}
+
+seos_err_t
+SeosCryptoApi_migrateObject(
+    SeosCryptoApi_Proxy**      proxy,
+    const SeosCryptoApiH       self,
+    const SeosCryptoLib_Object ptr)
+{
+    if (NULL == ptr)
+    {
+        return SEOS_ERROR_INVALID_HANDLE;
+    }
+
+    PROXY_INIT(*proxy, self);
+    (*proxy)->obj = ptr;
+
+    return SEOS_SUCCESS;
+}
+
 // -------------------------------- RNG API ------------------------------------
 
 seos_err_t
@@ -439,23 +463,6 @@ SeosCryptoApi_Key_loadParams(
     size_t*                       paramSize)
 {
     return CALL_IMPL(self, Key_loadParams, name, keyParams, paramSize);
-}
-
-seos_err_t
-SeosCryptoApi_Key_migrate(
-    SeosCryptoApiH                    self,
-    SeosCryptoApi_Key*                prKey,
-    const SeosCryptoApi_Key_RemotePtr ptr)
-{
-    if (NULL == ptr)
-    {
-        return SEOS_ERROR_INVALID_HANDLE;
-    }
-
-    INIT_PROXY(prKey, self);
-    prKey->key = ptr;
-
-    return SEOS_SUCCESS;
 }
 
 // ------------------------------ Cipher API -----------------------------------
