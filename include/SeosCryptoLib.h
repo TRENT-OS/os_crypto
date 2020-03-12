@@ -14,8 +14,13 @@
 
 #include "SeosCryptoApi.h"
 
-#include "util/PtrVector.h"
+#include "lib/SeosCryptoLib_Cipher.h"
+#include "lib/SeosCryptoLib_Key.h"
 #include "lib/SeosCryptoLib_Rng.h"
+#include "lib/SeosCryptoLib_Digest.h"
+#include "lib/SeosCryptoLib_Mac.h"
+#include "lib/SeosCryptoLib_Signature.h"
+#include "lib/SeosCryptoLib_Agreement.h"
 
 // -------------------------- defines/types/variables --------------------------
 

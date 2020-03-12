@@ -2,16 +2,9 @@
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 
-#include "lib/SeosCryptoLib_Cipher.h"
-#include "lib/SeosCryptoLib_Key.h"
-#include "lib/SeosCryptoLib_Rng.h"
-#include "lib/SeosCryptoLib_Digest.h"
-#include "lib/SeosCryptoLib_Mac.h"
-#include "lib/SeosCryptoLib_Signature.h"
-#include "lib/SeosCryptoLib_Agreement.h"
+#include "SeosCryptoLib.h"
 
 #include "SeosCryptoVtable.h"
-#include "SeosCryptoLib.h"
 
 #include "util/PtrVector.h"
 

@@ -34,6 +34,43 @@
     p->impl = c->impl;                          \
 }
 
+// Allocate proxy object and set its API handle
+#define PROXY_INIT(p, c)                                                \
+    if (NULL == &(p) || NULL == (c)) {                                  \
+        return SEOS_ERROR_INVALID_PARAMETER;                            \
+    }                                                                   \
+    if(((p) = c->memIf.malloc(sizeof(SeosCryptoApi_Proxy))) == NULL) {  \
+        return SEOS_ERROR_INSUFFICIENT_SPACE;                           \
+    }                                                                   \
+    (p)->hCrypto = (c);
+// Free proxy object with associated API context's mem IF
+#define PROXY_FREE(p)                           \
+    if (NULL == (p)) {                          \
+        return SEOS_ERROR_INVALID_PARAMETER;    \
+    }                                           \
+    (p)->hCrypto->memIf.free(p);
+// Call function from proxy objects API handle
+#define PROXY_CALL(p, f, ...)                                                   \
+    (NULL == (p)) ? SEOS_ERROR_INVALID_PARAMETER :                              \
+        (NULL == (p)->hCrypto->impl.vtable->f) ? SEOS_ERROR_NOT_SUPPORTED :     \
+        (p)->hCrypto->impl.vtable->f((p)->hCrypto->impl.context, __VA_ARGS__)   \
+// Get object from proxy
+#define PROXY_GET_OBJ(p) ((NULL == (p)) ? NULL : (p)->obj)
+// Get object specific pointers to object from proxy
+#define PROXY_GET_OBJ_PTR(p) ((NULL == (p)) ? NULL : &(p)->obj)
+#define PROXY_GET_AGREE_PTR(p) \
+    (SeosCryptoLib_Agreement**) PROXY_GET_OBJ_PTR(p)
+#define PROXY_GET_CIPHER_PTR(p) \
+    (SeosCryptoLib_Cipher**) PROXY_GET_OBJ_PTR(p)
+#define PROXY_GET_DIGEST_PTR(p) \
+    (SeosCryptoLib_Digest**) PROXY_GET_OBJ_PTR(p)
+#define PROXY_GET_KEY_PTR(p) \
+    (SeosCryptoLib_Key**) PROXY_GET_OBJ_PTR(p)
+#define PROXY_GET_MAC_PTR(p) \
+    (SeosCryptoLib_Mac**) PROXY_GET_OBJ_PTR(p)
+#define PROXY_GET_SIG_PTR(p) \
+    (SeosCryptoLib_Signature**) PROXY_GET_OBJ_PTR(p)
+
 struct SeosCryptoApi
 {
     SeosCryptoApi_Mode mode;

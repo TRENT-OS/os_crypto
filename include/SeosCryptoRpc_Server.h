@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include "SeosCryptoApi.h"
+#include "SeosCryptoLib.h"
 
 // -------------------------- defines/types/variables --------------------------
 

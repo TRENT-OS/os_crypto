@@ -5,6 +5,7 @@
 #pragma once
 
 #include "SeosCryptoApi.h"
+#include "SeosCryptoLib.h"
 
 // -------------------------------- RNG API ------------------------------------
 
