@@ -264,46 +264,59 @@ SeosCryptoApi_Rng_reseed(
 
 seos_err_t
 SeosCryptoApi_Mac_init(
-    SeosCryptoApiH              self,
-    SeosCryptoApi_Mac*          prMac,
+    SeosCryptoApi_MacH*         hMac,
+    const SeosCryptoApiH        self,
     const SeosCryptoApi_Mac_Alg algorithm)
 {
-    INIT_PROXY(prMac, self);
-    return CALL_IMPL(prMac, Mac_init, &prMac->mac, algorithm);
+    seos_err_t err;
+
+    PROXY_INIT(*hMac, self);
+    if ((err = PROXY_CALL(*hMac, Mac_init, PROXY_GET_MAC_PTR(*hMac),
+                          algorithm)) != SEOS_SUCCESS)
+    {
+        PROXY_FREE(*hMac);
+    }
+
+    return err;
 }
 
 seos_err_t
 SeosCryptoApi_Mac_free(
-    SeosCryptoApi_Mac* prMac)
+    SeosCryptoApi_MacH hMac)
 {
-    return CALL_IMPL(prMac, Mac_free, GET_OBJ(prMac, mac));
+    seos_err_t err;
+
+    err = PROXY_CALL(hMac, Mac_free, PROXY_GET_OBJ(hMac));
+    PROXY_FREE(hMac);
+
+    return err;
 }
 
 seos_err_t
 SeosCryptoApi_Mac_start(
-    SeosCryptoApi_Mac* prMac,
+    SeosCryptoApi_MacH hMac,
     const void*        secret,
     const size_t       secretSize)
 {
-    return CALL_IMPL(prMac, Mac_start, GET_OBJ(prMac, mac), secret, secretSize);
+    return PROXY_CALL(hMac, Mac_start, PROXY_GET_OBJ(hMac), secret, secretSize);
 }
 
 seos_err_t
 SeosCryptoApi_Mac_process(
-    SeosCryptoApi_Mac* prMac,
+    SeosCryptoApi_MacH hMac,
     const void*        data,
     const size_t       dataSize)
 {
-    return CALL_IMPL(prMac, Mac_process, GET_OBJ(prMac, mac), data, dataSize);
+    return PROXY_CALL(hMac, Mac_process, PROXY_GET_OBJ(hMac), data, dataSize);
 }
 
 seos_err_t
 SeosCryptoApi_Mac_finalize(
-    SeosCryptoApi_Mac* prMac,
+    SeosCryptoApi_MacH hMac,
     void*              mac,
     size_t*            macSize)
 {
-    return CALL_IMPL(prMac, Mac_finalize, GET_OBJ(prMac, mac), mac, macSize);
+    return PROXY_CALL(hMac, Mac_finalize, PROXY_GET_OBJ(hMac), mac, macSize);
 }
 
 // ------------------------------ Digest API -----------------------------------

@@ -4,21 +4,50 @@
 
 #include "lib/SeosCryptoLib_Mac.h"
 
+#include "mbedtls/md.h"
+
 #include "compiler.h"
 
 #include <string.h>
+#include <stdbool.h>
+
+// Internal types/defines/enums ------------------------------------------------
+
+struct SeosCryptoLib_Mac
+{
+    union
+    {
+        mbedtls_md_context_t md;
+    }
+    mbedtls;
+    SeosCryptoApi_Mac_Alg algorithm;
+    bool started;
+    bool processed;
+};
 
 // Private Functions -----------------------------------------------------------
 
 static seos_err_t
 initImpl(
-    SeosCryptoLib_Mac*         self,
-    const SeosCryptoApi_MemIf* memIf)
+    SeosCryptoLib_Mac**         self,
+    const SeosCryptoApi_MemIf*  memIf,
+    const SeosCryptoApi_Mac_Alg algorithm)
 {
-    UNUSED_VAR(memIf);
+    seos_err_t err;
+    SeosCryptoLib_Mac* mac;
     mbedtls_md_type_t type;
 
-    switch (self->algorithm)
+    if ((mac = memIf->malloc(sizeof(SeosCryptoLib_Mac))) == NULL)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
+
+    memset(mac, 0, sizeof(SeosCryptoLib_Mac));
+    mac->algorithm = algorithm;
+    mac->started   = false;
+    mac->processed = false;
+
+    switch (mac->algorithm)
     {
     case SeosCryptoApi_Mac_ALG_HMAC_MD5:
         type = MBEDTLS_MD_MD5;
@@ -27,12 +56,27 @@ initImpl(
         type = MBEDTLS_MD_SHA256;
         break;
     default:
-        return SEOS_ERROR_NOT_SUPPORTED;
+        err = SEOS_ERROR_NOT_SUPPORTED;
+        goto err0;
     }
 
-    mbedtls_md_init(&self->mbedtls.md);
-    return mbedtls_md_setup(&self->mbedtls.md, mbedtls_md_info_from_type(type), 1) ?
-           SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+    mbedtls_md_init(&mac->mbedtls.md);
+    if (mbedtls_md_setup(&mac->mbedtls.md, mbedtls_md_info_from_type(type), 1))
+    {
+        err = SEOS_ERROR_ABORTED;
+        goto err1;
+    }
+
+    *self = mac;
+
+    return SEOS_SUCCESS;
+
+err1:
+    mbedtls_md_free(&mac->mbedtls.md);
+err0:
+    memIf->free(mac);
+
+    return err;
 }
 
 static seos_err_t
@@ -40,19 +84,20 @@ freeImpl(
     SeosCryptoLib_Mac*         self,
     const SeosCryptoApi_MemIf* memIf)
 {
-    UNUSED_VAR(memIf);
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    seos_err_t err;
 
+    err = SEOS_SUCCESS;
     switch (self->algorithm)
     {
     case SeosCryptoApi_Mac_ALG_HMAC_MD5:
     case SeosCryptoApi_Mac_ALG_HMAC_SHA256:
         mbedtls_md_free(&self->mbedtls.md);
-        err = SEOS_SUCCESS;
         break;
     default:
         err = SEOS_ERROR_NOT_SUPPORTED;
     }
+
+    memIf->free(self);
 
     return err;
 }
@@ -146,7 +191,7 @@ finalizeImpl(
 
 seos_err_t
 SeosCryptoLib_Mac_init(
-    SeosCryptoLib_Mac*          self,
+    SeosCryptoLib_Mac**         self,
     const SeosCryptoApi_MemIf*  memIf,
     const SeosCryptoApi_Mac_Alg algorithm)
 {
@@ -155,13 +200,7 @@ SeosCryptoLib_Mac_init(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    memset(self, 0, sizeof(*self));
-
-    self->algorithm = algorithm;
-    self->started   = false;
-    self->processed = false;
-
-    return initImpl(self, memIf);
+    return initImpl(self, memIf, algorithm);
 }
 
 seos_err_t

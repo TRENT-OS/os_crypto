@@ -91,29 +91,45 @@ Mac_init(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((*pMacObj = self->memIf.malloc(sizeof(SeosCryptoLib_Mac))) == NULL)
+    if ((err = SeosCryptoLib_Mac_init(pMacObj, &self->memIf,
+                                      algorithm)) != SEOS_SUCCESS)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return err;
     }
 
-    if ((err = SeosCryptoLib_Mac_init(*pMacObj, &self->memIf,
-                                      algorithm)) != SEOS_SUCCESS)
+    if ((err = PtrVector_add(&self->macObjects, *pMacObj)) != SEOS_SUCCESS)
     {
         goto err0;
     }
-    else if ((err = PtrVector_add(&self->macObjects, *pMacObj)) != SEOS_SUCCESS)
+
+    return SEOS_SUCCESS;
+
+err0:
+    SeosCryptoLib_Mac_free(*pMacObj, &self->memIf);
+
+    return err;
+}
+
+static seos_err_t
+Mac_free(
+    void*              ctx,
+    SeosCryptoLib_Mac* macObj)
+{
+    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
+
+    if (NULL == ctx)
     {
-        goto err1;
+        return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return err;
+    if (!PtrVector_hasPtr(&self->macObjects, macObj))
+    {
+        return SEOS_ERROR_INVALID_HANDLE;
+    }
 
-err1:
-    SeosCryptoLib_Mac_free(*pMacObj, &self->memIf);
-err0:
-    self->memIf.free(*pMacObj);
+    PtrVector_remove(&self->macObjects, macObj);
 
-    return err;
+    return SeosCryptoLib_Mac_free(macObj, &self->memIf);
 }
 
 static seos_err_t
@@ -131,32 +147,6 @@ Mac_exists(
     return !PtrVector_hasPtr(&self->macObjects, macObj) ?
            SEOS_ERROR_INVALID_HANDLE :
            SEOS_SUCCESS;
-}
-
-static seos_err_t
-Mac_free(
-    void*              ctx,
-    SeosCryptoLib_Mac* macObj)
-{
-    seos_err_t err = SEOS_ERROR_GENERIC;
-    SeosCryptoLib* self = (SeosCryptoLib*) ctx;
-
-    if (NULL == ctx)
-    {
-        return SEOS_ERROR_INVALID_PARAMETER;
-    }
-    else if (!PtrVector_hasPtr(&self->macObjects, macObj))
-    {
-        return SEOS_ERROR_INVALID_HANDLE;
-    }
-
-    if ((err = SeosCryptoLib_Mac_free(macObj, &self->memIf)) == SEOS_SUCCESS)
-    {
-        PtrVector_remove(&self->macObjects, macObj);
-        self->memIf.free(macObj);
-    }
-
-    return err;
 }
 
 static seos_err_t

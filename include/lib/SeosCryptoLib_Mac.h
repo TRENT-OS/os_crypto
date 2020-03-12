@@ -14,30 +14,17 @@
 
 #include "SeosCryptoApi.h"
 
-#include "mbedtls/md.h"
-
-#include <stdbool.h>
 #include <stddef.h>
 
-// Internal types/defines/enums ------------------------------------------------
+// Exported types/defines/enums ------------------------------------------------
 
-struct SeosCryptoLib_Mac
-{
-    union
-    {
-        mbedtls_md_context_t md;
-    }
-    mbedtls;
-    SeosCryptoApi_Mac_Alg algorithm;
-    bool started;
-    bool processed;
-};
+typedef struct SeosCryptoLib_Mac SeosCryptoLib_Mac;
 
-// Internal functions ----------------------------------------------------------
+// Exported functions ----------------------------------------------------------
 
 seos_err_t
 SeosCryptoLib_Mac_init(
-    SeosCryptoLib_Mac*          self,
+    SeosCryptoLib_Mac**         self,
     const SeosCryptoApi_MemIf*  memIf,
     const SeosCryptoApi_Mac_Alg algorithm);
 
