@@ -195,6 +195,13 @@ SeosCryptoApi_migrateObject(
     return SEOS_SUCCESS;
 }
 
+SeosCryptoApi_Mode
+SeosCryptoApi_getMode(
+    const SeosCryptoApiH self)
+{
+    return (NULL == self) ? SeosCryptoApi_Mode_NONE : self->mode;
+}
+
 // -------------------------------- RNG API ------------------------------------
 
 seos_err_t
