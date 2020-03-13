@@ -4,6 +4,8 @@
 
 #if defined(SEOS_CRYPTO_WITH_RPC_SERVER)
 
+#include "SeosCryptoApi.h"
+
 #include "SeosCryptoRpc_Server.h"
 
 #include "SeosCryptoVtable.h"
@@ -18,21 +20,23 @@
  * This way, it is up to the host (e.g., the CryptoServer) to implement its own
  * way of handling multiple clients and their respective contextx.
  */
-extern SeosCryptoApi*
+extern SeosCryptoApiH
 SeosCryptoRpc_Server_getSeosCryptoApi(
     void);
 
+// This is not exposed via header intentionally
+void*
+SeosCryptoApi_getServer(
+    const SeosCryptoApiH self);
+
 // Get SeosTlsRpc_Server context from API
-#define GET_SELF(s) {                                                   \
-    SeosCryptoApi *api;                                                 \
-    if (((api = SeosCryptoRpc_Server_getSeosCryptoApi()) == NULL) ||    \
-        ((s = api->server) == NULL) )                                   \
-    {                                                                   \
-        return SEOS_ERROR_INVALID_PARAMETER;                            \
-    }                                                                   \
-    if (SeosCryptoApi_Mode_RPC_SERVER_WITH_LIBRARY != api->mode) {      \
-        return SEOS_ERROR_INVALID_STATE;                                \
-    }                                                                   \
+#define GET_SELF(s) {                                               \
+    SeosCryptoApi *a;                                               \
+    if (((a = SeosCryptoRpc_Server_getSeosCryptoApi()) == NULL) ||  \
+        ((s = SeosCryptoApi_getServer(a)) == NULL) )                \
+    {                                                               \
+        return SEOS_ERROR_INVALID_PARAMETER;                        \
+    }                                                               \
 }
 
 // Call function pointer to LIB, make sure it is defined

@@ -34,14 +34,23 @@
     p->impl = c->impl;                          \
 }
 
+struct SeosCryptoApi
+{
+    SeosCryptoApi_Mode mode;
+    SeosCryptoApi_Impl impl;
+    SeosCryptoApi_MemIf memIf;
+    void* server;
+};
+
 // ------------------------------- Init/Free -----------------------------------
 
 seos_err_t
 SeosCryptoApi_init(
-    SeosCryptoApi*              self,
+    SeosCryptoApiH*             self,
     const SeosCryptoApi_Config* cfg)
 {
     seos_err_t err;
+    SeosCryptoApi* ctx;
 
     if (NULL == self || NULL == cfg || NULL == cfg->mem.malloc
         || NULL == cfg->mem.free)
@@ -49,13 +58,20 @@ SeosCryptoApi_init(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    memset(self, 0, sizeof(*self));
-    self->mode = cfg->mode;
+    if ((ctx = cfg->mem.malloc(sizeof(SeosCryptoApi))) == NULL)
+    {
+        return SEOS_ERROR_INSUFFICIENT_SPACE;
+    }
+
+    *self = ctx;
+
+    ctx->mode  = cfg->mode;
+    ctx->memIf = cfg->mem;
 
     switch (cfg->mode)
     {
     case SeosCryptoApi_Mode_LIBRARY:
-        if ((err = SeosCryptoLib_init(&self->impl, &cfg->mem,
+        if ((err = SeosCryptoLib_init(&ctx->impl, &cfg->mem,
                                       &cfg->impl.lib)) != SEOS_SUCCESS)
         {
             goto err0;
@@ -63,14 +79,14 @@ SeosCryptoApi_init(
         break;
 #if defined(SEOS_CRYPTO_WITH_RPC_CLIENT)
     case SeosCryptoApi_Mode_RPC_CLIENT:
-        if ((err = SeosCryptoRpc_Client_init(&self->impl, &cfg->mem,
+        if ((err = SeosCryptoRpc_Client_init(&ctx->impl, &cfg->mem,
                                              &cfg->impl.client)) != SEOS_SUCCESS)
         {
             goto err0;
         }
         break;
     case SeosCryptoApi_Mode_ROUTER:
-        if ((err = SeosCryptoRouter_init(&self->impl, &cfg->mem,
+        if ((err = SeosCryptoRouter_init(&ctx->impl, &cfg->mem,
                                          &cfg->impl.router)) != SEOS_SUCCESS)
         {
             goto err0;
@@ -79,13 +95,13 @@ SeosCryptoApi_init(
 #endif /* SEOS_CRYPTO_WITH_RPC_CLIENT */
 #if defined(SEOS_CRYPTO_WITH_RPC_SERVER)
     case SeosCryptoApi_Mode_RPC_SERVER_WITH_LIBRARY:
-        if ((err = SeosCryptoLib_init(&self->impl, &cfg->mem,
+        if ((err = SeosCryptoLib_init(&ctx->impl, &cfg->mem,
                                       &cfg->impl.lib)) != SEOS_SUCCESS)
         {
             goto err0;
         }
-        if ((err = SeosCryptoRpc_Server_init((SeosCryptoRpc_Server**) &self->server,
-                                             &self->impl, &cfg->mem, &cfg->server)) != SEOS_SUCCESS)
+        if ((err = SeosCryptoRpc_Server_init((SeosCryptoRpc_Server**) &ctx->server,
+                                             &ctx->impl, &cfg->mem, &cfg->server)) != SEOS_SUCCESS)
         {
             goto err1;
         }
@@ -93,23 +109,27 @@ SeosCryptoApi_init(
 #endif /* SEOS_CRYPTO_WITH_RPC_SERVER */
     default:
         err = SEOS_ERROR_NOT_SUPPORTED;
+        goto err0;
     }
 
-    return err;
+    return SEOS_SUCCESS;
 
 #if defined(SEOS_CRYPTO_WITH_RPC_SERVER)
 err1:
-    SeosCryptoLib_free(self->impl.context);
+    SeosCryptoLib_free(ctx->impl.context);
 #endif /* SEOS_CRYPTO_WITH_RPC_SERVER */
 err0:
+    ctx->memIf.free(ctx);
 
     return err;
 }
 
 seos_err_t
 SeosCryptoApi_free(
-    SeosCryptoApi* self)
+    SeosCryptoApiH self)
 {
+    seos_err_t err;
+
     if (NULL == self)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
@@ -118,36 +138,44 @@ SeosCryptoApi_free(
     switch (self->mode)
     {
     case SeosCryptoApi_Mode_LIBRARY:
-        return SeosCryptoLib_free(self->impl.context);
+        err = SeosCryptoLib_free(self->impl.context);
+        break;
 #if defined(SEOS_CRYPTO_WITH_RPC_CLIENT)
     case SeosCryptoApi_Mode_RPC_CLIENT:
-        return SeosCryptoRpc_Client_free(self->impl.context);
+        err = SeosCryptoRpc_Client_free(self->impl.context);
+        break;
     case SeosCryptoApi_Mode_ROUTER:
-        return SeosCryptoRouter_free(self->impl.context);
+        err = SeosCryptoRouter_free(self->impl.context);
+        break;
 #endif /* SEOS_CRYPTO_WITH_RPC_CLIENT */
 #if defined(SEOS_CRYPTO_WITH_RPC_SERVER)
     case SeosCryptoApi_Mode_RPC_SERVER_WITH_LIBRARY:
-    {
-        seos_err_t err;
         if ((err = SeosCryptoLib_free(self->impl.context)) != SEOS_SUCCESS)
         {
             return err;
         }
-        return SeosCryptoRpc_Server_free(self->server);
-    }
+        err = SeosCryptoRpc_Server_free(self->server);
+        break;
 #endif /* SEOS_CRYPTO_WITH_RPC_SERVER */
     default:
-        return SEOS_ERROR_NOT_SUPPORTED;
+        err = SEOS_ERROR_NOT_SUPPORTED;
     }
 
-    return SEOS_ERROR_GENERIC;
+    return err;
+}
+
+void*
+SeosCryptoApi_getServer(
+    const SeosCryptoApiH self)
+{
+    return (NULL == self) ? NULL : self->server;
 }
 
 // -------------------------------- RNG API ------------------------------------
 
 seos_err_t
 SeosCryptoApi_Rng_getBytes(
-    SeosCryptoApi*               self,
+    SeosCryptoApiH               self,
     const SeosCryptoApi_Rng_Flag flags,
     void*                        buf,
     const size_t                 bufSize)
@@ -157,7 +185,7 @@ SeosCryptoApi_Rng_getBytes(
 
 seos_err_t
 SeosCryptoApi_Rng_reseed(
-    SeosCryptoApi* self,
+    SeosCryptoApiH self,
     const void*    seed,
     const size_t   seedSize)
 {
@@ -168,11 +196,11 @@ SeosCryptoApi_Rng_reseed(
 
 seos_err_t
 SeosCryptoApi_Mac_init(
-    SeosCryptoApi*              api,
+    SeosCryptoApiH              self,
     SeosCryptoApi_Mac*          prMac,
     const SeosCryptoApi_Mac_Alg algorithm)
 {
-    INIT_PROXY(prMac, api);
+    INIT_PROXY(prMac, self);
     return CALL_IMPL(prMac, Mac_init, &prMac->mac, algorithm);
 }
 
@@ -214,11 +242,11 @@ SeosCryptoApi_Mac_finalize(
 
 seos_err_t
 SeosCryptoApi_Digest_init(
-    SeosCryptoApi*                 api,
+    SeosCryptoApiH                 self,
     SeosCryptoApi_Digest*          prDigest,
     const SeosCryptoApi_Digest_Alg algorithm)
 {
-    INIT_PROXY(prDigest, api);
+    INIT_PROXY(prDigest, self);
     return CALL_IMPL(prDigest, Digest_init, &prDigest->digest, algorithm);
 }
 
@@ -262,14 +290,14 @@ SeosCryptoApi_Digest_finalize(
 
 seos_err_t
 SeosCryptoApi_Signature_init(
-    SeosCryptoApi*                    api,
+    SeosCryptoApiH                    self,
     SeosCryptoApi_Signature*          prSig,
     const SeosCryptoApi_Signature_Alg algorithm,
     const SeosCryptoApi_Digest_Alg    digest,
     const SeosCryptoApi_Key*          prPrvKey,
     const SeosCryptoApi_Key*          prPubKey)
 {
-    INIT_PROXY(prSig, api);
+    INIT_PROXY(prSig, self);
     return CALL_IMPL(prSig, Signature_init, &prSig->signature, algorithm, digest,
                      GET_OBJ(prPrvKey, key), GET_OBJ(prPubKey, key));
 }
@@ -309,12 +337,12 @@ SeosCryptoApi_Signature_verify(
 
 seos_err_t
 SeosCryptoApi_Agreement_init(
-    SeosCryptoApi*                    api,
+    SeosCryptoApiH                    self,
     SeosCryptoApi_Agreement*          prAgr,
     const SeosCryptoApi_Agreement_Alg algorithm,
     const SeosCryptoApi_Key*          prPrvKey)
 {
-    INIT_PROXY(prAgr, api);
+    INIT_PROXY(prAgr, self);
     return CALL_IMPL(prAgr, Agreement_init, &prAgr->agreement, algorithm,
                      GET_OBJ(prPrvKey, key));
 }
@@ -341,21 +369,21 @@ SeosCryptoApi_Agreement_agree(
 
 seos_err_t
 SeosCryptoApi_Key_generate(
-    SeosCryptoApi*                api,
+    SeosCryptoApiH                self,
     SeosCryptoApi_Key*            prKey,
     const SeosCryptoApi_Key_Spec* spec)
 {
-    INIT_PROXY(prKey, api);
+    INIT_PROXY(prKey, self);
     return CALL_IMPL(prKey, Key_generate, &prKey->key, spec);
 }
 
 seos_err_t
 SeosCryptoApi_Key_import(
-    SeosCryptoApi*                api,
+    SeosCryptoApiH                self,
     SeosCryptoApi_Key*            prKey,
     const SeosCryptoApi_Key_Data* keyData)
 {
-    INIT_PROXY(prKey, api);
+    INIT_PROXY(prKey, self);
     return CALL_IMPL(prKey, Key_import, &prKey->key, keyData);
 }
 
@@ -405,17 +433,17 @@ SeosCryptoApi_Key_free(
 
 seos_err_t
 SeosCryptoApi_Key_loadParams(
-    SeosCryptoApi*                api,
+    SeosCryptoApiH                self,
     const SeosCryptoApi_Key_Param name,
     void*                         keyParams,
     size_t*                       paramSize)
 {
-    return CALL_IMPL(api, Key_loadParams, name, keyParams, paramSize);
+    return CALL_IMPL(self, Key_loadParams, name, keyParams, paramSize);
 }
 
 seos_err_t
 SeosCryptoApi_Key_migrate(
-    SeosCryptoApi*                    api,
+    SeosCryptoApiH                    self,
     SeosCryptoApi_Key*                prKey,
     const SeosCryptoApi_Key_RemotePtr ptr)
 {
@@ -424,7 +452,7 @@ SeosCryptoApi_Key_migrate(
         return SEOS_ERROR_INVALID_HANDLE;
     }
 
-    INIT_PROXY(prKey, api);
+    INIT_PROXY(prKey, self);
     prKey->key = ptr;
 
     return SEOS_SUCCESS;
@@ -434,14 +462,14 @@ SeosCryptoApi_Key_migrate(
 
 seos_err_t
 SeosCryptoApi_Cipher_init(
-    SeosCryptoApi*                 api,
+    SeosCryptoApiH                 self,
     SeosCryptoApi_Cipher*          prCipher,
     const SeosCryptoApi_Cipher_Alg algorithm,
     const SeosCryptoApi_Key*       prKey,
     const void*                    iv,
     const size_t                   ivSize)
 {
-    INIT_PROXY(prCipher, api);
+    INIT_PROXY(prCipher, self);
     return CALL_IMPL(prCipher, Cipher_init, &prCipher->cipher, algorithm,
                      GET_OBJ(prKey, key), iv, ivSize);
 }
