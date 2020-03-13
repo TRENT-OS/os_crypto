@@ -17,6 +17,8 @@
 
 #include "SeosCryptoApi.h"
 
+#include "SeosCryptoImpl.h"
+
 // -------------------------- defines/types/variables --------------------------
 
 typedef struct SeosCryptoRpc_Client SeosCryptoRpc_Client;
@@ -25,7 +27,7 @@ typedef struct SeosCryptoRpc_Client SeosCryptoRpc_Client;
 
 seos_err_t
 SeosCryptoRpc_Client_init(
-    SeosCryptoApi_Impl*               impl,
+    SeosCryptoImpl*                   impl,
     const SeosCryptoApi_MemIf*        memIf,
     const SeosCryptoRpcClient_Config* cfg);
 

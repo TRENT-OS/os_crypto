@@ -8,8 +8,6 @@
 
 #include "SeosCryptoRpc_Server.h"
 
-#include "SeosCryptoVtable.h"
-
 #include <string.h>
 #include <stdlib.h>
 
@@ -54,7 +52,7 @@ struct SeosCryptoRpc_Server
     /**
      * Context and function pointers of CLIENT implementation
      */
-    SeosCryptoApi_Impl client;
+    SeosCryptoImpl client;
     SeosCryptoApi_MemIf memIf;
 };
 
@@ -532,7 +530,7 @@ SeosCryptoRpc_Server_Cipher_finalize(
 seos_err_t
 SeosCryptoRpc_Server_init(
     SeosCryptoRpc_Server**            ctx,
-    const SeosCryptoApi_Impl*         client,
+    const SeosCryptoImpl*             client,
     const SeosCryptoApi_MemIf*        memIf,
     const SeosCryptoRpcServer_Config* cfg)
 {

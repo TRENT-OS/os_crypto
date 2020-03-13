@@ -25,7 +25,7 @@ typedef struct SeosCryptoRpc_Server SeosCryptoRpc_Server;
 seos_err_t
 SeosCryptoRpc_Server_init(
     SeosCryptoRpc_Server**            ctx,
-    const SeosCryptoApi_Impl*         client,
+    const SeosCryptoImpl*             client,
     const SeosCryptoApi_MemIf*        memIf,
     const SeosCryptoRpcServer_Config* cfg);
 

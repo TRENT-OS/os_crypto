@@ -4,8 +4,6 @@
 
 #include "SeosCryptoLib.h"
 
-#include "SeosCryptoVtable.h"
-
 #include "util/PtrVector.h"
 
 #include <string.h>
@@ -995,7 +993,7 @@ Cipher_finalize(
 
 // ------------------------------- init/free -----------------------------------
 
-static const SeosCryptoVtable SeosCryptoLib_vtable =
+static const SeosCryptoImpl_Vtable SeosCryptoLib_vtable =
 {
     .Rng_getBytes        = Rng_getBytes,
     .Rng_reseed          = Rng_reseed,
@@ -1039,7 +1037,7 @@ static const SeosCryptoVtable SeosCryptoLib_vtable =
 
 seos_err_t
 SeosCryptoLib_init(
-    SeosCryptoApi_Impl*         impl,
+    SeosCryptoImpl*             impl,
     const SeosCryptoApi_MemIf*  memIf,
     const SeosCryptoLib_Config* cfg)
 {

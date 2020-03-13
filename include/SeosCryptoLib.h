@@ -22,6 +22,8 @@
 #include "lib/SeosCryptoLib_Signature.h"
 #include "lib/SeosCryptoLib_Agreement.h"
 
+#include "SeosCryptoImpl.h"
+
 // -------------------------- defines/types/variables --------------------------
 
 typedef struct SeosCryptoLib SeosCryptoLib;
@@ -30,7 +32,7 @@ typedef struct SeosCryptoLib SeosCryptoLib;
 
 seos_err_t
 SeosCryptoLib_init(
-    SeosCryptoApi_Impl*         impl,
+    SeosCryptoImpl*             impl,
     const SeosCryptoApi_MemIf*  memIf,
     const SeosCryptoLib_Config* cfg);
 

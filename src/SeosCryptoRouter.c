@@ -5,10 +5,8 @@
 #if defined(SEOS_CRYPTO_WITH_RPC_CLIENT)
 
 #include "SeosCryptoRouter.h"
-
-#include "SeosCryptoVtable.h"
-
-#include "util/PtrVector.h"
+#include "SeosCryptoRpc_Client.h"
+#include "SeosCryptoLib.h"
 
 #include <string.h>
 
@@ -59,8 +57,8 @@
 
 struct SeosCryptoRouter
 {
-    SeosCryptoApi_Impl lib;
-    SeosCryptoApi_Impl client;
+    SeosCryptoImpl lib;
+    SeosCryptoImpl client;
     SeosCryptoApi_MemIf memIf;
 };
 
@@ -495,7 +493,7 @@ Cipher_finalize(
 
 // ------------------------------- init/free -----------------------------------
 
-static const SeosCryptoVtable SeosCryptoRouter_vtable =
+static const SeosCryptoImpl_Vtable SeosCryptoRouter_vtable =
 {
     .Rng_getBytes        = Rng_getBytes,
     .Rng_reseed          = Rng_reseed,

@@ -4,12 +4,11 @@
 
 #include "SeosCryptoApi.h"
 
+#include "SeosCryptoImpl.h"
 #include "SeosCryptoLib.h"
 #include "SeosCryptoRpc_Client.h"
 #include "SeosCryptoRpc_Server.h"
 #include "SeosCryptoRouter.h"
-
-#include "SeosCryptoVtable.h"
 
 #include <string.h>
 
@@ -65,9 +64,15 @@
 struct SeosCryptoApi
 {
     SeosCryptoApi_Mode mode;
-    SeosCryptoApi_Impl impl;
+    SeosCryptoImpl impl;
     SeosCryptoApi_MemIf memIf;
     void* server;
+};
+
+struct SeosCryptoApi_Proxy
+{
+    SeosCryptoApi* hCrypto;
+    SeosCryptoLib_Object obj;
 };
 
 // ------------------------------- Init/Free -----------------------------------

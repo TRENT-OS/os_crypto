@@ -6,7 +6,6 @@
 
 #include "SeosCryptoRpc_Client.h"
 #include "SeosCryptoRpc_Server.h"
-#include "SeosCryptoVtable.h"
 
 #include "compiler.h"
 
@@ -731,7 +730,7 @@ Cipher_finalize(
 
 // ------------------------------- init/free -----------------------------------
 
-static const SeosCryptoVtable SeosCryptoRpc_Client_vtable =
+static const SeosCryptoImpl_Vtable SeosCryptoRpc_Client_vtable =
 {
     .Rng_getBytes        = Rng_getBytes,
     .Rng_reseed          = Rng_reseed,
@@ -775,7 +774,7 @@ static const SeosCryptoVtable SeosCryptoRpc_Client_vtable =
 
 seos_err_t
 SeosCryptoRpc_Client_init(
-    SeosCryptoApi_Impl*               impl,
+    SeosCryptoImpl*                   impl,
     const SeosCryptoApi_MemIf*        memIf,
     const SeosCryptoRpcClient_Config* cfg)
 {
