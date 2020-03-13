@@ -1039,9 +1039,9 @@ static const SeosCryptoVtable SeosCryptoLib_vtable =
 
 seos_err_t
 SeosCryptoLib_init(
-    SeosCryptoApi_Impl*             impl,
-    const SeosCryptoApi_MemIf*      memIf,
-    const SeosCryptoApi_Lib_Config* cfg)
+    SeosCryptoApi_Impl*         impl,
+    const SeosCryptoApi_MemIf*  memIf,
+    const SeosCryptoLib_Config* cfg)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
     SeosCryptoLib* self;

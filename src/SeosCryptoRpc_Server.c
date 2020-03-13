@@ -531,10 +531,10 @@ SeosCryptoRpc_Server_Cipher_finalize(
 
 seos_err_t
 SeosCryptoRpc_Server_init(
-    SeosCryptoRpc_Server**                ctx,
-    const SeosCryptoApi_Impl*             client,
-    const SeosCryptoApi_MemIf*            memIf,
-    const SeosCryptoApi_RpcServer_Config* cfg)
+    SeosCryptoRpc_Server**            ctx,
+    const SeosCryptoApi_Impl*         client,
+    const SeosCryptoApi_MemIf*        memIf,
+    const SeosCryptoRpcServer_Config* cfg)
 {
     SeosCryptoRpc_Server* svr;
 

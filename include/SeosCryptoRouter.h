@@ -30,9 +30,9 @@ typedef struct SeosCryptoRouter SeosCryptoRouter;
 
 seos_err_t
 SeosCryptoRouter_init(
-    SeosCryptoApi_Impl*                impl,
-    const SeosCryptoApi_MemIf*         memIf,
-    const SeosCryptoApi_Router_Config* cfg);
+    SeosCryptoImpl*                impl,
+    const SeosCryptoApi_MemIf*     memIf,
+    const SeosCryptoRouter_Config* cfg);
 
 seos_err_t
 SeosCryptoRouter_free(

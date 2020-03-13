@@ -775,9 +775,9 @@ static const SeosCryptoVtable SeosCryptoRpc_Client_vtable =
 
 seos_err_t
 SeosCryptoRpc_Client_init(
-    SeosCryptoApi_Impl*                   impl,
-    const SeosCryptoApi_MemIf*            memIf,
-    const SeosCryptoApi_RpcClient_Config* cfg)
+    SeosCryptoApi_Impl*               impl,
+    const SeosCryptoApi_MemIf*        memIf,
+    const SeosCryptoRpcClient_Config* cfg)
 {
     SeosCryptoRpc_Client* self;
 

@@ -25,9 +25,9 @@ typedef struct SeosCryptoRpc_Client SeosCryptoRpc_Client;
 
 seos_err_t
 SeosCryptoRpc_Client_init(
-    SeosCryptoApi_Impl*                   impl,
-    const SeosCryptoApi_MemIf*            memIf,
-    const SeosCryptoApi_RpcClient_Config* cfg);
+    SeosCryptoApi_Impl*               impl,
+    const SeosCryptoApi_MemIf*        memIf,
+    const SeosCryptoRpcClient_Config* cfg);
 
 seos_err_t
 SeosCryptoRpc_Client_free(

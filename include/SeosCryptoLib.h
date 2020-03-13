@@ -30,9 +30,9 @@ typedef struct SeosCryptoLib SeosCryptoLib;
 
 seos_err_t
 SeosCryptoLib_init(
-    SeosCryptoApi_Impl*             impl,
-    const SeosCryptoApi_MemIf*      memIf,
-    const SeosCryptoApi_Lib_Config* cfg);
+    SeosCryptoApi_Impl*         impl,
+    const SeosCryptoApi_MemIf*  memIf,
+    const SeosCryptoLib_Config* cfg);
 
 seos_err_t
 SeosCryptoLib_free(

@@ -24,10 +24,10 @@ typedef struct SeosCryptoRpc_Server SeosCryptoRpc_Server;
 
 seos_err_t
 SeosCryptoRpc_Server_init(
-    SeosCryptoRpc_Server**                ctx,
-    const SeosCryptoApi_Impl*             client,
-    const SeosCryptoApi_MemIf*            memIf,
-    const SeosCryptoApi_RpcServer_Config* cfg);
+    SeosCryptoRpc_Server**            ctx,
+    const SeosCryptoApi_Impl*         client,
+    const SeosCryptoApi_MemIf*        memIf,
+    const SeosCryptoRpcServer_Config* cfg);
 
 seos_err_t
 SeosCryptoRpc_Server_free(
