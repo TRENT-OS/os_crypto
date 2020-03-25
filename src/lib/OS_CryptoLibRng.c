@@ -2,13 +2,13 @@
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 
-#include "lib/SeosCryptoLib_Rng.h"
+#include "lib/OS_CryptoLibRng.h"
 
 #include <string.h>
 
 // Internal types/defines/enums ------------------------------------------------
 
-struct SeosCryptoLib_Rng
+struct OS_CryptoLibRng
 {
     mbedtls_ctr_drbg_context drbg;
 };
@@ -16,28 +16,28 @@ struct SeosCryptoLib_Rng
 // Public Functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoLib_Rng_init(
-    SeosCryptoLib_Rng**                  self,
-    const SeosCryptoApi_MemIf*           memIf,
-    const SeosCryptoApi_Rng_EntropyFunc* entropyFunc,
-    void*                                entropyCtx)
+OS_CryptoLibRng_init(
+    OS_CryptoLibRng**               self,
+    const OS_Crypto_Memory*         memIf,
+    const OS_CryptoRng_EntropyFunc* entropyFunc,
+    void*                           entropyCtx)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    SeosCryptoLib_Rng* rng;
+    OS_CryptoLibRng* rng;
 
     if (NULL == memIf || NULL == self || NULL == entropyFunc)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((rng = memIf->malloc(sizeof(SeosCryptoLib_Rng))) == NULL)
+    if ((rng = memIf->malloc(sizeof(OS_CryptoLibRng))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
     *self = rng;
 
-    memset(rng, 0, sizeof(SeosCryptoLib_Rng));
+    memset(rng, 0, sizeof(OS_CryptoLibRng));
     mbedtls_ctr_drbg_init(&rng->drbg);
 
     if (mbedtls_ctr_drbg_seed(&rng->drbg, entropyFunc, entropyCtx, NULL, 0) != 0)
@@ -60,9 +60,9 @@ err0:
 }
 
 seos_err_t
-SeosCryptoLib_Rng_free(
-    SeosCryptoLib_Rng*         self,
-    const SeosCryptoApi_MemIf* memIf)
+OS_CryptoLibRng_free(
+    OS_CryptoLibRng*        self,
+    const OS_Crypto_Memory* memIf)
 {
     if (NULL == memIf || NULL == self)
     {
@@ -76,11 +76,11 @@ SeosCryptoLib_Rng_free(
 }
 
 seos_err_t
-SeosCryptoLib_Rng_getBytes(
-    SeosCryptoLib_Rng*           self,
-    const SeosCryptoApi_Rng_Flag flags,
-    void*                        buf,
-    const size_t                 bufSize)
+OS_CryptoLibRng_getBytes(
+    OS_CryptoLibRng*        self,
+    const OS_CryptoRng_Flag flags,
+    void*                   buf,
+    const size_t            bufSize)
 {
     if (NULL == self || NULL == buf || 0 == bufSize)
     {
@@ -96,10 +96,10 @@ SeosCryptoLib_Rng_getBytes(
 }
 
 seos_err_t
-SeosCryptoLib_Rng_reSeed(
-    SeosCryptoLib_Rng* self,
-    const void*        seed,
-    const size_t       seedSize)
+OS_CryptoLibRng_reSeed(
+    OS_CryptoLibRng* self,
+    const void*      seed,
+    const size_t     seedSize)
 {
     if (NULL == seed || 0 == seedSize)
     {

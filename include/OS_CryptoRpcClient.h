@@ -4,7 +4,7 @@
  * @addtogroup RPC
  * @{
  *
- * @file SeosCryptoRpc_Client.h
+ * @file OS_CryptoRpcClient.h
  *
  * @brief RPC client object and functions to access a SEOS Crypto API instance
  * running as RPC server in another component. If configured to act as RPC client,
@@ -15,24 +15,24 @@
 
 #pragma once
 
-#include "SeosCryptoApi.h"
+#include "OS_Crypto.h"
 
-#include "SeosCryptoImpl.h"
+#include "OS_CryptoImpl.h"
 
 // -------------------------- defines/types/variables --------------------------
 
-typedef struct SeosCryptoRpc_Client SeosCryptoRpc_Client;
+typedef struct OS_CryptoRpcClient OS_CryptoRpcClient;
 
 // ------------------------------- Init/Free -----------------------------------
 
 seos_err_t
-SeosCryptoRpc_Client_init(
-    SeosCryptoImpl*                   impl,
-    const SeosCryptoApi_MemIf*        memIf,
-    const SeosCryptoRpcClient_Config* cfg);
+OS_CryptoRpcClient_init(
+    OS_CryptoImpl*                   impl,
+    const OS_Crypto_Memory*          memIf,
+    const OS_CryptoRpcClient_Config* cfg);
 
 seos_err_t
-SeosCryptoRpc_Client_free(
-    SeosCryptoRpc_Client* self);
+OS_CryptoRpcClient_free(
+    OS_CryptoRpcClient* self);
 
 /** @} */

@@ -17,16 +17,16 @@
 
 # These are the sources we ALWAYS compile, for all targets
 set(SHARED_LIB_SOURCES
-    "src/SeosCryptoLib.c"
-    "src/SeosCryptoApi.c"
+    "src/OS_CryptoLib.c"
+    "src/OS_Crypto.c"
     "src/util/PtrVector.c"
-    "src/lib/SeosCryptoLib_Agreement.c"
-    "src/lib/SeosCryptoLib_Rng.c"
-    "src/lib/SeosCryptoLib_Digest.c"
-    "src/lib/SeosCryptoLib_Mac.c"
-    "src/lib/SeosCryptoLib_Cipher.c"
-    "src/lib/SeosCryptoLib_Signature.c"
-    "src/lib/SeosCryptoLib_Key.c"
+    "src/lib/OS_CryptoLibAgreement.c"
+    "src/lib/OS_CryptoLibRng.c"
+    "src/lib/OS_CryptoLibDigest.c"
+    "src/lib/OS_CryptoLibMac.c"
+    "src/lib/OS_CryptoLibCipher.c"
+    "src/lib/OS_CryptoLibSignature.c"
+    "src/lib/OS_CryptoLibKey.c"
 )
 
 # These are the 3rd party sources, holding the actual algorithms
@@ -135,8 +135,8 @@ project(seos_crypto_with_rpc_client C)
 
 add_library(${PROJECT_NAME} STATIC
     ${SHARED_LIB_SOURCES}
-    "src/SeosCryptoRpc_Client.c"
-    "src/SeosCryptoRouter.c"
+    "src/OS_CryptoRpcClient.c"
+    "src/OS_CryptoRouter.c"
     ${MBEDTLS_SOURCES})
 
 target_compile_definitions(${PROJECT_NAME}
@@ -171,7 +171,7 @@ project(seos_crypto_with_rpc_server C)
 
 add_library(${PROJECT_NAME} STATIC
     ${SHARED_LIB_SOURCES}
-    "src/SeosCryptoRpc_Server.c"
+    "src/OS_CryptoRpcServer.c"
     ${MBEDTLS_SOURCES})
 
 target_compile_definitions(${PROJECT_NAME}

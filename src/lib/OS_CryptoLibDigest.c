@@ -2,7 +2,7 @@
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 
-#include "lib/SeosCryptoLib_Digest.h"
+#include "lib/OS_CryptoLibDigest.h"
 
 #include "mbedtls/md.h"
 #include "mbedtls/md5.h"
@@ -15,54 +15,53 @@
 
 // Internal types/defines/enums ------------------------------------------------
 
-struct SeosCryptoLib_Digest
+struct OS_CryptoLibDigest
 {
     union
     {
         mbedtls_md5_context md5;
         mbedtls_sha256_context sha256;
-    }
-    mbedtls;
-    SeosCryptoApi_Digest_Alg algorithm;
+    } mbedtls;
+    OS_CryptoDigest_Alg algorithm;
     bool processed;
 };
 
 // Make sure these hold, otherwise stuff will break!
-Debug_STATIC_ASSERT((int)SeosCryptoApi_Digest_ALG_NONE     ==
+Debug_STATIC_ASSERT((int)OS_CryptoDigest_ALG_NONE     ==
                     (int)MBEDTLS_MD_NONE);
-Debug_STATIC_ASSERT((int)SeosCryptoApi_Digest_ALG_MD5      ==
+Debug_STATIC_ASSERT((int)OS_CryptoDigest_ALG_MD5      ==
                     (int)MBEDTLS_MD_MD5);
-Debug_STATIC_ASSERT((int)SeosCryptoApi_Digest_ALG_SHA256   ==
+Debug_STATIC_ASSERT((int)OS_CryptoDigest_ALG_SHA256   ==
                     (int)MBEDTLS_MD_SHA256);
 
 // Private Functions -----------------------------------------------------------
 
 static seos_err_t
 initImpl(
-    SeosCryptoLib_Digest**         self,
-    const SeosCryptoApi_MemIf*     memIf,
-    const SeosCryptoApi_Digest_Alg algorithm)
+    OS_CryptoLibDigest**      self,
+    const OS_Crypto_Memory*   memIf,
+    const OS_CryptoDigest_Alg algorithm)
 {
     seos_err_t err;
-    SeosCryptoLib_Digest* dig;
+    OS_CryptoLibDigest* dig;
 
-    if ((dig = memIf->malloc(sizeof(SeosCryptoLib_Digest))) == NULL)
+    if ((dig = memIf->malloc(sizeof(OS_CryptoLibDigest))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    memset(dig, 0, sizeof(SeosCryptoLib_Digest));
+    memset(dig, 0, sizeof(OS_CryptoLibDigest));
     dig->algorithm = algorithm;
     dig->processed = false;
 
     switch (dig->algorithm)
     {
-    case SeosCryptoApi_Digest_ALG_MD5:
+    case OS_CryptoDigest_ALG_MD5:
         mbedtls_md5_init(&dig->mbedtls.md5);
         err = mbedtls_md5_starts_ret(&dig->mbedtls.md5) ?
               SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         break;
-    case SeosCryptoApi_Digest_ALG_SHA256:
+    case OS_CryptoDigest_ALG_SHA256:
         mbedtls_sha256_init(&dig->mbedtls.sha256);
         err = mbedtls_sha256_starts_ret(&dig->mbedtls.sha256, 0) ?
               SEOS_ERROR_ABORTED : SEOS_SUCCESS;
@@ -83,18 +82,18 @@ initImpl(
 
 static seos_err_t
 freeImpl(
-    SeosCryptoLib_Digest*      self,
-    const SeosCryptoApi_MemIf* memIf)
+    OS_CryptoLibDigest*     self,
+    const OS_Crypto_Memory* memIf)
 {
     seos_err_t err;
 
     err = SEOS_SUCCESS;
     switch (self->algorithm)
     {
-    case SeosCryptoApi_Digest_ALG_MD5:
+    case OS_CryptoDigest_ALG_MD5:
         mbedtls_md5_free(&self->mbedtls.md5);
         break;
-    case SeosCryptoApi_Digest_ALG_SHA256:
+    case OS_CryptoDigest_ALG_SHA256:
         mbedtls_sha256_free(&self->mbedtls.sha256);
         break;
     default:
@@ -108,16 +107,16 @@ freeImpl(
 
 static seos_err_t
 finalizeImpl(
-    SeosCryptoLib_Digest* self,
-    void*                 digest,
-    size_t*               digestSize)
+    OS_CryptoLibDigest* self,
+    void*               digest,
+    size_t*             digestSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
-    case SeosCryptoApi_Digest_ALG_MD5:
-        if (*digestSize < SeosCryptoApi_Digest_SIZE_MD5)
+    case OS_CryptoDigest_ALG_MD5:
+        if (*digestSize < OS_CryptoDigest_SIZE_MD5)
         {
             err = SEOS_ERROR_BUFFER_TOO_SMALL;
         }
@@ -127,10 +126,10 @@ finalizeImpl(
                   mbedtls_md5_starts_ret(&self->mbedtls.md5) ?
                   SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         }
-        *digestSize = SeosCryptoApi_Digest_SIZE_MD5;
+        *digestSize = OS_CryptoDigest_SIZE_MD5;
         break;
-    case SeosCryptoApi_Digest_ALG_SHA256:
-        if (*digestSize < SeosCryptoApi_Digest_SIZE_SHA256)
+    case OS_CryptoDigest_ALG_SHA256:
+        if (*digestSize < OS_CryptoDigest_SIZE_SHA256)
         {
             err = SEOS_ERROR_BUFFER_TOO_SMALL;
         }
@@ -140,7 +139,7 @@ finalizeImpl(
                   mbedtls_sha256_starts_ret(&self->mbedtls.sha256, 0) ?
                   SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         }
-        *digestSize = SeosCryptoApi_Digest_SIZE_SHA256;
+        *digestSize = OS_CryptoDigest_SIZE_SHA256;
         break;
     default:
         err = SEOS_ERROR_NOT_SUPPORTED;
@@ -151,16 +150,16 @@ finalizeImpl(
 
 static seos_err_t
 processImpl(
-    SeosCryptoLib_Digest* self,
-    const void*           data,
-    const size_t          len)
+    OS_CryptoLibDigest* self,
+    const void*         data,
+    const size_t        len)
 {
     switch (self->algorithm)
     {
-    case SeosCryptoApi_Digest_ALG_MD5:
+    case OS_CryptoDigest_ALG_MD5:
         return mbedtls_md5_update_ret(&self->mbedtls.md5, data, len) ?
                SEOS_ERROR_ABORTED : SEOS_SUCCESS;
-    case SeosCryptoApi_Digest_ALG_SHA256:
+    case OS_CryptoDigest_ALG_SHA256:
         return mbedtls_sha256_update_ret(&self->mbedtls.sha256, data, len) ?
                SEOS_ERROR_ABORTED : SEOS_SUCCESS;
     default:
@@ -172,15 +171,15 @@ processImpl(
 
 static seos_err_t
 cloneImpl(
-    SeosCryptoLib_Digest*       self,
-    const SeosCryptoLib_Digest* source)
+    OS_CryptoLibDigest*       self,
+    const OS_CryptoLibDigest* source)
 {
     switch (self->algorithm)
     {
-    case SeosCryptoApi_Digest_ALG_MD5:
+    case OS_CryptoDigest_ALG_MD5:
         mbedtls_md5_clone(&self->mbedtls.md5, &source->mbedtls.md5);
         break;
-    case SeosCryptoApi_Digest_ALG_SHA256:
+    case OS_CryptoDigest_ALG_SHA256:
         mbedtls_sha256_clone(&self->mbedtls.sha256, &source->mbedtls.sha256);
         break;
     default:
@@ -193,10 +192,10 @@ cloneImpl(
 // Public Functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoLib_Digest_init(
-    SeosCryptoLib_Digest**         self,
-    const SeosCryptoApi_MemIf*     memIf,
-    const SeosCryptoApi_Digest_Alg algorithm)
+OS_CryptoLibDigest_init(
+    OS_CryptoLibDigest**      self,
+    const OS_Crypto_Memory*   memIf,
+    const OS_CryptoDigest_Alg algorithm)
 {
     if (NULL == memIf || NULL == self)
     {
@@ -207,9 +206,9 @@ SeosCryptoLib_Digest_init(
 }
 
 seos_err_t
-SeosCryptoLib_Digest_free(
-    SeosCryptoLib_Digest*      self,
-    const SeosCryptoApi_MemIf* memIf)
+OS_CryptoLibDigest_free(
+    OS_CryptoLibDigest*     self,
+    const OS_Crypto_Memory* memIf)
 {
     if (NULL == memIf || NULL == self)
     {
@@ -220,9 +219,9 @@ SeosCryptoLib_Digest_free(
 }
 
 seos_err_t
-SeosCryptoLib_Digest_clone(
-    SeosCryptoLib_Digest*       self,
-    const SeosCryptoLib_Digest* source)
+OS_CryptoLibDigest_clone(
+    OS_CryptoLibDigest*       self,
+    const OS_CryptoLibDigest* source)
 {
     if (NULL == self || NULL == source || self->algorithm != source->algorithm)
     {
@@ -235,10 +234,10 @@ SeosCryptoLib_Digest_clone(
 }
 
 seos_err_t
-SeosCryptoLib_Digest_process(
-    SeosCryptoLib_Digest* self,
-    const void*           data,
-    const size_t          len)
+OS_CryptoLibDigest_process(
+    OS_CryptoLibDigest* self,
+    const void*         data,
+    const size_t        len)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 
@@ -254,10 +253,10 @@ SeosCryptoLib_Digest_process(
 }
 
 seos_err_t
-SeosCryptoLib_Digest_finalize(
-    SeosCryptoLib_Digest* self,
-    void*                 digest,
-    size_t*               digestSize)
+OS_CryptoLibDigest_finalize(
+    OS_CryptoLibDigest* self,
+    void*               digest,
+    size_t*             digestSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 

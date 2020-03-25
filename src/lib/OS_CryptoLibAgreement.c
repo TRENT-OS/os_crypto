@@ -2,8 +2,8 @@
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 
-#include "lib/SeosCryptoLib_Agreement.h"
-#include "lib/SeosCryptoLib_Rng.h"
+#include "lib/OS_CryptoLibAgreement.h"
+#include "lib/OS_CryptoLibRng.h"
 
 #include "mbedtls/dhm.h"
 #include "mbedtls/ecdh.h"
@@ -12,46 +12,45 @@
 
 // Internal types/defines/enums ------------------------------------------------
 
-struct SeosCryptoLib_Agreement
+struct OS_CryptoLibAgreement
 {
     union
     {
         mbedtls_dhm_context dh;
         mbedtls_ecdh_context ecdh;
-    }
-    mbedtls;
-    SeosCryptoApi_Agreement_Alg algorithm;
-    const SeosCryptoLib_Key* prvKey;
+    } mbedtls;
+    OS_CryptoAgreement_Alg algorithm;
+    const OS_CryptoLibKey* prvKey;
 };
 
 // Private Functions -----------------------------------------------------------
 
 static seos_err_t
 initImpl(
-    SeosCryptoLib_Agreement**         self,
-    const SeosCryptoApi_MemIf*        memIf,
-    const SeosCryptoApi_Agreement_Alg algorithm,
-    const SeosCryptoLib_Key*          prvKey)
+    OS_CryptoLibAgreement**      self,
+    const OS_Crypto_Memory*      memIf,
+    const OS_CryptoAgreement_Alg algorithm,
+    const OS_CryptoLibKey*       prvKey)
 {
     seos_err_t err;
-    SeosCryptoLib_Agreement* agr;
+    OS_CryptoLibAgreement* agr;
 
-    if ((agr = memIf->malloc(sizeof(SeosCryptoLib_Agreement))) == NULL)
+    if ((agr = memIf->malloc(sizeof(OS_CryptoLibAgreement))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    memset(agr, 0, sizeof(SeosCryptoLib_Agreement));
+    memset(agr, 0, sizeof(OS_CryptoLibAgreement));
     agr->algorithm = algorithm;
     agr->prvKey    = prvKey;
 
     err = SEOS_SUCCESS;
     switch (agr->algorithm)
     {
-    case SeosCryptoApi_Agreement_ALG_DH:
+    case OS_CryptoAgreement_ALG_DH:
         mbedtls_dhm_init(&agr->mbedtls.dh);
         break;
-    case SeosCryptoApi_Agreement_ALG_ECDH:
+    case OS_CryptoAgreement_ALG_ECDH:
         mbedtls_ecdh_init(&agr->mbedtls.ecdh);
         break;
     default:
@@ -70,19 +69,19 @@ initImpl(
 
 static seos_err_t
 freeImpl(
-    SeosCryptoLib_Agreement*   self,
-    const SeosCryptoApi_MemIf* memIf)
+    OS_CryptoLibAgreement*  self,
+    const OS_Crypto_Memory* memIf)
 {
     seos_err_t err;
 
     err = SEOS_SUCCESS;
     switch (self->algorithm)
     {
-    case SeosCryptoApi_Agreement_ALG_DH:
+    case OS_CryptoAgreement_ALG_DH:
         mbedtls_dhm_free(&self->mbedtls.dh);
         err = SEOS_SUCCESS;
         break;
-    case SeosCryptoApi_Agreement_ALG_ECDH:
+    case OS_CryptoAgreement_ALG_ECDH:
         mbedtls_ecdh_free(&self->mbedtls.ecdh);
         break;
     default:
@@ -96,23 +95,23 @@ freeImpl(
 
 static seos_err_t
 setKeyImpl(
-    SeosCryptoLib_Agreement* self)
+    OS_CryptoLibAgreement* self)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
-    case SeosCryptoApi_Agreement_ALG_DH:
-        err = (SeosCryptoLib_Key_getType(self->prvKey)
-               != SeosCryptoApi_Key_TYPE_DH_PRV) ?
+    case OS_CryptoAgreement_ALG_DH:
+        err = (OS_CryptoLibKey_getType(self->prvKey)
+               != OS_CryptoKey_TYPE_DH_PRV) ?
               SEOS_ERROR_INVALID_PARAMETER :
-              SeosCryptoLib_Key_writeDhPrv(self->prvKey, &self->mbedtls.dh);
+              OS_CryptoLibKey_writeDhPrv(self->prvKey, &self->mbedtls.dh);
         break;
-    case SeosCryptoApi_Agreement_ALG_ECDH:
-        err = (SeosCryptoLib_Key_getType(self->prvKey)
-               != SeosCryptoApi_Key_TYPE_SECP256R1_PRV) ?
+    case OS_CryptoAgreement_ALG_ECDH:
+        err = (OS_CryptoLibKey_getType(self->prvKey)
+               != OS_CryptoKey_TYPE_SECP256R1_PRV) ?
               SEOS_ERROR_INVALID_PARAMETER :
-              SeosCryptoLib_Key_writeSecp256r1Prv(self->prvKey, &self->mbedtls.ecdh);
+              OS_CryptoLibKey_writeSecp256r1Prv(self->prvKey, &self->mbedtls.ecdh);
         break;
     default:
         err = SEOS_ERROR_NOT_SUPPORTED;
@@ -123,20 +122,20 @@ setKeyImpl(
 
 static seos_err_t
 agreeImpl(
-    SeosCryptoLib_Agreement* self,
-    SeosCryptoLib_Rng*       rng,
-    const SeosCryptoLib_Key* pubKey,
-    void*                    buf,
-    size_t*                  bufSize)
+    OS_CryptoLibAgreement* self,
+    OS_CryptoLibRng*       rng,
+    const OS_CryptoLibKey* pubKey,
+    void*                  buf,
+    size_t*                bufSize)
 {
-    void* rngFunc = (NULL != rng) ? SeosCryptoLib_Rng_getBytesMbedtls : NULL;
+    void* rngFunc = (NULL != rng) ? OS_CryptoLibRng_getBytesMbedtls : NULL;
     seos_err_t err = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
-    case SeosCryptoApi_Agreement_ALG_DH:
-        if ((SeosCryptoLib_Key_getType(pubKey) != SeosCryptoApi_Key_TYPE_DH_PUB)
-            || SeosCryptoLib_Key_writeDhPub(pubKey, &self->mbedtls.dh) != SEOS_SUCCESS)
+    case OS_CryptoAgreement_ALG_DH:
+        if ((OS_CryptoLibKey_getType(pubKey) != OS_CryptoKey_TYPE_DH_PUB)
+            || OS_CryptoLibKey_writeDhPub(pubKey, &self->mbedtls.dh) != SEOS_SUCCESS)
         {
             err = SEOS_ERROR_INVALID_PARAMETER;
         }
@@ -152,10 +151,10 @@ agreeImpl(
                   SEOS_ERROR_ABORTED : SEOS_SUCCESS;
         }
         break;
-    case SeosCryptoApi_Agreement_ALG_ECDH:
-        if ((SeosCryptoLib_Key_getType(pubKey) != SeosCryptoApi_Key_TYPE_SECP256R1_PUB)
-            || SeosCryptoLib_Key_writeSecp256r1Pub(pubKey,
-                                                   &self->mbedtls.ecdh) != SEOS_SUCCESS)
+    case OS_CryptoAgreement_ALG_ECDH:
+        if ((OS_CryptoLibKey_getType(pubKey) != OS_CryptoKey_TYPE_SECP256R1_PUB)
+            || OS_CryptoLibKey_writeSecp256r1Pub(pubKey,
+                                                 &self->mbedtls.ecdh) != SEOS_SUCCESS)
         {
             err = SEOS_ERROR_INVALID_PARAMETER;
         }
@@ -181,11 +180,11 @@ agreeImpl(
 // Public Functions ------------------------------------------------------------
 
 seos_err_t
-SeosCryptoLib_Agreement_init(
-    SeosCryptoLib_Agreement**         self,
-    const SeosCryptoApi_MemIf*        memIf,
-    const SeosCryptoApi_Agreement_Alg algorithm,
-    const SeosCryptoLib_Key*          prvKey)
+OS_CryptoLibAgreement_init(
+    OS_CryptoLibAgreement**      self,
+    const OS_Crypto_Memory*      memIf,
+    const OS_CryptoAgreement_Alg algorithm,
+    const OS_CryptoLibKey*       prvKey)
 {
     seos_err_t err;
 
@@ -206,9 +205,9 @@ SeosCryptoLib_Agreement_init(
 }
 
 seos_err_t
-SeosCryptoLib_Agreement_free(
-    SeosCryptoLib_Agreement*   self,
-    const SeosCryptoApi_MemIf* memIf)
+OS_CryptoLibAgreement_free(
+    OS_CryptoLibAgreement*  self,
+    const OS_Crypto_Memory* memIf)
 {
     if (NULL == self || NULL == memIf)
     {
@@ -219,12 +218,12 @@ SeosCryptoLib_Agreement_free(
 }
 
 seos_err_t
-SeosCryptoLib_Agreement_agree(
-    SeosCryptoLib_Agreement* self,
-    SeosCryptoLib_Rng*       rng,
-    const SeosCryptoLib_Key* pubKey,
-    void*                    shared,
-    size_t*                  sharedSize)
+OS_CryptoLibAgreement_agree(
+    OS_CryptoLibAgreement* self,
+    OS_CryptoLibRng*       rng,
+    const OS_CryptoLibKey* pubKey,
+    void*                  shared,
+    size_t*                sharedSize)
 {
     if (NULL == self || NULL == pubKey || NULL == shared || NULL == sharedSize)
     {

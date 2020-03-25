@@ -4,7 +4,7 @@
  * @addtogroup Crypto
  * @{
  *
- * @file SeosCryptoLib_Rng.h
+ * @file OS_CryptoLibRng.h
  *
  * @brief Crypto library implementation of RNG functions
  *
@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include "SeosCryptoApi.h"
+#include "OS_Crypto.h"
 
 #include "mbedtls/ctr_drbg.h"
 
@@ -22,34 +22,34 @@
 
 // Exported types/defines/enums ------------------------------------------------
 
-typedef struct SeosCryptoLib_Rng SeosCryptoLib_Rng;
+typedef struct OS_CryptoLibRng OS_CryptoLibRng;
 
 // Exported functions ----------------------------------------------------------
 
 seos_err_t
-SeosCryptoLib_Rng_init(
-    SeosCryptoLib_Rng**                  self,
-    const SeosCryptoApi_MemIf*           memIf,
-    const SeosCryptoApi_Rng_EntropyFunc* entropyFunc,
-    void*                                entropyCtx);
+OS_CryptoLibRng_init(
+    OS_CryptoLibRng**               self,
+    const OS_Crypto_Memory*         memIf,
+    const OS_CryptoRng_EntropyFunc* entropyFunc,
+    void*                           entropyCtx);
 
 seos_err_t
-SeosCryptoLib_Rng_getBytes(
-    SeosCryptoLib_Rng*           self,
-    const SeosCryptoApi_Rng_Flag flags,
-    void*                        buf,
-    const size_t                 bufSize);
+OS_CryptoLibRng_getBytes(
+    OS_CryptoLibRng*        self,
+    const OS_CryptoRng_Flag flags,
+    void*                   buf,
+    const size_t            bufSize);
 
 seos_err_t
-SeosCryptoLib_Rng_reSeed(
-    SeosCryptoLib_Rng* self,
-    const void*        seed,
-    const size_t       seedSize);
+OS_CryptoLibRng_reSeed(
+    OS_CryptoLibRng* self,
+    const void*      seed,
+    const size_t     seedSize);
 
 seos_err_t
-SeosCryptoLib_Rng_free(
-    SeosCryptoLib_Rng*         self,
-    const SeosCryptoApi_MemIf* memIf);
+OS_CryptoLibRng_free(
+    OS_CryptoLibRng*        self,
+    const OS_Crypto_Memory* memIf);
 
 /**
  * @brief Get random bytes for mbedTLS wrapper
@@ -63,15 +63,15 @@ SeosCryptoLib_Rng_free(
  *
  */
 INLINE int
-SeosCryptoLib_Rng_getBytesMbedtls(
+OS_CryptoLibRng_getBytesMbedtls(
     void*          self,
     unsigned char* buf,
     size_t         bufSize)
 {
     // Simple wrapper for mbedTLS, to allow the buffered use of the getRandomData()
     // function as is common, but also to directly pass a function to mbedTLS
-    return SeosCryptoLib_Rng_getBytes(self, 0, buf,
-                                      bufSize) == SEOS_SUCCESS ? 0 : 1;
+    return OS_CryptoLibRng_getBytes(self, 0, buf,
+                                    bufSize) == SEOS_SUCCESS ? 0 : 1;
 }
 
 /** @} */
