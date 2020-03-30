@@ -120,7 +120,7 @@ target_compile_options(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC
-        "include"
+        "inc"
         "3rdParty/mbedtls/include"
 )
 
@@ -156,7 +156,7 @@ target_compile_options(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC
-        "include"
+        "inc"
         "3rdParty/mbedtls/include"
 )
 
@@ -191,7 +191,7 @@ target_compile_options(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC
-        "include"
+        "inc"
         "3rdParty/mbedtls/include"
 )
 
