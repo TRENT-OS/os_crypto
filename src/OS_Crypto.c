@@ -79,7 +79,7 @@ struct OS_Crypto_Object
 
 seos_err_t
 OS_Crypto_init(
-    OS_CryptoH_t*             self,
+    OS_Crypto_Handle_t*       self,
     const OS_Crypto_Config_t* cfg)
 {
     seos_err_t err;
@@ -159,7 +159,7 @@ err0:
 
 seos_err_t
 OS_Crypto_free(
-    OS_CryptoH_t self)
+    OS_Crypto_Handle_t self)
 {
     seos_err_t err;
 
@@ -199,7 +199,7 @@ OS_Crypto_free(
 
 void*
 OS_Crypto_getServer(
-    const OS_CryptoH_t self)
+    const OS_Crypto_Handle_t self)
 {
     return (NULL == self) ? NULL : self->server;
 }
@@ -214,7 +214,7 @@ OS_Crypto_getObject(
 seos_err_t
 OS_Crypto_migrateObject(
     OS_Crypto_Object_t**          proxy,
-    const OS_CryptoH_t            self,
+    const OS_Crypto_Handle_t      self,
     const OS_CryptoLib_Object_ptr ptr)
 {
     if (NULL == ptr)
@@ -230,7 +230,7 @@ OS_Crypto_migrateObject(
 
 OS_Crypto_Mode_t
 OS_Crypto_getMode(
-    const OS_CryptoH_t self)
+    const OS_Crypto_Handle_t self)
 {
     return (NULL == self) ? OS_Crypto_MODE_NONE : self->mode;
 }
@@ -239,7 +239,7 @@ OS_Crypto_getMode(
 
 seos_err_t
 OS_CryptoRng_getBytes(
-    OS_CryptoH_t              self,
+    OS_Crypto_Handle_t        self,
     const OS_CryptoRng_Flag_t flags,
     void*                     buf,
     const size_t              bufSize)
@@ -249,9 +249,9 @@ OS_CryptoRng_getBytes(
 
 seos_err_t
 OS_CryptoRng_reseed(
-    OS_CryptoH_t self,
-    const void*  seed,
-    const size_t seedSize)
+    OS_Crypto_Handle_t self,
+    const void*        seed,
+    const size_t       seedSize)
 {
     return CALL(self, Rng_reseed, seed, seedSize);
 }
@@ -260,8 +260,8 @@ OS_CryptoRng_reseed(
 
 seos_err_t
 OS_CryptoMac_init(
-    OS_CryptoMacH_t*         hMac,
-    const OS_CryptoH_t       self,
+    OS_CryptoMac_Handle_t*   hMac,
+    const OS_Crypto_Handle_t self,
     const OS_CryptoMac_Alg_t algorithm)
 {
     seos_err_t err;
@@ -278,7 +278,7 @@ OS_CryptoMac_init(
 
 seos_err_t
 OS_CryptoMac_free(
-    OS_CryptoMacH_t hMac)
+    OS_CryptoMac_Handle_t hMac)
 {
     seos_err_t err;
 
@@ -290,27 +290,27 @@ OS_CryptoMac_free(
 
 seos_err_t
 OS_CryptoMac_start(
-    OS_CryptoMacH_t hMac,
-    const void*     secret,
-    const size_t    secretSize)
+    OS_CryptoMac_Handle_t hMac,
+    const void*           secret,
+    const size_t          secretSize)
 {
     return PROXY_CALL(hMac, Mac_start, PROXY_GET_OBJ(hMac), secret, secretSize);
 }
 
 seos_err_t
 OS_CryptoMac_process(
-    OS_CryptoMacH_t hMac,
-    const void*     data,
-    const size_t    dataSize)
+    OS_CryptoMac_Handle_t hMac,
+    const void*           data,
+    const size_t          dataSize)
 {
     return PROXY_CALL(hMac, Mac_process, PROXY_GET_OBJ(hMac), data, dataSize);
 }
 
 seos_err_t
 OS_CryptoMac_finalize(
-    OS_CryptoMacH_t hMac,
-    void*           mac,
-    size_t*         macSize)
+    OS_CryptoMac_Handle_t hMac,
+    void*                 mac,
+    size_t*               macSize)
 {
     return PROXY_CALL(hMac, Mac_finalize, PROXY_GET_OBJ(hMac), mac, macSize);
 }
@@ -319,8 +319,8 @@ OS_CryptoMac_finalize(
 
 seos_err_t
 OS_CryptoDigest_init(
-    OS_CryptoDigestH_t*         hDigest,
-    const OS_CryptoH_t          self,
+    OS_CryptoDigest_Handle_t*   hDigest,
+    const OS_Crypto_Handle_t    self,
     const OS_CryptoDigest_Alg_t algorithm)
 {
     seos_err_t err;
@@ -337,7 +337,7 @@ OS_CryptoDigest_init(
 
 seos_err_t
 OS_CryptoDigest_free(
-    OS_CryptoDigestH_t hDigest)
+    OS_CryptoDigest_Handle_t hDigest)
 {
     seos_err_t err;
 
@@ -349,8 +349,8 @@ OS_CryptoDigest_free(
 
 seos_err_t
 OS_CryptoDigest_clone(
-    OS_CryptoDigestH_t       hDstDigest,
-    const OS_CryptoDigestH_t hSrcDigest)
+    OS_CryptoDigest_Handle_t       hDstDigest,
+    const OS_CryptoDigest_Handle_t hSrcDigest)
 {
     return PROXY_CALL(hDstDigest, Digest_clone, PROXY_GET_OBJ(hDstDigest),
                       PROXY_GET_OBJ(hSrcDigest));
@@ -358,9 +358,9 @@ OS_CryptoDigest_clone(
 
 seos_err_t
 OS_CryptoDigest_process(
-    OS_CryptoDigestH_t hDigest,
-    const void*        data,
-    const size_t       dataSize)
+    OS_CryptoDigest_Handle_t hDigest,
+    const void*              data,
+    const size_t             dataSize)
 {
     return PROXY_CALL(hDigest, Digest_process, PROXY_GET_OBJ(hDigest), data,
                       dataSize);
@@ -368,9 +368,9 @@ OS_CryptoDigest_process(
 
 seos_err_t
 OS_CryptoDigest_finalize(
-    OS_CryptoDigestH_t hDigest,
-    void*              digest,
-    size_t*            digestSize)
+    OS_CryptoDigest_Handle_t hDigest,
+    void*                    digest,
+    size_t*                  digestSize)
 {
     return PROXY_CALL(hDigest, Digest_finalize, PROXY_GET_OBJ(hDigest), digest,
                       digestSize);
@@ -380,10 +380,10 @@ OS_CryptoDigest_finalize(
 
 seos_err_t
 OS_CryptoSignature_init(
-    OS_CryptoSignatureH_t*         hSig,
-    const OS_CryptoH_t             self,
-    const OS_CryptoKeyH_t          hPrvKey,
-    const OS_CryptoKeyH_t          hPubKey,
+    OS_CryptoSignature_Handle_t*   hSig,
+    const OS_Crypto_Handle_t       self,
+    const OS_CryptoKey_Handle_t    hPrvKey,
+    const OS_CryptoKey_Handle_t    hPubKey,
     const OS_CryptoSignature_Alg_t sigAlgorithm,
     const OS_CryptoDigest_Alg_t    digAlgorithm)
 {
@@ -402,7 +402,7 @@ OS_CryptoSignature_init(
 
 seos_err_t
 OS_CryptoSignature_free(
-    OS_CryptoSignatureH_t hSig)
+    OS_CryptoSignature_Handle_t hSig)
 {
     seos_err_t err;
 
@@ -414,11 +414,11 @@ OS_CryptoSignature_free(
 
 seos_err_t
 OS_CryptoSignature_sign(
-    OS_CryptoSignatureH_t hSig,
-    const void*           hash,
-    const size_t          hashSize,
-    void*                 signature,
-    size_t*               signatureSize)
+    OS_CryptoSignature_Handle_t hSig,
+    const void*                 hash,
+    const size_t                hashSize,
+    void*                       signature,
+    size_t*                     signatureSize)
 {
     return PROXY_CALL(hSig, Signature_sign, PROXY_GET_OBJ(hSig), hash, hashSize,
                       signature, signatureSize);
@@ -426,11 +426,11 @@ OS_CryptoSignature_sign(
 
 seos_err_t
 OS_CryptoSignature_verify(
-    OS_CryptoSignatureH_t hSig,
-    const void*           hash,
-    const size_t          hashSize,
-    const void*           signature,
-    const size_t          signatureSize)
+    OS_CryptoSignature_Handle_t hSig,
+    const void*                 hash,
+    const size_t                hashSize,
+    const void*                 signature,
+    const size_t                signatureSize)
 {
     return PROXY_CALL(hSig, Signature_verify, PROXY_GET_OBJ(hSig), hash, hashSize,
                       signature, signatureSize);
@@ -440,9 +440,9 @@ OS_CryptoSignature_verify(
 
 seos_err_t
 OS_CryptoAgreement_init(
-    OS_CryptoAgreementH_t*         hAgree,
-    const OS_CryptoH_t             self,
-    const OS_CryptoKeyH_t          hPrvKey,
+    OS_CryptoAgreement_Handle_t*   hAgree,
+    const OS_Crypto_Handle_t       self,
+    const OS_CryptoKey_Handle_t    hPrvKey,
     const OS_CryptoAgreement_Alg_t algorithm)
 {
     seos_err_t err;
@@ -459,7 +459,7 @@ OS_CryptoAgreement_init(
 
 seos_err_t
 OS_CryptoAgreement_free(
-    OS_CryptoAgreementH_t hAgree)
+    OS_CryptoAgreement_Handle_t hAgree)
 {
     seos_err_t err;
 
@@ -471,10 +471,10 @@ OS_CryptoAgreement_free(
 
 seos_err_t
 OS_CryptoAgreement_agree(
-    OS_CryptoAgreementH_t hAgree,
-    const OS_CryptoKeyH_t hPubKey,
-    void*                 shared,
-    size_t*               sharedSize)
+    OS_CryptoAgreement_Handle_t hAgree,
+    const OS_CryptoKey_Handle_t hPubKey,
+    void*                       shared,
+    size_t*                     sharedSize)
 {
     return PROXY_CALL(hAgree, Agreement_agree, PROXY_GET_OBJ(hAgree),
                       PROXY_GET_OBJ(hPubKey), shared, sharedSize);
@@ -484,8 +484,8 @@ OS_CryptoAgreement_agree(
 
 seos_err_t
 OS_CryptoKey_generate(
-    OS_CryptoKeyH_t*           hKey,
-    const OS_CryptoH_t         self,
+    OS_CryptoKey_Handle_t*     hKey,
+    const OS_Crypto_Handle_t   self,
     const OS_CryptoKey_Spec_t* spec)
 {
     seos_err_t err;
@@ -502,8 +502,8 @@ OS_CryptoKey_generate(
 
 seos_err_t
 OS_CryptoKey_import(
-    OS_CryptoKeyH_t*           hKey,
-    const OS_CryptoH_t         self,
+    OS_CryptoKey_Handle_t*     hKey,
+    const OS_Crypto_Handle_t   self,
     const OS_CryptoKey_Data_t* keyData)
 {
     seos_err_t err;
@@ -520,9 +520,9 @@ OS_CryptoKey_import(
 
 seos_err_t
 OS_CryptoKey_makePublic(
-    OS_CryptoKeyH_t*             hPubKey,
-    const OS_CryptoH_t           self,
-    const OS_CryptoKeyH_t        hPrvKey,
+    OS_CryptoKey_Handle_t*       hPubKey,
+    const OS_Crypto_Handle_t     self,
+    const OS_CryptoKey_Handle_t  hPrvKey,
     const OS_CryptoKey_Attrib_t* attribs)
 {
     seos_err_t err;
@@ -539,24 +539,24 @@ OS_CryptoKey_makePublic(
 
 seos_err_t
 OS_CryptoKey_free(
-    OS_CryptoKeyH_t hKey)
+    OS_CryptoKey_Handle_t hKey)
 {
     return PROXY_CALL(hKey, Key_free, PROXY_GET_OBJ(hKey));
 }
 
 seos_err_t
 OS_CryptoKey_export(
-    const OS_CryptoKeyH_t hKey,
-    OS_CryptoKey_Data_t*  keyData)
+    const OS_CryptoKey_Handle_t hKey,
+    OS_CryptoKey_Data_t*        keyData)
 {
     return PROXY_CALL(hKey, Key_export, PROXY_GET_OBJ(hKey), keyData);
 }
 
 seos_err_t
 OS_CryptoKey_getParams(
-    const OS_CryptoKeyH_t hKey,
-    void*                 keyParams,
-    size_t*               paramSize)
+    const OS_CryptoKey_Handle_t hKey,
+    void*                       keyParams,
+    size_t*                     paramSize)
 {
     return PROXY_CALL(hKey, Key_getParams, PROXY_GET_OBJ(hKey), keyParams,
                       paramSize);
@@ -564,15 +564,15 @@ OS_CryptoKey_getParams(
 
 seos_err_t
 OS_CryptoKey_getAttribs(
-    const OS_CryptoKeyH_t  hKey,
-    OS_CryptoKey_Attrib_t* attribs)
+    const OS_CryptoKey_Handle_t hKey,
+    OS_CryptoKey_Attrib_t*      attribs)
 {
     return PROXY_CALL(hKey, Key_getAttribs, PROXY_GET_OBJ(hKey), attribs);
 }
 
 seos_err_t
 OS_CryptoKey_loadParams(
-    OS_CryptoH_t               self,
+    OS_Crypto_Handle_t         self,
     const OS_CryptoKey_Param_t name,
     void*                      keyParams,
     size_t*                    paramSize)
@@ -584,9 +584,9 @@ OS_CryptoKey_loadParams(
 
 seos_err_t
 OS_CryptoCipher_init(
-    OS_CryptoCipherH_t*         hCipher,
-    const OS_CryptoH_t          self,
-    const OS_CryptoKeyH_t       hKey,
+    OS_CryptoCipher_Handle_t*   hCipher,
+    const OS_Crypto_Handle_t    self,
+    const OS_CryptoKey_Handle_t hKey,
     const OS_CryptoCipher_Alg_t algorithm,
     const void*                 iv,
     const size_t                ivSize)
@@ -605,7 +605,7 @@ OS_CryptoCipher_init(
 
 seos_err_t
 OS_CryptoCipher_free(
-    OS_CryptoCipherH_t hCipher)
+    OS_CryptoCipher_Handle_t hCipher)
 {
     seos_err_t err;
 
@@ -617,11 +617,11 @@ OS_CryptoCipher_free(
 
 seos_err_t
 OS_CryptoCipher_process(
-    OS_CryptoCipherH_t hCipher,
-    const void*        input,
-    const size_t       inputSize,
-    void*              output,
-    size_t*            outputSize)
+    OS_CryptoCipher_Handle_t hCipher,
+    const void*              input,
+    const size_t             inputSize,
+    void*                    output,
+    size_t*                  outputSize)
 {
     return PROXY_CALL(hCipher, Cipher_process, PROXY_GET_OBJ(hCipher), input,
                       inputSize, output, outputSize);
@@ -629,18 +629,18 @@ OS_CryptoCipher_process(
 
 seos_err_t
 OS_CryptoCipher_start(
-    OS_CryptoCipherH_t hCipher,
-    const void*        ad,
-    const size_t       adSize)
+    OS_CryptoCipher_Handle_t hCipher,
+    const void*              ad,
+    const size_t             adSize)
 {
     return PROXY_CALL(hCipher, Cipher_start, PROXY_GET_OBJ(hCipher), ad, adSize);
 }
 
 seos_err_t
 OS_CryptoCipher_finalize(
-    OS_CryptoCipherH_t hCipher,
-    void*              output,
-    size_t*            outputSize)
+    OS_CryptoCipher_Handle_t hCipher,
+    void*                    output,
+    size_t*                  outputSize)
 {
     return PROXY_CALL(hCipher, Cipher_finalize, PROXY_GET_OBJ(hCipher), output,
                       outputSize);

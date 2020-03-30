@@ -18,14 +18,14 @@
  * This way, it is up to the host (e.g., the CryptoServer) to implement its own
  * way of handling multiple clients and their respective contextx.
  */
-extern OS_CryptoH_t
+extern OS_Crypto_Handle_t
 OS_CryptoRpcServer_getCrypto(
     void);
 
 // This is not exposed via header intentionally
 void*
 OS_Crypto_getServer(
-    const OS_CryptoH_t self);
+    const OS_Crypto_Handle_t self);
 
 // Get Crypto API context host of Crypto API in RPC_SERVER mode
 #define GET_SELF(s) {                                       \
