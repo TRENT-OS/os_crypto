@@ -26,18 +26,18 @@
 
 // -------------------------- defines/types/variables --------------------------
 
-typedef struct OS_CryptoLib OS_CryptoLib;
+typedef struct OS_CryptoLib OS_CryptoLib_t;
 
 // ------------------------------- Init/Free -----------------------------------
 
 seos_err_t
 OS_CryptoLib_init(
-    OS_CryptoImpl*             impl,
-    const OS_Crypto_Memory*    memIf,
-    const OS_CryptoLib_Config* cfg);
+    OS_CryptoImpl_t*             impl,
+    const OS_Crypto_Memory_t*    memIf,
+    const OS_CryptoLib_Config_t* cfg);
 
 seos_err_t
 OS_CryptoLib_free(
-    OS_CryptoLib* self);
+    OS_CryptoLib_t* self);
 
 /** @} */

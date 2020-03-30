@@ -21,18 +21,18 @@
 
 // -------------------------- defines/types/variables --------------------------
 
-typedef struct OS_CryptoRpcClient OS_CryptoRpcClient;
+typedef struct OS_CryptoRpcClient OS_CryptoRpcClient_t;
 
 // ------------------------------- Init/Free -----------------------------------
 
 seos_err_t
 OS_CryptoRpcClient_init(
-    OS_CryptoImpl*                   impl,
-    const OS_Crypto_Memory*          memIf,
-    const OS_CryptoRpcClient_Config* cfg);
+    OS_CryptoImpl_t*                   impl,
+    const OS_Crypto_Memory_t*          memIf,
+    const OS_CryptoRpcClient_Config_t* cfg);
 
 seos_err_t
 OS_CryptoRpcClient_free(
-    OS_CryptoRpcClient* self);
+    OS_CryptoRpcClient_t* self);
 
 /** @} */

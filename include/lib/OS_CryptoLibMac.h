@@ -18,37 +18,37 @@
 
 // Exported types/defines/enums ------------------------------------------------
 
-typedef struct OS_CryptoLibMac OS_CryptoLibMac;
+typedef struct OS_CryptoLibMac OS_CryptoLibMac_t;
 
 // Exported functions ----------------------------------------------------------
 
 seos_err_t
 OS_CryptoLibMac_init(
-    OS_CryptoLibMac**       self,
-    const OS_Crypto_Memory* memIf,
-    const OS_CryptoMac_Alg  algorithm);
+    OS_CryptoLibMac_t**       self,
+    const OS_Crypto_Memory_t* memIf,
+    const OS_CryptoMac_Alg_t  algorithm);
 
 seos_err_t
 OS_CryptoLibMac_free(
-    OS_CryptoLibMac*        self,
-    const OS_Crypto_Memory* memIf);
+    OS_CryptoLibMac_t*        self,
+    const OS_Crypto_Memory_t* memIf);
 
 seos_err_t
 OS_CryptoLibMac_start(
-    OS_CryptoLibMac* self,
-    const void*      secret,
-    const size_t     secretSize);
+    OS_CryptoLibMac_t* self,
+    const void*        secret,
+    const size_t       secretSize);
 
 seos_err_t
 OS_CryptoLibMac_process(
-    OS_CryptoLibMac* self,
-    const void*      data,
-    const size_t     dataSize);
+    OS_CryptoLibMac_t* self,
+    const void*        data,
+    const size_t       dataSize);
 
 seos_err_t
 OS_CryptoLibMac_finalize(
-    OS_CryptoLibMac* self,
-    void*            mac,
-    size_t*          macSize);
+    OS_CryptoLibMac_t* self,
+    void*              mac,
+    size_t*            macSize);
 
 /** @} */

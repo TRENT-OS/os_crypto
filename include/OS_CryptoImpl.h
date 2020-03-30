@@ -32,37 +32,37 @@ typedef seos_err_t
 typedef seos_err_t
 (*OS_CryptoImpl_Mac_init)(
     void*,
-    OS_CryptoLibMac**,
-    const OS_CryptoMac_Alg);
+    OS_CryptoLibMac_t**,
+    const OS_CryptoMac_Alg_t);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Mac_exists)(
     void*,
-    const OS_CryptoLibMac*);
+    const OS_CryptoLibMac_t*);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Mac_free)(
     void*,
-    OS_CryptoLibMac*);
+    OS_CryptoLibMac_t*);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Mac_start)(
     void*,
-    OS_CryptoLibMac*,
+    OS_CryptoLibMac_t*,
     const void*,
     const size_t);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Mac_process)(
     void*,
-    OS_CryptoLibMac*,
+    OS_CryptoLibMac_t*,
     const void*,
     const size_t);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Mac_finalize)(
     void*,
-    OS_CryptoLibMac*,
+    OS_CryptoLibMac_t*,
     void*,
     size_t*);
 
@@ -71,36 +71,36 @@ typedef seos_err_t
 typedef seos_err_t
 (*OS_CryptoImpl_Digest_init)(
     void*,
-    OS_CryptoLibDigest**,
-    const OS_CryptoDigest_Alg);
+    OS_CryptoLibDigest_t**,
+    const OS_CryptoDigest_Alg_t);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Digest_exists)(
     void*,
-    const OS_CryptoLibDigest*);
+    const OS_CryptoLibDigest_t*);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Digest_free)(
     void*,
-    OS_CryptoLibDigest*);
+    OS_CryptoLibDigest_t*);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Digest_clone)(
     void*,
-    OS_CryptoLibDigest*,
-    const OS_CryptoLibDigest*);
+    OS_CryptoLibDigest_t*,
+    const OS_CryptoLibDigest_t*);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Digest_process)(
     void*,
-    OS_CryptoLibDigest*,
+    OS_CryptoLibDigest_t*,
     const void*,
     const size_t);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Digest_finalize)(
     void*,
-    OS_CryptoLibDigest*,
+    OS_CryptoLibDigest_t*,
     void*,
     size_t*);
 
@@ -109,55 +109,55 @@ typedef seos_err_t
 typedef seos_err_t
 (*OS_CryptoImpl_Key_generate)(
     void*,
-    OS_CryptoLibKey**,
-    const OS_CryptoKey_Spec*);
+    OS_CryptoLibKey_t**,
+    const OS_CryptoKey_Spec_t*);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Key_import)(
     void*,
-    OS_CryptoLibKey**,
-    const OS_CryptoKey_Data*);
+    OS_CryptoLibKey_t**,
+    const OS_CryptoKey_Data_t*);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Key_makePublic)(
     void*,
-    OS_CryptoLibKey**,
-    const OS_CryptoLibKey*,
-    const OS_CryptoKey_Attribs*);
+    OS_CryptoLibKey_t**,
+    const OS_CryptoLibKey_t*,
+    const OS_CryptoKey_Attrib_t*);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Key_export)(
     void*,
-    const OS_CryptoLibKey*,
-    OS_CryptoKey_Data*);
+    const OS_CryptoLibKey_t*,
+    OS_CryptoKey_Data_t*);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Key_getParams)(
     void*,
-    const OS_CryptoLibKey*,
+    const OS_CryptoLibKey_t*,
     void*,
     size_t*);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Key_getAttribs)(
     void*,
-    const OS_CryptoLibKey*,
-    OS_CryptoKey_Attribs*);
+    const OS_CryptoLibKey_t*,
+    OS_CryptoKey_Attrib_t*);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Key_exists)(
     void*,
-    const OS_CryptoLibKey*);
+    const OS_CryptoLibKey_t*);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Key_free)(
     void*,
-    OS_CryptoLibKey*);
+    OS_CryptoLibKey_t*);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Key_loadParams)(
     void*,
-    const OS_CryptoKey_Param,
+    const OS_CryptoKey_Param_t,
     void*,
     size_t*);
 
@@ -166,26 +166,26 @@ typedef seos_err_t
 typedef seos_err_t
 (*OS_CryptoImpl_Signature_init)(
     void*,
-    OS_CryptoLibSignature**,
-    const OS_CryptoSignature_Alg,
-    const OS_CryptoDigest_Alg,
-    const OS_CryptoLibKey*,
-    const OS_CryptoLibKey*);
+    OS_CryptoLibSignature_t**,
+    const OS_CryptoSignature_Alg_t,
+    const OS_CryptoDigest_Alg_t,
+    const OS_CryptoLibKey_t*,
+    const OS_CryptoLibKey_t*);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Signature_exists)(
     void*,
-    const OS_CryptoLibSignature* );
+    const OS_CryptoLibSignature_t* );
 
 typedef seos_err_t
 (*OS_CryptoImpl_Signature_free)(
     void*,
-    OS_CryptoLibSignature*);
+    OS_CryptoLibSignature_t*);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Signature_sign)(
     void*,
-    OS_CryptoLibSignature*,
+    OS_CryptoLibSignature_t*,
     const void*,
     const size_t,
     void*,
@@ -194,7 +194,7 @@ typedef seos_err_t
 typedef seos_err_t
 (*OS_CryptoImpl_Signature_verify)(
     void*,
-    OS_CryptoLibSignature*,
+    OS_CryptoLibSignature_t*,
     const void*,
     const size_t,
     const void*,
@@ -205,25 +205,25 @@ typedef seos_err_t
 typedef seos_err_t
 (*OS_CryptoImpl_Agreement_init)(
     void*,
-    OS_CryptoLibAgreement**,
-    const OS_CryptoAgreement_Alg,
-    const OS_CryptoLibKey*);
+    OS_CryptoLibAgreement_t**,
+    const OS_CryptoAgreement_Alg_t,
+    const OS_CryptoLibKey_t*);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Agreement_exists)(
     void*,
-    const OS_CryptoLibAgreement*);
+    const OS_CryptoLibAgreement_t*);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Agreement_free)(
     void*,
-    OS_CryptoLibAgreement*);
+    OS_CryptoLibAgreement_t*);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Agreement_agree)(
     void*,
-    OS_CryptoLibAgreement*,
-    const OS_CryptoLibKey*,
+    OS_CryptoLibAgreement_t*,
+    const OS_CryptoLibKey_t*,
     void*,
     size_t*);
 
@@ -232,26 +232,26 @@ typedef seos_err_t
 typedef seos_err_t
 (*OS_CryptoImpl_Cipher_init)(
     void*,
-    OS_CryptoLibCipher**,
-    const OS_CryptoCipher_Alg,
-    const OS_CryptoLibKey*,
+    OS_CryptoLibCipher_t**,
+    const OS_CryptoCipher_Alg_t,
+    const OS_CryptoLibKey_t*,
     const void*,
     const size_t);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Cipher_exists)(
     void*,
-    const OS_CryptoLibCipher*);
+    const OS_CryptoLibCipher_t*);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Cipher_free)(
     void*,
-    OS_CryptoLibCipher*);
+    OS_CryptoLibCipher_t*);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Cipher_process)(
     void*,
-    OS_CryptoLibCipher*,
+    OS_CryptoLibCipher_t*,
     const void*,
     const size_t,
     void*,
@@ -260,14 +260,14 @@ typedef seos_err_t
 typedef seos_err_t
 (*OS_CryptoImpl_Cipher_start)(
     void*,
-    OS_CryptoLibCipher*,
+    OS_CryptoLibCipher_t*,
     const void*,
     const size_t);
 
 typedef seos_err_t
 (*OS_CryptoImpl_Cipher_finalize)(
     void*,
-    OS_CryptoLibCipher*,
+    OS_CryptoLibCipher_t*,
     void*,
     size_t*);
 
@@ -313,10 +313,10 @@ typedef struct
     OS_CryptoImpl_Cipher_process Cipher_process;
     OS_CryptoImpl_Cipher_start Cipher_start;
     OS_CryptoImpl_Cipher_finalize Cipher_finalize;
-} OS_CryptoImpl_Vtable;
+} OS_CryptoImpl_Vtable_t;
 
 typedef struct
 {
-    const OS_CryptoImpl_Vtable* vtable;
+    const OS_CryptoImpl_Vtable_t* vtable;
     void* context;
-} OS_CryptoImpl;
+} OS_CryptoImpl_t;

@@ -14,8 +14,8 @@
 
 struct OS_CryptoLib
 {
-    OS_Crypto_Memory memIf;
-    OS_CryptoLibRng* rng;
+    OS_Crypto_Memory_t memIf;
+    OS_CryptoLibRng_t* rng;
     PtrVector keyObjects;
     PtrVector macObjects;
     PtrVector digestObjects;
@@ -34,12 +34,12 @@ struct OS_CryptoLib
 
 static seos_err_t
 Rng_getBytes(
-    void*                   ctx,
-    const OS_CryptoRng_Flag flags,
-    void*                   buf,
-    const size_t            bufSize)
+    void*                     ctx,
+    const OS_CryptoRng_Flag_t flags,
+    void*                     buf,
+    const size_t              bufSize)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx)
     {
@@ -59,7 +59,7 @@ Rng_reseed(
     const void*  seed,
     const size_t seedSize)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx)
     {
@@ -77,12 +77,12 @@ Rng_reseed(
 
 static seos_err_t
 Mac_init(
-    void*                  ctx,
-    OS_CryptoLibMac**      pMacObj,
-    const OS_CryptoMac_Alg algorithm)
+    void*                    ctx,
+    OS_CryptoLibMac_t**      pMacObj,
+    const OS_CryptoMac_Alg_t algorithm)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pMacObj)
     {
@@ -110,10 +110,10 @@ err0:
 
 static seos_err_t
 Mac_free(
-    void*            ctx,
-    OS_CryptoLibMac* macObj)
+    void*              ctx,
+    OS_CryptoLibMac_t* macObj)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx)
     {
@@ -132,10 +132,10 @@ Mac_free(
 
 static seos_err_t
 Mac_exists(
-    void*                  ctx,
-    const OS_CryptoLibMac* macObj)
+    void*                    ctx,
+    const OS_CryptoLibMac_t* macObj)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx)
     {
@@ -149,12 +149,12 @@ Mac_exists(
 
 static seos_err_t
 Mac_start(
-    void*            ctx,
-    OS_CryptoLibMac* macObj,
-    const void*      secret,
-    const size_t     secretSize)
+    void*              ctx,
+    OS_CryptoLibMac_t* macObj,
+    const void*        secret,
+    const size_t       secretSize)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx)
     {
@@ -172,12 +172,12 @@ Mac_start(
 
 static seos_err_t
 Mac_process(
-    void*            ctx,
-    OS_CryptoLibMac* macObj,
-    const void*      data,
-    const size_t     dataSize)
+    void*              ctx,
+    OS_CryptoLibMac_t* macObj,
+    const void*        data,
+    const size_t       dataSize)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx)
     {
@@ -195,12 +195,12 @@ Mac_process(
 
 static seos_err_t
 Mac_finalize(
-    void*            ctx,
-    OS_CryptoLibMac* macObj,
-    void*            mac,
-    size_t*          macSize)
+    void*              ctx,
+    OS_CryptoLibMac_t* macObj,
+    void*              mac,
+    size_t*            macSize)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == macSize)
     {
@@ -220,12 +220,12 @@ Mac_finalize(
 
 static seos_err_t
 Digest_init(
-    void*                     ctx,
-    OS_CryptoLibDigest**      pDigObj,
-    const OS_CryptoDigest_Alg algorithm)
+    void*                       ctx,
+    OS_CryptoLibDigest_t**      pDigObj,
+    const OS_CryptoDigest_Alg_t algorithm)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pDigObj)
     {
@@ -253,10 +253,10 @@ err0:
 
 static seos_err_t
 Digest_free(
-    void*               ctx,
-    OS_CryptoLibDigest* digObj)
+    void*                 ctx,
+    OS_CryptoLibDigest_t* digObj)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx)
     {
@@ -275,10 +275,10 @@ Digest_free(
 
 static seos_err_t
 Digest_exists(
-    void*                     ctx,
-    const OS_CryptoLibDigest* digestObj)
+    void*                       ctx,
+    const OS_CryptoLibDigest_t* digestObj)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx)
     {
@@ -292,11 +292,11 @@ Digest_exists(
 
 static seos_err_t
 Digest_clone(
-    void*                     ctx,
-    OS_CryptoLibDigest*       dstDigObj,
-    const OS_CryptoLibDigest* srcDigObj)
+    void*                       ctx,
+    OS_CryptoLibDigest_t*       dstDigObj,
+    const OS_CryptoLibDigest_t* srcDigObj)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx)
     {
@@ -311,12 +311,12 @@ Digest_clone(
 
 static seos_err_t
 Digest_process(
-    void*               ctx,
-    OS_CryptoLibDigest* digObj,
-    const void*         data,
-    const size_t        dataSize)
+    void*                 ctx,
+    OS_CryptoLibDigest_t* digObj,
+    const void*           data,
+    const size_t          dataSize)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx)
     {
@@ -334,12 +334,12 @@ Digest_process(
 
 static seos_err_t
 Digest_finalize(
-    void*               ctx,
-    OS_CryptoLibDigest* digObj,
-    void*               digest,
-    size_t*             digestSize)
+    void*                 ctx,
+    OS_CryptoLibDigest_t* digObj,
+    void*                 digest,
+    size_t*               digestSize)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == digestSize)
     {
@@ -359,15 +359,15 @@ Digest_finalize(
 
 static seos_err_t
 Signature_init(
-    void*                        ctx,
-    OS_CryptoLibSignature**      pSigObj,
-    const OS_CryptoSignature_Alg algorithm,
-    const OS_CryptoDigest_Alg    digest,
-    const OS_CryptoLibKey*       prvKey,
-    const OS_CryptoLibKey*       pubKey)
+    void*                          ctx,
+    OS_CryptoLibSignature_t**      pSigObj,
+    const OS_CryptoSignature_Alg_t algorithm,
+    const OS_CryptoDigest_Alg_t    digest,
+    const OS_CryptoLibKey_t*       prvKey,
+    const OS_CryptoLibKey_t*       pubKey)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pSigObj)
     {
@@ -404,10 +404,10 @@ err0:
 
 static seos_err_t
 Signature_free(
-    void*                  ctx,
-    OS_CryptoLibSignature* sigObj)
+    void*                    ctx,
+    OS_CryptoLibSignature_t* sigObj)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx)
     {
@@ -426,10 +426,10 @@ Signature_free(
 
 static seos_err_t
 Signature_exists(
-    void*                        ctx,
-    const OS_CryptoLibSignature* signatureObj)
+    void*                          ctx,
+    const OS_CryptoLibSignature_t* signatureObj)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx)
     {
@@ -443,14 +443,14 @@ Signature_exists(
 
 static seos_err_t
 Signature_sign(
-    void*                  ctx,
-    OS_CryptoLibSignature* sigObj,
-    const void*            hash,
-    const size_t           hashSize,
-    void*                  signature,
-    size_t*                signatureSize)
+    void*                    ctx,
+    OS_CryptoLibSignature_t* sigObj,
+    const void*              hash,
+    const size_t             hashSize,
+    void*                    signature,
+    size_t*                  signatureSize)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == hash || NULL == signatureSize)
     {
@@ -472,14 +472,14 @@ Signature_sign(
 
 static seos_err_t
 Signature_verify(
-    void*                  ctx,
-    OS_CryptoLibSignature* sigObj,
-    const void*            hash,
-    const size_t           hashSize,
-    const void*            signature,
-    const size_t           signatureSize)
+    void*                    ctx,
+    OS_CryptoLibSignature_t* sigObj,
+    const void*              hash,
+    const size_t             hashSize,
+    const void*              signature,
+    const size_t             signatureSize)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx)
     {
@@ -500,13 +500,13 @@ Signature_verify(
 
 static seos_err_t
 Agreement_init(
-    void*                        ctx,
-    OS_CryptoLibAgreement**      pAgrObj,
-    const OS_CryptoAgreement_Alg algorithm,
-    const OS_CryptoLibKey*       prvKey)
+    void*                          ctx,
+    OS_CryptoLibAgreement_t**      pAgrObj,
+    const OS_CryptoAgreement_Alg_t algorithm,
+    const OS_CryptoLibKey_t*       prvKey)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pAgrObj)
     {
@@ -539,10 +539,10 @@ err0:
 
 static seos_err_t
 Agreement_free(
-    void*                  ctx,
-    OS_CryptoLibAgreement* agrObj)
+    void*                    ctx,
+    OS_CryptoLibAgreement_t* agrObj)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx)
     {
@@ -561,10 +561,10 @@ Agreement_free(
 
 static seos_err_t
 Agreement_exists(
-    void*                        ctx,
-    const OS_CryptoLibAgreement* agrObj)
+    void*                          ctx,
+    const OS_CryptoLibAgreement_t* agrObj)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx)
     {
@@ -578,13 +578,13 @@ Agreement_exists(
 
 static seos_err_t
 Agreement_agree(
-    void*                  ctx,
-    OS_CryptoLibAgreement* agrObj,
-    const OS_CryptoLibKey* pubKey,
-    void*                  shared,
-    size_t*                sharedSize)
+    void*                    ctx,
+    OS_CryptoLibAgreement_t* agrObj,
+    const OS_CryptoLibKey_t* pubKey,
+    void*                    shared,
+    size_t*                  sharedSize)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == sharedSize)
     {
@@ -610,12 +610,12 @@ Agreement_agree(
 
 static seos_err_t
 Key_generate(
-    void*                    ctx,
-    OS_CryptoLibKey**        pKeyObj,
-    const OS_CryptoKey_Spec* spec)
+    void*                      ctx,
+    OS_CryptoLibKey_t**        pKeyObj,
+    const OS_CryptoKey_Spec_t* spec)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pKeyObj)
     {
@@ -643,12 +643,12 @@ err0:
 
 static seos_err_t
 Key_import(
-    void*                    ctx,
-    OS_CryptoLibKey**        pKeyObj,
-    const OS_CryptoKey_Data* keyData)
+    void*                      ctx,
+    OS_CryptoLibKey_t**        pKeyObj,
+    const OS_CryptoKey_Data_t* keyData)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pKeyObj)
     {
@@ -676,13 +676,13 @@ err0:
 
 static seos_err_t
 Key_makePublic(
-    void*                       ctx,
-    OS_CryptoLibKey**           pPubKeyObj,
-    const OS_CryptoLibKey*      prvKeyObj,
-    const OS_CryptoKey_Attribs* attribs)
+    void*                        ctx,
+    OS_CryptoLibKey_t**          pPubKeyObj,
+    const OS_CryptoLibKey_t*     prvKeyObj,
+    const OS_CryptoKey_Attrib_t* attribs)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pPubKeyObj)
     {
@@ -715,10 +715,10 @@ err0:
 
 static seos_err_t
 Key_free(
-    void*            ctx,
-    OS_CryptoLibKey* keyObj)
+    void*              ctx,
+    OS_CryptoLibKey_t* keyObj)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx)
     {
@@ -737,10 +737,10 @@ Key_free(
 
 static seos_err_t
 Key_exists(
-    void*                  ctx,
-    const OS_CryptoLibKey* keyObj)
+    void*                    ctx,
+    const OS_CryptoLibKey_t* keyObj)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx)
     {
@@ -754,11 +754,11 @@ Key_exists(
 
 static seos_err_t
 Key_export(
-    void*                  ctx,
-    const OS_CryptoLibKey* keyObj,
-    OS_CryptoKey_Data*     keyData)
+    void*                    ctx,
+    const OS_CryptoLibKey_t* keyObj,
+    OS_CryptoKey_Data_t*     keyData)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx)
     {
@@ -772,12 +772,12 @@ Key_export(
 
 static seos_err_t
 Key_getParams(
-    void*                  ctx,
-    const OS_CryptoLibKey* keyObj,
-    void*                  keyParams,
-    size_t*                paramSize)
+    void*                    ctx,
+    const OS_CryptoLibKey_t* keyObj,
+    void*                    keyParams,
+    size_t*                  paramSize)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == paramSize)
     {
@@ -795,11 +795,11 @@ Key_getParams(
 
 static seos_err_t
 Key_getAttribs(
-    void*                  ctx,
-    const OS_CryptoLibKey* keyObj,
-    OS_CryptoKey_Attribs*  attribs)
+    void*                    ctx,
+    const OS_CryptoLibKey_t* keyObj,
+    OS_CryptoKey_Attrib_t*   attribs)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == attribs)
     {
@@ -813,10 +813,10 @@ Key_getAttribs(
 
 static seos_err_t
 Key_loadParams(
-    void*                    ctx,
-    const OS_CryptoKey_Param name,
-    void*                    keyParams,
-    size_t*                  paramSize)
+    void*                      ctx,
+    const OS_CryptoKey_Param_t name,
+    void*                      keyParams,
+    size_t*                    paramSize)
 {
     if (NULL == ctx || NULL == paramSize)
     {
@@ -834,15 +834,15 @@ Key_loadParams(
 
 static seos_err_t
 Cipher_init(
-    void*                     ctx,
-    OS_CryptoLibCipher**      pCipherObj,
-    const OS_CryptoCipher_Alg algorithm,
-    const OS_CryptoLibKey*    key,
-    const void*               iv,
-    const size_t              ivSize)
+    void*                       ctx,
+    OS_CryptoLibCipher_t**      pCipherObj,
+    const OS_CryptoCipher_Alg_t algorithm,
+    const OS_CryptoLibKey_t*    key,
+    const void*                 iv,
+    const size_t                ivSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pCipherObj)
     {
@@ -879,10 +879,10 @@ err0:
 
 static seos_err_t
 Cipher_free(
-    void*               ctx,
-    OS_CryptoLibCipher* cipherObj)
+    void*                 ctx,
+    OS_CryptoLibCipher_t* cipherObj)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx)
     {
@@ -901,10 +901,10 @@ Cipher_free(
 
 static seos_err_t
 Cipher_exists(
-    void*                     ctx,
-    const OS_CryptoLibCipher* cipherObj)
+    void*                       ctx,
+    const OS_CryptoLibCipher_t* cipherObj)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx)
     {
@@ -918,14 +918,14 @@ Cipher_exists(
 
 static seos_err_t
 Cipher_process(
-    void*               ctx,
-    OS_CryptoLibCipher* cipherObj,
-    const void*         input,
-    const size_t        inputSize,
-    void*               output,
-    size_t*             outputSize)
+    void*                 ctx,
+    OS_CryptoLibCipher_t* cipherObj,
+    const void*           input,
+    const size_t          inputSize,
+    void*                 output,
+    size_t*               outputSize)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == input || NULL == outputSize)
     {
@@ -947,12 +947,12 @@ Cipher_process(
 
 static seos_err_t
 Cipher_start(
-    void*               ctx,
-    OS_CryptoLibCipher* cipherObj,
-    const void*         ad,
-    const size_t        adSize)
+    void*                 ctx,
+    OS_CryptoLibCipher_t* cipherObj,
+    const void*           ad,
+    const size_t          adSize)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx)
     {
@@ -970,12 +970,12 @@ Cipher_start(
 
 static seos_err_t
 Cipher_finalize(
-    void*               ctx,
-    OS_CryptoLibCipher* cipherObj,
-    void*               output,
-    size_t*             outputSize)
+    void*                 ctx,
+    OS_CryptoLibCipher_t* cipherObj,
+    void*                 output,
+    size_t*               outputSize)
 {
-    OS_CryptoLib* self = (OS_CryptoLib*) ctx;
+    OS_CryptoLib_t* self = (OS_CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == outputSize)
     {
@@ -993,7 +993,7 @@ Cipher_finalize(
 
 // ------------------------------- init/free -----------------------------------
 
-static const OS_CryptoImpl_Vtable OS_CryptoLib_vtable =
+static const OS_CryptoImpl_Vtable_t OS_CryptoLib_vtable =
 {
     .Rng_getBytes        = Rng_getBytes,
     .Rng_reseed          = Rng_reseed,
@@ -1037,19 +1037,19 @@ static const OS_CryptoImpl_Vtable OS_CryptoLib_vtable =
 
 seos_err_t
 OS_CryptoLib_init(
-    OS_CryptoImpl*             impl,
-    const OS_Crypto_Memory*    memIf,
-    const OS_CryptoLib_Config* cfg)
+    OS_CryptoImpl_t*             impl,
+    const OS_Crypto_Memory_t*    memIf,
+    const OS_CryptoLib_Config_t* cfg)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    OS_CryptoLib* self;
+    OS_CryptoLib_t* self;
 
     if (NULL == impl || NULL == memIf || NULL == cfg || NULL == cfg->rng.entropy)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((self = memIf->malloc(sizeof(OS_CryptoLib))) == NULL)
+    if ((self = memIf->malloc(sizeof(OS_CryptoLib_t))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -1084,7 +1084,7 @@ OS_CryptoLib_init(
     }
 
     if ((err = OS_CryptoLibRng_init(&self->rng, &self->memIf,
-                                    (const OS_CryptoRng_EntropyFunc*)
+                                    (const OS_CryptoRng_Entropy_func*)
                                     cfg->rng.entropy, cfg->rng.context)) != SEOS_SUCCESS)
     {
         goto err6;
@@ -1112,7 +1112,7 @@ err0:
 
 seos_err_t
 OS_CryptoLib_free(
-    OS_CryptoLib* self)
+    OS_CryptoLib_t* self)
 {
     if (NULL == self)
     {

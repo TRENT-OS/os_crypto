@@ -21,17 +21,17 @@
 
 struct OS_CryptoLibKey
 {
-    OS_CryptoKey_Type type;
-    OS_CryptoKey_Attribs attribs;
+    OS_CryptoKey_Type_t type;
+    OS_CryptoKey_Attrib_t attribs;
     void* data;
     uint32_t size;
 };
 
 // Make sure that these structs are smaller than the width of the dataport so
 // that we do not have any problem when passing them via RPC
-Debug_STATIC_ASSERT(sizeof(OS_CryptoKey_Spec) <=
+Debug_STATIC_ASSERT(sizeof(OS_CryptoKey_Spec_t) <=
                     OS_Crypto_SIZE_DATAPORT);
-Debug_STATIC_ASSERT(sizeof(OS_CryptoKey_Data) <=
+Debug_STATIC_ASSERT(sizeof(OS_CryptoKey_Data_t) <=
                     OS_Crypto_SIZE_DATAPORT);
 
 // Private static functions ----------------------------------------------------
@@ -100,9 +100,9 @@ cleanup:
 
 static seos_err_t
 generate_DHParams(
-    OS_CryptoLibRng*       rng,
-    const size_t           bits,
-    OS_CryptoKey_DhParams* params)
+    OS_CryptoLibRng_t*       rng,
+    const size_t             bits,
+    OS_CryptoKey_DhParams_t* params)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
     mbedtls_mpi Q, T, G, P;
@@ -169,8 +169,8 @@ generate_DHParams(
 
 static seos_err_t
 generate_DHPrv(
-    OS_CryptoKey_DhPrv* key,
-    OS_CryptoLibRng*    rng)
+    OS_CryptoKey_DhPrv_t* key,
+    OS_CryptoLibRng_t*    rng)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
     mbedtls_mpi X, GX, G, P;
@@ -236,11 +236,11 @@ exit:
 
 static seos_err_t
 make_DHPub(
-    OS_CryptoKey_DhPub*       pubKey,
-    const OS_CryptoKey_DhPrv* prvKey)
+    OS_CryptoKey_DhPub_t*       pubKey,
+    const OS_CryptoKey_DhPrv_t* prvKey)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    const OS_CryptoKey_DhParams* params = &prvKey->params;
+    const OS_CryptoKey_DhParams_t* params = &prvKey->params;
     mbedtls_mpi GX, X, P, G;
 
     mbedtls_mpi_init(&X);
@@ -262,7 +262,7 @@ make_DHPub(
         (mbedtls_mpi_exp_mod(&GX, &G, &X, &P, NULL) == 0) &&
         (checkMpiRange(&GX, &P) == 0))
     {
-        memcpy(&pubKey->params, params, sizeof(OS_CryptoKey_DhParams));
+        memcpy(&pubKey->params, params, sizeof(OS_CryptoKey_DhParams_t));
         pubKey->gxLen = mbedtls_mpi_size(&GX);
         err = mbedtls_mpi_write_binary(&GX, pubKey->gxBytes, pubKey->gxLen) != 0 ?
               SEOS_ERROR_ABORTED : SEOS_SUCCESS;
@@ -285,9 +285,9 @@ exit:
 
 static seos_err_t
 generate_RsaPrv(
-    OS_CryptoKey_RsaRrv* key,
-    OS_CryptoLibRng*     rng,
-    const size_t         bits)
+    OS_CryptoKey_RsaRrv_t* key,
+    OS_CryptoLibRng_t*     rng,
+    const size_t           bits)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
     mbedtls_rsa_context rsa;
@@ -319,8 +319,8 @@ exit:
 
 static seos_err_t
 make_RsaPub(
-    OS_CryptoKey_RsaRub*       pubKey,
-    const OS_CryptoKey_RsaRrv* prvKey)
+    OS_CryptoKey_RsaRub_t*       pubKey,
+    const OS_CryptoKey_RsaRrv_t* prvKey)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
     mbedtls_mpi P, Q, N;
@@ -359,8 +359,8 @@ exit:
 
 static seos_err_t
 generate_SECP256r1Prv(
-    OS_CryptoKey_Secp256r1Prv* key,
-    OS_CryptoLibRng*           rng)
+    OS_CryptoKey_Secp256r1Prv_t* key,
+    OS_CryptoLibRng_t*           rng)
 {
     seos_err_t err;
     mbedtls_ecp_group grp;
@@ -389,8 +389,8 @@ exit:
 
 static seos_err_t
 make_SECP256r1Pub(
-    OS_CryptoKey_Secp256r1Pub*       pubKey,
-    const OS_CryptoKey_Secp256r1Prv* prvKey)
+    OS_CryptoKey_Secp256r1Pub_t*       pubKey,
+    const OS_CryptoKey_Secp256r1Prv_t* prvKey)
 {
     seos_err_t err;
     mbedtls_ecp_group grp;
@@ -431,48 +431,48 @@ exit:
 
 static seos_err_t
 initImpl(
-    OS_CryptoLibKey**           self,
-    const OS_Crypto_Memory*     memIf,
-    const OS_CryptoKey_Type     type,
-    const OS_CryptoKey_Attribs* attribs)
+    OS_CryptoLibKey_t**          self,
+    const OS_Crypto_Memory_t*    memIf,
+    const OS_CryptoKey_Type_t    type,
+    const OS_CryptoKey_Attrib_t* attribs)
 {
     size_t size;
     seos_err_t err;
-    OS_CryptoLibKey* key;
+    OS_CryptoLibKey_t* key;
 
     switch (type)
     {
     case OS_CryptoKey_TYPE_AES:
-        size = sizeof(OS_CryptoKey_Aes);
+        size = sizeof(OS_CryptoKey_Aes_t);
         break;
     case OS_CryptoKey_TYPE_RSA_PRV:
-        size = sizeof(OS_CryptoKey_RsaRrv);
+        size = sizeof(OS_CryptoKey_RsaRrv_t);
         break;
     case OS_CryptoKey_TYPE_RSA_PUB:
-        size = sizeof(OS_CryptoKey_RsaRub);
+        size = sizeof(OS_CryptoKey_RsaRub_t);
         break;
     case OS_CryptoKey_TYPE_DH_PRV:
-        size = sizeof(OS_CryptoKey_DhPrv);
+        size = sizeof(OS_CryptoKey_DhPrv_t);
         break;
     case OS_CryptoKey_TYPE_DH_PUB:
-        size = sizeof(OS_CryptoKey_DhPub);
+        size = sizeof(OS_CryptoKey_DhPub_t);
         break;
     case OS_CryptoKey_TYPE_SECP256R1_PRV:
-        size = sizeof(OS_CryptoKey_Secp256r1Prv);
+        size = sizeof(OS_CryptoKey_Secp256r1Prv_t);
         break;
     case OS_CryptoKey_TYPE_SECP256R1_PUB:
-        size = sizeof(OS_CryptoKey_Secp256r1Pub);
+        size = sizeof(OS_CryptoKey_Secp256r1Pub_t);
         break;
     default:
         return SEOS_ERROR_NOT_SUPPORTED;
     }
 
-    if ((key = memIf->malloc(sizeof(OS_CryptoLibKey))) == NULL)
+    if ((key = memIf->malloc(sizeof(OS_CryptoLibKey_t))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    memset(key, 0, sizeof(OS_CryptoLibKey));
+    memset(key, 0, sizeof(OS_CryptoLibKey_t));
     key->attribs = *attribs;
     key->type    = type;
     key->size    = size;
@@ -491,9 +491,9 @@ initImpl(
 
 static seos_err_t
 generateImpl(
-    OS_CryptoLibKey*         self,
-    OS_CryptoLibRng*         rng,
-    const OS_CryptoKey_Spec* spec)
+    OS_CryptoLibKey_t*         self,
+    OS_CryptoLibRng_t*         rng,
+    const OS_CryptoKey_Spec_t* spec)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 
@@ -501,7 +501,7 @@ generateImpl(
     {
     case OS_CryptoKey_TYPE_AES:
     {
-        OS_CryptoKey_Aes* key = (OS_CryptoKey_Aes*) self->data;
+        OS_CryptoKey_Aes_t* key = (OS_CryptoKey_Aes_t*) self->data;
         if ((OS_CryptoKey_SPECTYPE_BITS != spec->type)
             || ((128 != spec->key.params.bits)
                 && (192 != spec->key.params.bits)
@@ -529,7 +529,7 @@ generateImpl(
 
     case OS_CryptoKey_TYPE_DH_PRV:
     {
-        OS_CryptoKey_DhPrv* key = (OS_CryptoKey_DhPrv*) self->data;
+        OS_CryptoKey_DhPrv_t* key = (OS_CryptoKey_DhPrv_t*) self->data;
         size_t bits;
 
         switch (spec->type)
@@ -550,7 +550,7 @@ generateImpl(
         }
         if (OS_CryptoKey_SPECTYPE_PARAMS == spec->type)
         {
-            memcpy(&key->params, &spec->key.params, sizeof(OS_CryptoKey_DhParams));
+            memcpy(&key->params, &spec->key.params, sizeof(OS_CryptoKey_DhParams_t));
             err = SEOS_SUCCESS;
         }
         else
@@ -570,8 +570,8 @@ generateImpl(
 
 static seos_err_t
 makeImpl(
-    OS_CryptoLibKey*       self,
-    const OS_CryptoLibKey* prvKey)
+    OS_CryptoLibKey_t*       self,
+    const OS_CryptoLibKey_t* prvKey)
 {
     switch (self->type)
     {
@@ -588,8 +588,8 @@ makeImpl(
 
 static seos_err_t
 importImpl(
-    OS_CryptoLibKey*         self,
-    const OS_CryptoKey_Data* key)
+    OS_CryptoLibKey_t*         self,
+    const OS_CryptoKey_Data_t* key)
 {
     size_t bits;
 
@@ -695,11 +695,11 @@ importImpl(
 
 static seos_err_t
 exportImpl(
-    const OS_CryptoLibKey* self,
-    OS_CryptoKey_Data*     keyData)
+    const OS_CryptoLibKey_t* self,
+    OS_CryptoKey_Data_t*     keyData)
 {
     memcpy(&keyData->data, self->data, self->size);
-    memcpy(&keyData->attribs, &self->attribs, sizeof(OS_CryptoKey_Attribs));
+    memcpy(&keyData->attribs, &self->attribs, sizeof(OS_CryptoKey_Attrib_t));
     keyData->type = self->type;
 
     return SEOS_SUCCESS;
@@ -707,9 +707,9 @@ exportImpl(
 
 static seos_err_t
 getParamsImpl(
-    const OS_CryptoLibKey* self,
-    void*                  keyParams,
-    size_t*                paramSize)
+    const OS_CryptoLibKey_t* self,
+    void*                    keyParams,
+    size_t*                  paramSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
     size_t size;
@@ -719,7 +719,7 @@ getParamsImpl(
     {
     case OS_CryptoKey_TYPE_DH_PUB:
     case OS_CryptoKey_TYPE_DH_PRV:
-        size = sizeof(OS_CryptoKey_DhParams);
+        size = sizeof(OS_CryptoKey_DhParams_t);
         params = (self->type == OS_CryptoKey_TYPE_DH_PUB) ?
                  &OS_CryptoLibKey_getDhPub(self)->params :
                  &OS_CryptoLibKey_getDhPrv(self)->params;
@@ -745,18 +745,18 @@ getParamsImpl(
 
 static seos_err_t
 getAttribsImpl(
-    const OS_CryptoLibKey* self,
-    OS_CryptoKey_Attribs*  attribs)
+    const OS_CryptoLibKey_t* self,
+    OS_CryptoKey_Attrib_t*   attribs)
 {
-    memcpy(attribs, &self->attribs, sizeof(OS_CryptoKey_Attribs));
+    memcpy(attribs, &self->attribs, sizeof(OS_CryptoKey_Attrib_t));
     return SEOS_SUCCESS;
 }
 
 static seos_err_t
 loadParamsImpl(
-    const OS_CryptoKey_Param name,
-    void*                    keyParams,
-    size_t*                  paramSize)
+    const OS_CryptoKey_Param_t name,
+    void*                      keyParams,
+    size_t*                    paramSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
     size_t size;
@@ -767,10 +767,10 @@ loadParamsImpl(
     case OS_CryptoKey_PARAM_ECC_SECP224R1:
     case OS_CryptoKey_PARAM_ECC_SECP256R1:
     {
-        OS_CryptoKey_EccParams* params = (OS_CryptoKey_EccParams*) keyParams;
+        OS_CryptoKey_EccParams_t* params = (OS_CryptoKey_EccParams_t*) keyParams;
         mbedtls_ecp_group grp;
 
-        size = sizeof(OS_CryptoKey_EccParams);
+        size = sizeof(OS_CryptoKey_EccParams_t);
         if (*paramSize < size)
         {
             err = SEOS_ERROR_BUFFER_TOO_SMALL;
@@ -808,8 +808,8 @@ loadParamsImpl(
 
 static seos_err_t
 freeImpl(
-    OS_CryptoLibKey*        self,
-    const OS_Crypto_Memory* memIf)
+    OS_CryptoLibKey_t*        self,
+    const OS_Crypto_Memory_t* memIf)
 {
     // We may have stored sensitive key data here, better make sure to remove it.
     zeroizeMemory(self->data, self->size);
@@ -824,10 +824,10 @@ freeImpl(
 
 seos_err_t
 OS_CryptoLibKey_generate(
-    OS_CryptoLibKey**        self,
-    const OS_Crypto_Memory*  memIf,
-    OS_CryptoLibRng*         rng,
-    const OS_CryptoKey_Spec* spec)
+    OS_CryptoLibKey_t**        self,
+    const OS_Crypto_Memory_t*  memIf,
+    OS_CryptoLibRng_t*         rng,
+    const OS_CryptoKey_Spec_t* spec)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 
@@ -850,13 +850,13 @@ OS_CryptoLibKey_generate(
 
 seos_err_t
 OS_CryptoLibKey_makePublic(
-    OS_CryptoLibKey**           self,
-    const OS_Crypto_Memory*     memIf,
-    const OS_CryptoLibKey*      prvKey,
-    const OS_CryptoKey_Attribs* attribs)
+    OS_CryptoLibKey_t**          self,
+    const OS_Crypto_Memory_t*    memIf,
+    const OS_CryptoLibKey_t*     prvKey,
+    const OS_CryptoKey_Attrib_t* attribs)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
-    OS_CryptoKey_Type type;
+    OS_CryptoKey_Type_t type;
 
     if (NULL == self || NULL == memIf || NULL == prvKey || NULL == attribs)
     {
@@ -891,9 +891,9 @@ OS_CryptoLibKey_makePublic(
 
 seos_err_t
 OS_CryptoLibKey_import(
-    OS_CryptoLibKey**        self,
-    const OS_Crypto_Memory*  memIf,
-    const OS_CryptoKey_Data* keyData)
+    OS_CryptoLibKey_t**        self,
+    const OS_Crypto_Memory_t*  memIf,
+    const OS_CryptoKey_Data_t* keyData)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 
@@ -915,8 +915,8 @@ OS_CryptoLibKey_import(
 
 seos_err_t
 OS_CryptoLibKey_free(
-    OS_CryptoLibKey*        self,
-    const OS_Crypto_Memory* memIf)
+    OS_CryptoLibKey_t*        self,
+    const OS_Crypto_Memory_t* memIf)
 {
     if (NULL == memIf || NULL == self)
     {
@@ -928,8 +928,8 @@ OS_CryptoLibKey_free(
 
 seos_err_t
 OS_CryptoLibKey_export(
-    const OS_CryptoLibKey* self,
-    OS_CryptoKey_Data*     keyData)
+    const OS_CryptoLibKey_t* self,
+    OS_CryptoKey_Data_t*     keyData)
 {
     /*
      * Keys do have an "exportable" attribute. However, this is only meaningful
@@ -948,9 +948,9 @@ OS_CryptoLibKey_export(
 
 seos_err_t
 OS_CryptoLibKey_getParams(
-    const OS_CryptoLibKey* self,
-    void*                  keyParams,
-    size_t*                paramSize)
+    const OS_CryptoLibKey_t* self,
+    void*                    keyParams,
+    size_t*                  paramSize)
 {
     if (NULL == self || NULL == keyParams || NULL == paramSize)
     {
@@ -962,8 +962,8 @@ OS_CryptoLibKey_getParams(
 
 seos_err_t
 OS_CryptoLibKey_getAttribs(
-    const OS_CryptoLibKey* self,
-    OS_CryptoKey_Attribs*  attribs)
+    const OS_CryptoLibKey_t* self,
+    OS_CryptoKey_Attrib_t*   attribs)
 {
     if (NULL == self || NULL == attribs)
     {
@@ -975,9 +975,9 @@ OS_CryptoLibKey_getAttribs(
 
 seos_err_t
 OS_CryptoLibKey_loadParams(
-    const OS_CryptoKey_Param name,
-    void*                    keyParams,
-    size_t*                  paramSize)
+    const OS_CryptoKey_Param_t name,
+    void*                      keyParams,
+    size_t*                    paramSize)
 {
     if (NULL == keyParams || NULL == paramSize)
     {
@@ -991,10 +991,10 @@ OS_CryptoLibKey_loadParams(
 
 seos_err_t
 OS_CryptoLibKey_writeRsaPub(
-    const OS_CryptoLibKey* key,
-    mbedtls_rsa_context*   rsa)
+    const OS_CryptoLibKey_t* key,
+    mbedtls_rsa_context*     rsa)
 {
-    OS_CryptoKey_RsaRub* pubKey = OS_CryptoLibKey_getRsaPub(key);
+    OS_CryptoKey_RsaRub_t* pubKey = OS_CryptoLibKey_getRsaPub(key);
     return (mbedtls_rsa_import_raw(rsa,
                                    pubKey->nBytes, pubKey->nLen,
                                    NULL, 0, NULL, 0, NULL, 0,
@@ -1006,10 +1006,10 @@ OS_CryptoLibKey_writeRsaPub(
 
 seos_err_t
 OS_CryptoLibKey_writeRsaPrv(
-    const OS_CryptoLibKey* key,
-    mbedtls_rsa_context*   rsa)
+    const OS_CryptoLibKey_t* key,
+    mbedtls_rsa_context*     rsa)
 {
-    OS_CryptoKey_RsaRrv* prvKey = OS_CryptoLibKey_getRsaPrv(key);
+    OS_CryptoKey_RsaRrv_t* prvKey = OS_CryptoLibKey_getRsaPrv(key);
     return (mbedtls_rsa_import_raw(rsa,
                                    NULL, 0,
                                    prvKey->pBytes, prvKey->pLen,
@@ -1023,10 +1023,10 @@ OS_CryptoLibKey_writeRsaPrv(
 
 seos_err_t
 OS_CryptoLibKey_writeDhPub(
-    const OS_CryptoLibKey* key,
-    mbedtls_dhm_context*   dh)
+    const OS_CryptoLibKey_t* key,
+    mbedtls_dhm_context*     dh)
 {
-    OS_CryptoKey_DhPub* dhKey = OS_CryptoLibKey_getDhPub(key);
+    OS_CryptoKey_DhPub_t* dhKey = OS_CryptoLibKey_getDhPub(key);
     return mbedtls_mpi_read_binary(&dh->P, dhKey->params.pBytes,
                                    dhKey->params.pLen) != 0
            || mbedtls_mpi_read_binary(&dh->G, dhKey->params.gBytes,
@@ -1038,10 +1038,10 @@ OS_CryptoLibKey_writeDhPub(
 
 seos_err_t
 OS_CryptoLibKey_writeDhPrv(
-    const OS_CryptoLibKey* key,
-    mbedtls_dhm_context*   dh)
+    const OS_CryptoLibKey_t* key,
+    mbedtls_dhm_context*     dh)
 {
-    OS_CryptoKey_DhPrv* dhKey = OS_CryptoLibKey_getDhPrv(key);
+    OS_CryptoKey_DhPrv_t* dhKey = OS_CryptoLibKey_getDhPrv(key);
     return mbedtls_mpi_read_binary(&dh->P, dhKey->params.pBytes,
                                    dhKey->params.pLen) != 0
            || mbedtls_mpi_read_binary(&dh->G, dhKey->params.gBytes,
@@ -1053,10 +1053,10 @@ OS_CryptoLibKey_writeDhPrv(
 
 seos_err_t
 OS_CryptoLibKey_writeSecp256r1Pub(
-    const OS_CryptoLibKey* key,
-    mbedtls_ecdh_context*  ecdh)
+    const OS_CryptoLibKey_t* key,
+    mbedtls_ecdh_context*    ecdh)
 {
-    OS_CryptoKey_Secp256r1Pub* ecKey = OS_CryptoLibKey_getSecp256r1Pub(key);
+    OS_CryptoKey_Secp256r1Pub_t* ecKey = OS_CryptoLibKey_getSecp256r1Pub(key);
     return mbedtls_mpi_read_binary(&ecdh->Qp.X, ecKey->qxBytes, ecKey->qxLen) != 0
            || mbedtls_mpi_read_binary(&ecdh->Qp.Y, ecKey->qyBytes, ecKey->qyLen) != 0
            || mbedtls_mpi_lset(&ecdh->Qp.Z, 1) != 0
@@ -1066,68 +1066,68 @@ OS_CryptoLibKey_writeSecp256r1Pub(
 
 seos_err_t
 OS_CryptoLibKey_writeSecp256r1Prv(
-    const OS_CryptoLibKey* key,
-    mbedtls_ecdh_context*  ecdh)
+    const OS_CryptoLibKey_t* key,
+    mbedtls_ecdh_context*    ecdh)
 {
-    OS_CryptoKey_Secp256r1Prv* ecKey = OS_CryptoLibKey_getSecp256r1Prv(key);
+    OS_CryptoKey_Secp256r1Prv_t* ecKey = OS_CryptoLibKey_getSecp256r1Prv(key);
     return mbedtls_ecp_group_load(&ecdh->grp, MBEDTLS_ECP_DP_SECP256R1) != 0
            || mbedtls_mpi_read_binary(&ecdh->d, ecKey->dBytes, ecKey->dLen) != 0
            || mbedtls_ecp_check_privkey(&ecdh->grp, &ecdh->d) != 0 ?
            SEOS_ERROR_INVALID_PARAMETER : SEOS_SUCCESS;
 }
 
-OS_CryptoKey_Type
+OS_CryptoKey_Type_t
 OS_CryptoLibKey_getType(
-    const OS_CryptoLibKey* key)
+    const OS_CryptoLibKey_t* key)
 {
     return key->type;
 }
 
-OS_CryptoKey_RsaRub*
+OS_CryptoKey_RsaRub_t*
 OS_CryptoLibKey_getRsaPub(
-    const OS_CryptoLibKey* key)
+    const OS_CryptoLibKey_t* key)
 {
-    return (OS_CryptoKey_RsaRub*) key->data;
+    return (OS_CryptoKey_RsaRub_t*) key->data;
 }
 
-OS_CryptoKey_RsaRrv*
+OS_CryptoKey_RsaRrv_t*
 OS_CryptoLibKey_getRsaPrv(
-    const OS_CryptoLibKey* key)
+    const OS_CryptoLibKey_t* key)
 {
-    return (OS_CryptoKey_RsaRrv*) key->data;
+    return (OS_CryptoKey_RsaRrv_t*) key->data;
 }
 
-OS_CryptoKey_Secp256r1Pub*
+OS_CryptoKey_Secp256r1Pub_t*
 OS_CryptoLibKey_getSecp256r1Pub(
-    const OS_CryptoLibKey* key)
+    const OS_CryptoLibKey_t* key)
 {
-    return (OS_CryptoKey_Secp256r1Pub*) key->data;
+    return (OS_CryptoKey_Secp256r1Pub_t*) key->data;
 }
 
-OS_CryptoKey_Secp256r1Prv*
+OS_CryptoKey_Secp256r1Prv_t*
 OS_CryptoLibKey_getSecp256r1Prv(
-    const OS_CryptoLibKey* key)
+    const OS_CryptoLibKey_t* key)
 {
-    return (OS_CryptoKey_Secp256r1Prv*) key->data;
+    return (OS_CryptoKey_Secp256r1Prv_t*) key->data;
 }
 
-OS_CryptoKey_DhPub*
+OS_CryptoKey_DhPub_t*
 OS_CryptoLibKey_getDhPub(
-    const OS_CryptoLibKey* key)
+    const OS_CryptoLibKey_t* key)
 {
-    return (OS_CryptoKey_DhPub*) key->data;
+    return (OS_CryptoKey_DhPub_t*) key->data;
 }
 
-OS_CryptoKey_DhPrv*
+OS_CryptoKey_DhPrv_t*
 OS_CryptoLibKey_getDhPrv(
-    const OS_CryptoLibKey* key)
+    const OS_CryptoLibKey_t* key)
 {
-    return (OS_CryptoKey_DhPrv*) key->data;
+    return (OS_CryptoKey_DhPrv_t*) key->data;
 }
 
-OS_CryptoKey_Aes*
+OS_CryptoKey_Aes_t*
 OS_CryptoLibKey_getAes(
-    const OS_CryptoLibKey* key)
+    const OS_CryptoLibKey_t* key)
 {
-    return (OS_CryptoKey_Aes*) key->data;
+    return (OS_CryptoKey_Aes_t*) key->data;
 }

@@ -20,42 +20,42 @@
 
 // Exported types/defines/enums ------------------------------------------------
 
-typedef struct OS_CryptoLibCipher OS_CryptoLibCipher;
+typedef struct OS_CryptoLibCipher OS_CryptoLibCipher_t;
 
 // Exported functions ----------------------------------------------------------
 
 seos_err_t
 OS_CryptoLibCipher_init(
-    OS_CryptoLibCipher**      self,
-    const OS_Crypto_Memory*   memIf,
-    const OS_CryptoCipher_Alg algorithm,
-    const OS_CryptoLibKey*    key,
-    const void*               iv,
-    size_t                    ivSize);
+    OS_CryptoLibCipher_t**      self,
+    const OS_Crypto_Memory_t*   memIf,
+    const OS_CryptoCipher_Alg_t algorithm,
+    const OS_CryptoLibKey_t*    key,
+    const void*                 iv,
+    size_t                      ivSize);
 
 seos_err_t
 OS_CryptoLibCipher_free(
-    OS_CryptoLibCipher*     self,
-    const OS_Crypto_Memory* memIf);
+    OS_CryptoLibCipher_t*     self,
+    const OS_Crypto_Memory_t* memIf);
 
 seos_err_t
 OS_CryptoLibCipher_start(
-    OS_CryptoLibCipher* self,
-    const void*         input,
-    const size_t        inputSize);
+    OS_CryptoLibCipher_t* self,
+    const void*           input,
+    const size_t          inputSize);
 
 seos_err_t
 OS_CryptoLibCipher_process(
-    OS_CryptoLibCipher* self,
-    const void*         input,
-    const size_t        inputSize,
-    void*               output,
-    size_t*             outputSize);
+    OS_CryptoLibCipher_t* self,
+    const void*           input,
+    const size_t          inputSize,
+    void*                 output,
+    size_t*               outputSize);
 
 seos_err_t
 OS_CryptoLibCipher_finalize(
-    OS_CryptoLibCipher* self,
-    void*               output,
-    size_t*             outputSize);
+    OS_CryptoLibCipher_t* self,
+    void*                 output,
+    size_t*               outputSize);
 
 /** @} */

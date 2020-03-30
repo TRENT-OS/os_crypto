@@ -21,28 +21,28 @@
 
 // Exported types/defines/enums ------------------------------------------------
 
-typedef struct OS_CryptoLibAgreement OS_CryptoLibAgreement;
+typedef struct OS_CryptoLibAgreement OS_CryptoLibAgreement_t;
 
 // Exported functions ----------------------------------------------------------
 
 seos_err_t
 OS_CryptoLibAgreement_init(
-    OS_CryptoLibAgreement**      self,
-    const OS_Crypto_Memory*      memIf,
-    const OS_CryptoAgreement_Alg algorithm,
-    const OS_CryptoLibKey*       prvKey);
+    OS_CryptoLibAgreement_t**      self,
+    const OS_Crypto_Memory_t*      memIf,
+    const OS_CryptoAgreement_Alg_t algorithm,
+    const OS_CryptoLibKey_t*       prvKey);
 
 seos_err_t
 OS_CryptoLibAgreement_agree(
-    OS_CryptoLibAgreement* self,
-    OS_CryptoLibRng*       rng,
-    const OS_CryptoLibKey* pubKey,
-    void*                  shared,
-    size_t*                sharedSize);
+    OS_CryptoLibAgreement_t* self,
+    OS_CryptoLibRng_t*       rng,
+    const OS_CryptoLibKey_t* pubKey,
+    void*                    shared,
+    size_t*                  sharedSize);
 
 seos_err_t
 OS_CryptoLibAgreement_free(
-    OS_CryptoLibAgreement*  self,
-    const OS_Crypto_Memory* memIf);
+    OS_CryptoLibAgreement_t*  self,
+    const OS_Crypto_Memory_t* memIf);
 
 /** @} */

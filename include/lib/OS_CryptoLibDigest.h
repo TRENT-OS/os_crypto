@@ -20,36 +20,36 @@
 
 // Exported types/defines/enums ------------------------------------------------
 
-typedef struct OS_CryptoLibDigest OS_CryptoLibDigest;
+typedef struct OS_CryptoLibDigest OS_CryptoLibDigest_t;
 
 // Exported functions ----------------------------------------------------------
 
 seos_err_t
 OS_CryptoLibDigest_init(
-    OS_CryptoLibDigest**      self,
-    const OS_Crypto_Memory*   memIf,
-    const OS_CryptoDigest_Alg algorithm);
+    OS_CryptoLibDigest_t**      self,
+    const OS_Crypto_Memory_t*   memIf,
+    const OS_CryptoDigest_Alg_t algorithm);
 
 seos_err_t
 OS_CryptoLibDigest_free(
-    OS_CryptoLibDigest*     self,
-    const OS_Crypto_Memory* memIf);
+    OS_CryptoLibDigest_t*     self,
+    const OS_Crypto_Memory_t* memIf);
 
 seos_err_t
 OS_CryptoLibDigest_clone(
-    OS_CryptoLibDigest*       self,
-    const OS_CryptoLibDigest* source);
+    OS_CryptoLibDigest_t*       self,
+    const OS_CryptoLibDigest_t* source);
 
 seos_err_t
 OS_CryptoLibDigest_process(
-    OS_CryptoLibDigest* self,
-    const void*         data,
-    const size_t        dataSize);
+    OS_CryptoLibDigest_t* self,
+    const void*           data,
+    const size_t          dataSize);
 
 seos_err_t
 OS_CryptoLibDigest_finalize(
-    OS_CryptoLibDigest* self,
-    void*               digest,
-    size_t*             digestSize);
+    OS_CryptoLibDigest_t* self,
+    void*                 digest,
+    size_t*               digestSize);
 
 /** @} */

@@ -4,7 +4,7 @@
  * @addtogroup Crypto
  * @{
  *
- * @file OS_CryptoLibSignature.h
+ * @file OS_CryptoLibSignature_t.h
  *
  * @brief Crypto library implementation of Signature functions
  *
@@ -21,40 +21,40 @@
 
 // Exported types/defines/enums ------------------------------------------------
 
-typedef struct OS_CryptoLibSignature OS_CryptoLibSignature;
+typedef struct OS_CryptoLibSignature OS_CryptoLibSignature_t;
 
 // Exported functions ----------------------------------------------------------
 
 seos_err_t
 OS_CryptoLibSignature_init(
-    OS_CryptoLibSignature**      self,
-    const OS_Crypto_Memory*      memIf,
-    const OS_CryptoSignature_Alg algorithm,
-    const OS_CryptoDigest_Alg    digest,
-    const OS_CryptoLibKey*       prvKey,
-    const OS_CryptoLibKey*       pubKey);
+    OS_CryptoLibSignature_t**      self,
+    const OS_Crypto_Memory_t*      memIf,
+    const OS_CryptoSignature_Alg_t algorithm,
+    const OS_CryptoDigest_Alg_t    digest,
+    const OS_CryptoLibKey_t*       prvKey,
+    const OS_CryptoLibKey_t*       pubKey);
 
 seos_err_t
 OS_CryptoLibSignature_free(
-    OS_CryptoLibSignature*  self,
-    const OS_Crypto_Memory* memIf);
+    OS_CryptoLibSignature_t*  self,
+    const OS_Crypto_Memory_t* memIf);
 
 seos_err_t
 OS_CryptoLibSignature_sign(
-    OS_CryptoLibSignature* self,
-    OS_CryptoLibRng*       rng,
-    const void*            hash,
-    const size_t           hashSize,
-    void*                  signature,
-    size_t*                signatureSize);
+    OS_CryptoLibSignature_t* self,
+    OS_CryptoLibRng_t*       rng,
+    const void*              hash,
+    const size_t             hashSize,
+    void*                    signature,
+    size_t*                  signatureSize);
 
 seos_err_t
 OS_CryptoLibSignature_verify(
-    OS_CryptoLibSignature* self,
-    OS_CryptoLibRng*       rng,
-    const void*            hash,
-    const size_t           hashSize,
-    const void*            signature,
-    const size_t           signatureSize);
+    OS_CryptoLibSignature_t* self,
+    OS_CryptoLibRng_t*       rng,
+    const void*              hash,
+    const size_t             hashSize,
+    const void*              signature,
+    const size_t             signatureSize);
 
 /** @} */

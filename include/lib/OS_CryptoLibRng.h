@@ -4,7 +4,7 @@
  * @addtogroup Crypto
  * @{
  *
- * @file OS_CryptoLibRng.h
+ * @file OS_CryptoLibRng_t.h
  *
  * @brief Crypto library implementation of RNG functions
  *
@@ -22,34 +22,34 @@
 
 // Exported types/defines/enums ------------------------------------------------
 
-typedef struct OS_CryptoLibRng OS_CryptoLibRng;
+typedef struct OS_CryptoLibRng OS_CryptoLibRng_t;
 
 // Exported functions ----------------------------------------------------------
 
 seos_err_t
 OS_CryptoLibRng_init(
-    OS_CryptoLibRng**               self,
-    const OS_Crypto_Memory*         memIf,
-    const OS_CryptoRng_EntropyFunc* entropyFunc,
-    void*                           entropyCtx);
+    OS_CryptoLibRng_t**              self,
+    const OS_Crypto_Memory_t*        memIf,
+    const OS_CryptoRng_Entropy_func* entropyFunc,
+    void*                            entropyCtx);
 
 seos_err_t
 OS_CryptoLibRng_getBytes(
-    OS_CryptoLibRng*        self,
-    const OS_CryptoRng_Flag flags,
-    void*                   buf,
-    const size_t            bufSize);
+    OS_CryptoLibRng_t*        self,
+    const OS_CryptoRng_Flag_t flags,
+    void*                     buf,
+    const size_t              bufSize);
 
 seos_err_t
 OS_CryptoLibRng_reSeed(
-    OS_CryptoLibRng* self,
-    const void*      seed,
-    const size_t     seedSize);
+    OS_CryptoLibRng_t* self,
+    const void*        seed,
+    const size_t       seedSize);
 
 seos_err_t
 OS_CryptoLibRng_free(
-    OS_CryptoLibRng*        self,
-    const OS_Crypto_Memory* memIf);
+    OS_CryptoLibRng_t*        self,
+    const OS_Crypto_Memory_t* memIf);
 
 /**
  * @brief Get random bytes for mbedTLS wrapper

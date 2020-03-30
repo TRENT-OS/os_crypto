@@ -16,25 +16,25 @@ struct OS_CryptoLibSignature
     {
         mbedtls_rsa_context rsa;
     } mbedtls;
-    OS_CryptoSignature_Alg algorithm;
-    OS_CryptoDigest_Alg digest;
-    const OS_CryptoLibKey* prvKey;
-    const OS_CryptoLibKey* pubKey;
+    OS_CryptoSignature_Alg_t algorithm;
+    OS_CryptoDigest_Alg_t digest;
+    const OS_CryptoLibKey_t* prvKey;
+    const OS_CryptoLibKey_t* pubKey;
 };
 
 // Private Functions -----------------------------------------------------------
 
 static seos_err_t
 initImpl(
-    OS_CryptoLibSignature**      self,
-    const OS_Crypto_Memory*      memIf,
-    const OS_CryptoSignature_Alg algorithm,
-    const OS_CryptoDigest_Alg    digest,
-    const OS_CryptoLibKey*       prvKey,
-    const OS_CryptoLibKey*       pubKey)
+    OS_CryptoLibSignature_t**      self,
+    const OS_Crypto_Memory_t*      memIf,
+    const OS_CryptoSignature_Alg_t algorithm,
+    const OS_CryptoDigest_Alg_t    digest,
+    const OS_CryptoLibKey_t*       prvKey,
+    const OS_CryptoLibKey_t*       pubKey)
 {
     seos_err_t err;
-    OS_CryptoLibSignature* sig;
+    OS_CryptoLibSignature_t* sig;
     int padding;
 
     // We can have one of those keys be empty, but not both
@@ -43,12 +43,12 @@ initImpl(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((sig = memIf->malloc(sizeof(OS_CryptoLibSignature))) == NULL)
+    if ((sig = memIf->malloc(sizeof(OS_CryptoLibSignature_t))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    memset(sig, 0, sizeof(OS_CryptoLibSignature));
+    memset(sig, 0, sizeof(OS_CryptoLibSignature_t));
     sig->algorithm = algorithm;
     sig->digest    = digest;
     sig->prvKey    = prvKey;
@@ -94,8 +94,8 @@ err0:
 
 static seos_err_t
 freeImpl(
-    OS_CryptoLibSignature*  self,
-    const OS_Crypto_Memory* memIf)
+    OS_CryptoLibSignature_t*  self,
+    const OS_Crypto_Memory_t* memIf)
 {
     seos_err_t err;
 
@@ -118,7 +118,7 @@ freeImpl(
 
 static seos_err_t
 setKeyImpl(
-    OS_CryptoLibSignature* self)
+    OS_CryptoLibSignature_t* self)
 {
     seos_err_t err;
 
@@ -153,12 +153,12 @@ setKeyImpl(
 
 static seos_err_t
 verifyHashImpl(
-    OS_CryptoLibSignature* self,
-    OS_CryptoLibRng*       rng,
-    const void*            hash,
-    const size_t           hashSize,
-    const void*            signature,
-    const size_t           signatureSize)
+    OS_CryptoLibSignature_t* self,
+    OS_CryptoLibRng_t*       rng,
+    const void*              hash,
+    const size_t             hashSize,
+    const void*              signature,
+    const size_t             signatureSize)
 {
     void* rngFunc = (NULL != rng) ? OS_CryptoLibRng_getBytesMbedtls : NULL;
     seos_err_t err = SEOS_ERROR_GENERIC;
@@ -189,12 +189,12 @@ verifyHashImpl(
 
 static seos_err_t
 signHashImpl(
-    OS_CryptoLibSignature* self,
-    OS_CryptoLibRng*       rng,
-    const void*            hash,
-    const size_t           hashSize,
-    void*                  signature,
-    size_t*                signatureSize)
+    OS_CryptoLibSignature_t* self,
+    OS_CryptoLibRng_t*       rng,
+    const void*              hash,
+    const size_t             hashSize,
+    void*                    signature,
+    size_t*                  signatureSize)
 {
     void* rngFunc = (NULL != rng) ? OS_CryptoLibRng_getBytesMbedtls : NULL;
     seos_err_t err = SEOS_ERROR_GENERIC;
@@ -229,12 +229,12 @@ signHashImpl(
 
 seos_err_t
 OS_CryptoLibSignature_init(
-    OS_CryptoLibSignature**      self,
-    const OS_Crypto_Memory*      memIf,
-    const OS_CryptoSignature_Alg algorithm,
-    const OS_CryptoDigest_Alg    digest,
-    const OS_CryptoLibKey*       prvKey,
-    const OS_CryptoLibKey*       pubKey)
+    OS_CryptoLibSignature_t**      self,
+    const OS_Crypto_Memory_t*      memIf,
+    const OS_CryptoSignature_Alg_t algorithm,
+    const OS_CryptoDigest_Alg_t    digest,
+    const OS_CryptoLibKey_t*       prvKey,
+    const OS_CryptoLibKey_t*       pubKey)
 {
     seos_err_t err;
 
@@ -258,8 +258,8 @@ OS_CryptoLibSignature_init(
 
 seos_err_t
 OS_CryptoLibSignature_free(
-    OS_CryptoLibSignature*  self,
-    const OS_Crypto_Memory* memIf)
+    OS_CryptoLibSignature_t*  self,
+    const OS_Crypto_Memory_t* memIf)
 {
     if (NULL == self || NULL == memIf)
     {
@@ -271,12 +271,12 @@ OS_CryptoLibSignature_free(
 
 seos_err_t
 OS_CryptoLibSignature_sign(
-    OS_CryptoLibSignature* self,
-    OS_CryptoLibRng*       rng,
-    const void*            hash,
-    const size_t           hashSize,
-    void*                  signature,
-    size_t*                signatureSize)
+    OS_CryptoLibSignature_t* self,
+    OS_CryptoLibRng_t*       rng,
+    const void*              hash,
+    const size_t             hashSize,
+    void*                    signature,
+    size_t*                  signatureSize)
 {
     if (NULL == self || NULL == hash || 0 == hashSize || NULL == signature
         || NULL == signatureSize)
@@ -291,12 +291,12 @@ OS_CryptoLibSignature_sign(
 
 seos_err_t
 OS_CryptoLibSignature_verify(
-    OS_CryptoLibSignature* self,
-    OS_CryptoLibRng*       rng,
-    const void*            hash,
-    const size_t           hashSize,
-    const void*            signature,
-    const size_t           signatureSize)
+    OS_CryptoLibSignature_t* self,
+    OS_CryptoLibRng_t*       rng,
+    const void*              hash,
+    const size_t             hashSize,
+    const void*              signature,
+    const size_t             signatureSize)
 {
     if (NULL == self || NULL == hash || 0 == hashSize || NULL == signature
         || 0 == signatureSize)
