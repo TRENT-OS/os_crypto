@@ -4,7 +4,7 @@
  * @addtogroup RPC
  * @{
  *
- * @file OS_CryptoRouter.h
+ * @file CryptoLibRouter.h
  *
  * @brief The router instantiates the API as library AND RPC client and switches
  * between these contexts based on attributes of they key. This way, critical
@@ -21,18 +21,18 @@
 
 // -------------------------- defines/types/variables --------------------------
 
-typedef struct OS_CryptoRouter OS_CryptoRouter_t;
+typedef struct CryptoLibRouter CryptoLibRouter_t;
 
 // ------------------------------- Init/Free -----------------------------------
 
 seos_err_t
-OS_CryptoRouter_init(
+CryptoLibRouter_init(
     OS_CryptoImpl_t*                impl,
     const OS_Crypto_Memory_t*       memIf,
-    const OS_CryptoRouter_Config_t* cfg);
+    const CryptoLibRouter_Config_t* cfg);
 
 seos_err_t
-OS_CryptoRouter_free(
-    OS_CryptoRouter_t* self);
+CryptoLibRouter_free(
+    CryptoLibRouter_t* self);
 
 /** @} */

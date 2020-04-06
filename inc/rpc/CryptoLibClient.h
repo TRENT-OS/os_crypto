@@ -4,7 +4,7 @@
  * @addtogroup RPC
  * @{
  *
- * @file OS_CryptoRpcClient.h
+ * @file CryptoLibClient.h
  *
  * @brief RPC client object and functions to access a SEOS Crypto API instance
  * running as RPC server in another component. If configured to act as RPC client,
@@ -21,18 +21,18 @@
 
 // -------------------------- defines/types/variables --------------------------
 
-typedef struct OS_CryptoRpcClient OS_CryptoRpcClient_t;
+typedef struct CryptoLibClient CryptoLibClient_t;
 
 // ------------------------------- Init/Free -----------------------------------
 
 seos_err_t
-OS_CryptoRpcClient_init(
-    OS_CryptoImpl_t*                   impl,
-    const OS_Crypto_Memory_t*          memIf,
-    const OS_CryptoRpcClient_Config_t* cfg);
+CryptoLibClient_init(
+    OS_CryptoImpl_t*                impl,
+    const OS_Crypto_Memory_t*       memIf,
+    const CryptoLibClient_Config_t* cfg);
 
 seos_err_t
-OS_CryptoRpcClient_free(
-    OS_CryptoRpcClient_t* self);
+CryptoLibClient_free(
+    CryptoLibClient_t* self);
 
 /** @} */

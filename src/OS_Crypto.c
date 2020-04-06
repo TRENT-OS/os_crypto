@@ -7,9 +7,9 @@
 #include "OS_Crypto_Object.h"
 
 #include "lib/CryptoLib.h"
-#include "OS_CryptoRpcClient.h"
-#include "OS_CryptoRpcServer.h"
-#include "OS_CryptoRouter.h"
+#include "rpc/CryptoLibClient.h"
+#include "rpc/CryptoLibServer.h"
+#include "rpc/CryptoLibRouter.h"
 
 // Public functions ------------------------------------------------------------
 
@@ -48,14 +48,14 @@ OS_Crypto_init(
         break;
 #if defined(SEOS_CRYPTO_WITH_RPC_CLIENT)
     case OS_Crypto_MODE_RPC_CLIENT:
-        if ((err = OS_CryptoRpcClient_init(&ctx->impl, &cfg->mem,
-                                           &cfg->impl.client)) != SEOS_SUCCESS)
+        if ((err = CryptoLibClient_init(&ctx->impl, &cfg->mem,
+                                        &cfg->impl.client)) != SEOS_SUCCESS)
         {
             goto err0;
         }
         break;
     case OS_Crypto_MODE_ROUTER:
-        if ((err = OS_CryptoRouter_init(&ctx->impl, &cfg->mem,
+        if ((err = CryptoLibRouter_init(&ctx->impl, &cfg->mem,
                                         &cfg->impl.router)) != SEOS_SUCCESS)
         {
             goto err0;
@@ -69,8 +69,8 @@ OS_Crypto_init(
         {
             goto err0;
         }
-        if ((err = OS_CryptoRpcServer_init((OS_CryptoRpcServer_t**) &ctx->server,
-                                           &ctx->impl, &cfg->mem, &cfg->server)) != SEOS_SUCCESS)
+        if ((err = CryptoLibServer_init((CryptoLibServer_t**) &ctx->server,
+                                        &ctx->impl, &cfg->mem, &cfg->server)) != SEOS_SUCCESS)
         {
             goto err1;
         }
@@ -111,10 +111,10 @@ OS_Crypto_free(
         break;
 #if defined(SEOS_CRYPTO_WITH_RPC_CLIENT)
     case OS_Crypto_MODE_RPC_CLIENT:
-        err = OS_CryptoRpcClient_free(self->impl.context);
+        err = CryptoLibClient_free(self->impl.context);
         break;
     case OS_Crypto_MODE_ROUTER:
-        err = OS_CryptoRouter_free(self->impl.context);
+        err = CryptoLibRouter_free(self->impl.context);
         break;
 #endif /* SEOS_CRYPTO_WITH_RPC_CLIENT */
 #if defined(SEOS_CRYPTO_WITH_RPC_SERVER)
@@ -123,7 +123,7 @@ OS_Crypto_free(
         {
             return err;
         }
-        err = OS_CryptoRpcServer_free(self->server);
+        err = CryptoLibServer_free(self->server);
         break;
 #endif /* SEOS_CRYPTO_WITH_RPC_SERVER */
     default:

@@ -4,8 +4,8 @@
 
 #if defined(SEOS_CRYPTO_WITH_RPC_CLIENT)
 
-#include "OS_CryptoRouter.h"
-#include "OS_CryptoRpcClient.h"
+#include "rpc/CryptoLibRouter.h"
+#include "rpc/CryptoLibClient.h"
 
 #include "lib/CryptoLib.h"
 
@@ -32,10 +32,10 @@
 // including the function pointer
 #define CALL(c, v, f, ...)                                          \
     (NULL == c) ? SEOS_ERROR_INVALID_PARAMETER :                    \
-        (NULL == ((OS_CryptoRouter_t *)c)->v.vtable->f) ?           \
+    (NULL == ((CryptoLibRouter_t *)c)->v.vtable->f) ?               \
         SEOS_ERROR_NOT_SUPPORTED :                                  \
-            ((OS_CryptoRouter_t *)c)->v.vtable->f(                  \
-            ((OS_CryptoRouter_t *)c)->v.context, ## __VA_ARGS__     \
+        ((CryptoLibRouter_t *)c)->v.vtable->f(                      \
+            ((CryptoLibRouter_t *)c)->v.context, ## __VA_ARGS__     \
         )
 #define CALL_LIB(c, f, ...) \
     CALL(c, lib, f, ## __VA_ARGS__)
@@ -45,8 +45,8 @@
 // Route call to LIB/CLIENT based on location of object
 #define ROUTE_CALL(e, c, f, o, ...)             \
     (CALL_LIB(c, e, o) == SEOS_SUCCESS) ?       \
-        CALL_LIB(c, f, o, ## __VA_ARGS__) :     \
-        CALL_CLI(c, f, o, ## __VA_ARGS__)
+    CALL_LIB(c, f, o, ## __VA_ARGS__) :     \
+    CALL_CLI(c, f, o, ## __VA_ARGS__)
 #define ROUTE_KEY_CALL(c, f, o, ...) \
     ROUTE_CALL(Key_exists, c, f, o, ## ## __VA_ARGS__)
 #define ROUTE_CIPHER_CALL(c, f, o, ...) \
@@ -56,7 +56,7 @@
 #define ROUTE_AGR_CALL(c, f, o, ...) \
     ROUTE_CALL(Agreement_exists, c, f, o, ## ## __VA_ARGS__)
 
-struct OS_CryptoRouter
+struct CryptoLibRouter
 {
     OS_CryptoImpl_t lib;
     OS_CryptoImpl_t client;
@@ -494,7 +494,7 @@ Cipher_finalize(
 
 // ------------------------------- init/free -----------------------------------
 
-static const OS_CryptoImpl_Vtable_t OS_CryptoRouter_vtable =
+static const OS_CryptoImpl_Vtable_t CryptoLibRouter_vtable =
 {
     .Rng_getBytes        = Rng_getBytes,
     .Rng_reseed          = Rng_reseed,
@@ -537,34 +537,34 @@ static const OS_CryptoImpl_Vtable_t OS_CryptoRouter_vtable =
 };
 
 seos_err_t
-OS_CryptoRouter_init(
+CryptoLibRouter_init(
     OS_CryptoImpl_t*                impl,
     const OS_Crypto_Memory_t*       memIf,
-    const OS_CryptoRouter_Config_t* cfg)
+    const CryptoLibRouter_Config_t* cfg)
 {
     seos_err_t err;
-    OS_CryptoRouter_t* self;
+    CryptoLibRouter_t* self;
 
     if (NULL == impl || NULL == memIf || NULL == cfg)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((self = memIf->malloc(sizeof(OS_CryptoRouter_t))) == NULL)
+    if ((self = memIf->malloc(sizeof(CryptoLibRouter_t))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
     impl->context = self;
-    impl->vtable  = &OS_CryptoRouter_vtable;;
+    impl->vtable  = &CryptoLibRouter_vtable;;
     self->memIf   = *memIf;
 
     if ((err = CryptoLib_init(&self->lib, memIf, &cfg->lib)) != SEOS_SUCCESS)
     {
         goto err0;
     }
-    if ((err = OS_CryptoRpcClient_init(&self->client, memIf,
-                                       &cfg->client)) != SEOS_SUCCESS)
+    if ((err = CryptoLibClient_init(&self->client, memIf,
+                                    &cfg->client)) != SEOS_SUCCESS)
     {
         goto err1;
     }
@@ -580,8 +580,8 @@ err0:
 }
 
 seos_err_t
-OS_CryptoRouter_free(
-    OS_CryptoRouter_t* self)
+CryptoLibRouter_free(
+    CryptoLibRouter_t* self)
 {
     seos_err_t err;
 
@@ -590,7 +590,7 @@ OS_CryptoRouter_free(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((err = OS_CryptoRpcClient_free(self->client.context)) != SEOS_SUCCESS)
+    if ((err = CryptoLibClient_free(self->client.context)) != SEOS_SUCCESS)
     {
         return err;
     }

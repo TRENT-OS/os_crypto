@@ -9,10 +9,12 @@
 #include "OS_CryptoImpl.h"
 
 // Call function from self pointer
-#define CALL(s, f, ...)                                             \
-    (NULL == (s)) ? SEOS_ERROR_INVALID_PARAMETER :                  \
-        (NULL == (s)->impl.vtable->f) ? SEOS_ERROR_NOT_SUPPORTED :  \
-        (s)->impl.vtable->f((s)->impl.context, __VA_ARGS__)         \
+#define CALL(s, f, ...)                                         \
+    (NULL == (s)) ?                                             \
+        SEOS_ERROR_INVALID_PARAMETER :                          \
+        (NULL == (s)->impl.vtable->f) ?                         \
+            SEOS_ERROR_NOT_SUPPORTED :                          \
+            (s)->impl.vtable->f((s)->impl.context, __VA_ARGS__)
 
 // Allocate proxy object and set its API handle to self pointer
 #define PROXY_INIT(p, s)                                                \
@@ -32,10 +34,14 @@
     (p)->hCrypto->memIf.free(p);
 
 // Call function from proxy objects API handle
-#define PROXY_CALL(p, f, ...)                                                   \
-    (NULL == (p)) ? SEOS_ERROR_INVALID_PARAMETER :                              \
-        (NULL == (p)->hCrypto->impl.vtable->f) ? SEOS_ERROR_NOT_SUPPORTED :     \
-        (p)->hCrypto->impl.vtable->f((p)->hCrypto->impl.context, __VA_ARGS__)   \
+#define PROXY_CALL(p, f, ...)                               \
+    (NULL == (p)) ?                                         \
+        SEOS_ERROR_INVALID_PARAMETER :                      \
+        (NULL == (p)->hCrypto->impl.vtable->f) ?            \
+            SEOS_ERROR_NOT_SUPPORTED :                      \
+            (p)->hCrypto->impl.vtable->f(                   \
+                (p)->hCrypto->impl.context, __VA_ARGS__     \
+            )
 
 // Get object from proxy
 #define PROXY_GET_OBJ(p) ((NULL == (p)) ? NULL : (p)->obj)
