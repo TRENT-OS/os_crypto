@@ -339,13 +339,13 @@ CryptoLibServer_Key_free(
 seos_err_t
 CryptoLibServer_Agreement_init(
     CryptoLibAgreement_ptr*  pAgrObj,
-    OS_CryptoAgreement_Alg_t algorithm,
-    CryptoLibKey_cptr        prvKey)
+    CryptoLibKey_cptr        prvKey,
+    OS_CryptoAgreement_Alg_t algorithm)
 {
     CryptoLibServer_t* self;
 
     GET_SELF(self);
-    return CALL(self, Agreement_init, pAgrObj, algorithm, prvKey);
+    return CALL(self, Agreement_init, pAgrObj, prvKey, algorithm);
 }
 
 seos_err_t

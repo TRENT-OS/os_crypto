@@ -502,8 +502,8 @@ static seos_err_t
 Agreement_init(
     void*                          ctx,
     CryptoLibAgreement_t**         pAgrObj,
-    const OS_CryptoAgreement_Alg_t algorithm,
-    const CryptoLibKey_t*          prvKey)
+    const CryptoLibKey_t*          prvKey,
+    const OS_CryptoAgreement_Alg_t algorithm)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
@@ -518,8 +518,8 @@ Agreement_init(
         return SEOS_ERROR_INVALID_HANDLE;
     }
 
-    if ((err = CryptoLibAgreement_init(pAgrObj, &self->memIf, algorithm,
-                                       prvKey)) != SEOS_SUCCESS)
+    if ((err = CryptoLibAgreement_init(pAgrObj, prvKey, algorithm,
+                                       &self->memIf)) != SEOS_SUCCESS)
     {
         return err;
     }

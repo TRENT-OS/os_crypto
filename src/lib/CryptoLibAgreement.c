@@ -28,9 +28,9 @@ struct CryptoLibAgreement
 static seos_err_t
 initImpl(
     CryptoLibAgreement_t**         self,
-    const OS_Crypto_Memory_t*      memIf,
+    const CryptoLibKey_t*          prvKey,
     const OS_CryptoAgreement_Alg_t algorithm,
-    const CryptoLibKey_t*          prvKey)
+    const OS_Crypto_Memory_t*      memIf)
 {
     seos_err_t err;
     CryptoLibAgreement_t* agr;
@@ -182,9 +182,9 @@ agreeImpl(
 seos_err_t
 CryptoLibAgreement_init(
     CryptoLibAgreement_t**         self,
-    const OS_Crypto_Memory_t*      memIf,
+    const CryptoLibKey_t*          prvKey,
     const OS_CryptoAgreement_Alg_t algorithm,
-    const CryptoLibKey_t*          prvKey)
+    const OS_Crypto_Memory_t*      memIf)
 {
     seos_err_t err;
 
@@ -193,7 +193,7 @@ CryptoLibAgreement_init(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((err = initImpl(self, memIf, algorithm, prvKey)) == SEOS_SUCCESS)
+    if ((err = initImpl(self, prvKey, algorithm, memIf)) == SEOS_SUCCESS)
     {
         if ((err = setKeyImpl(*self)) != SEOS_SUCCESS)
         {

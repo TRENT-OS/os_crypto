@@ -195,8 +195,8 @@ typedef const CryptoLibAgreement_t* CryptoLibAgreement_cptr;
 seos_err_t
 CryptoLibServer_Agreement_init(
     CryptoLibAgreement_ptr*  pAgrPtr,
-    OS_CryptoAgreement_Alg_t algorithm,
-    CryptoLibKey_cptr        prvPtr);
+    CryptoLibKey_cptr        prvPtr,
+    OS_CryptoAgreement_Alg_t algorithm);
 
 seos_err_t
 CryptoLibServer_Agreement_agree(

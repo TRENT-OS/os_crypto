@@ -28,9 +28,9 @@ typedef struct CryptoLibAgreement CryptoLibAgreement_t;
 seos_err_t
 CryptoLibAgreement_init(
     CryptoLibAgreement_t**         self,
-    const OS_Crypto_Memory_t*      memIf,
+    const CryptoLibKey_t*          prvKey,
     const OS_CryptoAgreement_Alg_t algorithm,
-    const CryptoLibKey_t*          prvKey);
+    const OS_Crypto_Memory_t*      memIf);
 
 seos_err_t
 CryptoLibAgreement_agree(

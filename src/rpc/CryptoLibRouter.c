@@ -280,12 +280,12 @@ static seos_err_t
 Agreement_init(
     void*                          ctx,
     CryptoLibAgreement_t**         pAgrObj,
-    const OS_CryptoAgreement_Alg_t algorithm,
-    const CryptoLibKey_t*          prvKey)
+    const CryptoLibKey_t*          prvKey,
+    const OS_CryptoAgreement_Alg_t algorithm)
 {
     return CALL_LIB(ctx, Key_exists, prvKey) == SEOS_SUCCESS ?
-           CALL_LIB(ctx, Agreement_init, pAgrObj, algorithm, prvKey) :
-           CALL_CLI(ctx, Agreement_init, pAgrObj, algorithm, prvKey);
+           CALL_LIB(ctx, Agreement_init, pAgrObj, prvKey, algorithm) :
+           CALL_CLI(ctx, Agreement_init, pAgrObj, prvKey, algorithm);
 }
 
 static seos_err_t

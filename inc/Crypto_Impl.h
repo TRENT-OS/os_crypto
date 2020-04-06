@@ -206,8 +206,8 @@ typedef seos_err_t
 (*Agreement_init_func)(
     void*,
     CryptoLibAgreement_t**,
-    const OS_CryptoAgreement_Alg_t,
-    const CryptoLibKey_t*);
+    const CryptoLibKey_t*,
+    const OS_CryptoAgreement_Alg_t);
 
 typedef seos_err_t
 (*Agreement_exists_func)(

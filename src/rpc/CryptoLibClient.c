@@ -364,11 +364,11 @@ static seos_err_t
 Agreement_init(
     void*                          ctx,
     CryptoLibAgreement_t**         pAgrObj,
-    const OS_CryptoAgreement_Alg_t algorithm,
-    const CryptoLibKey_t*          prvKey)
+    const CryptoLibKey_t*          prvKey,
+    const OS_CryptoAgreement_Alg_t algorithm)
 {
     UNUSED_VAR(ctx);
-    return CryptoLibServer_Agreement_init(pAgrObj, algorithm, prvKey);
+    return CryptoLibServer_Agreement_init(pAgrObj, prvKey, algorithm);
 }
 
 static seos_err_t
