@@ -17,9 +17,15 @@
 
 # These are the sources we ALWAYS compile, for all targets
 set(SHARED_LIB_SOURCES
-    "src/OS_CryptoLib.c"
     "src/OS_Crypto.c"
-    "src/util/PtrVector.c"
+    "src/OS_CryptoAgreement.c"
+    "src/OS_CryptoCipher.c"
+    "src/OS_CryptoDigest.c"
+    "src/OS_CryptoKey.c"
+    "src/OS_CryptoMac.c"
+    "src/OS_CryptoRng.c"
+    "src/OS_CryptoSignature.c"
+    "src/OS_CryptoLib.c"
     "src/lib/OS_CryptoLibAgreement.c"
     "src/lib/OS_CryptoLibRng.c"
     "src/lib/OS_CryptoLibDigest.c"
@@ -27,6 +33,7 @@ set(SHARED_LIB_SOURCES
     "src/lib/OS_CryptoLibCipher.c"
     "src/lib/OS_CryptoLibSignature.c"
     "src/lib/OS_CryptoLibKey.c"
+    "src/util/PtrVector.c"
 )
 
 # These are the 3rd party sources, holding the actual algorithms
