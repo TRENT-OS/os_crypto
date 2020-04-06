@@ -17,7 +17,7 @@
 
 #include "OS_Crypto.h"
 
-#include "OS_CryptoImpl.h"
+#include "Crypto_Impl.h"
 
 // -------------------------- defines/types/variables --------------------------
 
@@ -27,7 +27,7 @@ typedef struct CryptoLibRouter CryptoLibRouter_t;
 
 seos_err_t
 CryptoLibRouter_init(
-    OS_CryptoImpl_t*                impl,
+    Crypto_Impl_t*                  impl,
     const OS_Crypto_Memory_t*       memIf,
     const CryptoLibRouter_Config_t* cfg);
 

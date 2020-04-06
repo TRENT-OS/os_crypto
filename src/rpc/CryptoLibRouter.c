@@ -58,8 +58,8 @@
 
 struct CryptoLibRouter
 {
-    OS_CryptoImpl_t lib;
-    OS_CryptoImpl_t client;
+    Crypto_Impl_t lib;
+    Crypto_Impl_t client;
     OS_Crypto_Memory_t memIf;
 };
 
@@ -494,7 +494,7 @@ Cipher_finalize(
 
 // ------------------------------- init/free -----------------------------------
 
-static const OS_CryptoImpl_Vtable_t CryptoLibRouter_vtable =
+static const Crypto_Vtable_t CryptoLibRouter_vtable =
 {
     .Rng_getBytes        = Rng_getBytes,
     .Rng_reseed          = Rng_reseed,
@@ -538,7 +538,7 @@ static const OS_CryptoImpl_Vtable_t CryptoLibRouter_vtable =
 
 seos_err_t
 CryptoLibRouter_init(
-    OS_CryptoImpl_t*                impl,
+    Crypto_Impl_t*                  impl,
     const OS_Crypto_Memory_t*       memIf,
     const CryptoLibRouter_Config_t* cfg)
 {

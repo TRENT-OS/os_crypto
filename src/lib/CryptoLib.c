@@ -993,7 +993,7 @@ Cipher_finalize(
 
 // ------------------------------- init/free -----------------------------------
 
-static const OS_CryptoImpl_Vtable_t CryptoLib_vtable =
+static const Crypto_Vtable_t CryptoLib_vtable =
 {
     .Rng_getBytes        = Rng_getBytes,
     .Rng_reseed          = Rng_reseed,
@@ -1037,7 +1037,7 @@ static const OS_CryptoImpl_Vtable_t CryptoLib_vtable =
 
 seos_err_t
 CryptoLib_init(
-    OS_CryptoImpl_t*          impl,
+    Crypto_Impl_t*            impl,
     const OS_Crypto_Memory_t* memIf,
     const CryptoLib_Config_t* cfg)
 {

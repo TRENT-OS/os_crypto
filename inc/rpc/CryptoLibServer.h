@@ -25,7 +25,7 @@ typedef struct CryptoLibServer CryptoLibServer_t;
 seos_err_t
 CryptoLibServer_init(
     CryptoLibServer_t**             ctx,
-    const OS_CryptoImpl_t*          client,
+    const Crypto_Impl_t*            client,
     const OS_Crypto_Memory_t*       memIf,
     const CryptoLibServer_Config_t* cfg);
 

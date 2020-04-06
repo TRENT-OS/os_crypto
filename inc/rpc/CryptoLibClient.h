@@ -17,7 +17,7 @@
 
 #include "OS_Crypto.h"
 
-#include "OS_CryptoImpl.h"
+#include "Crypto_Impl.h"
 
 // -------------------------- defines/types/variables --------------------------
 
@@ -27,7 +27,7 @@ typedef struct CryptoLibClient CryptoLibClient_t;
 
 seos_err_t
 CryptoLibClient_init(
-    OS_CryptoImpl_t*                impl,
+    Crypto_Impl_t*                  impl,
     const OS_Crypto_Memory_t*       memIf,
     const CryptoLibClient_Config_t* cfg);
 

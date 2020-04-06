@@ -22,7 +22,7 @@
 #include "lib/CryptoLibSignature.h"
 #include "lib/CryptoLibAgreement.h"
 
-#include "OS_CryptoImpl.h"
+#include "Crypto_Impl.h"
 
 // -------------------------- defines/types/variables --------------------------
 
@@ -32,7 +32,7 @@ typedef struct CryptoLib CryptoLib_t;
 
 seos_err_t
 CryptoLib_init(
-    OS_CryptoImpl_t*          impl,
+    Crypto_Impl_t*            impl,
     const OS_Crypto_Memory_t* memIf,
     const CryptoLib_Config_t* cfg);
 

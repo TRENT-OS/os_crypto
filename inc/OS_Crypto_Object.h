@@ -6,7 +6,7 @@
 
 #include "OS_Crypto.h"
 
-#include "OS_CryptoImpl.h"
+#include "Crypto_Impl.h"
 
 // Call function from self pointer
 #define CALL(s, f, ...)                                         \
@@ -51,7 +51,7 @@
 
 struct OS_Crypto
 {
-    OS_CryptoImpl_t impl;
+    Crypto_Impl_t impl;
     OS_Crypto_Mode_t mode;
     OS_Crypto_Memory_t memIf;
     void* server;

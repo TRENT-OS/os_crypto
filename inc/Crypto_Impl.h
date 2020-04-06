@@ -15,14 +15,14 @@
 // -------------------------------- RNG API ------------------------------------
 
 typedef seos_err_t
-(*OS_CryptoImpl_Rng_getBytes)(
+(*Rng_getBytes_func)(
     void*,
     unsigned int,
     void*,
     const size_t);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Rng_reseed)(
+(*Rng_reseed_func)(
     void*,
     const void*,
     const size_t);
@@ -30,37 +30,37 @@ typedef seos_err_t
 // --------------------------------- MAC API -----------------------------------
 
 typedef seos_err_t
-(*OS_CryptoImpl_Mac_init)(
+(*Mac_init_func)(
     void*,
     CryptoLibMac_t**,
     const OS_CryptoMac_Alg_t);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Mac_exists)(
+(*Mac_exists_func)(
     void*,
     const CryptoLibMac_t*);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Mac_free)(
+(*Mac_free_func)(
     void*,
     CryptoLibMac_t*);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Mac_start)(
+(*Mac_start_func)(
     void*,
     CryptoLibMac_t*,
     const void*,
     const size_t);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Mac_process)(
+(*Mac_process_func)(
     void*,
     CryptoLibMac_t*,
     const void*,
     const size_t);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Mac_finalize)(
+(*Mac_finalize_func)(
     void*,
     CryptoLibMac_t*,
     void*,
@@ -69,36 +69,36 @@ typedef seos_err_t
 // ------------------------------- Digest API ----------------------------------
 
 typedef seos_err_t
-(*OS_CryptoImpl_Digest_init)(
+(*Digest_init_func)(
     void*,
     CryptoLibDigest_t**,
     const OS_CryptoDigest_Alg_t);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Digest_exists)(
+(*Digest_exists_func)(
     void*,
     const CryptoLibDigest_t*);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Digest_free)(
+(*Digest_free_func)(
     void*,
     CryptoLibDigest_t*);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Digest_clone)(
+(*Digest_clone_func)(
     void*,
     CryptoLibDigest_t*,
     const CryptoLibDigest_t*);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Digest_process)(
+(*Digest_process_func)(
     void*,
     CryptoLibDigest_t*,
     const void*,
     const size_t);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Digest_finalize)(
+(*Digest_finalize_func)(
     void*,
     CryptoLibDigest_t*,
     void*,
@@ -107,55 +107,55 @@ typedef seos_err_t
 // -------------------------------- Key API ------------------------------------
 
 typedef seos_err_t
-(*OS_CryptoImpl_Key_generate)(
+(*Key_generate_func)(
     void*,
     CryptoLibKey_t**,
     const OS_CryptoKey_Spec_t*);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Key_import)(
+(*Key_import_func)(
     void*,
     CryptoLibKey_t**,
     const OS_CryptoKey_Data_t*);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Key_makePublic)(
+(*Key_makePublic_func)(
     void*,
     CryptoLibKey_t**,
     const CryptoLibKey_t*,
     const OS_CryptoKey_Attrib_t*);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Key_export)(
+(*Key_export_func)(
     void*,
     const CryptoLibKey_t*,
     OS_CryptoKey_Data_t*);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Key_getParams)(
+(*Key_getParams_func)(
     void*,
     const CryptoLibKey_t*,
     void*,
     size_t*);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Key_getAttribs)(
+(*Key_getAttribs_func)(
     void*,
     const CryptoLibKey_t*,
     OS_CryptoKey_Attrib_t*);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Key_exists)(
+(*Key_exists_func)(
     void*,
     const CryptoLibKey_t*);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Key_free)(
+(*Key_free_func)(
     void*,
     CryptoLibKey_t*);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Key_loadParams)(
+(*Key_loadParams_func)(
     void*,
     const OS_CryptoKey_Param_t,
     void*,
@@ -164,7 +164,7 @@ typedef seos_err_t
 // ----------------------------- Signature API ---------------------------------
 
 typedef seos_err_t
-(*OS_CryptoImpl_Signature_init)(
+(*Signature_init_func)(
     void*,
     CryptoLibSignature_t**,
     const OS_CryptoSignature_Alg_t,
@@ -173,17 +173,17 @@ typedef seos_err_t
     const CryptoLibKey_t*);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Signature_exists)(
+(*Signature_exists_func)(
     void*,
     const CryptoLibSignature_t* );
 
 typedef seos_err_t
-(*OS_CryptoImpl_Signature_free)(
+(*Signature_free_func)(
     void*,
     CryptoLibSignature_t*);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Signature_sign)(
+(*Signature_sign_func)(
     void*,
     CryptoLibSignature_t*,
     const void*,
@@ -192,7 +192,7 @@ typedef seos_err_t
     size_t*);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Signature_verify)(
+(*Signature_verify_func)(
     void*,
     CryptoLibSignature_t*,
     const void*,
@@ -203,24 +203,24 @@ typedef seos_err_t
 // ----------------------------- Agreement API ---------------------------------
 
 typedef seos_err_t
-(*OS_CryptoImpl_Agreement_init)(
+(*Agreement_init_func)(
     void*,
     CryptoLibAgreement_t**,
     const OS_CryptoAgreement_Alg_t,
     const CryptoLibKey_t*);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Agreement_exists)(
+(*Agreement_exists_func)(
     void*,
     const CryptoLibAgreement_t*);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Agreement_free)(
+(*Agreement_free_func)(
     void*,
     CryptoLibAgreement_t*);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Agreement_agree)(
+(*Agreement_agree_func)(
     void*,
     CryptoLibAgreement_t*,
     const CryptoLibKey_t*,
@@ -230,7 +230,7 @@ typedef seos_err_t
 // ------------------------------ Cipher API -----------------------------------
 
 typedef seos_err_t
-(*OS_CryptoImpl_Cipher_init)(
+(*Cipher_init_func)(
     void*,
     CryptoLibCipher_t**,
     const OS_CryptoCipher_Alg_t,
@@ -239,17 +239,17 @@ typedef seos_err_t
     const size_t);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Cipher_exists)(
+(*Cipher_exists_func)(
     void*,
     const CryptoLibCipher_t*);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Cipher_free)(
+(*Cipher_free_func)(
     void*,
     CryptoLibCipher_t*);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Cipher_process)(
+(*Cipher_process_func)(
     void*,
     CryptoLibCipher_t*,
     const void*,
@@ -258,14 +258,14 @@ typedef seos_err_t
     size_t*);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Cipher_start)(
+(*Cipher_start_func)(
     void*,
     CryptoLibCipher_t*,
     const void*,
     const size_t);
 
 typedef seos_err_t
-(*OS_CryptoImpl_Cipher_finalize)(
+(*Cipher_finalize_func)(
     void*,
     CryptoLibCipher_t*,
     void*,
@@ -275,48 +275,48 @@ typedef seos_err_t
 
 typedef struct
 {
-    OS_CryptoImpl_Rng_getBytes Rng_getBytes;
-    OS_CryptoImpl_Rng_reseed Rng_reseed;
-    OS_CryptoImpl_Mac_init Mac_init;
-    OS_CryptoImpl_Mac_exists Mac_exists;
-    OS_CryptoImpl_Mac_free Mac_free;
-    OS_CryptoImpl_Mac_start Mac_start;
-    OS_CryptoImpl_Mac_process Mac_process;
-    OS_CryptoImpl_Mac_finalize Mac_finalize;
-    OS_CryptoImpl_Digest_init Digest_init;
-    OS_CryptoImpl_Digest_exists Digest_exists;
-    OS_CryptoImpl_Digest_free Digest_free;
-    OS_CryptoImpl_Digest_clone Digest_clone;
-    OS_CryptoImpl_Digest_process Digest_process;
-    OS_CryptoImpl_Digest_finalize Digest_finalize;
-    OS_CryptoImpl_Key_generate Key_generate;
-    OS_CryptoImpl_Key_makePublic Key_makePublic;
-    OS_CryptoImpl_Key_import Key_import;
-    OS_CryptoImpl_Key_export Key_export;
-    OS_CryptoImpl_Key_getParams Key_getParams;
-    OS_CryptoImpl_Key_getAttribs Key_getAttribs;
-    OS_CryptoImpl_Key_loadParams Key_loadParams;
-    OS_CryptoImpl_Key_exists Key_exists;
-    OS_CryptoImpl_Key_free Key_free;
-    OS_CryptoImpl_Signature_init Signature_init;
-    OS_CryptoImpl_Signature_exists Signature_exists;
-    OS_CryptoImpl_Signature_free Signature_free;
-    OS_CryptoImpl_Signature_sign Signature_sign;
-    OS_CryptoImpl_Signature_verify Signature_verify;
-    OS_CryptoImpl_Agreement_init Agreement_init;
-    OS_CryptoImpl_Agreement_exists Agreement_exists;
-    OS_CryptoImpl_Agreement_free Agreement_free;
-    OS_CryptoImpl_Agreement_agree Agreement_agree;
-    OS_CryptoImpl_Cipher_init Cipher_init;
-    OS_CryptoImpl_Cipher_exists Cipher_exists;
-    OS_CryptoImpl_Cipher_free Cipher_free;
-    OS_CryptoImpl_Cipher_process Cipher_process;
-    OS_CryptoImpl_Cipher_start Cipher_start;
-    OS_CryptoImpl_Cipher_finalize Cipher_finalize;
-} OS_CryptoImpl_Vtable_t;
+    Rng_getBytes_func Rng_getBytes;
+    Rng_reseed_func Rng_reseed;
+    Mac_init_func Mac_init;
+    Mac_exists_func Mac_exists;
+    Mac_free_func Mac_free;
+    Mac_start_func Mac_start;
+    Mac_process_func Mac_process;
+    Mac_finalize_func Mac_finalize;
+    Digest_init_func Digest_init;
+    Digest_exists_func Digest_exists;
+    Digest_free_func Digest_free;
+    Digest_clone_func Digest_clone;
+    Digest_process_func Digest_process;
+    Digest_finalize_func Digest_finalize;
+    Key_generate_func Key_generate;
+    Key_makePublic_func Key_makePublic;
+    Key_import_func Key_import;
+    Key_export_func Key_export;
+    Key_getParams_func Key_getParams;
+    Key_getAttribs_func Key_getAttribs;
+    Key_loadParams_func Key_loadParams;
+    Key_exists_func Key_exists;
+    Key_free_func Key_free;
+    Signature_init_func Signature_init;
+    Signature_exists_func Signature_exists;
+    Signature_free_func Signature_free;
+    Signature_sign_func Signature_sign;
+    Signature_verify_func Signature_verify;
+    Agreement_init_func Agreement_init;
+    Agreement_exists_func Agreement_exists;
+    Agreement_free_func Agreement_free;
+    Agreement_agree_func Agreement_agree;
+    Cipher_init_func Cipher_init;
+    Cipher_exists_func Cipher_exists;
+    Cipher_free_func Cipher_free;
+    Cipher_process_func Cipher_process;
+    Cipher_start_func Cipher_start;
+    Cipher_finalize_func Cipher_finalize;
+} Crypto_Vtable_t;
 
 typedef struct
 {
-    const OS_CryptoImpl_Vtable_t* vtable;
+    const Crypto_Vtable_t* vtable;
     void* context;
-} OS_CryptoImpl_t;
+} Crypto_Impl_t;
