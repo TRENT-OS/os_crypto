@@ -2,7 +2,7 @@
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 
-#include "lib/OS_CryptoLibDigest.h"
+#include "lib/CryptoLibDigest.h"
 
 #include "mbedtls/md.h"
 #include "mbedtls/md5.h"
@@ -15,7 +15,7 @@
 
 // Internal types/defines/enums ------------------------------------------------
 
-struct OS_CryptoLibDigest
+struct CryptoLibDigest
 {
     union
     {
@@ -38,19 +38,19 @@ Debug_STATIC_ASSERT((int)OS_CryptoDigest_ALG_SHA256   ==
 
 static seos_err_t
 initImpl(
-    OS_CryptoLibDigest_t**      self,
+    CryptoLibDigest_t**         self,
     const OS_Crypto_Memory_t*   memIf,
     const OS_CryptoDigest_Alg_t algorithm)
 {
     seos_err_t err;
-    OS_CryptoLibDigest_t* dig;
+    CryptoLibDigest_t* dig;
 
-    if ((dig = memIf->malloc(sizeof(OS_CryptoLibDigest_t))) == NULL)
+    if ((dig = memIf->malloc(sizeof(CryptoLibDigest_t))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    memset(dig, 0, sizeof(OS_CryptoLibDigest_t));
+    memset(dig, 0, sizeof(CryptoLibDigest_t));
     dig->algorithm = algorithm;
     dig->processed = false;
 
@@ -82,7 +82,7 @@ initImpl(
 
 static seos_err_t
 freeImpl(
-    OS_CryptoLibDigest_t*     self,
+    CryptoLibDigest_t*        self,
     const OS_Crypto_Memory_t* memIf)
 {
     seos_err_t err;
@@ -107,9 +107,9 @@ freeImpl(
 
 static seos_err_t
 finalizeImpl(
-    OS_CryptoLibDigest_t* self,
-    void*                 digest,
-    size_t*               digestSize)
+    CryptoLibDigest_t* self,
+    void*              digest,
+    size_t*            digestSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 
@@ -150,9 +150,9 @@ finalizeImpl(
 
 static seos_err_t
 processImpl(
-    OS_CryptoLibDigest_t* self,
-    const void*           data,
-    const size_t          len)
+    CryptoLibDigest_t* self,
+    const void*        data,
+    const size_t       len)
 {
     switch (self->algorithm)
     {
@@ -171,8 +171,8 @@ processImpl(
 
 static seos_err_t
 cloneImpl(
-    OS_CryptoLibDigest_t*       self,
-    const OS_CryptoLibDigest_t* source)
+    CryptoLibDigest_t*       self,
+    const CryptoLibDigest_t* source)
 {
     switch (self->algorithm)
     {
@@ -192,8 +192,8 @@ cloneImpl(
 // Public Functions ------------------------------------------------------------
 
 seos_err_t
-OS_CryptoLibDigest_init(
-    OS_CryptoLibDigest_t**      self,
+CryptoLibDigest_init(
+    CryptoLibDigest_t**         self,
     const OS_Crypto_Memory_t*   memIf,
     const OS_CryptoDigest_Alg_t algorithm)
 {
@@ -206,8 +206,8 @@ OS_CryptoLibDigest_init(
 }
 
 seos_err_t
-OS_CryptoLibDigest_free(
-    OS_CryptoLibDigest_t*     self,
+CryptoLibDigest_free(
+    CryptoLibDigest_t*        self,
     const OS_Crypto_Memory_t* memIf)
 {
     if (NULL == memIf || NULL == self)
@@ -219,9 +219,9 @@ OS_CryptoLibDigest_free(
 }
 
 seos_err_t
-OS_CryptoLibDigest_clone(
-    OS_CryptoLibDigest_t*       self,
-    const OS_CryptoLibDigest_t* source)
+CryptoLibDigest_clone(
+    CryptoLibDigest_t*       self,
+    const CryptoLibDigest_t* source)
 {
     if (NULL == self || NULL == source || self->algorithm != source->algorithm)
     {
@@ -234,10 +234,10 @@ OS_CryptoLibDigest_clone(
 }
 
 seos_err_t
-OS_CryptoLibDigest_process(
-    OS_CryptoLibDigest_t* self,
-    const void*           data,
-    const size_t          len)
+CryptoLibDigest_process(
+    CryptoLibDigest_t* self,
+    const void*        data,
+    const size_t       len)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 
@@ -253,10 +253,10 @@ OS_CryptoLibDigest_process(
 }
 
 seos_err_t
-OS_CryptoLibDigest_finalize(
-    OS_CryptoLibDigest_t* self,
-    void*                 digest,
-    size_t*               digestSize)
+CryptoLibDigest_finalize(
+    CryptoLibDigest_t* self,
+    void*              digest,
+    size_t*            digestSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 

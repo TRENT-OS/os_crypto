@@ -6,7 +6,7 @@
 
 #include "OS_Crypto_Object.h"
 
-#include "OS_CryptoLib.h"
+#include "lib/CryptoLib.h"
 #include "OS_CryptoRpcClient.h"
 #include "OS_CryptoRpcServer.h"
 #include "OS_CryptoRouter.h"
@@ -40,8 +40,8 @@ OS_Crypto_init(
     switch (cfg->mode)
     {
     case OS_Crypto_MODE_LIBRARY:
-        if ((err = OS_CryptoLib_init(&ctx->impl, &cfg->mem,
-                                     &cfg->impl.lib)) != SEOS_SUCCESS)
+        if ((err = CryptoLib_init(&ctx->impl, &cfg->mem,
+                                  &cfg->impl.lib)) != SEOS_SUCCESS)
         {
             goto err0;
         }
@@ -64,8 +64,8 @@ OS_Crypto_init(
 #endif /* SEOS_CRYPTO_WITH_RPC_CLIENT */
 #if defined(SEOS_CRYPTO_WITH_RPC_SERVER)
     case OS_Crypto_MODE_RPC_SERVER_WITH_LIBRARY:
-        if ((err = OS_CryptoLib_init(&ctx->impl, &cfg->mem,
-                                     &cfg->impl.lib)) != SEOS_SUCCESS)
+        if ((err = CryptoLib_init(&ctx->impl, &cfg->mem,
+                                  &cfg->impl.lib)) != SEOS_SUCCESS)
         {
             goto err0;
         }
@@ -85,7 +85,7 @@ OS_Crypto_init(
 
 #if defined(SEOS_CRYPTO_WITH_RPC_SERVER)
 err1:
-    OS_CryptoLib_free(ctx->impl.context);
+    CryptoLib_free(ctx->impl.context);
 #endif /* SEOS_CRYPTO_WITH_RPC_SERVER */
 err0:
     ctx->memIf.free(ctx);
@@ -107,7 +107,7 @@ OS_Crypto_free(
     switch (self->mode)
     {
     case OS_Crypto_MODE_LIBRARY:
-        err = OS_CryptoLib_free(self->impl.context);
+        err = CryptoLib_free(self->impl.context);
         break;
 #if defined(SEOS_CRYPTO_WITH_RPC_CLIENT)
     case OS_Crypto_MODE_RPC_CLIENT:
@@ -119,7 +119,7 @@ OS_Crypto_free(
 #endif /* SEOS_CRYPTO_WITH_RPC_CLIENT */
 #if defined(SEOS_CRYPTO_WITH_RPC_SERVER)
     case OS_Crypto_MODE_RPC_SERVER_WITH_LIBRARY:
-        if ((err = OS_CryptoLib_free(self->impl.context)) != SEOS_SUCCESS)
+        if ((err = CryptoLib_free(self->impl.context)) != SEOS_SUCCESS)
         {
             return err;
         }
@@ -140,7 +140,7 @@ OS_Crypto_getServer(
     return (NULL == self) ? NULL : self->server;
 }
 
-OS_CryptoLib_Object_ptr*
+CryptoLib_Object_ptr*
 OS_Crypto_getObject(
     const OS_Crypto_Object_t* proxy)
 {
@@ -149,9 +149,9 @@ OS_Crypto_getObject(
 
 seos_err_t
 OS_Crypto_migrateObject(
-    OS_Crypto_Object_t**          proxy,
-    const OS_Crypto_Handle_t      self,
-    const OS_CryptoLib_Object_ptr ptr)
+    OS_Crypto_Object_t**       proxy,
+    const OS_Crypto_Handle_t   self,
+    const CryptoLib_Object_ptr ptr)
 {
     if (NULL == ptr)
     {

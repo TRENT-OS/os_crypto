@@ -9,7 +9,7 @@
 #include "lib/CryptoLibDigest.h"
 
 #define PROXY_GET_PTR(p) \
-    (OS_CryptoLibDigest_t**) PROXY_GET_OBJ_PTR(p)
+    (CryptoLibDigest_t**) PROXY_GET_OBJ_PTR(p)
 
 seos_err_t
 OS_CryptoDigest_init(

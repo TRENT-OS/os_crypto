@@ -78,7 +78,7 @@ Rng_reseed(
 static seos_err_t
 Mac_init(
     void*                    ctx,
-    OS_CryptoLibMac_t**      pMacObj,
+    CryptoLibMac_t**         pMacObj,
     const OS_CryptoMac_Alg_t algorithm)
 {
     UNUSED_VAR(ctx);
@@ -87,8 +87,8 @@ Mac_init(
 
 static seos_err_t
 Mac_exists(
-    void*                    ctx,
-    const OS_CryptoLibMac_t* macObj)
+    void*                 ctx,
+    const CryptoLibMac_t* macObj)
 {
     UNUSED_VAR(ctx);
     return OS_CryptoRpcServer_Mac_exists(macObj);
@@ -96,8 +96,8 @@ Mac_exists(
 
 static seos_err_t
 Mac_free(
-    void*              ctx,
-    OS_CryptoLibMac_t* macObj)
+    void*           ctx,
+    CryptoLibMac_t* macObj)
 {
     UNUSED_VAR(ctx);
     return OS_CryptoRpcServer_Mac_free(macObj);
@@ -105,10 +105,10 @@ Mac_free(
 
 static seos_err_t
 Mac_start(
-    void*              ctx,
-    OS_CryptoLibMac_t* macObj,
-    const void*        secret,
-    const size_t       secretSize)
+    void*           ctx,
+    CryptoLibMac_t* macObj,
+    const void*     secret,
+    const size_t    secretSize)
 {
     OS_CryptoRpcClient_t* self = (OS_CryptoRpcClient_t*) ctx;
 
@@ -127,10 +127,10 @@ Mac_start(
 
 static seos_err_t
 Mac_process(
-    void*              ctx,
-    OS_CryptoLibMac_t* macObj,
-    const void*        data,
-    const size_t       dataSize)
+    void*           ctx,
+    CryptoLibMac_t* macObj,
+    const void*     data,
+    const size_t    dataSize)
 {
     OS_CryptoRpcClient_t* self = (OS_CryptoRpcClient_t*) ctx;
 
@@ -149,10 +149,10 @@ Mac_process(
 
 static seos_err_t
 Mac_finalize(
-    void*              ctx,
-    OS_CryptoLibMac_t* macObj,
-    void*              mac,
-    size_t*            macSize)
+    void*           ctx,
+    CryptoLibMac_t* macObj,
+    void*           mac,
+    size_t*         macSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
     OS_CryptoRpcClient_t* self = (OS_CryptoRpcClient_t*) ctx;
@@ -179,7 +179,7 @@ Mac_finalize(
 static seos_err_t
 Digest_init(
     void*                       ctx,
-    OS_CryptoLibDigest_t**      pDigestObj,
+    CryptoLibDigest_t**         pDigestObj,
     const OS_CryptoDigest_Alg_t algorithm)
 {
     UNUSED_VAR(ctx);
@@ -188,8 +188,8 @@ Digest_init(
 
 static seos_err_t
 Digest_exists(
-    void*                       ctx,
-    const OS_CryptoLibDigest_t* digestObj)
+    void*                    ctx,
+    const CryptoLibDigest_t* digestObj)
 {
     UNUSED_VAR(ctx);
     return OS_CryptoRpcServer_Digest_exists(digestObj);
@@ -197,8 +197,8 @@ Digest_exists(
 
 static seos_err_t
 Digest_free(
-    void*                 ctx,
-    OS_CryptoLibDigest_t* digestObj)
+    void*              ctx,
+    CryptoLibDigest_t* digestObj)
 {
     UNUSED_VAR(ctx);
     return OS_CryptoRpcServer_Digest_free(digestObj);
@@ -206,9 +206,9 @@ Digest_free(
 
 static seos_err_t
 Digest_clone(
-    void*                       ctx,
-    OS_CryptoLibDigest_t*       dstDigObj,
-    const OS_CryptoLibDigest_t* srcDigObj)
+    void*                    ctx,
+    CryptoLibDigest_t*       dstDigObj,
+    const CryptoLibDigest_t* srcDigObj)
 {
     UNUSED_VAR(ctx);
     return OS_CryptoRpcServer_Digest_clone(dstDigObj, srcDigObj);
@@ -216,10 +216,10 @@ Digest_clone(
 
 static seos_err_t
 Digest_process(
-    void*                 ctx,
-    OS_CryptoLibDigest_t* digestObj,
-    const void*           data,
-    const size_t          dataSize)
+    void*              ctx,
+    CryptoLibDigest_t* digestObj,
+    const void*        data,
+    const size_t       dataSize)
 {
     OS_CryptoRpcClient_t* self = (OS_CryptoRpcClient_t*) ctx;
 
@@ -238,10 +238,10 @@ Digest_process(
 
 static seos_err_t
 Digest_finalize(
-    void*                 ctx,
-    OS_CryptoLibDigest_t* digestObj,
-    void*                 digest,
-    size_t*               digestSize)
+    void*              ctx,
+    CryptoLibDigest_t* digestObj,
+    void*              digest,
+    size_t*            digestSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
     OS_CryptoRpcClient_t* self = (OS_CryptoRpcClient_t*) ctx;
@@ -269,11 +269,11 @@ Digest_finalize(
 static seos_err_t
 Signature_init(
     void*                          ctx,
-    OS_CryptoLibSignature_t**      pSigObj,
+    CryptoLibSignature_t**         pSigObj,
     const OS_CryptoSignature_Alg_t algorithm,
     const OS_CryptoDigest_Alg_t    digest,
-    const OS_CryptoLibKey_t*       prvKey,
-    const OS_CryptoLibKey_t*       pubKey)
+    const CryptoLibKey_t*          prvKey,
+    const CryptoLibKey_t*          pubKey)
 {
     UNUSED_VAR(ctx);
     return OS_CryptoRpcServer_Signature_init(pSigObj, algorithm, digest, prvKey,
@@ -282,8 +282,8 @@ Signature_init(
 
 static seos_err_t
 Signature_exists(
-    void*                          ctx,
-    const OS_CryptoLibSignature_t* signatureObj)
+    void*                       ctx,
+    const CryptoLibSignature_t* signatureObj)
 {
     UNUSED_VAR(ctx);
     return OS_CryptoRpcServer_Signature_exists(signatureObj);
@@ -291,8 +291,8 @@ Signature_exists(
 
 static seos_err_t
 Signature_free(
-    void*                    ctx,
-    OS_CryptoLibSignature_t* sigObj)
+    void*                 ctx,
+    CryptoLibSignature_t* sigObj)
 {
     UNUSED_VAR(ctx);
     return OS_CryptoRpcServer_Signature_free(sigObj);
@@ -300,12 +300,12 @@ Signature_free(
 
 static seos_err_t
 Signature_sign(
-    void*                    ctx,
-    OS_CryptoLibSignature_t* sigObj,
-    const void*              hash,
-    const size_t             hashSize,
-    void*                    signature,
-    size_t*                  signatureSize)
+    void*                 ctx,
+    CryptoLibSignature_t* sigObj,
+    const void*           hash,
+    const size_t          hashSize,
+    void*                 signature,
+    size_t*               signatureSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
     OS_CryptoRpcClient_t* self = (OS_CryptoRpcClient_t*) ctx;
@@ -335,12 +335,12 @@ Signature_sign(
 
 static seos_err_t
 Signature_verify(
-    void*                    ctx,
-    OS_CryptoLibSignature_t* sigObj,
-    const void*              hash,
-    const size_t             hashSize,
-    const void*              signature,
-    const size_t             signatureSize)
+    void*                 ctx,
+    CryptoLibSignature_t* sigObj,
+    const void*           hash,
+    const size_t          hashSize,
+    const void*           signature,
+    const size_t          signatureSize)
 {
     OS_CryptoRpcClient_t* self = (OS_CryptoRpcClient_t*) ctx;
 
@@ -363,9 +363,9 @@ Signature_verify(
 static seos_err_t
 Agreement_init(
     void*                          ctx,
-    OS_CryptoLibAgreement_t**      pAgrObj,
+    CryptoLibAgreement_t**         pAgrObj,
     const OS_CryptoAgreement_Alg_t algorithm,
-    const OS_CryptoLibKey_t*       prvKey)
+    const CryptoLibKey_t*          prvKey)
 {
     UNUSED_VAR(ctx);
     return OS_CryptoRpcServer_Agreement_init(pAgrObj, algorithm, prvKey);
@@ -373,8 +373,8 @@ Agreement_init(
 
 static seos_err_t
 Agreement_exists(
-    void*                          ctx,
-    const OS_CryptoLibAgreement_t* agrObj)
+    void*                       ctx,
+    const CryptoLibAgreement_t* agrObj)
 {
     UNUSED_VAR(ctx);
     return OS_CryptoRpcServer_Agreement_exists(agrObj);
@@ -382,8 +382,8 @@ Agreement_exists(
 
 static seos_err_t
 Agreement_free(
-    void*                    ctx,
-    OS_CryptoLibAgreement_t* agrObj)
+    void*                 ctx,
+    CryptoLibAgreement_t* agrObj)
 {
     UNUSED_VAR(ctx);
     return OS_CryptoRpcServer_Agreement_free(agrObj);
@@ -391,11 +391,11 @@ Agreement_free(
 
 static seos_err_t
 Agreement_agree(
-    void*                    ctx,
-    OS_CryptoLibAgreement_t* agrObj,
-    const OS_CryptoLibKey_t* pubKey,
-    void*                    shared,
-    size_t*                  sharedSize)
+    void*                 ctx,
+    CryptoLibAgreement_t* agrObj,
+    const CryptoLibKey_t* pubKey,
+    void*                 shared,
+    size_t*               sharedSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
     OS_CryptoRpcClient_t* self = (OS_CryptoRpcClient_t*) ctx;
@@ -423,7 +423,7 @@ Agreement_agree(
 static seos_err_t
 Key_generate(
     void*                      ctx,
-    OS_CryptoLibKey_t**        pKeyObj,
+    CryptoLibKey_t**           pKeyObj,
     const OS_CryptoKey_Spec_t* spec)
 {
     OS_CryptoRpcClient_t* self = (OS_CryptoRpcClient_t*) ctx;
@@ -440,8 +440,8 @@ Key_generate(
 static seos_err_t
 Key_makePublic(
     void*                        ctx,
-    OS_CryptoLibKey_t**          pPubKeyObj,
-    const OS_CryptoLibKey_t*     prvKeyObj,
+    CryptoLibKey_t**             pPubKeyObj,
+    const CryptoLibKey_t*        prvKeyObj,
     const OS_CryptoKey_Attrib_t* attribs)
 {
     OS_CryptoRpcClient_t* self = (OS_CryptoRpcClient_t*) ctx;
@@ -458,7 +458,7 @@ Key_makePublic(
 static seos_err_t
 Key_import(
     void*                      ctx,
-    OS_CryptoLibKey_t**        pKeyObj,
+    CryptoLibKey_t**           pKeyObj,
     const OS_CryptoKey_Data_t* keyData)
 {
     OS_CryptoRpcClient_t* self = (OS_CryptoRpcClient_t*) ctx;
@@ -474,9 +474,9 @@ Key_import(
 
 static seos_err_t
 Key_export(
-    void*                    ctx,
-    const OS_CryptoLibKey_t* keyObj,
-    OS_CryptoKey_Data_t*     keyData)
+    void*                 ctx,
+    const CryptoLibKey_t* keyObj,
+    OS_CryptoKey_Data_t*  keyData)
 {
     OS_CryptoRpcClient_t* self = (OS_CryptoRpcClient_t*) ctx;
     seos_err_t err = SEOS_ERROR_GENERIC;
@@ -496,10 +496,10 @@ Key_export(
 
 static seos_err_t
 Key_getParams(
-    void*                    ctx,
-    const OS_CryptoLibKey_t* keyObj,
-    void*                    keyParams,
-    size_t*                  paramSize)
+    void*                 ctx,
+    const CryptoLibKey_t* keyObj,
+    void*                 keyParams,
+    size_t*               paramSize)
 {
     OS_CryptoRpcClient_t* self = (OS_CryptoRpcClient_t*) ctx;
     seos_err_t err = SEOS_ERROR_GENERIC;
@@ -524,9 +524,9 @@ Key_getParams(
 
 static seos_err_t
 Key_getAttribs(
-    void*                    ctx,
-    const OS_CryptoLibKey_t* keyObj,
-    OS_CryptoKey_Attrib_t*   attribs)
+    void*                  ctx,
+    const CryptoLibKey_t*  keyObj,
+    OS_CryptoKey_Attrib_t* attribs)
 {
     OS_CryptoRpcClient_t* self = (OS_CryptoRpcClient_t*) ctx;
     seos_err_t err = SEOS_ERROR_GENERIC;
@@ -574,8 +574,8 @@ Key_loadParams(
 
 static seos_err_t
 Key_exists(
-    void*                    ctx,
-    const OS_CryptoLibKey_t* keyObj)
+    void*                 ctx,
+    const CryptoLibKey_t* keyObj)
 {
     UNUSED_VAR(ctx);
     return OS_CryptoRpcServer_Key_exists(keyObj);
@@ -583,8 +583,8 @@ Key_exists(
 
 static seos_err_t
 Key_free(
-    void*              ctx,
-    OS_CryptoLibKey_t* keyObj)
+    void*           ctx,
+    CryptoLibKey_t* keyObj)
 {
     UNUSED_VAR(ctx);
     return OS_CryptoRpcServer_Key_free(keyObj);
@@ -595,9 +595,9 @@ Key_free(
 static seos_err_t
 Cipher_init(
     void*                       ctx,
-    OS_CryptoLibCipher_t**      pCipherObj,
+    CryptoLibCipher_t**         pCipherObj,
     const OS_CryptoCipher_Alg_t algorithm,
-    const OS_CryptoLibKey_t*    key,
+    const CryptoLibKey_t*       key,
     const void*                 iv,
     const size_t                ivSize)
 {
@@ -622,8 +622,8 @@ Cipher_init(
 
 static seos_err_t
 Cipher_exists(
-    void*                       ctx,
-    const OS_CryptoLibCipher_t* cipherObj)
+    void*                    ctx,
+    const CryptoLibCipher_t* cipherObj)
 {
     UNUSED_VAR(ctx);
     return OS_CryptoRpcServer_Cipher_exists(cipherObj);
@@ -631,8 +631,8 @@ Cipher_exists(
 
 static seos_err_t
 Cipher_free(
-    void*                 ctx,
-    OS_CryptoLibCipher_t* cipherObj)
+    void*              ctx,
+    CryptoLibCipher_t* cipherObj)
 {
     UNUSED_VAR(ctx);
     return OS_CryptoRpcServer_Cipher_free(cipherObj);
@@ -640,12 +640,12 @@ Cipher_free(
 
 static seos_err_t
 Cipher_process(
-    void*                 ctx,
-    OS_CryptoLibCipher_t* cipherObj,
-    const void*           input,
-    const size_t          inputSize,
-    void*                 output,
-    size_t*               outputSize)
+    void*              ctx,
+    CryptoLibCipher_t* cipherObj,
+    const void*        input,
+    const size_t       inputSize,
+    void*              output,
+    size_t*            outputSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
     OS_CryptoRpcClient_t* self = (OS_CryptoRpcClient_t*) ctx;
@@ -675,10 +675,10 @@ Cipher_process(
 
 static seos_err_t
 Cipher_start(
-    void*                 ctx,
-    OS_CryptoLibCipher_t* cipherObj,
-    const void*           data,
-    const size_t          dataSize)
+    void*              ctx,
+    CryptoLibCipher_t* cipherObj,
+    const void*        data,
+    const size_t       dataSize)
 {
     OS_CryptoRpcClient_t* self = (OS_CryptoRpcClient_t*) ctx;
 
@@ -701,10 +701,10 @@ Cipher_start(
 
 static seos_err_t
 Cipher_finalize(
-    void*                 ctx,
-    OS_CryptoLibCipher_t* cipherObj,
-    void*                 tag,
-    size_t*               tagSize)
+    void*              ctx,
+    CryptoLibCipher_t* cipherObj,
+    void*              tag,
+    size_t*            tagSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
     OS_CryptoRpcClient_t* self = (OS_CryptoRpcClient_t*) ctx;

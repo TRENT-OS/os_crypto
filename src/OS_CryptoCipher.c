@@ -9,7 +9,7 @@
 #include "lib/CryptoLibCipher.h"
 
 #define PROXY_GET_PTR(p) \
-    (OS_CryptoLibCipher_t**) PROXY_GET_OBJ_PTR(p)
+    (CryptoLibCipher_t**) PROXY_GET_OBJ_PTR(p)
 
 seos_err_t
 OS_CryptoCipher_init(

@@ -4,7 +4,7 @@
  * @addtogroup Crypto
  * @{
  *
- * @file OS_CryptoLibDigest.h
+ * @file CryptoLibDigest.h
  *
  * @brief Crypto library implementation of Digest functions
  *
@@ -20,36 +20,36 @@
 
 // Exported types/defines/enums ------------------------------------------------
 
-typedef struct OS_CryptoLibDigest OS_CryptoLibDigest_t;
+typedef struct CryptoLibDigest CryptoLibDigest_t;
 
 // Exported functions ----------------------------------------------------------
 
 seos_err_t
-OS_CryptoLibDigest_init(
-    OS_CryptoLibDigest_t**      self,
+CryptoLibDigest_init(
+    CryptoLibDigest_t**         self,
     const OS_Crypto_Memory_t*   memIf,
     const OS_CryptoDigest_Alg_t algorithm);
 
 seos_err_t
-OS_CryptoLibDigest_free(
-    OS_CryptoLibDigest_t*     self,
+CryptoLibDigest_free(
+    CryptoLibDigest_t*        self,
     const OS_Crypto_Memory_t* memIf);
 
 seos_err_t
-OS_CryptoLibDigest_clone(
-    OS_CryptoLibDigest_t*       self,
-    const OS_CryptoLibDigest_t* source);
+CryptoLibDigest_clone(
+    CryptoLibDigest_t*       self,
+    const CryptoLibDigest_t* source);
 
 seos_err_t
-OS_CryptoLibDigest_process(
-    OS_CryptoLibDigest_t* self,
-    const void*           data,
-    const size_t          dataSize);
+CryptoLibDigest_process(
+    CryptoLibDigest_t* self,
+    const void*        data,
+    const size_t       dataSize);
 
 seos_err_t
-OS_CryptoLibDigest_finalize(
-    OS_CryptoLibDigest_t* self,
-    void*                 digest,
-    size_t*               digestSize);
+CryptoLibDigest_finalize(
+    CryptoLibDigest_t* self,
+    void*              digest,
+    size_t*            digestSize);
 
 /** @} */

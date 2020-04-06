@@ -9,7 +9,7 @@
 #include "lib/CryptoLibMac.h"
 
 #define PROXY_GET_PTR(p) \
-    (OS_CryptoLibMac_t**) PROXY_GET_OBJ_PTR(p)
+    (CryptoLibMac_t**) PROXY_GET_OBJ_PTR(p)
 
 seos_err_t
 OS_CryptoMac_init(

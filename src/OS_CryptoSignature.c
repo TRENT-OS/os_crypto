@@ -9,7 +9,7 @@
 #include "lib/CryptoLibSignature.h"
 
 #define PROXY_GET_PTR(p) \
-    (OS_CryptoLibSignature_t**) PROXY_GET_OBJ_PTR(p)
+    (CryptoLibSignature_t**) PROXY_GET_OBJ_PTR(p)
 
 seos_err_t
 OS_CryptoSignature_init(

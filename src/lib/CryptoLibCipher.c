@@ -2,7 +2,7 @@
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 
-#include "lib/OS_CryptoLibCipher.h"
+#include "lib/CryptoLibCipher.h"
 
 #include "mbedtls/rsa.h"
 #include "mbedtls/aes.h"
@@ -13,7 +13,7 @@
 
 // Internal types/defines/enums ------------------------------------------------
 
-struct OS_CryptoLibCipher
+struct CryptoLibCipher
 {
     union
     {
@@ -22,7 +22,7 @@ struct OS_CryptoLibCipher
         mbedtls_gcm_context gcm;
     } mbedtls;
     OS_CryptoCipher_Alg_t algorithm;
-    const OS_CryptoLibKey_t* key;
+    const CryptoLibKey_t* key;
     uint8_t iv[OS_CryptoCipher_SIZE_AES_BLOCK];
     size_t ivLen;
     size_t inputLen;
@@ -35,20 +35,20 @@ struct OS_CryptoLibCipher
 
 static seos_err_t
 initImpl(
-    OS_CryptoLibCipher_t**      self,
+    CryptoLibCipher_t**         self,
     const OS_Crypto_Memory_t*   memIf,
     const OS_CryptoCipher_Alg_t algorithm,
-    const OS_CryptoLibKey_t*    key)
+    const CryptoLibKey_t*       key)
 {
-    OS_CryptoLibCipher_t* ciph;
+    CryptoLibCipher_t* ciph;
     seos_err_t err;
 
-    if ((ciph = memIf->malloc(sizeof(OS_CryptoLibCipher_t))) == NULL)
+    if ((ciph = memIf->malloc(sizeof(CryptoLibCipher_t))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    memset(ciph, 0, sizeof(OS_CryptoLibCipher_t));
+    memset(ciph, 0, sizeof(CryptoLibCipher_t));
     ciph->algorithm  = algorithm;
     ciph->key        = key;
     ciph->inputLen   = 0;
@@ -88,7 +88,7 @@ initImpl(
 
 static seos_err_t
 freeImpl(
-    OS_CryptoLibCipher_t*     self,
+    CryptoLibCipher_t*        self,
     const OS_Crypto_Memory_t* memIf)
 {
     seos_err_t err;
@@ -117,7 +117,7 @@ freeImpl(
 
 static seos_err_t
 setKeyImpl(
-    OS_CryptoLibCipher_t* self)
+    CryptoLibCipher_t* self)
 {
     OS_CryptoKey_Aes_t* aesKey;
     seos_err_t err = SEOS_SUCCESS;
@@ -130,8 +130,8 @@ setKeyImpl(
     case OS_CryptoCipher_ALG_AES_CBC_DEC:
     case OS_CryptoCipher_ALG_AES_GCM_ENC:
     case OS_CryptoCipher_ALG_AES_GCM_DEC:
-        if (OS_CryptoLibKey_getType(self->key) != OS_CryptoKey_TYPE_AES ||
-            (aesKey = OS_CryptoLibKey_getAes(self->key)) == NULL)
+        if (CryptoLibKey_getType(self->key) != OS_CryptoKey_TYPE_AES ||
+            (aesKey = CryptoLibKey_getAes(self->key)) == NULL)
         {
             return SEOS_ERROR_INVALID_PARAMETER;
         }
@@ -170,9 +170,9 @@ setKeyImpl(
 
 static seos_err_t
 setIvImpl(
-    OS_CryptoLibCipher_t* self,
-    const void*           iv,
-    const size_t          ivSize)
+    CryptoLibCipher_t* self,
+    const void*        iv,
+    const size_t       ivSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 
@@ -209,11 +209,11 @@ setIvImpl(
 
 static seos_err_t
 processImpl(
-    OS_CryptoLibCipher_t* self,
-    const void*           input,
-    const size_t          inputSize,
-    void*                 output,
-    size_t*               outputSize)
+    CryptoLibCipher_t* self,
+    const void*        input,
+    const size_t       inputSize,
+    void*              output,
+    size_t*            outputSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 
@@ -292,9 +292,9 @@ processImpl(
 
 static seos_err_t
 startImpl(
-    OS_CryptoLibCipher_t* self,
-    const void*           ad,
-    const size_t          adSize)
+    CryptoLibCipher_t* self,
+    const void*        ad,
+    const size_t       adSize)
 {
     int mode;
 
@@ -341,9 +341,9 @@ cmemcmp(
 
 static seos_err_t
 finalizeImpl(
-    OS_CryptoLibCipher_t* self,
-    void*                 buf,
-    size_t*               bufSize)
+    CryptoLibCipher_t* self,
+    void*              buf,
+    size_t*            bufSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 
@@ -393,11 +393,11 @@ finalizeImpl(
 // Public functions ------------------------------------------------------------
 
 seos_err_t
-OS_CryptoLibCipher_init(
-    OS_CryptoLibCipher_t**      self,
+CryptoLibCipher_init(
+    CryptoLibCipher_t**         self,
     const OS_Crypto_Memory_t*   memIf,
     const OS_CryptoCipher_Alg_t algorithm,
-    const OS_CryptoLibKey_t*    key,
+    const CryptoLibKey_t*       key,
     const void*                 iv,
     const size_t                ivSize)
 {
@@ -421,8 +421,8 @@ OS_CryptoLibCipher_init(
 }
 
 seos_err_t
-OS_CryptoLibCipher_free(
-    OS_CryptoLibCipher_t*     self,
+CryptoLibCipher_free(
+    CryptoLibCipher_t*        self,
     const OS_Crypto_Memory_t* memIf)
 {
     if (NULL == memIf || NULL == self)
@@ -434,10 +434,10 @@ OS_CryptoLibCipher_free(
 }
 
 seos_err_t
-OS_CryptoLibCipher_start(
-    OS_CryptoLibCipher_t* self,
-    const void*           input,
-    const size_t          inputSize)
+CryptoLibCipher_start(
+    CryptoLibCipher_t* self,
+    const void*        input,
+    const size_t       inputSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 
@@ -453,12 +453,12 @@ OS_CryptoLibCipher_start(
 }
 
 seos_err_t
-OS_CryptoLibCipher_process(
-    OS_CryptoLibCipher_t* self,
-    const void*           input,
-    const size_t          inputSize,
-    void*                 output,
-    size_t*               outputSize)
+CryptoLibCipher_process(
+    CryptoLibCipher_t* self,
+    const void*        input,
+    const size_t       inputSize,
+    void*              output,
+    size_t*            outputSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 
@@ -478,10 +478,10 @@ OS_CryptoLibCipher_process(
 }
 
 seos_err_t
-OS_CryptoLibCipher_finalize(
-    OS_CryptoLibCipher_t* self,
-    void*                 buf,
-    size_t*               bufSize)
+CryptoLibCipher_finalize(
+    CryptoLibCipher_t* self,
+    void*              buf,
+    size_t*            bufSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 

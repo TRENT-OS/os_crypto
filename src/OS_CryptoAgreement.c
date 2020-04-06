@@ -9,7 +9,7 @@
 #include "lib/CryptoLibAgreement.h"
 
 #define PROXY_GET_PTR(p) \
-    (OS_CryptoLibAgreement_t**) PROXY_GET_OBJ_PTR(p)
+    (CryptoLibAgreement_t**) PROXY_GET_OBJ_PTR(p)
 
 seos_err_t
 OS_CryptoAgreement_init(

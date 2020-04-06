@@ -83,8 +83,8 @@ OS_CryptoRpcServer_Rng_reseed(
 
 seos_err_t
 OS_CryptoRpcServer_Mac_init(
-    OS_CryptoLibMac_ptr* pMacObj,
-    OS_CryptoMac_Alg_t   algorithm)
+    CryptoLibMac_ptr*  pMacObj,
+    OS_CryptoMac_Alg_t algorithm)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -94,7 +94,7 @@ OS_CryptoRpcServer_Mac_init(
 
 seos_err_t
 OS_CryptoRpcServer_Mac_exists(
-    OS_CryptoLibMac_cptr macObj)
+    CryptoLibMac_cptr macObj)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -104,7 +104,7 @@ OS_CryptoRpcServer_Mac_exists(
 
 seos_err_t
 OS_CryptoRpcServer_Mac_free(
-    OS_CryptoLibMac_ptr macObj)
+    CryptoLibMac_ptr macObj)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -114,8 +114,8 @@ OS_CryptoRpcServer_Mac_free(
 
 seos_err_t
 OS_CryptoRpcServer_Mac_start(
-    OS_CryptoLibMac_ptr macObj,
-    size_t              secretSize)
+    CryptoLibMac_ptr macObj,
+    size_t           secretSize)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -125,8 +125,8 @@ OS_CryptoRpcServer_Mac_start(
 
 seos_err_t
 OS_CryptoRpcServer_Mac_process(
-    OS_CryptoLibMac_ptr macObj,
-    size_t              dataSize)
+    CryptoLibMac_ptr macObj,
+    size_t           dataSize)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -136,8 +136,8 @@ OS_CryptoRpcServer_Mac_process(
 
 seos_err_t
 OS_CryptoRpcServer_Mac_finalize(
-    OS_CryptoLibMac_ptr macObj,
-    size_t*             macSize)
+    CryptoLibMac_ptr macObj,
+    size_t*          macSize)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -152,8 +152,8 @@ OS_CryptoRpcServer_Mac_finalize(
 
 seos_err_t
 OS_CryptoRpcServer_Digest_init(
-    OS_CryptoLibDigest_ptr* pDigestObj,
-    OS_CryptoDigest_Alg_t   algorithm)
+    CryptoLibDigest_ptr*  pDigestObj,
+    OS_CryptoDigest_Alg_t algorithm)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -163,7 +163,7 @@ OS_CryptoRpcServer_Digest_init(
 
 seos_err_t
 OS_CryptoRpcServer_Digest_exists(
-    OS_CryptoLibDigest_cptr digestObj)
+    CryptoLibDigest_cptr digestObj)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -173,7 +173,7 @@ OS_CryptoRpcServer_Digest_exists(
 
 seos_err_t
 OS_CryptoRpcServer_Digest_free(
-    OS_CryptoLibDigest_ptr digestObj)
+    CryptoLibDigest_ptr digestObj)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -183,8 +183,8 @@ OS_CryptoRpcServer_Digest_free(
 
 seos_err_t
 OS_CryptoRpcServer_Digest_clone(
-    OS_CryptoLibDigest_ptr  dstDigHandle,
-    OS_CryptoLibDigest_cptr srcDigHandle)
+    CryptoLibDigest_ptr  dstDigHandle,
+    CryptoLibDigest_cptr srcDigHandle)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -194,8 +194,8 @@ OS_CryptoRpcServer_Digest_clone(
 
 seos_err_t
 OS_CryptoRpcServer_Digest_process(
-    OS_CryptoLibDigest_ptr digestObj,
-    size_t                 inSize)
+    CryptoLibDigest_ptr digestObj,
+    size_t              inSize)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -205,8 +205,8 @@ OS_CryptoRpcServer_Digest_process(
 
 seos_err_t
 OS_CryptoRpcServer_Digest_finalize(
-    OS_CryptoLibDigest_ptr digestObj,
-    size_t*                digestSize)
+    CryptoLibDigest_ptr digestObj,
+    size_t*             digestSize)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -221,7 +221,7 @@ OS_CryptoRpcServer_Digest_finalize(
 
 seos_err_t
 OS_CryptoRpcServer_Key_generate(
-    OS_CryptoLibKey_ptr* pKeyObj)
+    CryptoLibKey_ptr* pKeyObj)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -231,8 +231,8 @@ OS_CryptoRpcServer_Key_generate(
 
 seos_err_t
 OS_CryptoRpcServer_Key_makePublic(
-    OS_CryptoLibKey_ptr* pPubKeyHandle,
-    OS_CryptoLibKey_cptr prvKeyHandle)
+    CryptoLibKey_ptr* pPubKeyHandle,
+    CryptoLibKey_cptr prvKeyHandle)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -242,7 +242,7 @@ OS_CryptoRpcServer_Key_makePublic(
 
 seos_err_t
 OS_CryptoRpcServer_Key_import(
-    OS_CryptoLibKey_ptr* pKeyObj)
+    CryptoLibKey_ptr* pKeyObj)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -252,7 +252,7 @@ OS_CryptoRpcServer_Key_import(
 
 seos_err_t
 OS_CryptoRpcServer_Key_export(
-    OS_CryptoLibKey_cptr keyObj)
+    CryptoLibKey_cptr keyObj)
 {
     seos_err_t err;
     OS_CryptoKey_Attrib_t attribs;
@@ -278,8 +278,8 @@ OS_CryptoRpcServer_Key_export(
 
 seos_err_t
 OS_CryptoRpcServer_Key_getParams(
-    OS_CryptoLibKey_cptr keyObj,
-    size_t*              paramSize)
+    CryptoLibKey_cptr keyObj,
+    size_t*           paramSize)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -292,7 +292,7 @@ OS_CryptoRpcServer_Key_getParams(
 
 seos_err_t
 OS_CryptoRpcServer_Key_getAttribs(
-    OS_CryptoLibKey_cptr keyObj)
+    CryptoLibKey_cptr keyObj)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -316,7 +316,7 @@ OS_CryptoRpcServer_Key_loadParams(
 
 seos_err_t
 OS_CryptoRpcServer_Key_exists(
-    OS_CryptoLibKey_cptr keyObj)
+    CryptoLibKey_cptr keyObj)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -326,7 +326,7 @@ OS_CryptoRpcServer_Key_exists(
 
 seos_err_t
 OS_CryptoRpcServer_Key_free(
-    OS_CryptoLibKey_ptr keyObj)
+    CryptoLibKey_ptr keyObj)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -338,9 +338,9 @@ OS_CryptoRpcServer_Key_free(
 
 seos_err_t
 OS_CryptoRpcServer_Agreement_init(
-    OS_CryptoLibAgreement_ptr* pAgrObj,
-    OS_CryptoAgreement_Alg_t   algorithm,
-    OS_CryptoLibKey_cptr       prvKey)
+    CryptoLibAgreement_ptr*  pAgrObj,
+    OS_CryptoAgreement_Alg_t algorithm,
+    CryptoLibKey_cptr        prvKey)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -350,9 +350,9 @@ OS_CryptoRpcServer_Agreement_init(
 
 seos_err_t
 OS_CryptoRpcServer_Agreement_agree(
-    OS_CryptoLibAgreement_ptr agrObj,
-    OS_CryptoLibKey_cptr      pubKey,
-    size_t*                   sharedSize)
+    CryptoLibAgreement_ptr agrObj,
+    CryptoLibKey_cptr      pubKey,
+    size_t*                sharedSize)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -365,7 +365,7 @@ OS_CryptoRpcServer_Agreement_agree(
 
 seos_err_t
 OS_CryptoRpcServer_Agreement_exists(
-    OS_CryptoLibAgreement_cptr agrObj)
+    CryptoLibAgreement_cptr agrObj)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -375,7 +375,7 @@ OS_CryptoRpcServer_Agreement_exists(
 
 seos_err_t
 OS_CryptoRpcServer_Agreement_free(
-    OS_CryptoLibAgreement_ptr agrObj)
+    CryptoLibAgreement_ptr agrObj)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -387,11 +387,11 @@ OS_CryptoRpcServer_Agreement_free(
 
 seos_err_t
 OS_CryptoRpcServer_Signature_init(
-    OS_CryptoLibSignature_ptr* pObj,
-    OS_CryptoSignature_Alg_t   algorithm,
-    OS_CryptoDigest_Alg_t      digest,
-    OS_CryptoLibKey_cptr       prvKey,
-    OS_CryptoLibKey_cptr       pubKey)
+    CryptoLibSignature_ptr*  pObj,
+    OS_CryptoSignature_Alg_t algorithm,
+    OS_CryptoDigest_Alg_t    digest,
+    CryptoLibKey_cptr        prvKey,
+    CryptoLibKey_cptr        pubKey)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -401,9 +401,9 @@ OS_CryptoRpcServer_Signature_init(
 
 seos_err_t
 OS_CryptoRpcServer_Signature_verify(
-    OS_CryptoLibSignature_ptr obj,
-    size_t                    hashSize,
-    size_t                    signatureSize)
+    CryptoLibSignature_ptr obj,
+    size_t                 hashSize,
+    size_t                 signatureSize)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -414,9 +414,9 @@ OS_CryptoRpcServer_Signature_verify(
 
 seos_err_t
 OS_CryptoRpcServer_Signature_sign(
-    OS_CryptoLibSignature_ptr obj,
-    size_t                    hashSize,
-    size_t*                   signatureSize)
+    CryptoLibSignature_ptr obj,
+    size_t                 hashSize,
+    size_t*                signatureSize)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -430,7 +430,7 @@ OS_CryptoRpcServer_Signature_sign(
 
 seos_err_t
 OS_CryptoRpcServer_Signature_exists(
-    OS_CryptoLibSignature_cptr obj)
+    CryptoLibSignature_cptr obj)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -440,7 +440,7 @@ OS_CryptoRpcServer_Signature_exists(
 
 seos_err_t
 OS_CryptoRpcServer_Signature_free(
-    OS_CryptoLibSignature_ptr obj)
+    CryptoLibSignature_ptr obj)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -452,10 +452,10 @@ OS_CryptoRpcServer_Signature_free(
 
 seos_err_t
 OS_CryptoRpcServer_Cipher_init(
-    OS_CryptoLibCipher_ptr* pCipherObj,
-    OS_CryptoCipher_Alg_t   algorithm,
-    OS_CryptoLibKey_cptr    key,
-    size_t                  ivSize)
+    CryptoLibCipher_ptr*  pCipherObj,
+    OS_CryptoCipher_Alg_t algorithm,
+    CryptoLibKey_cptr     key,
+    size_t                ivSize)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -466,7 +466,7 @@ OS_CryptoRpcServer_Cipher_init(
 
 seos_err_t
 OS_CryptoRpcServer_Cipher_exists(
-    OS_CryptoLibCipher_cptr cipherObj)
+    CryptoLibCipher_cptr cipherObj)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -476,7 +476,7 @@ OS_CryptoRpcServer_Cipher_exists(
 
 seos_err_t
 OS_CryptoRpcServer_Cipher_free(
-    OS_CryptoLibCipher_ptr cipherObj)
+    CryptoLibCipher_ptr cipherObj)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -486,9 +486,9 @@ OS_CryptoRpcServer_Cipher_free(
 
 seos_err_t
 OS_CryptoRpcServer_Cipher_process(
-    OS_CryptoLibCipher_ptr cipherObj,
-    size_t                 inputSize,
-    size_t*                outputSize)
+    CryptoLibCipher_ptr cipherObj,
+    size_t              inputSize,
+    size_t*             outputSize)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -502,8 +502,8 @@ OS_CryptoRpcServer_Cipher_process(
 
 seos_err_t
 OS_CryptoRpcServer_Cipher_start(
-    OS_CryptoLibCipher_ptr cipherObj,
-    size_t                 len)
+    CryptoLibCipher_ptr cipherObj,
+    size_t              len)
 {
     OS_CryptoRpcServer_t* self;
 
@@ -513,8 +513,8 @@ OS_CryptoRpcServer_Cipher_start(
 
 seos_err_t
 OS_CryptoRpcServer_Cipher_finalize(
-    OS_CryptoLibCipher_ptr cipherObj,
-    size_t*                tagSize)
+    CryptoLibCipher_ptr cipherObj,
+    size_t*             tagSize)
 {
     OS_CryptoRpcServer_t* self;
 

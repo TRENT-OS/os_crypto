@@ -2,8 +2,8 @@
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 
-#include "lib/OS_CryptoLibAgreement.h"
-#include "lib/OS_CryptoLibRng.h"
+#include "lib/CryptoLibAgreement.h"
+#include "lib/CryptoLibRng.h"
 
 #include "mbedtls/dhm.h"
 #include "mbedtls/ecdh.h"
@@ -12,7 +12,7 @@
 
 // Internal types/defines/enums ------------------------------------------------
 
-struct OS_CryptoLibAgreement
+struct CryptoLibAgreement
 {
     union
     {
@@ -20,27 +20,27 @@ struct OS_CryptoLibAgreement
         mbedtls_ecdh_context ecdh;
     } mbedtls;
     OS_CryptoAgreement_Alg_t algorithm;
-    const OS_CryptoLibKey_t* prvKey;
+    const CryptoLibKey_t* prvKey;
 };
 
 // Private Functions -----------------------------------------------------------
 
 static seos_err_t
 initImpl(
-    OS_CryptoLibAgreement_t**      self,
+    CryptoLibAgreement_t**         self,
     const OS_Crypto_Memory_t*      memIf,
     const OS_CryptoAgreement_Alg_t algorithm,
-    const OS_CryptoLibKey_t*       prvKey)
+    const CryptoLibKey_t*          prvKey)
 {
     seos_err_t err;
-    OS_CryptoLibAgreement_t* agr;
+    CryptoLibAgreement_t* agr;
 
-    if ((agr = memIf->malloc(sizeof(OS_CryptoLibAgreement_t))) == NULL)
+    if ((agr = memIf->malloc(sizeof(CryptoLibAgreement_t))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    memset(agr, 0, sizeof(OS_CryptoLibAgreement_t));
+    memset(agr, 0, sizeof(CryptoLibAgreement_t));
     agr->algorithm = algorithm;
     agr->prvKey    = prvKey;
 
@@ -69,7 +69,7 @@ initImpl(
 
 static seos_err_t
 freeImpl(
-    OS_CryptoLibAgreement_t*  self,
+    CryptoLibAgreement_t*     self,
     const OS_Crypto_Memory_t* memIf)
 {
     seos_err_t err;
@@ -95,23 +95,23 @@ freeImpl(
 
 static seos_err_t
 setKeyImpl(
-    OS_CryptoLibAgreement_t* self)
+    CryptoLibAgreement_t* self)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
     case OS_CryptoAgreement_ALG_DH:
-        err = (OS_CryptoLibKey_getType(self->prvKey)
+        err = (CryptoLibKey_getType(self->prvKey)
                != OS_CryptoKey_TYPE_DH_PRV) ?
               SEOS_ERROR_INVALID_PARAMETER :
-              OS_CryptoLibKey_writeDhPrv(self->prvKey, &self->mbedtls.dh);
+              CryptoLibKey_writeDhPrv(self->prvKey, &self->mbedtls.dh);
         break;
     case OS_CryptoAgreement_ALG_ECDH:
-        err = (OS_CryptoLibKey_getType(self->prvKey)
+        err = (CryptoLibKey_getType(self->prvKey)
                != OS_CryptoKey_TYPE_SECP256R1_PRV) ?
               SEOS_ERROR_INVALID_PARAMETER :
-              OS_CryptoLibKey_writeSecp256r1Prv(self->prvKey, &self->mbedtls.ecdh);
+              CryptoLibKey_writeSecp256r1Prv(self->prvKey, &self->mbedtls.ecdh);
         break;
     default:
         err = SEOS_ERROR_NOT_SUPPORTED;
@@ -122,20 +122,20 @@ setKeyImpl(
 
 static seos_err_t
 agreeImpl(
-    OS_CryptoLibAgreement_t* self,
-    OS_CryptoLibRng_t*       rng,
-    const OS_CryptoLibKey_t* pubKey,
-    void*                    buf,
-    size_t*                  bufSize)
+    CryptoLibAgreement_t* self,
+    CryptoLibRng_t*       rng,
+    const CryptoLibKey_t* pubKey,
+    void*                 buf,
+    size_t*               bufSize)
 {
-    void* rngFunc = (NULL != rng) ? OS_CryptoLibRng_getBytesMbedtls : NULL;
+    void* rngFunc = (NULL != rng) ? CryptoLibRng_getBytesMbedtls : NULL;
     seos_err_t err = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
     case OS_CryptoAgreement_ALG_DH:
-        if ((OS_CryptoLibKey_getType(pubKey) != OS_CryptoKey_TYPE_DH_PUB)
-            || OS_CryptoLibKey_writeDhPub(pubKey, &self->mbedtls.dh) != SEOS_SUCCESS)
+        if ((CryptoLibKey_getType(pubKey) != OS_CryptoKey_TYPE_DH_PUB)
+            || CryptoLibKey_writeDhPub(pubKey, &self->mbedtls.dh) != SEOS_SUCCESS)
         {
             err = SEOS_ERROR_INVALID_PARAMETER;
         }
@@ -152,9 +152,9 @@ agreeImpl(
         }
         break;
     case OS_CryptoAgreement_ALG_ECDH:
-        if ((OS_CryptoLibKey_getType(pubKey) != OS_CryptoKey_TYPE_SECP256R1_PUB)
-            || OS_CryptoLibKey_writeSecp256r1Pub(pubKey,
-                                                 &self->mbedtls.ecdh) != SEOS_SUCCESS)
+        if ((CryptoLibKey_getType(pubKey) != OS_CryptoKey_TYPE_SECP256R1_PUB)
+            || CryptoLibKey_writeSecp256r1Pub(pubKey,
+                                              &self->mbedtls.ecdh) != SEOS_SUCCESS)
         {
             err = SEOS_ERROR_INVALID_PARAMETER;
         }
@@ -180,11 +180,11 @@ agreeImpl(
 // Public Functions ------------------------------------------------------------
 
 seos_err_t
-OS_CryptoLibAgreement_init(
-    OS_CryptoLibAgreement_t**      self,
+CryptoLibAgreement_init(
+    CryptoLibAgreement_t**         self,
     const OS_Crypto_Memory_t*      memIf,
     const OS_CryptoAgreement_Alg_t algorithm,
-    const OS_CryptoLibKey_t*       prvKey)
+    const CryptoLibKey_t*          prvKey)
 {
     seos_err_t err;
 
@@ -205,8 +205,8 @@ OS_CryptoLibAgreement_init(
 }
 
 seos_err_t
-OS_CryptoLibAgreement_free(
-    OS_CryptoLibAgreement_t*  self,
+CryptoLibAgreement_free(
+    CryptoLibAgreement_t*     self,
     const OS_Crypto_Memory_t* memIf)
 {
     if (NULL == self || NULL == memIf)
@@ -218,12 +218,12 @@ OS_CryptoLibAgreement_free(
 }
 
 seos_err_t
-OS_CryptoLibAgreement_agree(
-    OS_CryptoLibAgreement_t* self,
-    OS_CryptoLibRng_t*       rng,
-    const OS_CryptoLibKey_t* pubKey,
-    void*                    shared,
-    size_t*                  sharedSize)
+CryptoLibAgreement_agree(
+    CryptoLibAgreement_t* self,
+    CryptoLibRng_t*       rng,
+    const CryptoLibKey_t* pubKey,
+    void*                 shared,
+    size_t*               sharedSize)
 {
     if (NULL == self || NULL == pubKey || NULL == shared || NULL == sharedSize)
     {

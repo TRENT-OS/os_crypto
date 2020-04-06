@@ -2,7 +2,7 @@
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 
-#include "lib/OS_CryptoLibMac.h"
+#include "lib/CryptoLibMac.h"
 
 #include "mbedtls/md.h"
 
@@ -13,7 +13,7 @@
 
 // Internal types/defines/enums ------------------------------------------------
 
-struct OS_CryptoLibMac
+struct CryptoLibMac
 {
     union
     {
@@ -28,20 +28,20 @@ struct OS_CryptoLibMac
 
 static seos_err_t
 initImpl(
-    OS_CryptoLibMac_t**       self,
+    CryptoLibMac_t**          self,
     const OS_Crypto_Memory_t* memIf,
     const OS_CryptoMac_Alg_t  algorithm)
 {
     seos_err_t err;
-    OS_CryptoLibMac_t* mac;
+    CryptoLibMac_t* mac;
     mbedtls_md_type_t type;
 
-    if ((mac = memIf->malloc(sizeof(OS_CryptoLibMac_t))) == NULL)
+    if ((mac = memIf->malloc(sizeof(CryptoLibMac_t))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    memset(mac, 0, sizeof(OS_CryptoLibMac_t));
+    memset(mac, 0, sizeof(CryptoLibMac_t));
     mac->algorithm = algorithm;
     mac->started   = false;
     mac->processed = false;
@@ -80,7 +80,7 @@ err0:
 
 static seos_err_t
 freeImpl(
-    OS_CryptoLibMac_t*        self,
+    CryptoLibMac_t*           self,
     const OS_Crypto_Memory_t* memIf)
 {
     seos_err_t err;
@@ -103,9 +103,9 @@ freeImpl(
 
 static seos_err_t
 startImpl(
-    OS_CryptoLibMac_t* self,
-    const void*        secret,
-    const size_t       secretSize)
+    CryptoLibMac_t* self,
+    const void*     secret,
+    const size_t    secretSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 
@@ -125,9 +125,9 @@ startImpl(
 
 static seos_err_t
 processImpl(
-    OS_CryptoLibMac_t* self,
-    const void*        data,
-    const size_t       dataSize)
+    CryptoLibMac_t* self,
+    const void*     data,
+    const size_t    dataSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 
@@ -147,9 +147,9 @@ processImpl(
 
 static seos_err_t
 finalizeImpl(
-    OS_CryptoLibMac_t* self,
-    void*              mac,
-    size_t*            macSize)
+    CryptoLibMac_t* self,
+    void*           mac,
+    size_t*         macSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 
@@ -189,8 +189,8 @@ finalizeImpl(
 // Public Functions ------------------------------------------------------------
 
 seos_err_t
-OS_CryptoLibMac_init(
-    OS_CryptoLibMac_t**       self,
+CryptoLibMac_init(
+    CryptoLibMac_t**          self,
     const OS_Crypto_Memory_t* memIf,
     const OS_CryptoMac_Alg_t  algorithm)
 {
@@ -203,8 +203,8 @@ OS_CryptoLibMac_init(
 }
 
 seos_err_t
-OS_CryptoLibMac_free(
-    OS_CryptoLibMac_t*        self,
+CryptoLibMac_free(
+    CryptoLibMac_t*           self,
     const OS_Crypto_Memory_t* memIf)
 {
     if (NULL == memIf || NULL == self)
@@ -216,10 +216,10 @@ OS_CryptoLibMac_free(
 }
 
 seos_err_t
-OS_CryptoLibMac_start(
-    OS_CryptoLibMac_t* self,
-    const void*        secret,
-    const size_t       secretSize)
+CryptoLibMac_start(
+    CryptoLibMac_t* self,
+    const void*     secret,
+    const size_t    secretSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 
@@ -236,10 +236,10 @@ OS_CryptoLibMac_start(
 }
 
 seos_err_t
-OS_CryptoLibMac_process(
-    OS_CryptoLibMac_t* self,
-    const void*        data,
-    const size_t       dataSize)
+CryptoLibMac_process(
+    CryptoLibMac_t* self,
+    const void*     data,
+    const size_t    dataSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 
@@ -256,10 +256,10 @@ OS_CryptoLibMac_process(
 }
 
 seos_err_t
-OS_CryptoLibMac_finalize(
-    OS_CryptoLibMac_t* self,
-    void*              mac,
-    size_t*            macSize)
+CryptoLibMac_finalize(
+    CryptoLibMac_t* self,
+    void*           mac,
+    size_t*         macSize)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 

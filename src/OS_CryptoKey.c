@@ -9,7 +9,7 @@
 #include "lib/CryptoLibKey.h"
 
 #define PROXY_GET_PTR(p) \
-    (OS_CryptoLibKey_t**) PROXY_GET_OBJ_PTR(p)
+    (CryptoLibKey_t**) PROXY_GET_OBJ_PTR(p)
 
 seos_err_t
 OS_CryptoKey_generate(

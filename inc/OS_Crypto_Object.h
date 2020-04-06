@@ -54,5 +54,5 @@ struct OS_Crypto
 struct OS_Crypto_Object
 {
     OS_Crypto_t* hCrypto;
-    OS_CryptoLib_Object_ptr obj;
+    CryptoLib_Object_ptr obj;
 };
