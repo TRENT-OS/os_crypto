@@ -232,8 +232,8 @@ Digest_init(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((err = CryptoLibDigest_init(pDigObj, &self->memIf,
-                                    algorithm)) != SEOS_SUCCESS)
+    if ((err = CryptoLibDigest_init(pDigObj, algorithm,
+                                    &self->memIf)) != SEOS_SUCCESS)
     {
         return err;
     }

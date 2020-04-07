@@ -27,8 +27,8 @@ typedef struct CryptoLibDigest CryptoLibDigest_t;
 seos_err_t
 CryptoLibDigest_init(
     CryptoLibDigest_t**         self,
-    const OS_Crypto_Memory_t*   memIf,
-    const OS_CryptoDigest_Alg_t algorithm);
+    const OS_CryptoDigest_Alg_t algorithm,
+    const OS_Crypto_Memory_t*   memIf);
 
 seos_err_t
 CryptoLibDigest_free(

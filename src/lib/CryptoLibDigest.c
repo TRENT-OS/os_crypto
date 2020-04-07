@@ -39,8 +39,8 @@ Debug_STATIC_ASSERT((int)OS_CryptoDigest_ALG_SHA256   ==
 static seos_err_t
 initImpl(
     CryptoLibDigest_t**         self,
-    const OS_Crypto_Memory_t*   memIf,
-    const OS_CryptoDigest_Alg_t algorithm)
+    const OS_CryptoDigest_Alg_t algorithm,
+    const OS_Crypto_Memory_t*   memIf)
 {
     seos_err_t err;
     CryptoLibDigest_t* dig;
@@ -194,15 +194,15 @@ cloneImpl(
 seos_err_t
 CryptoLibDigest_init(
     CryptoLibDigest_t**         self,
-    const OS_Crypto_Memory_t*   memIf,
-    const OS_CryptoDigest_Alg_t algorithm)
+    const OS_CryptoDigest_Alg_t algorithm,
+    const OS_Crypto_Memory_t*   memIf)
 {
     if (NULL == memIf || NULL == self)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return initImpl(self, memIf, algorithm);
+    return initImpl(self, algorithm, memIf);
 }
 
 seos_err_t

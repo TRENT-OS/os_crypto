@@ -13,17 +13,17 @@
 
 seos_err_t
 OS_CryptoDigest_init(
-    OS_CryptoDigest_Handle_t*   hDigest,
-    const OS_Crypto_Handle_t    self,
+    OS_CryptoDigest_Handle_t*   self,
+    const OS_Crypto_Handle_t    hCrypto,
     const OS_CryptoDigest_Alg_t algorithm)
 {
     seos_err_t err;
 
-    PROXY_INIT(*hDigest, self);
-    if ((err = PROXY_CALL(*hDigest, Digest_init, PROXY_GET_PTR(*hDigest),
+    PROXY_INIT(*self, hCrypto);
+    if ((err = PROXY_CALL(*self, Digest_init, PROXY_GET_PTR(*self),
                           algorithm)) != SEOS_SUCCESS)
     {
-        PROXY_FREE(*hDigest);
+        PROXY_FREE(*self);
     }
 
     return err;
@@ -31,41 +31,41 @@ OS_CryptoDigest_init(
 
 seos_err_t
 OS_CryptoDigest_free(
-    OS_CryptoDigest_Handle_t hDigest)
+    OS_CryptoDigest_Handle_t self)
 {
     seos_err_t err;
 
-    err = PROXY_CALL(hDigest, Digest_free, PROXY_GET_OBJ(hDigest));
-    PROXY_FREE(hDigest);
+    err = PROXY_CALL(self, Digest_free, PROXY_GET_OBJ(self));
+    PROXY_FREE(self);
 
     return err;
 }
 
 seos_err_t
 OS_CryptoDigest_clone(
-    OS_CryptoDigest_Handle_t       hDstDigest,
+    OS_CryptoDigest_Handle_t       self,
     const OS_CryptoDigest_Handle_t hSrcDigest)
 {
-    return PROXY_CALL(hDstDigest, Digest_clone, PROXY_GET_OBJ(hDstDigest),
+    return PROXY_CALL(self, Digest_clone, PROXY_GET_OBJ(self),
                       PROXY_GET_OBJ(hSrcDigest));
 }
 
 seos_err_t
 OS_CryptoDigest_process(
-    OS_CryptoDigest_Handle_t hDigest,
+    OS_CryptoDigest_Handle_t self,
     const void*              data,
     const size_t             dataSize)
 {
-    return PROXY_CALL(hDigest, Digest_process, PROXY_GET_OBJ(hDigest), data,
+    return PROXY_CALL(self, Digest_process, PROXY_GET_OBJ(self), data,
                       dataSize);
 }
 
 seos_err_t
 OS_CryptoDigest_finalize(
-    OS_CryptoDigest_Handle_t hDigest,
+    OS_CryptoDigest_Handle_t self,
     void*                    digest,
     size_t*                  digestSize)
 {
-    return PROXY_CALL(hDigest, Digest_finalize, PROXY_GET_OBJ(hDigest), digest,
+    return PROXY_CALL(self, Digest_finalize, PROXY_GET_OBJ(self), digest,
                       digestSize);
 }
