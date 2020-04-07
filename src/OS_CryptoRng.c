@@ -10,19 +10,19 @@
 
 seos_err_t
 OS_CryptoRng_getBytes(
-    OS_Crypto_Handle_t        self,
+    OS_Crypto_Handle_t        hCrypto,
     const OS_CryptoRng_Flag_t flags,
     void*                     buf,
     const size_t              bufSize)
 {
-    return CALL(self, Rng_getBytes, flags, buf, bufSize);
+    return CALL(hCrypto, Rng_getBytes, flags, buf, bufSize);
 }
 
 seos_err_t
 OS_CryptoRng_reseed(
-    OS_Crypto_Handle_t self,
+    OS_Crypto_Handle_t hCrypto,
     const void*        seed,
     const size_t       seedSize)
 {
-    return CALL(self, Rng_reseed, seed, seedSize);
+    return CALL(hCrypto, Rng_reseed, seed, seedSize);
 }

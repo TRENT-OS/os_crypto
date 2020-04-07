@@ -1081,9 +1081,11 @@ CryptoLib_init(
         goto err5;
     }
 
-    if ((err = CryptoLibRng_init(&self->rng, &self->memIf,
-                                 (const OS_CryptoRng_Entropy_func*)
-                                 cfg->rng.entropy, cfg->rng.context)) != SEOS_SUCCESS)
+    if ((err = CryptoLibRng_init(
+                   &self->rng,
+                   (const OS_CryptoRng_Entropy_func*) cfg->rng.entropy,
+                   cfg->rng.context,
+                   &self->memIf)) != SEOS_SUCCESS)
     {
         goto err6;
     }

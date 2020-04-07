@@ -18,9 +18,9 @@ struct CryptoLibRng
 seos_err_t
 CryptoLibRng_init(
     CryptoLibRng_t**                 self,
-    const OS_Crypto_Memory_t*        memIf,
     const OS_CryptoRng_Entropy_func* entropyFunc,
-    void*                            entropyCtx)
+    void*                            entropyCtx,
+    const OS_Crypto_Memory_t*        memIf)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
     CryptoLibRng_t* rng;
