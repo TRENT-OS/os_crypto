@@ -25,8 +25,8 @@ typedef struct CryptoLibMac CryptoLibMac_t;
 seos_err_t
 CryptoLibMac_init(
     CryptoLibMac_t**          self,
-    const OS_Crypto_Memory_t* memIf,
-    const OS_CryptoMac_Alg_t  algorithm);
+    const OS_CryptoMac_Alg_t  algorithm,
+    const OS_Crypto_Memory_t* memIf);
 
 seos_err_t
 CryptoLibMac_free(

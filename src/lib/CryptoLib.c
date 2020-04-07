@@ -89,8 +89,7 @@ Mac_init(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((err = CryptoLibMac_init(pMacObj, &self->memIf,
-                                 algorithm)) != SEOS_SUCCESS)
+    if ((err = CryptoLibMac_init(pMacObj, algorithm, &self->memIf)) != SEOS_SUCCESS)
     {
         return err;
     }

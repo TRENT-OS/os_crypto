@@ -29,8 +29,8 @@ struct CryptoLibMac
 static seos_err_t
 initImpl(
     CryptoLibMac_t**          self,
-    const OS_Crypto_Memory_t* memIf,
-    const OS_CryptoMac_Alg_t  algorithm)
+    const OS_CryptoMac_Alg_t  algorithm,
+    const OS_Crypto_Memory_t* memIf)
 {
     seos_err_t err;
     CryptoLibMac_t* mac;
@@ -191,15 +191,15 @@ finalizeImpl(
 seos_err_t
 CryptoLibMac_init(
     CryptoLibMac_t**          self,
-    const OS_Crypto_Memory_t* memIf,
-    const OS_CryptoMac_Alg_t  algorithm)
+    const OS_CryptoMac_Alg_t  algorithm,
+    const OS_Crypto_Memory_t* memIf)
 {
     if (NULL == memIf || NULL == self)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return initImpl(self, memIf, algorithm);
+    return initImpl(self, algorithm, memIf);
 }
 
 seos_err_t
