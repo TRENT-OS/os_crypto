@@ -233,8 +233,8 @@ typedef seos_err_t
 (*Cipher_init_func)(
     void*,
     CryptoLibCipher_t**,
-    const OS_CryptoCipher_Alg_t,
     const CryptoLibKey_t*,
+    const OS_CryptoCipher_Alg_t,
     const void*,
     const size_t);
 

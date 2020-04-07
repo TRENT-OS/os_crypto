@@ -836,8 +836,8 @@ static seos_err_t
 Cipher_init(
     void*                       ctx,
     CryptoLibCipher_t**         pCipherObj,
-    const OS_CryptoCipher_Alg_t algorithm,
     const CryptoLibKey_t*       key,
+    const OS_CryptoCipher_Alg_t algorithm,
     const void*                 iv,
     const size_t                ivSize)
 {
@@ -858,8 +858,8 @@ Cipher_init(
         return SEOS_ERROR_INVALID_HANDLE;
     }
 
-    if ((err = CryptoLibCipher_init(pCipherObj, &self->memIf, algorithm, key,
-                                    iv, ivSize)) != SEOS_SUCCESS)
+    if ((err = CryptoLibCipher_init(pCipherObj, key, algorithm, iv, ivSize,
+                                    &self->memIf)) != SEOS_SUCCESS)
     {
         return err;
     }

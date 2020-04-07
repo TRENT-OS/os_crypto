@@ -36,9 +36,9 @@ struct CryptoLibCipher
 static seos_err_t
 initImpl(
     CryptoLibCipher_t**         self,
-    const OS_Crypto_Memory_t*   memIf,
+    const CryptoLibKey_t*       key,
     const OS_CryptoCipher_Alg_t algorithm,
-    const CryptoLibKey_t*       key)
+    const OS_Crypto_Memory_t*   memIf)
 {
     CryptoLibCipher_t* ciph;
     seos_err_t err;
@@ -395,11 +395,11 @@ finalizeImpl(
 seos_err_t
 CryptoLibCipher_init(
     CryptoLibCipher_t**         self,
-    const OS_Crypto_Memory_t*   memIf,
-    const OS_CryptoCipher_Alg_t algorithm,
     const CryptoLibKey_t*       key,
+    const OS_CryptoCipher_Alg_t algorithm,
     const void*                 iv,
-    const size_t                ivSize)
+    const size_t                ivSize,
+    const OS_Crypto_Memory_t*   memIf)
 {
     seos_err_t err;
 
@@ -408,7 +408,7 @@ CryptoLibCipher_init(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((err = initImpl(self, memIf, algorithm, key)) == SEOS_SUCCESS)
+    if ((err = initImpl(self, key, algorithm, memIf)) == SEOS_SUCCESS)
     {
         if ((err = setIvImpl(*self, iv, ivSize)) != SEOS_SUCCESS
             || (err = setKeyImpl(*self)) != SEOS_SUCCESS)

@@ -220,8 +220,8 @@ typedef const CryptoLibCipher_t* CryptoLibCipher_cptr;
 seos_err_t
 CryptoLibServer_Cipher_init(
     CryptoLibCipher_ptr*  pCipherPtr,
-    OS_CryptoCipher_Alg_t algorithm,
     CryptoLibKey_cptr     keyPtr,
+    OS_CryptoCipher_Alg_t algorithm,
     size_t                ivSize);
 
 seos_err_t

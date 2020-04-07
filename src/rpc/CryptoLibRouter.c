@@ -430,14 +430,14 @@ static seos_err_t
 Cipher_init(
     void*                       ctx,
     CryptoLibCipher_t**         pCipherObj,
-    const OS_CryptoCipher_Alg_t algorithm,
     const CryptoLibKey_t*       key,
+    const OS_CryptoCipher_Alg_t algorithm,
     const void*                 iv,
     const size_t                ivSize)
 {
     return CALL_LIB(ctx, Key_exists, key) == SEOS_SUCCESS ?
-           CALL_LIB(ctx, Cipher_init, pCipherObj, algorithm, key, iv, ivSize) :
-           CALL_CLI(ctx, Cipher_init, pCipherObj, algorithm, key, iv, ivSize);
+           CALL_LIB(ctx, Cipher_init, pCipherObj, key, algorithm, iv, ivSize) :
+           CALL_CLI(ctx, Cipher_init, pCipherObj, key, algorithm, iv, ivSize);
 }
 
 static seos_err_t

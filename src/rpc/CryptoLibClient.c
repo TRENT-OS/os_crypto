@@ -596,8 +596,8 @@ static seos_err_t
 Cipher_init(
     void*                       ctx,
     CryptoLibCipher_t**         pCipherObj,
-    const OS_CryptoCipher_Alg_t algorithm,
     const CryptoLibKey_t*       key,
+    const OS_CryptoCipher_Alg_t algorithm,
     const void*                 iv,
     const size_t                ivSize)
 {
@@ -617,7 +617,7 @@ Cipher_init(
         memcpy(self->dataPort, iv, ivSize);
     }
 
-    return CryptoLibServer_Cipher_init(pCipherObj, algorithm, key, ivSize);
+    return CryptoLibServer_Cipher_init(pCipherObj, key, algorithm, ivSize);
 }
 
 static seos_err_t

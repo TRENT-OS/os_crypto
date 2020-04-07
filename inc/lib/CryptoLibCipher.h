@@ -27,11 +27,11 @@ typedef struct CryptoLibCipher CryptoLibCipher_t;
 seos_err_t
 CryptoLibCipher_init(
     CryptoLibCipher_t**         self,
-    const OS_Crypto_Memory_t*   memIf,
-    const OS_CryptoCipher_Alg_t algorithm,
     const CryptoLibKey_t*       key,
+    const OS_CryptoCipher_Alg_t algorithm,
     const void*                 iv,
-    size_t                      ivSize);
+    size_t                      ivSize,
+    const OS_Crypto_Memory_t*   memIf);
 
 seos_err_t
 CryptoLibCipher_free(

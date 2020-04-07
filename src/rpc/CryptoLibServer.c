@@ -453,14 +453,14 @@ CryptoLibServer_Signature_free(
 seos_err_t
 CryptoLibServer_Cipher_init(
     CryptoLibCipher_ptr*  pCipherObj,
-    OS_CryptoCipher_Alg_t algorithm,
     CryptoLibKey_cptr     key,
+    OS_CryptoCipher_Alg_t algorithm,
     size_t                ivSize)
 {
     CryptoLibServer_t* self;
 
     GET_SELF(self);
-    return CALL(self, Cipher_init, pCipherObj, algorithm, key, self->dataPort,
+    return CALL(self, Cipher_init, pCipherObj, key, algorithm, self->dataPort,
                 ivSize);
 }
 
