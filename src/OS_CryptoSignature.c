@@ -13,8 +13,8 @@
 
 seos_err_t
 OS_CryptoSignature_init(
-    OS_CryptoSignature_Handle_t*   hSig,
-    const OS_Crypto_Handle_t       self,
+    OS_CryptoSignature_Handle_t*   self,
+    const OS_Crypto_Handle_t       hCrypto,
     const OS_CryptoKey_Handle_t    hPrvKey,
     const OS_CryptoKey_Handle_t    hPubKey,
     const OS_CryptoSignature_Alg_t sigAlgorithm,
@@ -22,12 +22,12 @@ OS_CryptoSignature_init(
 {
     seos_err_t err;
 
-    PROXY_INIT(*hSig, self);
-    if ((err = PROXY_CALL(*hSig, Signature_init, PROXY_GET_PTR(*hSig),
-                          sigAlgorithm, digAlgorithm,
-                          PROXY_GET_OBJ(hPrvKey), PROXY_GET_OBJ(hPubKey))) != SEOS_SUCCESS)
+    PROXY_INIT(*self, hCrypto);
+    if ((err = PROXY_CALL(*self, Signature_init, PROXY_GET_PTR(*self),
+                          PROXY_GET_OBJ(hPrvKey), PROXY_GET_OBJ(hPubKey),
+                          sigAlgorithm, digAlgorithm)) != SEOS_SUCCESS)
     {
-        PROXY_FREE(*hSig);
+        PROXY_FREE(*self);
     }
 
     return err;
@@ -35,36 +35,36 @@ OS_CryptoSignature_init(
 
 seos_err_t
 OS_CryptoSignature_free(
-    OS_CryptoSignature_Handle_t hSig)
+    OS_CryptoSignature_Handle_t self)
 {
     seos_err_t err;
 
-    err = PROXY_CALL(hSig, Signature_free, PROXY_GET_OBJ(hSig));
-    PROXY_FREE(hSig);
+    err = PROXY_CALL(self, Signature_free, PROXY_GET_OBJ(self));
+    PROXY_FREE(self);
 
     return err;
 }
 
 seos_err_t
 OS_CryptoSignature_sign(
-    OS_CryptoSignature_Handle_t hSig,
+    OS_CryptoSignature_Handle_t self,
     const void*                 hash,
     const size_t                hashSize,
     void*                       signature,
     size_t*                     signatureSize)
 {
-    return PROXY_CALL(hSig, Signature_sign, PROXY_GET_OBJ(hSig), hash, hashSize,
+    return PROXY_CALL(self, Signature_sign, PROXY_GET_OBJ(self), hash, hashSize,
                       signature, signatureSize);
 }
 
 seos_err_t
 OS_CryptoSignature_verify(
-    OS_CryptoSignature_Handle_t hSig,
+    OS_CryptoSignature_Handle_t self,
     const void*                 hash,
     const size_t                hashSize,
     const void*                 signature,
     const size_t                signatureSize)
 {
-    return PROXY_CALL(hSig, Signature_verify, PROXY_GET_OBJ(hSig), hash, hashSize,
+    return PROXY_CALL(self, Signature_verify, PROXY_GET_OBJ(self), hash, hashSize,
                       signature, signatureSize);
 }

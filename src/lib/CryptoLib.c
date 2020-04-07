@@ -360,10 +360,10 @@ static seos_err_t
 Signature_init(
     void*                          ctx,
     CryptoLibSignature_t**         pSigObj,
-    const OS_CryptoSignature_Alg_t algorithm,
-    const OS_CryptoDigest_Alg_t    digest,
     const CryptoLibKey_t*          prvKey,
-    const CryptoLibKey_t*          pubKey)
+    const CryptoLibKey_t*          pubKey,
+    const OS_CryptoSignature_Alg_t algorithm,
+    const OS_CryptoDigest_Alg_t    digest)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
@@ -382,8 +382,8 @@ Signature_init(
         return SEOS_ERROR_INVALID_HANDLE;
     }
 
-    if ((err = CryptoLibSignature_init(pSigObj, &self->memIf, algorithm,
-                                       digest, prvKey, pubKey)) != SEOS_SUCCESS)
+    if ((err = CryptoLibSignature_init(pSigObj, prvKey, pubKey, algorithm, digest,
+                                       &self->memIf)) != SEOS_SUCCESS)
     {
         return err;
     }
@@ -465,8 +465,8 @@ Signature_sign(
     memcpy(self->buffer, hash, hashSize);
     return !PtrVector_hasPtr(&self->signatureObjects, sigObj) ?
            SEOS_ERROR_INVALID_HANDLE :
-           CryptoLibSignature_sign(sigObj, self->rng, self->buffer,
-                                   hashSize, signature, signatureSize);
+           CryptoLibSignature_sign(sigObj, self->buffer, hashSize, signature,
+                                   signatureSize, self->rng);
 }
 
 static seos_err_t
@@ -491,8 +491,8 @@ Signature_verify(
 
     return !PtrVector_hasPtr(&self->signatureObjects, sigObj) ?
            SEOS_ERROR_INVALID_HANDLE :
-           CryptoLibSignature_verify(sigObj, self->rng, hash, hashSize,
-                                     signature, signatureSize);
+           CryptoLibSignature_verify(sigObj, hash, hashSize, signature, signatureSize,
+                                     self->rng);
 }
 
 // ----------------------------- Agreement API ---------------------------------

@@ -203,24 +203,24 @@ static seos_err_t
 Signature_init(
     void*                          ctx,
     CryptoLibSignature_t**         pSigObj,
-    const OS_CryptoSignature_Alg_t algorithm,
-    const OS_CryptoDigest_Alg_t    digest,
     const CryptoLibKey_t*          prvKey,
-    const CryptoLibKey_t*          pubKey)
+    const CryptoLibKey_t*          pubKey,
+    const OS_CryptoSignature_Alg_t algorithm,
+    const OS_CryptoDigest_Alg_t    digest)
 {
     seos_err_t err;
 
     if (NULL != prvKey)
     {
         err = CALL_LIB(ctx, Key_exists, prvKey) == SEOS_SUCCESS ?
-              CALL_LIB(ctx, Signature_init, pSigObj, algorithm, digest, prvKey, pubKey) :
-              CALL_CLI(ctx, Signature_init, pSigObj, algorithm, digest, prvKey, pubKey);
+              CALL_LIB(ctx, Signature_init, pSigObj, prvKey, pubKey, algorithm, digest) :
+              CALL_CLI(ctx, Signature_init, pSigObj, prvKey, pubKey, algorithm, digest);
     }
     else if (NULL != pubKey)
     {
         err = CALL_LIB(ctx, Key_exists, pubKey) == SEOS_SUCCESS ?
-              CALL_LIB(ctx, Signature_init, pSigObj, algorithm, digest, prvKey, pubKey) :
-              CALL_CLI(ctx, Signature_init, pSigObj, algorithm, digest, prvKey, pubKey);
+              CALL_LIB(ctx, Signature_init, pSigObj, prvKey, pubKey, algorithm, digest) :
+              CALL_CLI(ctx, Signature_init, pSigObj, prvKey, pubKey, algorithm, digest);
     }
     else
     {

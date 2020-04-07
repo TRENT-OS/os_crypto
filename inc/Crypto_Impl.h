@@ -167,15 +167,15 @@ typedef seos_err_t
 (*Signature_init_func)(
     void*,
     CryptoLibSignature_t**,
-    const OS_CryptoSignature_Alg_t,
-    const OS_CryptoDigest_Alg_t,
     const CryptoLibKey_t*,
-    const CryptoLibKey_t*);
+    const CryptoLibKey_t*,
+    const OS_CryptoSignature_Alg_t,
+    const OS_CryptoDigest_Alg_t);
 
 typedef seos_err_t
 (*Signature_exists_func)(
     void*,
-    const CryptoLibSignature_t* );
+    const CryptoLibSignature_t*);
 
 typedef seos_err_t
 (*Signature_free_func)(

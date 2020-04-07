@@ -162,10 +162,10 @@ typedef const CryptoLibSignature_t* CryptoLibSignature_cptr;
 seos_err_t
 CryptoLibServer_Signature_init(
     CryptoLibSignature_ptr*  pSigPtr,
-    OS_CryptoSignature_Alg_t algorithm,
-    OS_CryptoDigest_Alg_t    digest,
     CryptoLibKey_cptr        prvPtr,
-    CryptoLibKey_cptr        pubPtr);
+    CryptoLibKey_cptr        pubPtr,
+    OS_CryptoSignature_Alg_t algorithm,
+    OS_CryptoDigest_Alg_t    digest);
 
 seos_err_t
 CryptoLibServer_Signature_verify(

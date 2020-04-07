@@ -270,14 +270,14 @@ static seos_err_t
 Signature_init(
     void*                          ctx,
     CryptoLibSignature_t**         pSigObj,
-    const OS_CryptoSignature_Alg_t algorithm,
-    const OS_CryptoDigest_Alg_t    digest,
     const CryptoLibKey_t*          prvKey,
-    const CryptoLibKey_t*          pubKey)
+    const CryptoLibKey_t*          pubKey,
+    const OS_CryptoSignature_Alg_t algorithm,
+    const OS_CryptoDigest_Alg_t    digest)
 {
     UNUSED_VAR(ctx);
-    return CryptoLibServer_Signature_init(pSigObj, algorithm, digest, prvKey,
-                                          pubKey);
+    return CryptoLibServer_Signature_init(pSigObj, prvKey, pubKey, algorithm,
+                                          digest);
 }
 
 static seos_err_t

@@ -388,15 +388,15 @@ CryptoLibServer_Agreement_free(
 seos_err_t
 CryptoLibServer_Signature_init(
     CryptoLibSignature_ptr*  pObj,
-    OS_CryptoSignature_Alg_t algorithm,
-    OS_CryptoDigest_Alg_t    digest,
     CryptoLibKey_cptr        prvKey,
-    CryptoLibKey_cptr        pubKey)
+    CryptoLibKey_cptr        pubKey,
+    OS_CryptoSignature_Alg_t algorithm,
+    OS_CryptoDigest_Alg_t    digest)
 {
     CryptoLibServer_t* self;
 
     GET_SELF(self);
-    return CALL(self, Signature_init, pObj, algorithm, digest, prvKey, pubKey);
+    return CALL(self, Signature_init, pObj, prvKey, pubKey, algorithm, digest);
 }
 
 seos_err_t

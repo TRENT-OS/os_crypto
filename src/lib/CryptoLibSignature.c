@@ -27,11 +27,11 @@ struct CryptoLibSignature
 static seos_err_t
 initImpl(
     CryptoLibSignature_t**         self,
-    const OS_Crypto_Memory_t*      memIf,
+    const CryptoLibKey_t*          prvKey,
+    const CryptoLibKey_t*          pubKey,
     const OS_CryptoSignature_Alg_t algorithm,
     const OS_CryptoDigest_Alg_t    digest,
-    const CryptoLibKey_t*          prvKey,
-    const CryptoLibKey_t*          pubKey)
+    const OS_Crypto_Memory_t*      memIf)
 {
     seos_err_t err;
     CryptoLibSignature_t* sig;
@@ -154,11 +154,11 @@ setKeyImpl(
 static seos_err_t
 verifyHashImpl(
     CryptoLibSignature_t* self,
-    CryptoLibRng_t*       rng,
     const void*           hash,
     const size_t          hashSize,
     const void*           signature,
-    const size_t          signatureSize)
+    const size_t          signatureSize,
+    CryptoLibRng_t*       rng)
 {
     void* rngFunc = (NULL != rng) ? CryptoLibRng_getBytesMbedtls : NULL;
     seos_err_t err = SEOS_ERROR_GENERIC;
@@ -190,11 +190,11 @@ verifyHashImpl(
 static seos_err_t
 signHashImpl(
     CryptoLibSignature_t* self,
-    CryptoLibRng_t*       rng,
     const void*           hash,
     const size_t          hashSize,
     void*                 signature,
-    size_t*               signatureSize)
+    size_t*               signatureSize,
+    CryptoLibRng_t*       rng)
 {
     void* rngFunc = (NULL != rng) ? CryptoLibRng_getBytesMbedtls : NULL;
     seos_err_t err = SEOS_ERROR_GENERIC;
@@ -230,11 +230,11 @@ signHashImpl(
 seos_err_t
 CryptoLibSignature_init(
     CryptoLibSignature_t**         self,
-    const OS_Crypto_Memory_t*      memIf,
+    const CryptoLibKey_t*          prvKey,
+    const CryptoLibKey_t*          pubKey,
     const OS_CryptoSignature_Alg_t algorithm,
     const OS_CryptoDigest_Alg_t    digest,
-    const CryptoLibKey_t*          prvKey,
-    const CryptoLibKey_t*          pubKey)
+    const OS_Crypto_Memory_t*      memIf)
 {
     seos_err_t err;
 
@@ -244,8 +244,8 @@ CryptoLibSignature_init(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((err = initImpl(self, memIf, algorithm, digest, prvKey,
-                        pubKey)) == SEOS_SUCCESS)
+    if ((err = initImpl(self, prvKey, pubKey, algorithm, digest,
+                        memIf)) == SEOS_SUCCESS)
     {
         if ((err = setKeyImpl(*self)) != SEOS_SUCCESS)
         {
@@ -272,11 +272,11 @@ CryptoLibSignature_free(
 seos_err_t
 CryptoLibSignature_sign(
     CryptoLibSignature_t* self,
-    CryptoLibRng_t*       rng,
     const void*           hash,
     const size_t          hashSize,
     void*                 signature,
-    size_t*               signatureSize)
+    size_t*               signatureSize,
+    CryptoLibRng_t*       rng)
 {
     if (NULL == self || NULL == hash || 0 == hashSize || NULL == signature
         || NULL == signatureSize)
@@ -285,18 +285,18 @@ CryptoLibSignature_sign(
     }
 
     return (self->prvKey != NULL) ?
-           signHashImpl(self, rng, hash, hashSize, signature, signatureSize) :
+           signHashImpl(self, hash, hashSize, signature, signatureSize, rng) :
            SEOS_ERROR_ABORTED;
 }
 
 seos_err_t
 CryptoLibSignature_verify(
     CryptoLibSignature_t* self,
-    CryptoLibRng_t*       rng,
     const void*           hash,
     const size_t          hashSize,
     const void*           signature,
-    const size_t          signatureSize)
+    const size_t          signatureSize,
+    CryptoLibRng_t*       rng)
 {
     if (NULL == self || NULL == hash || 0 == hashSize || NULL == signature
         || 0 == signatureSize)
@@ -305,6 +305,6 @@ CryptoLibSignature_verify(
     }
 
     return (self->pubKey != NULL) ?
-           verifyHashImpl(self, rng, hash, hashSize, signature, signatureSize) :
+           verifyHashImpl(self, hash, hashSize, signature, signatureSize, rng) :
            SEOS_ERROR_ABORTED;
 }

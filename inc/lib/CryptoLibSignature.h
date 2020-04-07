@@ -28,11 +28,11 @@ typedef struct CryptoLibSignature CryptoLibSignature_t;
 seos_err_t
 CryptoLibSignature_init(
     CryptoLibSignature_t**         self,
-    const OS_Crypto_Memory_t*      memIf,
+    const CryptoLibKey_t*          prvKey,
+    const CryptoLibKey_t*          pubKey,
     const OS_CryptoSignature_Alg_t algorithm,
     const OS_CryptoDigest_Alg_t    digest,
-    const CryptoLibKey_t*          prvKey,
-    const CryptoLibKey_t*          pubKey);
+    const OS_Crypto_Memory_t*      memIf);
 
 seos_err_t
 CryptoLibSignature_free(
@@ -42,19 +42,19 @@ CryptoLibSignature_free(
 seos_err_t
 CryptoLibSignature_sign(
     CryptoLibSignature_t* self,
-    CryptoLibRng_t*       rng,
     const void*           hash,
     const size_t          hashSize,
     void*                 signature,
-    size_t*               signatureSize);
+    size_t*               signatureSize,
+    CryptoLibRng_t*       rng);
 
 seos_err_t
 CryptoLibSignature_verify(
     CryptoLibSignature_t* self,
-    CryptoLibRng_t*       rng,
     const void*           hash,
     const size_t          hashSize,
     const void*           signature,
-    const size_t          signatureSize);
+    const size_t          signatureSize,
+    CryptoLibRng_t*       rng);
 
 /** @} */
