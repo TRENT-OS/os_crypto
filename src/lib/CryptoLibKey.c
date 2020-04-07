@@ -432,9 +432,9 @@ exit:
 static seos_err_t
 initImpl(
     CryptoLibKey_t**             self,
-    const OS_Crypto_Memory_t*    memIf,
     const OS_CryptoKey_Type_t    type,
-    const OS_CryptoKey_Attrib_t* attribs)
+    const OS_CryptoKey_Attrib_t* attribs,
+    const OS_Crypto_Memory_t*    memIf)
 {
     size_t size;
     seos_err_t err;
@@ -825,9 +825,9 @@ freeImpl(
 seos_err_t
 CryptoLibKey_generate(
     CryptoLibKey_t**           self,
+    const OS_CryptoKey_Spec_t* spec,
     const OS_Crypto_Memory_t*  memIf,
-    CryptoLibRng_t*            rng,
-    const OS_CryptoKey_Spec_t* spec)
+    CryptoLibRng_t*            rng)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 
@@ -836,8 +836,8 @@ CryptoLibKey_generate(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((err = initImpl(self, memIf, spec->key.type,
-                        &spec->key.attribs)) == SEOS_SUCCESS)
+    if ((err = initImpl(self, spec->key.type, &spec->key.attribs,
+                        memIf)) == SEOS_SUCCESS)
     {
         if ((err = generateImpl(*self, rng, spec)) != SEOS_SUCCESS)
         {
@@ -851,9 +851,9 @@ CryptoLibKey_generate(
 seos_err_t
 CryptoLibKey_makePublic(
     CryptoLibKey_t**             self,
-    const OS_Crypto_Memory_t*    memIf,
     const CryptoLibKey_t*        prvKey,
-    const OS_CryptoKey_Attrib_t* attribs)
+    const OS_CryptoKey_Attrib_t* attribs,
+    const OS_Crypto_Memory_t*    memIf)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
     OS_CryptoKey_Type_t type;
@@ -878,7 +878,7 @@ CryptoLibKey_makePublic(
         return SEOS_ERROR_NOT_SUPPORTED;
     }
 
-    if ((err = initImpl(self, memIf, type, attribs)) == SEOS_SUCCESS)
+    if ((err = initImpl(self, type, attribs, memIf)) == SEOS_SUCCESS)
     {
         if ((err = makeImpl(*self, prvKey)) != SEOS_SUCCESS)
         {
@@ -892,8 +892,8 @@ CryptoLibKey_makePublic(
 seos_err_t
 CryptoLibKey_import(
     CryptoLibKey_t**           self,
-    const OS_Crypto_Memory_t*  memIf,
-    const OS_CryptoKey_Data_t* keyData)
+    const OS_CryptoKey_Data_t* keyData,
+    const OS_Crypto_Memory_t*  memIf)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 
@@ -901,8 +901,8 @@ CryptoLibKey_import(
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
-    if ((err = initImpl(self, memIf, keyData->type,
-                        &keyData->attribs)) == SEOS_SUCCESS)
+    if ((err = initImpl(self, keyData->type, &keyData->attribs,
+                        memIf)) == SEOS_SUCCESS)
     {
         if ((err = importImpl(*self, keyData)) != SEOS_SUCCESS)
         {

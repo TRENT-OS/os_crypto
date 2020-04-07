@@ -622,8 +622,8 @@ Key_generate(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((err = CryptoLibKey_generate(pKeyObj, &self->memIf, self->rng,
-                                     spec)) != SEOS_SUCCESS)
+    if ((err = CryptoLibKey_generate(pKeyObj, spec, &self->memIf,
+                                     self->rng)) != SEOS_SUCCESS)
     {
         return err;
     }
@@ -655,8 +655,7 @@ Key_import(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((err = CryptoLibKey_import(pKeyObj, &self->memIf,
-                                   keyData)) != SEOS_SUCCESS)
+    if ((err = CryptoLibKey_import(pKeyObj, keyData, &self->memIf)) != SEOS_SUCCESS)
     {
         return err;
     }
@@ -694,8 +693,8 @@ Key_makePublic(
         return SEOS_ERROR_INVALID_HANDLE;
     }
 
-    if ((err = CryptoLibKey_makePublic(pPubKeyObj, &self->memIf, prvKeyObj,
-                                       attribs)) != SEOS_SUCCESS)
+    if ((err = CryptoLibKey_makePublic(pPubKeyObj, prvKeyObj, attribs,
+                                       &self->memIf)) != SEOS_SUCCESS)
     {
         return err;
     }
