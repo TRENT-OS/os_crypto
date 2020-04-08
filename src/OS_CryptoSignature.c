@@ -20,9 +20,31 @@ OS_CryptoSignature_init(
     const OS_CryptoSignature_Alg_t sigAlgorithm,
     const OS_CryptoDigest_Alg_t    digAlgorithm)
 {
+    OS_CryptoKey_Handle_t key;
     seos_err_t err;
 
-    PROXY_INIT(*self, hCrypto);
+    // We are actually not using this; lets check it anyways for consistency.
+    if (NULL == hCrypto)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    if (NULL == hPrvKey && NULL == hPubKey)
+    {
+        // We should at least have one key
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else if (NULL != hPrvKey && NULL != hPubKey
+             && (hPrvKey->impl->context != hPubKey->impl->context
+                 || hPrvKey->impl->vtable != hPubKey->impl->vtable))
+    {
+        // If we have two keys, we need to make sure that they are both associated
+        // with the same LIB instance
+        return SEOS_ERROR_INVALID_HANDLE;
+    }
+
+    key = (hPubKey != NULL) ? hPubKey : hPrvKey;
+    PROXY_INIT_FROM_KEY(*self, key);
     if ((err = PROXY_CALL(*self, Signature_init, PROXY_GET_PTR(*self),
                           PROXY_GET_OBJ(hPrvKey), PROXY_GET_OBJ(hPubKey),
                           sigAlgorithm, digAlgorithm)) != SEOS_SUCCESS)

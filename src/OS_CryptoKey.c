@@ -19,7 +19,14 @@ OS_CryptoKey_generate(
 {
     seos_err_t err;
 
-    PROXY_INIT(*self, hCrypto);
+    if (NULL == spec || hCrypto == NULL)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_RPC_CLIENT
+               || (hCrypto->mode == OS_Crypto_MODE_ROUTER &&
+                   !spec->key.attribs.exportable));
     if ((err = PROXY_CALL(*self, Key_generate, PROXY_GET_PTR(*self),
                           spec)) != SEOS_SUCCESS)
     {
@@ -37,7 +44,14 @@ OS_CryptoKey_import(
 {
     seos_err_t err;
 
-    PROXY_INIT(*self, hCrypto);
+    if (NULL == keyData || hCrypto == NULL)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_RPC_CLIENT
+               || (hCrypto->mode == OS_Crypto_MODE_ROUTER &&
+                   !keyData->attribs.exportable));
     if ((err = PROXY_CALL(*self, Key_import, PROXY_GET_PTR(*self),
                           keyData)) != SEOS_SUCCESS)
     {
@@ -54,9 +68,40 @@ OS_CryptoKey_makePublic(
     const OS_CryptoKey_Handle_t  hPrvKey,
     const OS_CryptoKey_Attrib_t* attribs)
 {
+    OS_CryptoKey_Attrib_t srcAttribs;
     seos_err_t err;
 
-    PROXY_INIT(*self, hCrypto);
+    if (NULL == attribs || hCrypto == NULL)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else if (NULL == hPrvKey)
+    {
+        return SEOS_ERROR_INVALID_HANDLE;
+    }
+    else if ((err = PROXY_CALL(hPrvKey, Key_getAttribs, PROXY_GET_OBJ(hPrvKey),
+                               &srcAttribs)) != SEOS_SUCCESS)
+    {
+        return err;
+    }
+
+    /*
+     * For now we need to make sure both have the same "exportablity" when
+     * running in router mode, because they have to live in the same address
+     * space..
+     * We could enable some of the cases where exportability differs by simply
+     * creating a temporary copy of the src/dst key to execute the makePublic()
+     * and then putting it in the correct address space.
+     */
+    if (hCrypto->mode == OS_Crypto_MODE_ROUTER &&
+        attribs->exportable != srcAttribs.exportable)
+    {
+        return SEOS_ERROR_NOT_SUPPORTED;
+    }
+
+    PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_RPC_CLIENT
+               || (hCrypto->mode == OS_Crypto_MODE_ROUTER &&
+                   !attribs->exportable));
     if ((err = PROXY_CALL(*self, Key_makePublic, PROXY_GET_PTR(*self),
                           PROXY_GET_OBJ(hPrvKey), attribs)) != SEOS_SUCCESS)
     {

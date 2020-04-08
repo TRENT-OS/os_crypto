@@ -8,39 +8,60 @@
 
 #include "Crypto_Impl.h"
 
-// Call function from self pointer
-#define CALL(s, f, ...)                                         \
-    (NULL == (s)) ?                                             \
-        SEOS_ERROR_INVALID_PARAMETER :                          \
-        (NULL == (s)->impl.vtable->f) ?                         \
-            SEOS_ERROR_NOT_SUPPORTED :                          \
-            (s)->impl.vtable->f((s)->impl.context, __VA_ARGS__)
+#include "rpc/CryptoLibServer.h"
 
-// Allocate proxy object and set its API handle to self pointer
-#define PROXY_INIT(p, s)                                                \
+// Call LIB or CLI, based on mode of API
+#define CALL(s, f, ...)                                                             \
+    (NULL == (s)) ?                                                                 \
+        SEOS_ERROR_INVALID_PARAMETER :                                              \
+        ((s)->mode == OS_Crypto_MODE_RPC_CLIENT) ?                                  \
+            (NULL == (s)->rpc.client.vtable->f) ?                                   \
+                SEOS_ERROR_NOT_SUPPORTED :                                          \
+                (s)->rpc.client.vtable->f((s)->rpc.client.context, __VA_ARGS__) :   \
+            (NULL == (s)->library.vtable->f) ?                                      \
+                SEOS_ERROR_NOT_SUPPORTED :                                          \
+                (s)->library.vtable->f((s)->library.context, __VA_ARGS__)
+
+// Allocate proxy object from crypto handle and set its impl according to
+// the c flag
+#define PROXY_INIT(p, s, c)                                             \
     if (NULL == &(p) || NULL == (s)) {                                  \
         return SEOS_ERROR_INVALID_PARAMETER;                            \
     }                                                                   \
     if(((p) = s->memIf.malloc(sizeof(OS_Crypto_Object_t))) == NULL) {   \
         return SEOS_ERROR_INSUFFICIENT_SPACE;                           \
     }                                                                   \
-    (p)->hCrypto = (s);
+    (p)->parent = (s);                                                  \
+    (p)->impl   = (c) ? &(s)->rpc.client : &(s)->library;
+
+// Allocate proxy object from key proxy and simply copy the impl
+#define PROXY_INIT_FROM_KEY(p, k)                                               \
+    if (NULL == &(p)) {                                                         \
+        return SEOS_ERROR_INVALID_PARAMETER;                                    \
+    } else if (NULL == (k)) {                                                   \
+        return SEOS_ERROR_INVALID_HANDLE;                                       \
+    }                                                                           \
+    if(((p) = k->parent->memIf.malloc(sizeof(OS_Crypto_Object_t))) == NULL) {   \
+        return SEOS_ERROR_INSUFFICIENT_SPACE;                                   \
+    }                                                                           \
+    (p)->parent = (k)->parent;                                                  \
+    (p)->impl   = (k)->impl;
 
 // Free proxy object with associated API context's mem IF
 #define PROXY_FREE(p)                           \
     if (NULL == (p)) {                          \
         return SEOS_ERROR_INVALID_PARAMETER;    \
     }                                           \
-    (p)->hCrypto->memIf.free(p);
+    (p)->parent->memIf.free(p);
 
 // Call function from proxy objects API handle
-#define PROXY_CALL(p, f, ...)                               \
-    (NULL == (p)) ?                                         \
-        SEOS_ERROR_INVALID_PARAMETER :                      \
-        (NULL == (p)->hCrypto->impl.vtable->f) ?            \
-            SEOS_ERROR_NOT_SUPPORTED :                      \
-            (p)->hCrypto->impl.vtable->f(                   \
-                (p)->hCrypto->impl.context, __VA_ARGS__     \
+#define PROXY_CALL(p, f, ...)                       \
+    (NULL == (p)) ?                                 \
+        SEOS_ERROR_INVALID_PARAMETER :              \
+        (NULL == (p)->impl->vtable->f) ?            \
+            SEOS_ERROR_NOT_SUPPORTED :              \
+            (p)->impl->vtable->f(                   \
+                (p)->impl->context, __VA_ARGS__     \
             )
 
 // Get object from proxy
@@ -51,14 +72,19 @@
 
 struct OS_Crypto
 {
-    Crypto_Impl_t impl;
     OS_Crypto_Mode_t mode;
     OS_Crypto_Memory_t memIf;
-    void* server;
+    Crypto_Impl_t library;
+    union
+    {
+        Crypto_Impl_t client;
+        CryptoLibServer_t* server;
+    } rpc;
 };
 
 struct OS_Crypto_Object
 {
-    OS_Crypto_t* hCrypto;
+    OS_Crypto_t* parent;
+    Crypto_Impl_t* impl;
     CryptoLib_Object_ptr obj;
 };

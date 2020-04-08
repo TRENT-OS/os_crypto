@@ -143,7 +143,6 @@ project(seos_crypto_with_rpc_client C)
 add_library(${PROJECT_NAME} STATIC
     ${SHARED_LIB_SOURCES}
     "src/rpc/CryptoLibClient.c"
-    "src/rpc/CryptoLibRouter.c"
     ${MBEDTLS_SOURCES})
 
 target_compile_definitions(${PROJECT_NAME}

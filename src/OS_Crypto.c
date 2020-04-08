@@ -9,7 +9,6 @@
 #include "lib/CryptoLib.h"
 #include "rpc/CryptoLibClient.h"
 #include "rpc/CryptoLibServer.h"
-#include "rpc/CryptoLibRouter.h"
 
 // Public functions ------------------------------------------------------------
 
@@ -37,40 +36,36 @@ OS_Crypto_init(
     ctx->mode  = cfg->mode;
     ctx->memIf = cfg->mem;
 
-    switch (cfg->mode)
+    // We always need a library instance; unless we want to force the API to
+    // delegate everything to the server
+    if (cfg->mode != OS_Crypto_MODE_RPC_CLIENT)
     {
-    case OS_Crypto_MODE_LIBRARY:
-        if ((err = CryptoLib_init(&ctx->impl, &cfg->mem,
-                                  &cfg->impl.lib)) != SEOS_SUCCESS)
+        if ((err = CryptoLib_init(&ctx->library, &cfg->mem,
+                                  &cfg->library)) != SEOS_SUCCESS)
         {
             goto err0;
         }
+    }
+
+    switch (cfg->mode)
+    {
+    case  OS_Crypto_MODE_LIBRARY:
+        // This is already set up.
         break;
 #if defined(SEOS_CRYPTO_WITH_RPC_CLIENT)
     case OS_Crypto_MODE_RPC_CLIENT:
-        if ((err = CryptoLibClient_init(&ctx->impl, &cfg->mem,
-                                        &cfg->impl.client)) != SEOS_SUCCESS)
-        {
-            goto err0;
-        }
-        break;
     case OS_Crypto_MODE_ROUTER:
-        if ((err = CryptoLibRouter_init(&ctx->impl, &cfg->mem,
-                                        &cfg->impl.router)) != SEOS_SUCCESS)
+        if ((err = CryptoLibClient_init(&ctx->rpc.client, &cfg->mem,
+                                        &cfg->rpc.client)) != SEOS_SUCCESS)
         {
-            goto err0;
+            goto err1;
         }
         break;
 #endif /* SEOS_CRYPTO_WITH_RPC_CLIENT */
 #if defined(SEOS_CRYPTO_WITH_RPC_SERVER)
     case OS_Crypto_MODE_RPC_SERVER_WITH_LIBRARY:
-        if ((err = CryptoLib_init(&ctx->impl, &cfg->mem,
-                                  &cfg->impl.lib)) != SEOS_SUCCESS)
-        {
-            goto err0;
-        }
-        if ((err = CryptoLibServer_init((CryptoLibServer_t**) &ctx->server,
-                                        &ctx->impl, &cfg->mem, &cfg->server)) != SEOS_SUCCESS)
+        if ((err = CryptoLibServer_init(&ctx->rpc.server, &ctx->library, &cfg->mem,
+                                        &cfg->rpc.server)) != SEOS_SUCCESS)
         {
             goto err1;
         }
@@ -78,15 +73,16 @@ OS_Crypto_init(
 #endif /* SEOS_CRYPTO_WITH_RPC_SERVER */
     default:
         err = SEOS_ERROR_NOT_SUPPORTED;
-        goto err0;
+        goto err1;
     }
 
     return SEOS_SUCCESS;
 
-#if defined(SEOS_CRYPTO_WITH_RPC_SERVER)
 err1:
-    CryptoLib_free(ctx->impl.context);
-#endif /* SEOS_CRYPTO_WITH_RPC_SERVER */
+    if (cfg->mode != OS_Crypto_MODE_RPC_CLIENT)
+    {
+        CryptoLib_free(ctx->library.context);
+    }
 err0:
     ctx->memIf.free(ctx);
 
@@ -104,26 +100,28 @@ OS_Crypto_free(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
+    if (self->mode != OS_Crypto_MODE_RPC_CLIENT)
+    {
+        if ((err = CryptoLib_free(self->library.context)) != SEOS_SUCCESS)
+        {
+            return err;
+        }
+    }
+
     switch (self->mode)
     {
     case OS_Crypto_MODE_LIBRARY:
-        err = CryptoLib_free(self->impl.context);
+        // Nothing more to do.
         break;
 #if defined(SEOS_CRYPTO_WITH_RPC_CLIENT)
     case OS_Crypto_MODE_RPC_CLIENT:
-        err = CryptoLibClient_free(self->impl.context);
-        break;
     case OS_Crypto_MODE_ROUTER:
-        err = CryptoLibRouter_free(self->impl.context);
+        err = CryptoLibClient_free(self->rpc.client.context);
         break;
 #endif /* SEOS_CRYPTO_WITH_RPC_CLIENT */
 #if defined(SEOS_CRYPTO_WITH_RPC_SERVER)
     case OS_Crypto_MODE_RPC_SERVER_WITH_LIBRARY:
-        if ((err = CryptoLib_free(self->impl.context)) != SEOS_SUCCESS)
-        {
-            return err;
-        }
-        err = CryptoLibServer_free(self->server);
+        err = CryptoLibServer_free(self->rpc.server);
         break;
 #endif /* SEOS_CRYPTO_WITH_RPC_SERVER */
     default:
@@ -137,7 +135,8 @@ void*
 OS_Crypto_getServer(
     const OS_Crypto_Handle_t self)
 {
-    return (NULL == self) ? NULL : self->server;
+    return (NULL == self || self->mode != OS_Crypto_MODE_RPC_SERVER_WITH_LIBRARY) ?
+           NULL : self->rpc.server;
 }
 
 CryptoLib_Object_ptr*
@@ -158,7 +157,9 @@ OS_Crypto_migrateObject(
         return SEOS_ERROR_INVALID_HANDLE;
     }
 
-    PROXY_INIT(*proxy, self);
+    // When we migrate a CryptoLib object, it is expected that this comes from a
+    // remote instance. So the only meaningful way to use it through the client.
+    PROXY_INIT(*proxy, self, true);
     (*proxy)->obj = ptr;
 
     return SEOS_SUCCESS;

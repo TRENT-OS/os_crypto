@@ -19,7 +19,12 @@ OS_CryptoDigest_init(
 {
     seos_err_t err;
 
-    PROXY_INIT(*self, hCrypto);
+    if (NULL == hCrypto)
+    {
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_RPC_CLIENT);
     if ((err = PROXY_CALL(*self, Digest_init, PROXY_GET_PTR(*self),
                           algorithm)) != SEOS_SUCCESS)
     {
