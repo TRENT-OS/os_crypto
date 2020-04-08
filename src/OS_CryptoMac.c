@@ -24,7 +24,7 @@ OS_CryptoMac_init(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_RPC_CLIENT);
+    PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT_ONLY);
     if ((err = PROXY_CALL(*self, Mac_init, PROXY_GET_PTR(*self),
                           algorithm)) != SEOS_SUCCESS)
     {

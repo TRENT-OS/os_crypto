@@ -24,8 +24,8 @@ OS_CryptoKey_generate(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_RPC_CLIENT
-               || (hCrypto->mode == OS_Crypto_MODE_ROUTER &&
+    PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT_ONLY
+               || (hCrypto->mode == OS_Crypto_MODE_CLIENT &&
                    !spec->key.attribs.exportable));
     if ((err = PROXY_CALL(*self, Key_generate, PROXY_GET_PTR(*self),
                           spec)) != SEOS_SUCCESS)
@@ -49,8 +49,8 @@ OS_CryptoKey_import(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_RPC_CLIENT
-               || (hCrypto->mode == OS_Crypto_MODE_ROUTER &&
+    PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT_ONLY
+               || (hCrypto->mode == OS_Crypto_MODE_CLIENT &&
                    !keyData->attribs.exportable));
     if ((err = PROXY_CALL(*self, Key_import, PROXY_GET_PTR(*self),
                           keyData)) != SEOS_SUCCESS)
@@ -93,14 +93,14 @@ OS_CryptoKey_makePublic(
      * creating a temporary copy of the src/dst key to execute the makePublic()
      * and then putting it in the correct address space.
      */
-    if (hCrypto->mode == OS_Crypto_MODE_ROUTER &&
+    if (hCrypto->mode == OS_Crypto_MODE_CLIENT &&
         attribs->exportable != srcAttribs.exportable)
     {
         return SEOS_ERROR_NOT_SUPPORTED;
     }
 
-    PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_RPC_CLIENT
-               || (hCrypto->mode == OS_Crypto_MODE_ROUTER &&
+    PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT_ONLY
+               || (hCrypto->mode == OS_Crypto_MODE_CLIENT &&
                    !attribs->exportable));
     if ((err = PROXY_CALL(*self, Key_makePublic, PROXY_GET_PTR(*self),
                           PROXY_GET_OBJ(hPrvKey), attribs)) != SEOS_SUCCESS)

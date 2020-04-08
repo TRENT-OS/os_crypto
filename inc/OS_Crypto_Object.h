@@ -14,7 +14,7 @@
 #define CALL(s, f, ...)                                                             \
     (NULL == (s)) ?                                                                 \
         SEOS_ERROR_INVALID_PARAMETER :                                              \
-        ((s)->mode == OS_Crypto_MODE_RPC_CLIENT) ?                                  \
+        ((s)->mode == OS_Crypto_MODE_CLIENT_ONLY) ?                                 \
             (NULL == (s)->rpc.client.vtable->f) ?                                   \
                 SEOS_ERROR_NOT_SUPPORTED :                                          \
                 (s)->rpc.client.vtable->f((s)->rpc.client.context, __VA_ARGS__) :   \
