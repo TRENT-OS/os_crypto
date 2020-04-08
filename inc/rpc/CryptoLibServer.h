@@ -55,10 +55,6 @@ CryptoLibServer_Mac_init(
     OS_CryptoMac_Alg_t algorithm);
 
 seos_err_t
-CryptoLibServer_Mac_exists(
-    CryptoLibMac_cptr macPtr);
-
-seos_err_t
 CryptoLibServer_Mac_free(
     CryptoLibMac_ptr macPtr);
 
@@ -86,10 +82,6 @@ seos_err_t
 CryptoLibServer_Digest_init(
     CryptoLibDigest_ptr*  pDigPtr,
     OS_CryptoDigest_Alg_t algorithm);
-
-seos_err_t
-CryptoLibServer_Digest_exists(
-    CryptoLibDigest_cptr digestPtr);
 
 seos_err_t
 CryptoLibServer_Digest_free(
@@ -147,10 +139,6 @@ CryptoLibServer_Key_loadParams(
     size_t*              paramSize);
 
 seos_err_t
-CryptoLibServer_Key_exists(
-    CryptoLibKey_cptr keyPtr);
-
-seos_err_t
 CryptoLibServer_Key_free(
     CryptoLibKey_ptr keyPtr);
 
@@ -180,10 +168,6 @@ CryptoLibServer_Signature_sign(
     size_t*                signatureSize);
 
 seos_err_t
-CryptoLibServer_Signature_exists(
-    CryptoLibSignature_cptr obj);
-
-seos_err_t
 CryptoLibServer_Signature_free(
     CryptoLibSignature_ptr sigPtr);
 
@@ -205,10 +189,6 @@ CryptoLibServer_Agreement_agree(
     size_t*                sharedSize);
 
 seos_err_t
-CryptoLibServer_Agreement_exists(
-    CryptoLibAgreement_cptr agrPtr);
-
-seos_err_t
 CryptoLibServer_Agreement_free(
     CryptoLibAgreement_ptr agrPtr);
 
@@ -223,10 +203,6 @@ CryptoLibServer_Cipher_init(
     CryptoLibKey_cptr     keyPtr,
     OS_CryptoCipher_Alg_t algorithm,
     size_t                ivSize);
-
-seos_err_t
-CryptoLibServer_Cipher_exists(
-    CryptoLibCipher_cptr cipherPtr);
 
 seos_err_t
 CryptoLibServer_Cipher_free(

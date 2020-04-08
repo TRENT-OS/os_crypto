@@ -93,16 +93,6 @@ CryptoLibServer_Mac_init(
 }
 
 seos_err_t
-CryptoLibServer_Mac_exists(
-    CryptoLibMac_cptr macObj)
-{
-    CryptoLibServer_t* self;
-
-    GET_SELF(self);
-    return CALL(self, Mac_exists, macObj);
-}
-
-seos_err_t
 CryptoLibServer_Mac_free(
     CryptoLibMac_ptr macObj)
 {
@@ -159,16 +149,6 @@ CryptoLibServer_Digest_init(
 
     GET_SELF(self);
     return CALL(self, Digest_init, pDigestObj, algorithm);
-}
-
-seos_err_t
-CryptoLibServer_Digest_exists(
-    CryptoLibDigest_cptr digestObj)
-{
-    CryptoLibServer_t* self;
-
-    GET_SELF(self);
-    return CALL(self, Digest_exists, digestObj);
 }
 
 seos_err_t
@@ -315,16 +295,6 @@ CryptoLibServer_Key_loadParams(
 }
 
 seos_err_t
-CryptoLibServer_Key_exists(
-    CryptoLibKey_cptr keyObj)
-{
-    CryptoLibServer_t* self;
-
-    GET_SELF(self);
-    return CALL(self, Key_exists, keyObj);
-}
-
-seos_err_t
 CryptoLibServer_Key_free(
     CryptoLibKey_ptr keyObj)
 {
@@ -361,16 +331,6 @@ CryptoLibServer_Agreement_agree(
 
     GET_SELF(self);
     return CALL(self, Agreement_agree, agrObj, pubKey, self->dataPort, sharedSize);
-}
-
-seos_err_t
-CryptoLibServer_Agreement_exists(
-    CryptoLibAgreement_cptr agrObj)
-{
-    CryptoLibServer_t* self;
-
-    GET_SELF(self);
-    return CALL(self, Agreement_exists, agrObj);
 }
 
 seos_err_t
@@ -429,16 +389,6 @@ CryptoLibServer_Signature_sign(
 }
 
 seos_err_t
-CryptoLibServer_Signature_exists(
-    CryptoLibSignature_cptr obj)
-{
-    CryptoLibServer_t* self;
-
-    GET_SELF(self);
-    return CALL(self, Signature_exists, obj);
-}
-
-seos_err_t
 CryptoLibServer_Signature_free(
     CryptoLibSignature_ptr obj)
 {
@@ -462,16 +412,6 @@ CryptoLibServer_Cipher_init(
     GET_SELF(self);
     return CALL(self, Cipher_init, pCipherObj, key, algorithm, self->dataPort,
                 ivSize);
-}
-
-seos_err_t
-CryptoLibServer_Cipher_exists(
-    CryptoLibCipher_cptr cipherObj)
-{
-    CryptoLibServer_t* self;
-
-    GET_SELF(self);
-    return CALL(self, Cipher_exists, cipherObj);
 }
 
 seos_err_t

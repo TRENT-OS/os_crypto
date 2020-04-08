@@ -36,11 +36,6 @@ typedef seos_err_t
     const OS_CryptoMac_Alg_t);
 
 typedef seos_err_t
-(*Mac_exists_func)(
-    void*,
-    const CryptoLibMac_t*);
-
-typedef seos_err_t
 (*Mac_free_func)(
     void*,
     CryptoLibMac_t*);
@@ -73,11 +68,6 @@ typedef seos_err_t
     void*,
     CryptoLibDigest_t**,
     const OS_CryptoDigest_Alg_t);
-
-typedef seos_err_t
-(*Digest_exists_func)(
-    void*,
-    const CryptoLibDigest_t*);
 
 typedef seos_err_t
 (*Digest_free_func)(
@@ -145,11 +135,6 @@ typedef seos_err_t
     OS_CryptoKey_Attrib_t*);
 
 typedef seos_err_t
-(*Key_exists_func)(
-    void*,
-    const CryptoLibKey_t*);
-
-typedef seos_err_t
 (*Key_free_func)(
     void*,
     CryptoLibKey_t*);
@@ -171,11 +156,6 @@ typedef seos_err_t
     const CryptoLibKey_t*,
     const OS_CryptoSignature_Alg_t,
     const OS_CryptoDigest_Alg_t);
-
-typedef seos_err_t
-(*Signature_exists_func)(
-    void*,
-    const CryptoLibSignature_t*);
 
 typedef seos_err_t
 (*Signature_free_func)(
@@ -210,11 +190,6 @@ typedef seos_err_t
     const OS_CryptoAgreement_Alg_t);
 
 typedef seos_err_t
-(*Agreement_exists_func)(
-    void*,
-    const CryptoLibAgreement_t*);
-
-typedef seos_err_t
 (*Agreement_free_func)(
     void*,
     CryptoLibAgreement_t*);
@@ -237,11 +212,6 @@ typedef seos_err_t
     const OS_CryptoCipher_Alg_t,
     const void*,
     const size_t);
-
-typedef seos_err_t
-(*Cipher_exists_func)(
-    void*,
-    const CryptoLibCipher_t*);
 
 typedef seos_err_t
 (*Cipher_free_func)(
@@ -278,13 +248,11 @@ typedef struct
     Rng_getBytes_func Rng_getBytes;
     Rng_reseed_func Rng_reseed;
     Mac_init_func Mac_init;
-    Mac_exists_func Mac_exists;
     Mac_free_func Mac_free;
     Mac_start_func Mac_start;
     Mac_process_func Mac_process;
     Mac_finalize_func Mac_finalize;
     Digest_init_func Digest_init;
-    Digest_exists_func Digest_exists;
     Digest_free_func Digest_free;
     Digest_clone_func Digest_clone;
     Digest_process_func Digest_process;
@@ -296,19 +264,15 @@ typedef struct
     Key_getParams_func Key_getParams;
     Key_getAttribs_func Key_getAttribs;
     Key_loadParams_func Key_loadParams;
-    Key_exists_func Key_exists;
     Key_free_func Key_free;
     Signature_init_func Signature_init;
-    Signature_exists_func Signature_exists;
     Signature_free_func Signature_free;
     Signature_sign_func Signature_sign;
     Signature_verify_func Signature_verify;
     Agreement_init_func Agreement_init;
-    Agreement_exists_func Agreement_exists;
     Agreement_free_func Agreement_free;
     Agreement_agree_func Agreement_agree;
     Cipher_init_func Cipher_init;
-    Cipher_exists_func Cipher_exists;
     Cipher_free_func Cipher_free;
     Cipher_process_func Cipher_process;
     Cipher_start_func Cipher_start;

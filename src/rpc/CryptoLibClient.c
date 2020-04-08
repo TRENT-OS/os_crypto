@@ -86,15 +86,6 @@ Mac_init(
 }
 
 static seos_err_t
-Mac_exists(
-    void*                 ctx,
-    const CryptoLibMac_t* macObj)
-{
-    UNUSED_VAR(ctx);
-    return CryptoLibServer_Mac_exists(macObj);
-}
-
-static seos_err_t
 Mac_free(
     void*           ctx,
     CryptoLibMac_t* macObj)
@@ -187,15 +178,6 @@ Digest_init(
 }
 
 static seos_err_t
-Digest_exists(
-    void*                    ctx,
-    const CryptoLibDigest_t* digestObj)
-{
-    UNUSED_VAR(ctx);
-    return CryptoLibServer_Digest_exists(digestObj);
-}
-
-static seos_err_t
 Digest_free(
     void*              ctx,
     CryptoLibDigest_t* digestObj)
@@ -281,15 +263,6 @@ Signature_init(
 }
 
 static seos_err_t
-Signature_exists(
-    void*                       ctx,
-    const CryptoLibSignature_t* signatureObj)
-{
-    UNUSED_VAR(ctx);
-    return CryptoLibServer_Signature_exists(signatureObj);
-}
-
-static seos_err_t
 Signature_free(
     void*                 ctx,
     CryptoLibSignature_t* sigObj)
@@ -369,15 +342,6 @@ Agreement_init(
 {
     UNUSED_VAR(ctx);
     return CryptoLibServer_Agreement_init(pAgrObj, prvKey, algorithm);
-}
-
-static seos_err_t
-Agreement_exists(
-    void*                       ctx,
-    const CryptoLibAgreement_t* agrObj)
-{
-    UNUSED_VAR(ctx);
-    return CryptoLibServer_Agreement_exists(agrObj);
 }
 
 static seos_err_t
@@ -573,15 +537,6 @@ Key_loadParams(
 }
 
 static seos_err_t
-Key_exists(
-    void*                 ctx,
-    const CryptoLibKey_t* keyObj)
-{
-    UNUSED_VAR(ctx);
-    return CryptoLibServer_Key_exists(keyObj);
-}
-
-static seos_err_t
 Key_free(
     void*           ctx,
     CryptoLibKey_t* keyObj)
@@ -618,15 +573,6 @@ Cipher_init(
     }
 
     return CryptoLibServer_Cipher_init(pCipherObj, key, algorithm, ivSize);
-}
-
-static seos_err_t
-Cipher_exists(
-    void*                    ctx,
-    const CryptoLibCipher_t* cipherObj)
-{
-    UNUSED_VAR(ctx);
-    return CryptoLibServer_Cipher_exists(cipherObj);
 }
 
 static seos_err_t
@@ -735,13 +681,11 @@ static const Crypto_Vtable_t CryptoLibClient_vtable =
     .Rng_getBytes        = Rng_getBytes,
     .Rng_reseed          = Rng_reseed,
     .Mac_init            = Mac_init,
-    .Mac_exists          = Mac_exists,
     .Mac_free            = Mac_free,
     .Mac_start           = Mac_start,
     .Mac_process         = Mac_process,
     .Mac_finalize        = Mac_finalize,
     .Digest_init         = Digest_init,
-    .Digest_exists       = Digest_exists,
     .Digest_free         = Digest_free,
     .Digest_clone        = Digest_clone,
     .Digest_process      = Digest_process,
@@ -753,19 +697,15 @@ static const Crypto_Vtable_t CryptoLibClient_vtable =
     .Key_getParams       = Key_getParams,
     .Key_getAttribs      = Key_getAttribs,
     .Key_loadParams      = Key_loadParams,
-    .Key_exists          = Key_exists,
     .Key_free            = Key_free,
     .Signature_init      = Signature_init,
-    .Signature_exists    = Signature_exists,
     .Signature_free      = Signature_free,
     .Signature_sign      = Signature_sign,
     .Signature_verify    = Signature_verify,
     .Agreement_init      = Agreement_init,
-    .Agreement_exists    = Agreement_exists,
     .Agreement_free      = Agreement_free,
     .Agreement_agree     = Agreement_agree,
     .Cipher_init         = Cipher_init,
-    .Cipher_exists       = Cipher_exists,
     .Cipher_free         = Cipher_free,
     .Cipher_process      = Cipher_process,
     .Cipher_start        = Cipher_start,
