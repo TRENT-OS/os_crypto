@@ -140,26 +140,37 @@ OS_Crypto_getServer(
 }
 
 CryptoLib_Object_ptr*
-OS_Crypto_getObject(
+OS_Crypto_getLibObject(
     const OS_Crypto_Object_t* proxy)
 {
     return (NULL == proxy) ? NULL : proxy->obj;
 }
 
 seos_err_t
-OS_Crypto_migrateObject(
+OS_Crypto_migrateLibObject(
     OS_Crypto_Object_t**       proxy,
     const OS_Crypto_Handle_t   self,
-    const CryptoLib_Object_ptr ptr)
+    const CryptoLib_Object_ptr ptr,
+    const bool                 local)
 {
-    if (NULL == ptr)
+    /*
+     * Generally speaking, crypto library objects can be in our local address
+     * space or in a remote address space (e.g., the CryptoServer). As a result,
+     * the proxy objects needs to know the appropriate vtable/context.
+     */
+
+    if (NULL == self || NULL == ptr)
     {
-        return SEOS_ERROR_INVALID_HANDLE;
+        return SEOS_ERROR_INVALID_PARAMETER;
+    }
+    else if (!local && self->mode == OS_Crypto_MODE_LIBRARY_ONLY)
+    {
+        // If it is a remote object, then we can only access it through the
+        // RPC client, so "library only" will not work.
+        return SEOS_ERROR_INVALID_STATE;
     }
 
-    // When we migrate a CryptoLib object, it is expected that this comes from a
-    // remote instance. So the only meaningful way to use it through the client.
-    PROXY_INIT(*proxy, self, true);
+    PROXY_INIT(*proxy, self, !local);
     (*proxy)->obj = ptr;
 
     return SEOS_SUCCESS;
