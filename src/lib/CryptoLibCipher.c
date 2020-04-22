@@ -4,7 +4,6 @@
 
 #include "lib/CryptoLibCipher.h"
 
-#include "mbedtls/rsa.h"
 #include "mbedtls/aes.h"
 #include "mbedtls/gcm.h"
 
@@ -18,7 +17,6 @@ struct CryptoLibCipher
     union
     {
         mbedtls_aes_context aes;
-        mbedtls_rsa_context rsa;
         mbedtls_gcm_context gcm;
     } mbedtls;
     OS_CryptoCipher_Alg_t algorithm;
