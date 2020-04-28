@@ -15,69 +15,36 @@
 #    to serve RPC requests from a crypto API RPC client.
 #
 
+# We need to build 3rdparty/mbedtls for this and would like to avoid
+# all users of SEOS_CRYPTO to include this as well, so we do it here
+seos_use_libs(
+    3RDPARTY_MBEDTLS_WITH_CRYPTO_ONLY
+)
+
 # These are the sources we ALWAYS compile, for all targets
-set(SHARED_LIB_SOURCES
-    "src/OS_Crypto.c"
-    "src/OS_CryptoAgreement.c"
-    "src/OS_CryptoCipher.c"
-    "src/OS_CryptoDigest.c"
-    "src/OS_CryptoKey.c"
-    "src/OS_CryptoMac.c"
-    "src/OS_CryptoRng.c"
-    "src/OS_CryptoSignature.c"
-    "src/lib/CryptoLib.c"
-    "src/lib/CryptoLibAgreement.c"
-    "src/lib/CryptoLibRng.c"
-    "src/lib/CryptoLibDigest.c"
-    "src/lib/CryptoLibMac.c"
-    "src/lib/CryptoLibCipher.c"
-    "src/lib/CryptoLibSignature.c"
-    "src/lib/CryptoLibKey.c"
-    "src/util/PtrVector.c"
+set(SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/OS_Crypto.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/OS_CryptoAgreement.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/OS_CryptoCipher.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/OS_CryptoDigest.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/OS_CryptoKey.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/OS_CryptoMac.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/OS_CryptoRng.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/OS_CryptoSignature.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/lib/CryptoLib.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/lib/CryptoLibAgreement.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/lib/CryptoLibRng.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/lib/CryptoLibDigest.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/lib/CryptoLibMac.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/lib/CryptoLibCipher.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/lib/CryptoLibSignature.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/lib/CryptoLibKey.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/util/PtrVector.c"
 )
 
-# These are the 3rd party sources, holding the actual algorithms
-set(MBEDTLS_SOURCES
-    # UTILS ----------------------------------------------------------------
-    "3rdParty/mbedtls/library/platform_util.c"
-    "3rdParty/mbedtls/library/bignum.c"
-    # DIGEST ---------------------------------------------------------------
-    "3rdParty/mbedtls/library/md.c"
-    "3rdParty/mbedtls/library/md_wrap.c"
-    "3rdParty/mbedtls/library/md5.c"
-    "3rdParty/mbedtls/library/sha1.c"
-    "3rdParty/mbedtls/library/sha256.c"
-    # RNG ------------------------------------------------------------------
-    "3rdParty/mbedtls/library/ctr_drbg.c"
-    # CIPHER ---------------------------------------------------------------
-    "3rdParty/mbedtls/library/cipher.c"
-    "3rdParty/mbedtls/library/cipher_wrap.c"
-    "3rdParty/mbedtls/library/aes.c"
-    "3rdParty/mbedtls/library/gcm.c"
-    # AGREEMENT ------------------------------------------------------------
-    "3rdParty/mbedtls/library/dhm.c"
-    "3rdParty/mbedtls/library/ecdh.c"
-    "3rdParty/mbedtls/library/ecp.c"
-    "3rdParty/mbedtls/library/ecp_curves.c"
-    # SIGNATURE ------------------------------------------------------------
-    "3rdParty/mbedtls/library/oid.c"
-    "3rdParty/mbedtls/library/rsa.c"
-    "3rdParty/mbedtls/library/rsa_internal.c"
-    # Temporary: For mbedTLS
-    "3rdParty/mbedtls/library/asn1parse.c"
-    "3rdParty/mbedtls/library/pem.c"
-    "3rdParty/mbedtls/library/base64.c"
-)
+set(COMPILE_DEFINITIONS)
 
-set(PRIVATE_TARGET_COMPILE_DEFINITIONS
-    MBEDTLS_CONFIG_FILE="${CMAKE_CURRENT_SOURCE_DIR}/configs/MbedTLS_Config.h"
-)
-
-set(PUBLIC_TARGET_COMPILE_DEFINITIONS)
-
-set(PRIVATE_TARGET_COMPILE_OTIONS)
-
-set(PUBLIC_TARGET_COMPILE_OTIONS
+set(COMPILE_OTIONS
     -Wall
 )
 
@@ -87,13 +54,13 @@ set(PUBLIC_TARGET_COMPILE_OTIONS
 if(NO_KERNEL_BUILD)
     # since PAGE_SIZE is normally defined as part of musllibc (which is missing
     # here) we have to define it
-    set(PRIVATE_TARGET_COMPILE_DEFINITIONS
-        ${PRIVATE_TARGET_COMPILE_DEFINITIONS}
+    set(COMPILE_OTIONS
+        ${COMPILE_OTIONS}
         PAGE_SIZE=${PAGE_SIZE_VALUE}
     )
 else()
-    set(PUBLIC_TARGET_COMPILE_OTIONS
-        ${PUBLIC_TARGET_COMPILE_OTIONS}
+    set(COMPILE_OTIONS
+        ${COMPILE_OTIONS}
         -Werror
     )
 endif(NO_KERNEL_BUILD)
@@ -107,103 +74,103 @@ endif()
 
 project(seos_crypto C)
 
-add_library(${PROJECT_NAME} STATIC
-    ${SHARED_LIB_SOURCES}
-    ${MBEDTLS_SOURCES})
+add_library(${PROJECT_NAME} INTERFACE)
+
+target_sources(${PROJECT_NAME}
+    INTERFACE
+        ${SOURCES}
+)
 
 target_compile_definitions(${PROJECT_NAME}
-    PUBLIC
-        ${PUBLIC_TARGET_COMPILE_DEFINITIONS}
-    PRIVATE
-        ${PRIVATE_TARGET_COMPILE_DEFINITIONS}
+    INTERFACE
+        ${COMPILE_DEFINITIONS}
 )
 
 target_compile_options(${PROJECT_NAME}
-    PUBLIC
-        ${PUBLIC_TARGET_COMPILE_OPTIONS}
-    PRIVATE
-        ${PRIVATE_TARGET_COMPILE_OPTIONS}
+    INTERFACE
+       ${COMPILE_OPTIONS}
 )
 
 target_include_directories(${PROJECT_NAME}
-    PUBLIC
+    INTERFACE
         "inc"
-        "3rdParty/mbedtls/include"
 )
 
 target_link_libraries(${PROJECT_NAME}
-    seos_core_api
-    seos_libs
+    INTERFACE
+        3rdparty_mbedtls_with_crypto_only
+        seos_core_api
+        seos_libs
 )
 
 #------------------------------------------------------------------------------
 
 project(seos_crypto_with_rpc_client C)
 
-add_library(${PROJECT_NAME} STATIC
-    ${SHARED_LIB_SOURCES}
-    "src/rpc/CryptoLibClient.c"
-    ${MBEDTLS_SOURCES})
+add_library(${PROJECT_NAME} INTERFACE)
+
+target_sources(${PROJECT_NAME}
+    INTERFACE
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/rpc/CryptoLibClient.c"
+        ${SOURCES}
+)
 
 target_compile_definitions(${PROJECT_NAME}
-    PUBLIC
-        ${PUBLIC_TARGET_COMPILE_DEFINITIONS}
-    PRIVATE
-        ${PRIVATE_TARGET_COMPILE_DEFINITIONS}
+    INTERFACE
+        ${COMPILE_DEFINITIONS}
 )
 
 target_compile_options(${PROJECT_NAME}
-    PUBLIC
-        ${PUBLIC_TARGET_COMPILE_OPTIONS}
-    PRIVATE
-        ${PRIVATE_TARGET_COMPILE_OPTIONS}
-        -DSEOS_CRYPTO_WITH_RPC_CLIENT
+    INTERFACE
+       ${COMPILE_OPTIONS}
+       -DSEOS_CRYPTO_WITH_RPC_CLIENT
 )
 
 target_include_directories(${PROJECT_NAME}
-    PUBLIC
+    INTERFACE
         "inc"
-        "3rdParty/mbedtls/include"
 )
 
 target_link_libraries(${PROJECT_NAME}
-    seos_core_api
-    seos_libs
+    INTERFACE
+        3rdparty_mbedtls_with_crypto_only
+        seos_core_api
+        seos_libs
 )
 
 #------------------------------------------------------------------------------
 
 project(seos_crypto_with_rpc_server C)
 
-add_library(${PROJECT_NAME} STATIC
-    ${SHARED_LIB_SOURCES}
-    "src/rpc/CryptoLibServer.c"
-    ${MBEDTLS_SOURCES})
+add_library(${PROJECT_NAME} INTERFACE)
+
+target_sources(${PROJECT_NAME}
+    INTERFACE
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/rpc/CryptoLibServer.c"
+        ${SOURCES}
+)
 
 target_compile_definitions(${PROJECT_NAME}
-    PUBLIC
-        ${PUBLIC_TARGET_COMPILE_DEFINITIONS}
-    PRIVATE
-        ${PRIVATE_TARGET_COMPILE_DEFINITIONS}
+    INTERFACE
+        ${COMPILE_DEFINITIONS}
 )
 
 target_compile_options(${PROJECT_NAME}
-    PUBLIC
-        ${PUBLIC_TARGET_COMPILE_OPTIONS}
-    PRIVATE
-        ${PRIVATE_TARGET_COMPILE_OPTIONS}
-        -DSEOS_CRYPTO_WITH_RPC_SERVER
+    INTERFACE
+       ${COMPILE_OPTIONS}
+       -DSEOS_CRYPTO_WITH_RPC_SERVER
 )
 
 target_include_directories(${PROJECT_NAME}
-    PUBLIC
+    INTERFACE
         "inc"
-        "3rdParty/mbedtls/include"
 )
 
 target_link_libraries(${PROJECT_NAME}
-    seos_core_api
-    seos_libs
+    INTERFACE
+        3rdparty_mbedtls_with_crypto_only
+        seos_core_api
+        seos_libs
 )
 
 #------------------------------------------------------------------------------
