@@ -14,14 +14,6 @@
 
 #include "OS_Crypto.h"
 
-#include "lib/CryptoLibCipher.h"
-#include "lib/CryptoLibKey.h"
-#include "lib/CryptoLibRng.h"
-#include "lib/CryptoLibDigest.h"
-#include "lib/CryptoLibMac.h"
-#include "lib/CryptoLibSignature.h"
-#include "lib/CryptoLibAgreement.h"
-
 #include "Crypto_Impl.h"
 
 // -------------------------- defines/types/variables --------------------------
