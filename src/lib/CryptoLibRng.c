@@ -4,6 +4,8 @@
 
 #include "lib/CryptoLibRng.h"
 
+#include "mbedtls/ctr_drbg.h"
+
 #include <string.h>
 
 // Internal types/defines/enums ------------------------------------------------

@@ -14,8 +14,6 @@
 
 #include "OS_Crypto.h"
 
-#include "mbedtls/ctr_drbg.h"
-
 #include "compiler.h"
 
 #include <stddef.h>
