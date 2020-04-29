@@ -6,6 +6,8 @@
 
 #include "util/PtrVector.h"
 
+#include "mbedtls/platform.h"
+
 #include <string.h>
 
 // -------------------------- defines/types/variables --------------------------
@@ -937,6 +939,14 @@ CryptoLib_init(
     if (NULL == impl || NULL == memIf || NULL == cfg || NULL == cfg->rng.entropy)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
+    }
+
+    // Make sure mbedtls uses our own calloc/free functions; this can be set
+    // multiple times (e.g., in case we have several parallel instances of the
+    // Crypto API).
+    if (mbedtls_platform_set_calloc_free(memIf->calloc, memIf->free) != 0)
+    {
+        return SEOS_ERROR_ABORTED;
     }
 
     if ((self = memIf->calloc(1, sizeof(CryptoLib_t))) == NULL)
