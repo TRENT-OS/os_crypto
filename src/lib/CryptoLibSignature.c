@@ -43,7 +43,7 @@ initImpl(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((sig = memIf->malloc(sizeof(CryptoLibSignature_t))) == NULL)
+    if ((sig = memIf->calloc(1, sizeof(CryptoLibSignature_t))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }

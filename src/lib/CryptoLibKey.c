@@ -467,7 +467,7 @@ initImpl(
         return SEOS_ERROR_NOT_SUPPORTED;
     }
 
-    if ((key = memIf->malloc(sizeof(CryptoLibKey_t))) == NULL)
+    if ((key = memIf->calloc(1, sizeof(CryptoLibKey_t))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -477,7 +477,7 @@ initImpl(
     key->type    = type;
     key->size    = size;
 
-    err = (key->data = memIf->malloc(size)) == NULL ?
+    err = (key->data = memIf->calloc(1, size)) == NULL ?
           SEOS_ERROR_INSUFFICIENT_SPACE : SEOS_SUCCESS;
     if (err != SEOS_SUCCESS)
     {

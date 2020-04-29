@@ -35,7 +35,7 @@ initImpl(
     seos_err_t err;
     CryptoLibAgreement_t* agr;
 
-    if ((agr = memIf->malloc(sizeof(CryptoLibAgreement_t))) == NULL)
+    if ((agr = memIf->calloc(1, sizeof(CryptoLibAgreement_t))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }

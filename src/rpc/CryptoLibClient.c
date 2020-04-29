@@ -725,7 +725,7 @@ CryptoLibClient_init(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((self = memIf->malloc(sizeof(CryptoLibClient_t))) == NULL)
+    if ((self = memIf->calloc(1, sizeof(CryptoLibClient_t))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }

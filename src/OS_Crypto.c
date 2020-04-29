@@ -20,13 +20,13 @@ OS_Crypto_init(
     seos_err_t err;
     OS_Crypto_t* ctx;
 
-    if (NULL == self || NULL == cfg || NULL == cfg->mem.malloc
+    if (NULL == self || NULL == cfg || NULL == cfg->mem.calloc
         || NULL == cfg->mem.free)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((ctx = cfg->mem.malloc(sizeof(OS_Crypto_t))) == NULL)
+    if ((ctx = cfg->mem.calloc(1, sizeof(OS_Crypto_t))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }

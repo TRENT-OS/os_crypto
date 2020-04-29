@@ -41,7 +41,7 @@ initImpl(
     CryptoLibCipher_t* ciph;
     seos_err_t err;
 
-    if ((ciph = memIf->malloc(sizeof(CryptoLibCipher_t))) == NULL)
+    if ((ciph = memIf->calloc(1, sizeof(CryptoLibCipher_t))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }

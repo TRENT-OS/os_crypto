@@ -24,27 +24,27 @@
 
 // Allocate proxy object from crypto handle and set its impl according to
 // the c flag
-#define PROXY_INIT(p, s, c)                                             \
-    if (NULL == &(p) || NULL == (s)) {                                  \
-        return SEOS_ERROR_INVALID_PARAMETER;                            \
-    }                                                                   \
-    if(((p) = s->memIf.malloc(sizeof(OS_Crypto_Object_t))) == NULL) {   \
-        return SEOS_ERROR_INSUFFICIENT_SPACE;                           \
-    }                                                                   \
-    (p)->parent = (s);                                                  \
+#define PROXY_INIT(p, s, c)                                                 \
+    if (NULL == &(p) || NULL == (s)) {                                      \
+        return SEOS_ERROR_INVALID_PARAMETER;                                \
+    }                                                                       \
+    if(((p) = s->memIf.calloc(1, sizeof(OS_Crypto_Object_t))) == NULL) {    \
+        return SEOS_ERROR_INSUFFICIENT_SPACE;                               \
+    }                                                                       \
+    (p)->parent = (s);                                                      \
     (p)->impl   = (c) ? &(s)->rpc.client : &(s)->library;
 
 // Allocate proxy object from key proxy and simply copy the impl
-#define PROXY_INIT_FROM_KEY(p, k)                                               \
-    if (NULL == &(p)) {                                                         \
-        return SEOS_ERROR_INVALID_PARAMETER;                                    \
-    } else if (NULL == (k)) {                                                   \
-        return SEOS_ERROR_INVALID_HANDLE;                                       \
-    }                                                                           \
-    if(((p) = k->parent->memIf.malloc(sizeof(OS_Crypto_Object_t))) == NULL) {   \
-        return SEOS_ERROR_INSUFFICIENT_SPACE;                                   \
-    }                                                                           \
-    (p)->parent = (k)->parent;                                                  \
+#define PROXY_INIT_FROM_KEY(p, k)                                                   \
+    if (NULL == &(p)) {                                                             \
+        return SEOS_ERROR_INVALID_PARAMETER;                                        \
+    } else if (NULL == (k)) {                                                       \
+        return SEOS_ERROR_INVALID_HANDLE;                                           \
+    }                                                                               \
+    if(((p) = k->parent->memIf.calloc(1, sizeof(OS_Crypto_Object_t))) == NULL) {    \
+        return SEOS_ERROR_INSUFFICIENT_SPACE;                                       \
+    }                                                                               \
+    (p)->parent = (k)->parent;                                                      \
     (p)->impl   = (k)->impl;
 
 // Free proxy object with associated API context's mem IF

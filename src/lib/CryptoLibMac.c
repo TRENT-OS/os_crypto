@@ -36,7 +36,7 @@ initImpl(
     CryptoLibMac_t* mac;
     mbedtls_md_type_t type;
 
-    if ((mac = memIf->malloc(sizeof(CryptoLibMac_t))) == NULL)
+    if ((mac = memIf->calloc(1, sizeof(CryptoLibMac_t))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }

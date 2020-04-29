@@ -32,7 +32,7 @@ CryptoLibRng_init(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((rng = memIf->malloc(sizeof(CryptoLibRng_t))) == NULL)
+    if ((rng = memIf->calloc(1, sizeof(CryptoLibRng_t))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }

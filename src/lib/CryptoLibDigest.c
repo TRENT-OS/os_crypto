@@ -45,7 +45,7 @@ initImpl(
     seos_err_t err;
     CryptoLibDigest_t* dig;
 
-    if ((dig = memIf->malloc(sizeof(CryptoLibDigest_t))) == NULL)
+    if ((dig = memIf->calloc(1, sizeof(CryptoLibDigest_t))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
