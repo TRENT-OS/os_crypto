@@ -25,7 +25,7 @@ typedef struct CryptoLib CryptoLib_t;
 seos_err_t
 CryptoLib_init(
     Crypto_Impl_t*            impl,
-    const OS_Crypto_Memory_t* memIf,
+    const OS_Crypto_Memory_t* memory,
     const CryptoLib_Config_t* cfg);
 
 seos_err_t

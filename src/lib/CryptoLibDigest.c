@@ -40,12 +40,12 @@ static seos_err_t
 initImpl(
     CryptoLibDigest_t**         self,
     const OS_CryptoDigest_Alg_t algorithm,
-    const OS_Crypto_Memory_t*   memIf)
+    const OS_Crypto_Memory_t*   memory)
 {
     seos_err_t err;
     CryptoLibDigest_t* dig;
 
-    if ((dig = memIf->calloc(1, sizeof(CryptoLibDigest_t))) == NULL)
+    if ((dig = memory->calloc(1, sizeof(CryptoLibDigest_t))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -72,7 +72,7 @@ initImpl(
 
     if (err != SEOS_SUCCESS)
     {
-        memIf->free(dig);
+        memory->free(dig);
     }
 
     *self = dig;
@@ -83,7 +83,7 @@ initImpl(
 static seos_err_t
 freeImpl(
     CryptoLibDigest_t*        self,
-    const OS_Crypto_Memory_t* memIf)
+    const OS_Crypto_Memory_t* memory)
 {
     seos_err_t err;
 
@@ -100,7 +100,7 @@ freeImpl(
         err = SEOS_ERROR_NOT_SUPPORTED;
     }
 
-    memIf->free(self);
+    memory->free(self);
 
     return err;
 }
@@ -195,27 +195,27 @@ seos_err_t
 CryptoLibDigest_init(
     CryptoLibDigest_t**         self,
     const OS_CryptoDigest_Alg_t algorithm,
-    const OS_Crypto_Memory_t*   memIf)
+    const OS_Crypto_Memory_t*   memory)
 {
-    if (NULL == memIf || NULL == self)
+    if (NULL == memory || NULL == self)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return initImpl(self, algorithm, memIf);
+    return initImpl(self, algorithm, memory);
 }
 
 seos_err_t
 CryptoLibDigest_free(
     CryptoLibDigest_t*        self,
-    const OS_Crypto_Memory_t* memIf)
+    const OS_Crypto_Memory_t* memory)
 {
-    if (NULL == memIf || NULL == self)
+    if (NULL == memory || NULL == self)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return freeImpl(self, memIf);
+    return freeImpl(self, memory);
 }
 
 seos_err_t

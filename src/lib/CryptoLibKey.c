@@ -434,7 +434,7 @@ initImpl(
     CryptoLibKey_t**             self,
     const OS_CryptoKey_Type_t    type,
     const OS_CryptoKey_Attrib_t* attribs,
-    const OS_Crypto_Memory_t*    memIf)
+    const OS_Crypto_Memory_t*    memory)
 {
     size_t size;
     seos_err_t err;
@@ -467,7 +467,7 @@ initImpl(
         return SEOS_ERROR_NOT_SUPPORTED;
     }
 
-    if ((key = memIf->calloc(1, sizeof(CryptoLibKey_t))) == NULL)
+    if ((key = memory->calloc(1, sizeof(CryptoLibKey_t))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -477,11 +477,11 @@ initImpl(
     key->type    = type;
     key->size    = size;
 
-    err = (key->data = memIf->calloc(1, size)) == NULL ?
+    err = (key->data = memory->calloc(1, size)) == NULL ?
           SEOS_ERROR_INSUFFICIENT_SPACE : SEOS_SUCCESS;
     if (err != SEOS_SUCCESS)
     {
-        memIf->free(key);
+        memory->free(key);
     }
 
     *self = key;
@@ -809,13 +809,13 @@ loadParamsImpl(
 static seos_err_t
 freeImpl(
     CryptoLibKey_t*           self,
-    const OS_Crypto_Memory_t* memIf)
+    const OS_Crypto_Memory_t* memory)
 {
     // We may have stored sensitive key data here, better make sure to remove it.
     zeroizeMemory(self->data, self->size);
 
-    memIf->free(self->data);
-    memIf->free(self);
+    memory->free(self->data);
+    memory->free(self);
 
     return SEOS_SUCCESS;
 }
@@ -826,22 +826,22 @@ seos_err_t
 CryptoLibKey_generate(
     CryptoLibKey_t**           self,
     const OS_CryptoKey_Spec_t* spec,
-    const OS_Crypto_Memory_t*  memIf,
+    const OS_Crypto_Memory_t*  memory,
     CryptoLibRng_t*            rng)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 
-    if (NULL == self || NULL == rng || NULL == memIf || NULL == spec)
+    if (NULL == self || NULL == rng || NULL == memory || NULL == spec)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
     if ((err = initImpl(self, spec->key.type, &spec->key.attribs,
-                        memIf)) == SEOS_SUCCESS)
+                        memory)) == SEOS_SUCCESS)
     {
         if ((err = generateImpl(*self, rng, spec)) != SEOS_SUCCESS)
         {
-            freeImpl(*self, memIf);
+            freeImpl(*self, memory);
         }
     }
 
@@ -853,12 +853,12 @@ CryptoLibKey_makePublic(
     CryptoLibKey_t**             self,
     const CryptoLibKey_t*        prvKey,
     const OS_CryptoKey_Attrib_t* attribs,
-    const OS_Crypto_Memory_t*    memIf)
+    const OS_Crypto_Memory_t*    memory)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
     OS_CryptoKey_Type_t type;
 
-    if (NULL == self || NULL == memIf || NULL == prvKey || NULL == attribs)
+    if (NULL == self || NULL == memory || NULL == prvKey || NULL == attribs)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
@@ -878,11 +878,11 @@ CryptoLibKey_makePublic(
         return SEOS_ERROR_NOT_SUPPORTED;
     }
 
-    if ((err = initImpl(self, type, attribs, memIf)) == SEOS_SUCCESS)
+    if ((err = initImpl(self, type, attribs, memory)) == SEOS_SUCCESS)
     {
         if ((err = makeImpl(*self, prvKey)) != SEOS_SUCCESS)
         {
-            freeImpl(*self, memIf);
+            freeImpl(*self, memory);
         }
     }
 
@@ -893,20 +893,20 @@ seos_err_t
 CryptoLibKey_import(
     CryptoLibKey_t**           self,
     const OS_CryptoKey_Data_t* keyData,
-    const OS_Crypto_Memory_t*  memIf)
+    const OS_Crypto_Memory_t*  memory)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
 
-    if (NULL == self || NULL == memIf || NULL == keyData)
+    if (NULL == self || NULL == memory || NULL == keyData)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
     if ((err = initImpl(self, keyData->type, &keyData->attribs,
-                        memIf)) == SEOS_SUCCESS)
+                        memory)) == SEOS_SUCCESS)
     {
         if ((err = importImpl(*self, keyData)) != SEOS_SUCCESS)
         {
-            freeImpl(*self, memIf);
+            freeImpl(*self, memory);
         }
     }
 
@@ -916,14 +916,14 @@ CryptoLibKey_import(
 seos_err_t
 CryptoLibKey_free(
     CryptoLibKey_t*           self,
-    const OS_Crypto_Memory_t* memIf)
+    const OS_Crypto_Memory_t* memory)
 {
-    if (NULL == memIf || NULL == self)
+    if (NULL == memory || NULL == self)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return freeImpl(self, memIf);
+    return freeImpl(self, memory);
 }
 
 seos_err_t

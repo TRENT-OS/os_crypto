@@ -26,7 +26,7 @@ seos_err_t
 CryptoLibServer_init(
     CryptoLibServer_t**             ctx,
     const Crypto_Impl_t*            client,
-    const OS_Crypto_Memory_t*       memIf,
+    const OS_Crypto_Memory_t*       memory,
     const CryptoLibServer_Config_t* cfg);
 
 seos_err_t

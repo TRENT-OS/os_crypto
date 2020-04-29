@@ -53,7 +53,7 @@ struct CryptoLibServer
      * Context and function pointers of CLIENT implementation
      */
     Crypto_Impl_t client;
-    OS_Crypto_Memory_t memIf;
+    OS_Crypto_Memory_t memory;
 };
 
 // -------------------------------- RNG API ------------------------------------
@@ -471,18 +471,18 @@ seos_err_t
 CryptoLibServer_init(
     CryptoLibServer_t**             ctx,
     const Crypto_Impl_t*            client,
-    const OS_Crypto_Memory_t*       memIf,
+    const OS_Crypto_Memory_t*       memory,
     const CryptoLibServer_Config_t* cfg)
 {
     CryptoLibServer_t* svr;
 
-    if (NULL == ctx || NULL == client || NULL == memIf || NULL == cfg
+    if (NULL == ctx || NULL == client || NULL == memory || NULL == cfg
         || NULL == cfg->dataPort)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((svr = memIf->calloc(1, sizeof(CryptoLibServer_t))) == NULL)
+    if ((svr = memory->calloc(1, sizeof(CryptoLibServer_t))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -490,7 +490,7 @@ CryptoLibServer_init(
     *ctx = svr;
 
     svr->dataPort = cfg->dataPort;
-    svr->memIf    = *memIf;
+    svr->memory    = *memory;
     svr->client   = *client;
 
     return SEOS_SUCCESS;
@@ -505,7 +505,7 @@ CryptoLibServer_free(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    self->memIf.free(self);
+    self->memory.free(self);
 
     return SEOS_SUCCESS;
 }

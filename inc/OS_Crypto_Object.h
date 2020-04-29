@@ -28,7 +28,7 @@
     if (NULL == &(p) || NULL == (s)) {                                      \
         return SEOS_ERROR_INVALID_PARAMETER;                                \
     }                                                                       \
-    if(((p) = s->memIf.calloc(1, sizeof(OS_Crypto_Object_t))) == NULL) {    \
+    if(((p) = s->memory.calloc(1, sizeof(OS_Crypto_Object_t))) == NULL) {   \
         return SEOS_ERROR_INSUFFICIENT_SPACE;                               \
     }                                                                       \
     (p)->parent = (s);                                                      \
@@ -41,7 +41,7 @@
     } else if (NULL == (k)) {                                                       \
         return SEOS_ERROR_INVALID_HANDLE;                                           \
     }                                                                               \
-    if(((p) = k->parent->memIf.calloc(1, sizeof(OS_Crypto_Object_t))) == NULL) {    \
+    if(((p) = k->parent->memory.calloc(1, sizeof(OS_Crypto_Object_t))) == NULL) {   \
         return SEOS_ERROR_INSUFFICIENT_SPACE;                                       \
     }                                                                               \
     (p)->parent = (k)->parent;                                                      \
@@ -52,7 +52,7 @@
     if (NULL == (p)) {                          \
         return SEOS_ERROR_INVALID_PARAMETER;    \
     }                                           \
-    (p)->parent->memIf.free(p);
+    (p)->parent->memory.free(p);
 
 // Call function from proxy objects API handle
 #define PROXY_CALL(p, f, ...)                       \
@@ -73,7 +73,7 @@
 struct OS_Crypto
 {
     OS_Crypto_Mode_t mode;
-    OS_Crypto_Memory_t memIf;
+    OS_Crypto_Memory_t memory;
     Crypto_Impl_t library;
     union
     {

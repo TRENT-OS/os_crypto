@@ -30,13 +30,13 @@ static seos_err_t
 initImpl(
     CryptoLibMac_t**          self,
     const OS_CryptoMac_Alg_t  algorithm,
-    const OS_Crypto_Memory_t* memIf)
+    const OS_Crypto_Memory_t* memory)
 {
     seos_err_t err;
     CryptoLibMac_t* mac;
     mbedtls_md_type_t type;
 
-    if ((mac = memIf->calloc(1, sizeof(CryptoLibMac_t))) == NULL)
+    if ((mac = memory->calloc(1, sizeof(CryptoLibMac_t))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -73,7 +73,7 @@ initImpl(
 err1:
     mbedtls_md_free(&mac->mbedtls.md);
 err0:
-    memIf->free(mac);
+    memory->free(mac);
 
     return err;
 }
@@ -81,7 +81,7 @@ err0:
 static seos_err_t
 freeImpl(
     CryptoLibMac_t*           self,
-    const OS_Crypto_Memory_t* memIf)
+    const OS_Crypto_Memory_t* memory)
 {
     seos_err_t err;
 
@@ -96,7 +96,7 @@ freeImpl(
         err = SEOS_ERROR_NOT_SUPPORTED;
     }
 
-    memIf->free(self);
+    memory->free(self);
 
     return err;
 }
@@ -192,27 +192,27 @@ seos_err_t
 CryptoLibMac_init(
     CryptoLibMac_t**          self,
     const OS_CryptoMac_Alg_t  algorithm,
-    const OS_Crypto_Memory_t* memIf)
+    const OS_Crypto_Memory_t* memory)
 {
-    if (NULL == memIf || NULL == self)
+    if (NULL == memory || NULL == self)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return initImpl(self, algorithm, memIf);
+    return initImpl(self, algorithm, memory);
 }
 
 seos_err_t
 CryptoLibMac_free(
     CryptoLibMac_t*           self,
-    const OS_Crypto_Memory_t* memIf)
+    const OS_Crypto_Memory_t* memory)
 {
-    if (NULL == memIf || NULL == self)
+    if (NULL == memory || NULL == self)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return freeImpl(self, memIf);
+    return freeImpl(self, memory);
 }
 
 seos_err_t

@@ -28,7 +28,7 @@ typedef struct CryptoLibClient CryptoLibClient_t;
 seos_err_t
 CryptoLibClient_init(
     Crypto_Impl_t*                  impl,
-    const OS_Crypto_Memory_t*       memIf,
+    const OS_Crypto_Memory_t*       memory,
     const CryptoLibClient_Config_t* cfg);
 
 seos_err_t

@@ -30,7 +30,7 @@ CryptoLibAgreement_init(
     CryptoLibAgreement_t**         self,
     const CryptoLibKey_t*          prvKey,
     const OS_CryptoAgreement_Alg_t algorithm,
-    const OS_Crypto_Memory_t*      memIf);
+    const OS_Crypto_Memory_t*      memory);
 
 seos_err_t
 CryptoLibAgreement_agree(
@@ -43,6 +43,6 @@ CryptoLibAgreement_agree(
 seos_err_t
 CryptoLibAgreement_free(
     CryptoLibAgreement_t*     self,
-    const OS_Crypto_Memory_t* memIf);
+    const OS_Crypto_Memory_t* memory);
 
 /** @} */

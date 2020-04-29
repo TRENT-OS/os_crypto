@@ -31,12 +31,12 @@ CryptoLibCipher_init(
     const OS_CryptoCipher_Alg_t algorithm,
     const void*                 iv,
     size_t                      ivSize,
-    const OS_Crypto_Memory_t*   memIf);
+    const OS_Crypto_Memory_t*   memory);
 
 seos_err_t
 CryptoLibCipher_free(
     CryptoLibCipher_t*        self,
-    const OS_Crypto_Memory_t* memIf);
+    const OS_Crypto_Memory_t* memory);
 
 seos_err_t
 CryptoLibCipher_start(

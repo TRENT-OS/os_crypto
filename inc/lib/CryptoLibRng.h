@@ -29,7 +29,7 @@ CryptoLibRng_init(
     CryptoLibRng_t**                 self,
     const OS_CryptoRng_Entropy_func* entropyFunc,
     void*                            entropyCtx,
-    const OS_Crypto_Memory_t*        memIf);
+    const OS_Crypto_Memory_t*        memory);
 
 seos_err_t
 CryptoLibRng_getBytes(
@@ -47,7 +47,7 @@ CryptoLibRng_reSeed(
 seos_err_t
 CryptoLibRng_free(
     CryptoLibRng_t*           self,
-    const OS_Crypto_Memory_t* memIf);
+    const OS_Crypto_Memory_t* memory);
 
 /**
  * @brief Get random bytes for mbedTLS wrapper

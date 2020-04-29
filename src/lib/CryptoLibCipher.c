@@ -36,12 +36,12 @@ initImpl(
     CryptoLibCipher_t**         self,
     const CryptoLibKey_t*       key,
     const OS_CryptoCipher_Alg_t algorithm,
-    const OS_Crypto_Memory_t*   memIf)
+    const OS_Crypto_Memory_t*   memory)
 {
     CryptoLibCipher_t* ciph;
     seos_err_t err;
 
-    if ((ciph = memIf->calloc(1, sizeof(CryptoLibCipher_t))) == NULL)
+    if ((ciph = memory->calloc(1, sizeof(CryptoLibCipher_t))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -76,7 +76,7 @@ initImpl(
 
     if (err != SEOS_SUCCESS)
     {
-        memIf->free(ciph);
+        memory->free(ciph);
     }
 
     *self = ciph;
@@ -87,7 +87,7 @@ initImpl(
 static seos_err_t
 freeImpl(
     CryptoLibCipher_t*        self,
-    const OS_Crypto_Memory_t* memIf)
+    const OS_Crypto_Memory_t* memory)
 {
     seos_err_t err;
 
@@ -108,7 +108,7 @@ freeImpl(
         err = SEOS_ERROR_NOT_SUPPORTED;
     }
 
-    memIf->free(self);
+    memory->free(self);
 
     return err;
 }
@@ -397,21 +397,21 @@ CryptoLibCipher_init(
     const OS_CryptoCipher_Alg_t algorithm,
     const void*                 iv,
     const size_t                ivSize,
-    const OS_Crypto_Memory_t*   memIf)
+    const OS_Crypto_Memory_t*   memory)
 {
     seos_err_t err;
 
-    if (NULL == memIf || NULL == self || NULL == key)
+    if (NULL == memory || NULL == self || NULL == key)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((err = initImpl(self, key, algorithm, memIf)) == SEOS_SUCCESS)
+    if ((err = initImpl(self, key, algorithm, memory)) == SEOS_SUCCESS)
     {
         if ((err = setIvImpl(*self, iv, ivSize)) != SEOS_SUCCESS
             || (err = setKeyImpl(*self)) != SEOS_SUCCESS)
         {
-            freeImpl(*self, memIf);
+            freeImpl(*self, memory);
         }
     }
 
@@ -421,14 +421,14 @@ CryptoLibCipher_init(
 seos_err_t
 CryptoLibCipher_free(
     CryptoLibCipher_t*        self,
-    const OS_Crypto_Memory_t* memIf)
+    const OS_Crypto_Memory_t* memory)
 {
-    if (NULL == memIf || NULL == self)
+    if (NULL == memory || NULL == self)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return freeImpl(self, memIf);
+    return freeImpl(self, memory);
 }
 
 seos_err_t

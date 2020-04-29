@@ -28,12 +28,12 @@ seos_err_t
 CryptoLibDigest_init(
     CryptoLibDigest_t**         self,
     const OS_CryptoDigest_Alg_t algorithm,
-    const OS_Crypto_Memory_t*   memIf);
+    const OS_Crypto_Memory_t*   memory);
 
 seos_err_t
 CryptoLibDigest_free(
     CryptoLibDigest_t*        self,
-    const OS_Crypto_Memory_t* memIf);
+    const OS_Crypto_Memory_t* memory);
 
 seos_err_t
 CryptoLibDigest_clone(

@@ -33,7 +33,7 @@ seos_err_t
 CryptoLibKey_generate(
     CryptoLibKey_t**           self,
     const OS_CryptoKey_Spec_t* spec,
-    const OS_Crypto_Memory_t*  memIf,
+    const OS_Crypto_Memory_t*  memory,
     CryptoLibRng_t*            rng);
 
 seos_err_t
@@ -41,18 +41,18 @@ CryptoLibKey_makePublic(
     CryptoLibKey_t**             self,
     const CryptoLibKey_t*        prvKey,
     const OS_CryptoKey_Attrib_t* attribs,
-    const OS_Crypto_Memory_t*    memIf);
+    const OS_Crypto_Memory_t*    memory);
 
 seos_err_t
 CryptoLibKey_import(
     CryptoLibKey_t**           self,
     const OS_CryptoKey_Data_t* keyData,
-    const OS_Crypto_Memory_t*  memIf);
+    const OS_Crypto_Memory_t*  memory);
 
 seos_err_t
 CryptoLibKey_free(
     CryptoLibKey_t*           self,
-    const OS_Crypto_Memory_t* memIf);
+    const OS_Crypto_Memory_t* memory);
 
 seos_err_t
 CryptoLibKey_export(

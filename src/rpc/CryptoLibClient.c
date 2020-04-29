@@ -16,7 +16,7 @@
 
 struct CryptoLibClient
 {
-    OS_Crypto_Memory_t memIf;
+    OS_Crypto_Memory_t memory;
     /**
      * The client's address of the dataport shared with the server
      */
@@ -715,17 +715,17 @@ static const Crypto_Vtable_t CryptoLibClient_vtable =
 seos_err_t
 CryptoLibClient_init(
     Crypto_Impl_t*                  impl,
-    const OS_Crypto_Memory_t*       memIf,
+    const OS_Crypto_Memory_t*       memory,
     const CryptoLibClient_Config_t* cfg)
 {
     CryptoLibClient_t* self;
 
-    if (NULL == impl || NULL == memIf || NULL == cfg || NULL == cfg->dataPort)
+    if (NULL == impl || NULL == memory || NULL == cfg || NULL == cfg->dataPort)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((self = memIf->calloc(1, sizeof(CryptoLibClient_t))) == NULL)
+    if ((self = memory->calloc(1, sizeof(CryptoLibClient_t))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -733,7 +733,7 @@ CryptoLibClient_init(
     impl->context  = self;
     impl->vtable   = &CryptoLibClient_vtable;
     self->dataPort = cfg->dataPort;
-    self->memIf    = *memIf;
+    self->memory    = *memory;
 
     return SEOS_SUCCESS;
 }
@@ -747,7 +747,7 @@ CryptoLibClient_free(
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    self->memIf.free(self);
+    self->memory.free(self);
 
     return SEOS_SUCCESS;
 }

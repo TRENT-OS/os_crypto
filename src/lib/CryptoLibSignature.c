@@ -31,19 +31,19 @@ initImpl(
     const CryptoLibKey_t*          pubKey,
     const OS_CryptoSignature_Alg_t algorithm,
     const OS_CryptoDigest_Alg_t    digest,
-    const OS_Crypto_Memory_t*      memIf)
+    const OS_Crypto_Memory_t*      memory)
 {
     seos_err_t err;
     CryptoLibSignature_t* sig;
     int padding;
 
     // We can have one of those keys be empty, but not both
-    if (NULL == memIf || NULL == self || (NULL == prvKey && NULL == pubKey))
+    if (NULL == memory || NULL == self || (NULL == prvKey && NULL == pubKey))
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((sig = memIf->calloc(1, sizeof(CryptoLibSignature_t))) == NULL)
+    if ((sig = memory->calloc(1, sizeof(CryptoLibSignature_t))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -87,7 +87,7 @@ initImpl(
     return SEOS_SUCCESS;
 
 err0:
-    memIf->free(sig);
+    memory->free(sig);
 
     return err;
 }
@@ -95,7 +95,7 @@ err0:
 static seos_err_t
 freeImpl(
     CryptoLibSignature_t*     self,
-    const OS_Crypto_Memory_t* memIf)
+    const OS_Crypto_Memory_t* memory)
 {
     seos_err_t err;
 
@@ -111,7 +111,7 @@ freeImpl(
         err = SEOS_ERROR_NOT_SUPPORTED;
     }
 
-    memIf->free(self);
+    memory->free(self);
 
     return err;
 }
@@ -234,22 +234,22 @@ CryptoLibSignature_init(
     const CryptoLibKey_t*          pubKey,
     const OS_CryptoSignature_Alg_t algorithm,
     const OS_CryptoDigest_Alg_t    digest,
-    const OS_Crypto_Memory_t*      memIf)
+    const OS_Crypto_Memory_t*      memory)
 {
     seos_err_t err;
 
     // We can have one of those keys be empty, but not both
-    if (NULL == memIf || NULL == self || (NULL == prvKey && NULL == pubKey))
+    if (NULL == memory || NULL == self || (NULL == prvKey && NULL == pubKey))
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
     if ((err = initImpl(self, prvKey, pubKey, algorithm, digest,
-                        memIf)) == SEOS_SUCCESS)
+                        memory)) == SEOS_SUCCESS)
     {
         if ((err = setKeyImpl(*self)) != SEOS_SUCCESS)
         {
-            freeImpl(*self, memIf);
+            freeImpl(*self, memory);
         }
     }
 
@@ -259,14 +259,14 @@ CryptoLibSignature_init(
 seos_err_t
 CryptoLibSignature_free(
     CryptoLibSignature_t*     self,
-    const OS_Crypto_Memory_t* memIf)
+    const OS_Crypto_Memory_t* memory)
 {
-    if (NULL == self || NULL == memIf)
+    if (NULL == self || NULL == memory)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    return freeImpl(self, memIf);
+    return freeImpl(self, memory);
 }
 
 seos_err_t

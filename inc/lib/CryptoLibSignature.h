@@ -32,12 +32,12 @@ CryptoLibSignature_init(
     const CryptoLibKey_t*          pubKey,
     const OS_CryptoSignature_Alg_t algorithm,
     const OS_CryptoDigest_Alg_t    digest,
-    const OS_Crypto_Memory_t*      memIf);
+    const OS_Crypto_Memory_t*      memory);
 
 seos_err_t
 CryptoLibSignature_free(
     CryptoLibSignature_t*     self,
-    const OS_Crypto_Memory_t* memIf);
+    const OS_Crypto_Memory_t* memory);
 
 seos_err_t
 CryptoLibSignature_sign(

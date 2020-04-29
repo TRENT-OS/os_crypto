@@ -22,17 +22,17 @@ CryptoLibRng_init(
     CryptoLibRng_t**                 self,
     const OS_CryptoRng_Entropy_func* entropyFunc,
     void*                            entropyCtx,
-    const OS_Crypto_Memory_t*        memIf)
+    const OS_Crypto_Memory_t*        memory)
 {
     seos_err_t err = SEOS_ERROR_GENERIC;
     CryptoLibRng_t* rng;
 
-    if (NULL == memIf || NULL == self || NULL == entropyFunc)
+    if (NULL == memory || NULL == self || NULL == entropyFunc)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((rng = memIf->calloc(1, sizeof(CryptoLibRng_t))) == NULL)
+    if ((rng = memory->calloc(1, sizeof(CryptoLibRng_t))) == NULL)
     {
         return SEOS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -56,7 +56,7 @@ CryptoLibRng_init(
 
 err0:
     mbedtls_ctr_drbg_free(&rng->drbg);
-    memIf->free(rng);
+    memory->free(rng);
 
     return err;
 }
@@ -64,15 +64,15 @@ err0:
 seos_err_t
 CryptoLibRng_free(
     CryptoLibRng_t*           self,
-    const OS_Crypto_Memory_t* memIf)
+    const OS_Crypto_Memory_t* memory)
 {
-    if (NULL == memIf || NULL == self)
+    if (NULL == memory || NULL == self)
     {
         return SEOS_ERROR_INVALID_PARAMETER;
     }
 
     mbedtls_ctr_drbg_free(&self->drbg);
-    memIf->free(self);
+    memory->free(self);
 
     return SEOS_SUCCESS;
 }
