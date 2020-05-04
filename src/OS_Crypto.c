@@ -49,14 +49,17 @@ OS_Crypto_init(
     *self = ctx;
 
     ctx->mode = cfg->mode;
-    ctx->memory.calloc = (cfg->memory.calloc == NULL) ? calloc : cfg->memory.calloc;
-    ctx->memory.free = (cfg->memory.free == NULL) ? free : cfg->memory.free;
+    ctx->memory.calloc = (cfg->memory.calloc == NULL) ?
+                         calloc : cfg->memory.calloc;
+    ctx->memory.free = (cfg->memory.free == NULL) ?
+                       free : cfg->memory.free;
 
     // We always need a library instance; unless we want to force the API to
     // delegate everything to the server
     if (cfg->mode != OS_Crypto_MODE_CLIENT_ONLY)
     {
-        if ((err = CryptoLib_init(&ctx->library, &ctx->memory,
+        if ((err = CryptoLib_init(&ctx->library,
+                                  &ctx->memory,
                                   &cfg->library)) != SEOS_SUCCESS)
         {
             goto err0;
@@ -71,7 +74,8 @@ OS_Crypto_init(
 #if defined(SEOS_CRYPTO_WITH_RPC_CLIENT)
     case OS_Crypto_MODE_CLIENT_ONLY:
     case OS_Crypto_MODE_CLIENT:
-        if ((err = CryptoLibClient_init(&ctx->rpc.client, &ctx->memory,
+        if ((err = CryptoLibClient_init(&ctx->rpc.client,
+                                        &ctx->memory,
                                         &cfg->rpc.client)) != SEOS_SUCCESS)
         {
             goto err1;
@@ -80,7 +84,9 @@ OS_Crypto_init(
 #endif /* SEOS_CRYPTO_WITH_RPC_CLIENT */
 #if defined(SEOS_CRYPTO_WITH_RPC_SERVER)
     case OS_Crypto_MODE_SERVER:
-        if ((err = CryptoLibServer_init(&ctx->rpc.server, &ctx->library, &ctx->memory,
+        if ((err = CryptoLibServer_init(&ctx->rpc.server,
+                                        &ctx->library,
+                                        &ctx->memory,
                                         &cfg->rpc.server)) != SEOS_SUCCESS)
         {
             goto err1;
