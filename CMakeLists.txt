@@ -18,7 +18,7 @@
 # We need to build 3rdparty/mbedtls for this and would like to avoid
 # all users of SEOS_CRYPTO to include this as well, so we do it here
 seos_use_libs(
-    3RDPARTY_MBEDTLS_WITH_CRYPTO_ONLY
+    3RDPARTY_MBEDTLS_FOR_CRYPTO
 )
 
 # These are the sources we ALWAYS compile, for all targets
@@ -98,7 +98,7 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     INTERFACE
-        3rdparty_mbedtls_with_crypto_only
+        3rdparty_mbedtls_for_crypto
         seos_core_api
         seos_libs
 )
@@ -133,7 +133,7 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     INTERFACE
-        3rdparty_mbedtls_with_crypto_only
+        3rdparty_mbedtls_for_crypto
         seos_core_api
         seos_libs
 )
@@ -168,7 +168,7 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     INTERFACE
-        3rdparty_mbedtls_with_crypto_only
+        3rdparty_mbedtls_for_crypto
         seos_core_api
         seos_libs
 )
