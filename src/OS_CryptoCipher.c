@@ -11,7 +11,7 @@
 #define PROXY_GET_PTR(p) \
     (CryptoLibCipher_t**) PROXY_GET_OBJ_PTR(p)
 
-seos_err_t
+OS_Error_t
 OS_CryptoCipher_init(
     OS_CryptoCipher_Handle_t*   self,
     const OS_Crypto_Handle_t    hCrypto,
@@ -20,7 +20,7 @@ OS_CryptoCipher_init(
     const void*                 iv,
     const size_t                ivSize)
 {
-    seos_err_t err;
+    OS_Error_t err;
 
     // We are actually not using this; lets check it anyways for consistency.
     if (NULL == hCrypto)
@@ -38,11 +38,11 @@ OS_CryptoCipher_init(
     return err;
 }
 
-seos_err_t
+OS_Error_t
 OS_CryptoCipher_free(
     OS_CryptoCipher_Handle_t self)
 {
-    seos_err_t err;
+    OS_Error_t err;
 
     err = PROXY_CALL(self, Cipher_free, PROXY_GET_OBJ(self));
     PROXY_FREE(self);
@@ -50,7 +50,7 @@ OS_CryptoCipher_free(
     return err;
 }
 
-seos_err_t
+OS_Error_t
 OS_CryptoCipher_process(
     OS_CryptoCipher_Handle_t self,
     const void*              input,
@@ -62,7 +62,7 @@ OS_CryptoCipher_process(
                       inputSize, output, outputSize);
 }
 
-seos_err_t
+OS_Error_t
 OS_CryptoCipher_start(
     OS_CryptoCipher_Handle_t self,
     const void*              ad,
@@ -71,7 +71,7 @@ OS_CryptoCipher_start(
     return PROXY_CALL(self, Cipher_start, PROXY_GET_OBJ(self), ad, adSize);
 }
 
-seos_err_t
+OS_Error_t
 OS_CryptoCipher_finalize(
     OS_CryptoCipher_Handle_t self,
     void*                    output,

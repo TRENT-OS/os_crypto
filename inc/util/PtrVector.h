@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "SeosError.h"
+#include "OS_Error.h"
 #include "LibUtil/PointerVector.h"
 
 typedef PointerVector PtrVector;
@@ -19,12 +19,12 @@ PtrVector_hasPtr(
     PtrVector*  v,
     const void* obj);
 
-seos_err_t
+OS_Error_t
 PtrVector_remove(
     PtrVector*  v,
     const void* obj);
 
-seos_err_t
+OS_Error_t
 PtrVector_add(
     PtrVector* v,
     void*      obj);
@@ -33,6 +33,6 @@ void
 PtrVector_free(
     PtrVector* v);
 
-seos_err_t
+OS_Error_t
 PtrVector_init(
     PtrVector* v);

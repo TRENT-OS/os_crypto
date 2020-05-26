@@ -11,7 +11,7 @@
 #define PROXY_GET_PTR(p) \
     (CryptoLibSignature_t**) PROXY_GET_OBJ_PTR(p)
 
-seos_err_t
+OS_Error_t
 OS_CryptoSignature_init(
     OS_CryptoSignature_Handle_t*   self,
     const OS_Crypto_Handle_t       hCrypto,
@@ -21,7 +21,7 @@ OS_CryptoSignature_init(
     const OS_CryptoDigest_Alg_t    digAlgorithm)
 {
     OS_CryptoKey_Handle_t key;
-    seos_err_t err;
+    OS_Error_t err;
 
     // We are actually not using this; lets check it anyways for consistency.
     if (NULL == hCrypto)
@@ -55,11 +55,11 @@ OS_CryptoSignature_init(
     return err;
 }
 
-seos_err_t
+OS_Error_t
 OS_CryptoSignature_free(
     OS_CryptoSignature_Handle_t self)
 {
-    seos_err_t err;
+    OS_Error_t err;
 
     err = PROXY_CALL(self, Signature_free, PROXY_GET_OBJ(self));
     PROXY_FREE(self);
@@ -67,7 +67,7 @@ OS_CryptoSignature_free(
     return err;
 }
 
-seos_err_t
+OS_Error_t
 OS_CryptoSignature_sign(
     OS_CryptoSignature_Handle_t self,
     const void*                 hash,
@@ -79,7 +79,7 @@ OS_CryptoSignature_sign(
                       signature, signatureSize);
 }
 
-seos_err_t
+OS_Error_t
 OS_CryptoSignature_verify(
     OS_CryptoSignature_Handle_t self,
     const void*                 hash,

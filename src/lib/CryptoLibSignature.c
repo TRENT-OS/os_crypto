@@ -24,7 +24,7 @@ struct CryptoLibSignature
 
 // Private Functions -----------------------------------------------------------
 
-static seos_err_t
+static OS_Error_t
 initImpl(
     CryptoLibSignature_t**         self,
     const CryptoLibKey_t*          prvKey,
@@ -33,7 +33,7 @@ initImpl(
     const OS_CryptoDigest_Alg_t    digest,
     const OS_Crypto_Memory_t*      memory)
 {
-    seos_err_t err;
+    OS_Error_t err;
     CryptoLibSignature_t* sig;
     int padding;
 
@@ -92,12 +92,12 @@ err0:
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 freeImpl(
     CryptoLibSignature_t*     self,
     const OS_Crypto_Memory_t* memory)
 {
-    seos_err_t err;
+    OS_Error_t err;
 
     err = SEOS_SUCCESS;
     switch (self->algorithm)
@@ -116,11 +116,11 @@ freeImpl(
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 setKeyImpl(
     CryptoLibSignature_t* self)
 {
-    seos_err_t err;
+    OS_Error_t err;
 
     err = SEOS_SUCCESS;
     switch (self->algorithm)
@@ -151,7 +151,7 @@ setKeyImpl(
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 verifyHashImpl(
     CryptoLibSignature_t* self,
     const void*           hash,
@@ -161,7 +161,7 @@ verifyHashImpl(
     CryptoLibRng_t*       rng)
 {
     void* rngFunc = (NULL != rng) ? CryptoLibRng_getBytesMbedtls : NULL;
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
@@ -187,7 +187,7 @@ verifyHashImpl(
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 signHashImpl(
     CryptoLibSignature_t* self,
     const void*           hash,
@@ -197,7 +197,7 @@ signHashImpl(
     CryptoLibRng_t*       rng)
 {
     void* rngFunc = (NULL != rng) ? CryptoLibRng_getBytesMbedtls : NULL;
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
@@ -227,7 +227,7 @@ signHashImpl(
 
 // Public Functions ------------------------------------------------------------
 
-seos_err_t
+OS_Error_t
 CryptoLibSignature_init(
     CryptoLibSignature_t**         self,
     const CryptoLibKey_t*          prvKey,
@@ -236,7 +236,7 @@ CryptoLibSignature_init(
     const OS_CryptoDigest_Alg_t    digest,
     const OS_Crypto_Memory_t*      memory)
 {
-    seos_err_t err;
+    OS_Error_t err;
 
     // We can have one of those keys be empty, but not both
     if (NULL == memory || NULL == self || (NULL == prvKey && NULL == pubKey))
@@ -256,7 +256,7 @@ CryptoLibSignature_init(
     return err;
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibSignature_free(
     CryptoLibSignature_t*     self,
     const OS_Crypto_Memory_t* memory)
@@ -269,7 +269,7 @@ CryptoLibSignature_free(
     return freeImpl(self, memory);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibSignature_sign(
     CryptoLibSignature_t* self,
     const void*           hash,
@@ -289,7 +289,7 @@ CryptoLibSignature_sign(
            SEOS_ERROR_ABORTED;
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibSignature_verify(
     CryptoLibSignature_t* self,
     const void*           hash,

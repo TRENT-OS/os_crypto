@@ -11,13 +11,13 @@
 #define PROXY_GET_PTR(p) \
     (CryptoLibKey_t**) PROXY_GET_OBJ_PTR(p)
 
-seos_err_t
+OS_Error_t
 OS_CryptoKey_generate(
     OS_CryptoKey_Handle_t*     self,
     const OS_Crypto_Handle_t   hCrypto,
     const OS_CryptoKey_Spec_t* spec)
 {
-    seos_err_t err;
+    OS_Error_t err;
 
     if (NULL == spec || hCrypto == NULL)
     {
@@ -36,13 +36,13 @@ OS_CryptoKey_generate(
     return err;
 }
 
-seos_err_t
+OS_Error_t
 OS_CryptoKey_import(
     OS_CryptoKey_Handle_t*     self,
     const OS_Crypto_Handle_t   hCrypto,
     const OS_CryptoKey_Data_t* keyData)
 {
-    seos_err_t err;
+    OS_Error_t err;
 
     if (NULL == keyData || hCrypto == NULL)
     {
@@ -61,7 +61,7 @@ OS_CryptoKey_import(
     return err;
 }
 
-seos_err_t
+OS_Error_t
 OS_CryptoKey_makePublic(
     OS_CryptoKey_Handle_t*       self,
     const OS_Crypto_Handle_t     hCrypto,
@@ -69,7 +69,7 @@ OS_CryptoKey_makePublic(
     const OS_CryptoKey_Attrib_t* attribs)
 {
     OS_CryptoKey_Attrib_t srcAttribs;
-    seos_err_t err;
+    OS_Error_t err;
 
     if (NULL == attribs || hCrypto == NULL)
     {
@@ -111,14 +111,14 @@ OS_CryptoKey_makePublic(
     return err;
 }
 
-seos_err_t
+OS_Error_t
 OS_CryptoKey_free(
     OS_CryptoKey_Handle_t self)
 {
     return PROXY_CALL(self, Key_free, PROXY_GET_OBJ(self));
 }
 
-seos_err_t
+OS_Error_t
 OS_CryptoKey_export(
     const OS_CryptoKey_Handle_t self,
     OS_CryptoKey_Data_t*        keyData)
@@ -126,7 +126,7 @@ OS_CryptoKey_export(
     return PROXY_CALL(self, Key_export, PROXY_GET_OBJ(self), keyData);
 }
 
-seos_err_t
+OS_Error_t
 OS_CryptoKey_getParams(
     const OS_CryptoKey_Handle_t self,
     void*                       keyParams,
@@ -136,7 +136,7 @@ OS_CryptoKey_getParams(
                       paramSize);
 }
 
-seos_err_t
+OS_Error_t
 OS_CryptoKey_getAttribs(
     const OS_CryptoKey_Handle_t self,
     OS_CryptoKey_Attrib_t*      attribs)
@@ -144,7 +144,7 @@ OS_CryptoKey_getAttribs(
     return PROXY_CALL(self, Key_getAttribs, PROXY_GET_OBJ(self), attribs);
 }
 
-seos_err_t
+OS_Error_t
 OS_CryptoKey_loadParams(
     OS_Crypto_Handle_t         hCrypto,
     const OS_CryptoKey_Param_t name,

@@ -24,7 +24,7 @@ typedef struct CryptoLibCipher CryptoLibCipher_t;
 
 // Exported functions ----------------------------------------------------------
 
-seos_err_t
+OS_Error_t
 CryptoLibCipher_init(
     CryptoLibCipher_t**         self,
     const CryptoLibKey_t*       key,
@@ -33,18 +33,18 @@ CryptoLibCipher_init(
     size_t                      ivSize,
     const OS_Crypto_Memory_t*   memory);
 
-seos_err_t
+OS_Error_t
 CryptoLibCipher_free(
     CryptoLibCipher_t*        self,
     const OS_Crypto_Memory_t* memory);
 
-seos_err_t
+OS_Error_t
 CryptoLibCipher_start(
     CryptoLibCipher_t* self,
     const void*        input,
     const size_t       inputSize);
 
-seos_err_t
+OS_Error_t
 CryptoLibCipher_process(
     CryptoLibCipher_t* self,
     const void*        input,
@@ -52,7 +52,7 @@ CryptoLibCipher_process(
     void*              output,
     size_t*            outputSize);
 
-seos_err_t
+OS_Error_t
 CryptoLibCipher_finalize(
     CryptoLibCipher_t* self,
     void*              output,

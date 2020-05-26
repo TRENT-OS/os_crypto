@@ -14,12 +14,12 @@
 
 // Public functions ------------------------------------------------------------
 
-seos_err_t
+OS_Error_t
 OS_Crypto_init(
     OS_Crypto_Handle_t*       self,
     const OS_Crypto_Config_t* cfg)
 {
-    seos_err_t err;
+    OS_Error_t err;
     OS_Crypto_t* ctx;
 
     if (NULL == self || NULL == cfg)
@@ -111,11 +111,11 @@ err0:
     return err;
 }
 
-seos_err_t
+OS_Error_t
 OS_Crypto_free(
     OS_Crypto_Handle_t self)
 {
-    seos_err_t err;
+    OS_Error_t err;
 
     if (NULL == self)
     {
@@ -168,7 +168,7 @@ OS_Crypto_getLibObject(
     return (NULL == proxy) ? NULL : proxy->obj;
 }
 
-seos_err_t
+OS_Error_t
 OS_Crypto_migrateLibObject(
     OS_Crypto_Object_t**       proxy,
     const OS_Crypto_Handle_t   self,

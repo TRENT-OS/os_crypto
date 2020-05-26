@@ -13,14 +13,14 @@
 
 // -------------------------------- RNG API ------------------------------------
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Rng_getBytes_func)(
     void*,
     unsigned int,
     void*,
     const size_t);
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Rng_reseed_func)(
     void*,
     const void*,
@@ -28,32 +28,32 @@ typedef seos_err_t
 
 // --------------------------------- MAC API -----------------------------------
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Mac_init_func)(
     void*,
     CryptoLibMac_t**,
     const OS_CryptoMac_Alg_t);
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Mac_free_func)(
     void*,
     CryptoLibMac_t*);
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Mac_start_func)(
     void*,
     CryptoLibMac_t*,
     const void*,
     const size_t);
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Mac_process_func)(
     void*,
     CryptoLibMac_t*,
     const void*,
     const size_t);
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Mac_finalize_func)(
     void*,
     CryptoLibMac_t*,
@@ -62,31 +62,31 @@ typedef seos_err_t
 
 // ------------------------------- Digest API ----------------------------------
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Digest_init_func)(
     void*,
     CryptoLibDigest_t**,
     const OS_CryptoDigest_Alg_t);
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Digest_free_func)(
     void*,
     CryptoLibDigest_t*);
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Digest_clone_func)(
     void*,
     CryptoLibDigest_t*,
     const CryptoLibDigest_t*);
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Digest_process_func)(
     void*,
     CryptoLibDigest_t*,
     const void*,
     const size_t);
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Digest_finalize_func)(
     void*,
     CryptoLibDigest_t*,
@@ -95,50 +95,50 @@ typedef seos_err_t
 
 // -------------------------------- Key API ------------------------------------
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Key_generate_func)(
     void*,
     CryptoLibKey_t**,
     const OS_CryptoKey_Spec_t*);
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Key_import_func)(
     void*,
     CryptoLibKey_t**,
     const OS_CryptoKey_Data_t*);
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Key_makePublic_func)(
     void*,
     CryptoLibKey_t**,
     const CryptoLibKey_t*,
     const OS_CryptoKey_Attrib_t*);
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Key_export_func)(
     void*,
     const CryptoLibKey_t*,
     OS_CryptoKey_Data_t*);
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Key_getParams_func)(
     void*,
     const CryptoLibKey_t*,
     void*,
     size_t*);
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Key_getAttribs_func)(
     void*,
     const CryptoLibKey_t*,
     OS_CryptoKey_Attrib_t*);
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Key_free_func)(
     void*,
     CryptoLibKey_t*);
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Key_loadParams_func)(
     void*,
     const OS_CryptoKey_Param_t,
@@ -147,7 +147,7 @@ typedef seos_err_t
 
 // ----------------------------- Signature API ---------------------------------
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Signature_init_func)(
     void*,
     CryptoLibSignature_t**,
@@ -156,12 +156,12 @@ typedef seos_err_t
     const OS_CryptoSignature_Alg_t,
     const OS_CryptoDigest_Alg_t);
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Signature_free_func)(
     void*,
     CryptoLibSignature_t*);
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Signature_sign_func)(
     void*,
     CryptoLibSignature_t*,
@@ -170,7 +170,7 @@ typedef seos_err_t
     void*,
     size_t*);
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Signature_verify_func)(
     void*,
     CryptoLibSignature_t*,
@@ -181,19 +181,19 @@ typedef seos_err_t
 
 // ----------------------------- Agreement API ---------------------------------
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Agreement_init_func)(
     void*,
     CryptoLibAgreement_t**,
     const CryptoLibKey_t*,
     const OS_CryptoAgreement_Alg_t);
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Agreement_free_func)(
     void*,
     CryptoLibAgreement_t*);
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Agreement_agree_func)(
     void*,
     CryptoLibAgreement_t*,
@@ -203,7 +203,7 @@ typedef seos_err_t
 
 // ------------------------------ Cipher API -----------------------------------
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Cipher_init_func)(
     void*,
     CryptoLibCipher_t**,
@@ -212,12 +212,12 @@ typedef seos_err_t
     const void*,
     const size_t);
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Cipher_free_func)(
     void*,
     CryptoLibCipher_t*);
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Cipher_process_func)(
     void*,
     CryptoLibCipher_t*,
@@ -226,14 +226,14 @@ typedef seos_err_t
     void*,
     size_t*);
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Cipher_start_func)(
     void*,
     CryptoLibCipher_t*,
     const void*,
     const size_t);
 
-typedef seos_err_t
+typedef OS_Error_t
 (*Cipher_finalize_func)(
     void*,
     CryptoLibCipher_t*,

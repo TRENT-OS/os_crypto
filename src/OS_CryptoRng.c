@@ -8,7 +8,7 @@
 
 #include "lib/CryptoLibRng.h"
 
-seos_err_t
+OS_Error_t
 OS_CryptoRng_getBytes(
     OS_Crypto_Handle_t        hCrypto,
     const OS_CryptoRng_Flag_t flags,
@@ -18,7 +18,7 @@ OS_CryptoRng_getBytes(
     return CALL(hCrypto, Rng_getBytes, flags, buf, bufSize);
 }
 
-seos_err_t
+OS_Error_t
 OS_CryptoRng_reseed(
     OS_Crypto_Handle_t hCrypto,
     const void*        seed,

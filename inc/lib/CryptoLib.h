@@ -22,13 +22,13 @@ typedef struct CryptoLib CryptoLib_t;
 
 // ------------------------------- Init/Free -----------------------------------
 
-seos_err_t
+OS_Error_t
 CryptoLib_init(
     Crypto_Impl_t*            impl,
     const OS_Crypto_Memory_t* memory,
     const CryptoLib_Config_t* cfg);
 
-seos_err_t
+OS_Error_t
 CryptoLib_free(
     CryptoLib_t* self);
 

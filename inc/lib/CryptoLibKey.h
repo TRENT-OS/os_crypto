@@ -29,48 +29,48 @@ typedef struct CryptoLibKey CryptoLibKey_t;
 
 // Exported functions ----------------------------------------------------------
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_generate(
     CryptoLibKey_t**           self,
     const OS_CryptoKey_Spec_t* spec,
     const OS_Crypto_Memory_t*  memory,
     CryptoLibRng_t*            rng);
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_makePublic(
     CryptoLibKey_t**             self,
     const CryptoLibKey_t*        prvKey,
     const OS_CryptoKey_Attrib_t* attribs,
     const OS_Crypto_Memory_t*    memory);
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_import(
     CryptoLibKey_t**           self,
     const OS_CryptoKey_Data_t* keyData,
     const OS_Crypto_Memory_t*  memory);
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_free(
     CryptoLibKey_t*           self,
     const OS_Crypto_Memory_t* memory);
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_export(
     const CryptoLibKey_t* self,
     OS_CryptoKey_Data_t*  keyData);
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_getParams(
     const CryptoLibKey_t* self,
     void*                 keyParams,
     size_t*               paramSize);
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_getAttribs(
     const CryptoLibKey_t*  self,
     OS_CryptoKey_Attrib_t* attribs);
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_loadParams(
     const OS_CryptoKey_Param_t name,
     void*                      keyParams,
@@ -78,32 +78,32 @@ CryptoLibKey_loadParams(
 
 // Conversion functions --------------------------------------------------------
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_writeRsaPub(
     const CryptoLibKey_t* key,
     mbedtls_rsa_context*  rsa);
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_writeRsaPrv(
     const CryptoLibKey_t* key,
     mbedtls_rsa_context*  rsa);
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_writeDhPub(
     const CryptoLibKey_t* key,
     mbedtls_dhm_context*  dh);
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_writeDhPrv(
     const CryptoLibKey_t* key,
     mbedtls_dhm_context*  dh);
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_writeSecp256r1Pub(
     const CryptoLibKey_t* key,
     mbedtls_ecdh_context* ecdh);
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_writeSecp256r1Prv(
     const CryptoLibKey_t* key,
     mbedtls_ecdh_context* ecdh);

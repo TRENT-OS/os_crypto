@@ -34,7 +34,7 @@ struct CryptoLib
 
 // -------------------------------- RNG API ------------------------------------
 
-static seos_err_t
+static OS_Error_t
 Rng_getBytes(
     void*                     ctx,
     const OS_CryptoRng_Flag_t flags,
@@ -55,7 +55,7 @@ Rng_getBytes(
     return CryptoLibRng_getBytes(self->rng, flags, buf, bufSize);
 }
 
-static seos_err_t
+static OS_Error_t
 Rng_reseed(
     void*        ctx,
     const void*  seed,
@@ -77,13 +77,13 @@ Rng_reseed(
 
 // -------------------------------- MAC API ------------------------------------
 
-static seos_err_t
+static OS_Error_t
 Mac_init(
     void*                    ctx,
     CryptoLibMac_t**         pMacObj,
     const OS_CryptoMac_Alg_t algorithm)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pMacObj)
@@ -110,7 +110,7 @@ err0:
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 Mac_free(
     void*           ctx,
     CryptoLibMac_t* macObj)
@@ -132,7 +132,7 @@ Mac_free(
     return CryptoLibMac_free(macObj, &self->memory);
 }
 
-static seos_err_t
+static OS_Error_t
 Mac_start(
     void*           ctx,
     CryptoLibMac_t* macObj,
@@ -155,7 +155,7 @@ Mac_start(
            CryptoLibMac_start(macObj, secret, secretSize);
 }
 
-static seos_err_t
+static OS_Error_t
 Mac_process(
     void*           ctx,
     CryptoLibMac_t* macObj,
@@ -178,7 +178,7 @@ Mac_process(
            CryptoLibMac_process(macObj, data, dataSize);
 }
 
-static seos_err_t
+static OS_Error_t
 Mac_finalize(
     void*           ctx,
     CryptoLibMac_t* macObj,
@@ -203,13 +203,13 @@ Mac_finalize(
 
 // ------------------------------ Digest API -----------------------------------
 
-static seos_err_t
+static OS_Error_t
 Digest_init(
     void*                       ctx,
     CryptoLibDigest_t**         pDigObj,
     const OS_CryptoDigest_Alg_t algorithm)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pDigObj)
@@ -236,7 +236,7 @@ err0:
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 Digest_free(
     void*              ctx,
     CryptoLibDigest_t* digObj)
@@ -258,7 +258,7 @@ Digest_free(
     return CryptoLibDigest_free(digObj, &self->memory);
 }
 
-static seos_err_t
+static OS_Error_t
 Digest_clone(
     void*                    ctx,
     CryptoLibDigest_t*       dstDigObj,
@@ -277,7 +277,7 @@ Digest_clone(
            CryptoLibDigest_clone(dstDigObj, srcDigObj);
 }
 
-static seos_err_t
+static OS_Error_t
 Digest_process(
     void*              ctx,
     CryptoLibDigest_t* digObj,
@@ -300,7 +300,7 @@ Digest_process(
            CryptoLibDigest_process(digObj, data, dataSize);
 }
 
-static seos_err_t
+static OS_Error_t
 Digest_finalize(
     void*              ctx,
     CryptoLibDigest_t* digObj,
@@ -325,7 +325,7 @@ Digest_finalize(
 
 // ----------------------------- Signature API ---------------------------------
 
-static seos_err_t
+static OS_Error_t
 Signature_init(
     void*                          ctx,
     CryptoLibSignature_t**         pSigObj,
@@ -334,7 +334,7 @@ Signature_init(
     const OS_CryptoSignature_Alg_t algorithm,
     const OS_CryptoDigest_Alg_t    digest)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pSigObj)
@@ -370,7 +370,7 @@ err0:
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 Signature_free(
     void*                 ctx,
     CryptoLibSignature_t* sigObj)
@@ -392,7 +392,7 @@ Signature_free(
     return CryptoLibSignature_free(sigObj, &self->memory);
 }
 
-static seos_err_t
+static OS_Error_t
 Signature_sign(
     void*                 ctx,
     CryptoLibSignature_t* sigObj,
@@ -421,7 +421,7 @@ Signature_sign(
                                    signatureSize, self->rng);
 }
 
-static seos_err_t
+static OS_Error_t
 Signature_verify(
     void*                 ctx,
     CryptoLibSignature_t* sigObj,
@@ -449,14 +449,14 @@ Signature_verify(
 
 // ----------------------------- Agreement API ---------------------------------
 
-static seos_err_t
+static OS_Error_t
 Agreement_init(
     void*                          ctx,
     CryptoLibAgreement_t**         pAgrObj,
     const CryptoLibKey_t*          prvKey,
     const OS_CryptoAgreement_Alg_t algorithm)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pAgrObj)
@@ -488,7 +488,7 @@ err0:
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 Agreement_free(
     void*                 ctx,
     CryptoLibAgreement_t* agrObj)
@@ -510,7 +510,7 @@ Agreement_free(
     return CryptoLibAgreement_free(agrObj, &self->memory);
 }
 
-static seos_err_t
+static OS_Error_t
 Agreement_agree(
     void*                 ctx,
     CryptoLibAgreement_t* agrObj,
@@ -542,13 +542,13 @@ Agreement_agree(
 
 // -------------------------------- Key API ------------------------------------
 
-static seos_err_t
+static OS_Error_t
 Key_generate(
     void*                      ctx,
     CryptoLibKey_t**           pKeyObj,
     const OS_CryptoKey_Spec_t* spec)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pKeyObj)
@@ -575,13 +575,13 @@ err0:
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 Key_import(
     void*                      ctx,
     CryptoLibKey_t**           pKeyObj,
     const OS_CryptoKey_Data_t* keyData)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pKeyObj)
@@ -608,14 +608,14 @@ err0:
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 Key_makePublic(
     void*                        ctx,
     CryptoLibKey_t**             pPubKeyObj,
     const CryptoLibKey_t*        prvKeyObj,
     const OS_CryptoKey_Attrib_t* attribs)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pPubKeyObj)
@@ -647,7 +647,7 @@ err0:
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 Key_free(
     void*           ctx,
     CryptoLibKey_t* keyObj)
@@ -669,7 +669,7 @@ Key_free(
     return CryptoLibKey_free(keyObj, &self->memory);
 }
 
-static seos_err_t
+static OS_Error_t
 Key_export(
     void*                 ctx,
     const CryptoLibKey_t* keyObj,
@@ -687,7 +687,7 @@ Key_export(
            CryptoLibKey_export(keyObj, keyData);
 }
 
-static seos_err_t
+static OS_Error_t
 Key_getParams(
     void*                 ctx,
     const CryptoLibKey_t* keyObj,
@@ -710,7 +710,7 @@ Key_getParams(
            CryptoLibKey_getParams(keyObj, keyParams, paramSize);
 }
 
-static seos_err_t
+static OS_Error_t
 Key_getAttribs(
     void*                  ctx,
     const CryptoLibKey_t*  keyObj,
@@ -728,7 +728,7 @@ Key_getAttribs(
            CryptoLibKey_getAttribs(keyObj, attribs);
 }
 
-static seos_err_t
+static OS_Error_t
 Key_loadParams(
     void*                      ctx,
     const OS_CryptoKey_Param_t name,
@@ -749,7 +749,7 @@ Key_loadParams(
 
 // ------------------------------ Cipher API -----------------------------------
 
-static seos_err_t
+static OS_Error_t
 Cipher_init(
     void*                       ctx,
     CryptoLibCipher_t**         pCipherObj,
@@ -758,7 +758,7 @@ Cipher_init(
     const void*                 iv,
     const size_t                ivSize)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pCipherObj)
@@ -794,7 +794,7 @@ err0:
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 Cipher_free(
     void*              ctx,
     CryptoLibCipher_t* cipherObj)
@@ -816,7 +816,7 @@ Cipher_free(
     return CryptoLibCipher_free(cipherObj, &self->memory);
 }
 
-static seos_err_t
+static OS_Error_t
 Cipher_process(
     void*              ctx,
     CryptoLibCipher_t* cipherObj,
@@ -845,7 +845,7 @@ Cipher_process(
                                    outputSize);
 }
 
-static seos_err_t
+static OS_Error_t
 Cipher_start(
     void*              ctx,
     CryptoLibCipher_t* cipherObj,
@@ -868,7 +868,7 @@ Cipher_start(
            CryptoLibCipher_start(cipherObj, ad, adSize);
 }
 
-static seos_err_t
+static OS_Error_t
 Cipher_finalize(
     void*              ctx,
     CryptoLibCipher_t* cipherObj,
@@ -929,13 +929,13 @@ static const Crypto_Vtable_t CryptoLib_vtable =
     .Cipher_finalize     = Cipher_finalize,
 };
 
-seos_err_t
+OS_Error_t
 CryptoLib_init(
     Crypto_Impl_t*            impl,
     const OS_Crypto_Memory_t* memory,
     const CryptoLib_Config_t* cfg)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
     CryptoLib_t* self;
 
     if (NULL == impl || NULL == memory || NULL == cfg || NULL == cfg->rng.entropy)
@@ -1014,7 +1014,7 @@ err0:
     return err;
 }
 
-seos_err_t
+OS_Error_t
 CryptoLib_free(
     CryptoLib_t* self)
 {

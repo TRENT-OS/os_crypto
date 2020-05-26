@@ -67,7 +67,7 @@ getMpiLen(
 }
 
 // Check if param is within range: 2 < param < P - 2
-static seos_err_t
+static OS_Error_t
 checkMpiRange(
     const mbedtls_mpi* param,
     const mbedtls_mpi* P)
@@ -98,13 +98,13 @@ cleanup:
 
 // -------------------------------- DH Keys ------------------------------------
 
-static seos_err_t
+static OS_Error_t
 generate_DHParams(
     CryptoLibRng_t*          rng,
     const size_t             bits,
     OS_CryptoKey_DhParams_t* params)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
     mbedtls_mpi Q, T, G, P;
     size_t retries;
 
@@ -167,12 +167,12 @@ generate_DHParams(
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 generate_DHPrv(
     OS_CryptoKey_DhPrv_t* key,
     CryptoLibRng_t*       rng)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
     mbedtls_mpi X, GX, G, P;
     size_t retries;
 
@@ -234,12 +234,12 @@ exit:
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 make_DHPub(
     OS_CryptoKey_DhPub_t*       pubKey,
     const OS_CryptoKey_DhPrv_t* prvKey)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
     const OS_CryptoKey_DhParams_t* params = &prvKey->params;
     mbedtls_mpi GX, X, P, G;
 
@@ -283,13 +283,13 @@ exit:
 
 // -------------------------------- RSA Keys -----------------------------------
 
-static seos_err_t
+static OS_Error_t
 generate_RsaPrv(
     OS_CryptoKey_RsaRrv_t* key,
     CryptoLibRng_t*        rng,
     const size_t           bits)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
     mbedtls_rsa_context rsa;
 
     mbedtls_rsa_init(&rsa, MBEDTLS_RSA_PKCS_V15, MBEDTLS_MD_NONE);
@@ -317,12 +317,12 @@ exit:
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 make_RsaPub(
     OS_CryptoKey_RsaRub_t*       pubKey,
     const OS_CryptoKey_RsaRrv_t* prvKey)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
     mbedtls_mpi P, Q, N;
 
     mbedtls_mpi_init(&P);
@@ -357,12 +357,12 @@ exit:
 
 // ----------------------------- SECP256r1 Keys --------------------------------
 
-static seos_err_t
+static OS_Error_t
 generate_SECP256r1Prv(
     OS_CryptoKey_Secp256r1Prv_t* key,
     CryptoLibRng_t*              rng)
 {
-    seos_err_t err;
+    OS_Error_t err;
     mbedtls_ecp_group grp;
     mbedtls_mpi d;
 
@@ -387,12 +387,12 @@ exit:
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 make_SECP256r1Pub(
     OS_CryptoKey_Secp256r1Pub_t*       pubKey,
     const OS_CryptoKey_Secp256r1Prv_t* prvKey)
 {
-    seos_err_t err;
+    OS_Error_t err;
     mbedtls_ecp_group grp;
     mbedtls_mpi d;
     mbedtls_ecp_point Q;
@@ -429,7 +429,7 @@ exit:
 
 // -----------------------------------------------------------------------------
 
-static seos_err_t
+static OS_Error_t
 initImpl(
     CryptoLibKey_t**             self,
     const OS_CryptoKey_Type_t    type,
@@ -437,7 +437,7 @@ initImpl(
     const OS_Crypto_Memory_t*    memory)
 {
     size_t size;
-    seos_err_t err;
+    OS_Error_t err;
     CryptoLibKey_t* key;
 
     switch (type)
@@ -489,13 +489,13 @@ initImpl(
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 generateImpl(
     CryptoLibKey_t*            self,
     CryptoLibRng_t*            rng,
     const OS_CryptoKey_Spec_t* spec)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
 
     switch (spec->key.type)
     {
@@ -568,7 +568,7 @@ generateImpl(
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 makeImpl(
     CryptoLibKey_t*       self,
     const CryptoLibKey_t* prvKey)
@@ -586,7 +586,7 @@ makeImpl(
     }
 }
 
-static seos_err_t
+static OS_Error_t
 importImpl(
     CryptoLibKey_t*            self,
     const OS_CryptoKey_Data_t* key)
@@ -693,7 +693,7 @@ importImpl(
     return SEOS_SUCCESS;
 }
 
-static seos_err_t
+static OS_Error_t
 exportImpl(
     const CryptoLibKey_t* self,
     OS_CryptoKey_Data_t*  keyData)
@@ -705,13 +705,13 @@ exportImpl(
     return SEOS_SUCCESS;
 }
 
-static seos_err_t
+static OS_Error_t
 getParamsImpl(
     const CryptoLibKey_t* self,
     void*                 keyParams,
     size_t*               paramSize)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
     size_t size;
     void* params = NULL;
 
@@ -743,7 +743,7 @@ getParamsImpl(
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 getAttribsImpl(
     const CryptoLibKey_t*  self,
     OS_CryptoKey_Attrib_t* attribs)
@@ -752,13 +752,13 @@ getAttribsImpl(
     return SEOS_SUCCESS;
 }
 
-static seos_err_t
+static OS_Error_t
 loadParamsImpl(
     const OS_CryptoKey_Param_t name,
     void*                      keyParams,
     size_t*                    paramSize)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
     size_t size;
 
     switch (name)
@@ -806,7 +806,7 @@ loadParamsImpl(
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 freeImpl(
     CryptoLibKey_t*           self,
     const OS_Crypto_Memory_t* memory)
@@ -822,14 +822,14 @@ freeImpl(
 
 // Public functions ------------------------------------------------------------
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_generate(
     CryptoLibKey_t**           self,
     const OS_CryptoKey_Spec_t* spec,
     const OS_Crypto_Memory_t*  memory,
     CryptoLibRng_t*            rng)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
 
     if (NULL == self || NULL == rng || NULL == memory || NULL == spec)
     {
@@ -848,14 +848,14 @@ CryptoLibKey_generate(
     return err;
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_makePublic(
     CryptoLibKey_t**             self,
     const CryptoLibKey_t*        prvKey,
     const OS_CryptoKey_Attrib_t* attribs,
     const OS_Crypto_Memory_t*    memory)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
     OS_CryptoKey_Type_t type;
 
     if (NULL == self || NULL == memory || NULL == prvKey || NULL == attribs)
@@ -889,13 +889,13 @@ CryptoLibKey_makePublic(
     return err;
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_import(
     CryptoLibKey_t**           self,
     const OS_CryptoKey_Data_t* keyData,
     const OS_Crypto_Memory_t*  memory)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
 
     if (NULL == self || NULL == memory || NULL == keyData)
     {
@@ -913,7 +913,7 @@ CryptoLibKey_import(
     return err;
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_free(
     CryptoLibKey_t*           self,
     const OS_Crypto_Memory_t* memory)
@@ -926,7 +926,7 @@ CryptoLibKey_free(
     return freeImpl(self, memory);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_export(
     const CryptoLibKey_t* self,
     OS_CryptoKey_Data_t*  keyData)
@@ -946,7 +946,7 @@ CryptoLibKey_export(
     return exportImpl(self, keyData);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_getParams(
     const CryptoLibKey_t* self,
     void*                 keyParams,
@@ -960,7 +960,7 @@ CryptoLibKey_getParams(
     return getParamsImpl(self, keyParams, paramSize);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_getAttribs(
     const CryptoLibKey_t*  self,
     OS_CryptoKey_Attrib_t* attribs)
@@ -973,7 +973,7 @@ CryptoLibKey_getAttribs(
     return getAttribsImpl(self, attribs);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_loadParams(
     const OS_CryptoKey_Param_t name,
     void*                      keyParams,
@@ -989,7 +989,7 @@ CryptoLibKey_loadParams(
 
 // Conversion functions --------------------------------------------------------
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_writeRsaPub(
     const CryptoLibKey_t* key,
     mbedtls_rsa_context*  rsa)
@@ -1004,7 +1004,7 @@ CryptoLibKey_writeRsaPub(
            SEOS_ERROR_INVALID_PARAMETER : SEOS_SUCCESS;
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_writeRsaPrv(
     const CryptoLibKey_t* key,
     mbedtls_rsa_context*  rsa)
@@ -1021,7 +1021,7 @@ CryptoLibKey_writeRsaPrv(
            SEOS_ERROR_INVALID_PARAMETER : SEOS_SUCCESS;
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_writeDhPub(
     const CryptoLibKey_t* key,
     mbedtls_dhm_context*  dh)
@@ -1036,7 +1036,7 @@ CryptoLibKey_writeDhPub(
            SEOS_ERROR_INVALID_PARAMETER : SEOS_SUCCESS;
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_writeDhPrv(
     const CryptoLibKey_t* key,
     mbedtls_dhm_context*  dh)
@@ -1051,7 +1051,7 @@ CryptoLibKey_writeDhPrv(
            SEOS_ERROR_INVALID_PARAMETER : SEOS_SUCCESS;
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_writeSecp256r1Pub(
     const CryptoLibKey_t* key,
     mbedtls_ecdh_context* ecdh)
@@ -1064,7 +1064,7 @@ CryptoLibKey_writeSecp256r1Pub(
            SEOS_ERROR_INVALID_PARAMETER : SEOS_SUCCESS;
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibKey_writeSecp256r1Prv(
     const CryptoLibKey_t* key,
     mbedtls_ecdh_context* ecdh)

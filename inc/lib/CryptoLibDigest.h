@@ -24,29 +24,29 @@ typedef struct CryptoLibDigest CryptoLibDigest_t;
 
 // Exported functions ----------------------------------------------------------
 
-seos_err_t
+OS_Error_t
 CryptoLibDigest_init(
     CryptoLibDigest_t**         self,
     const OS_CryptoDigest_Alg_t algorithm,
     const OS_Crypto_Memory_t*   memory);
 
-seos_err_t
+OS_Error_t
 CryptoLibDigest_free(
     CryptoLibDigest_t*        self,
     const OS_Crypto_Memory_t* memory);
 
-seos_err_t
+OS_Error_t
 CryptoLibDigest_clone(
     CryptoLibDigest_t*       self,
     const CryptoLibDigest_t* source);
 
-seos_err_t
+OS_Error_t
 CryptoLibDigest_process(
     CryptoLibDigest_t* self,
     const void*        data,
     const size_t       dataSize);
 
-seos_err_t
+OS_Error_t
 CryptoLibDigest_finalize(
     CryptoLibDigest_t* self,
     void*              digest,

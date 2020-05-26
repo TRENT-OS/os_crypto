@@ -25,14 +25,14 @@ typedef struct CryptoLibAgreement CryptoLibAgreement_t;
 
 // Exported functions ----------------------------------------------------------
 
-seos_err_t
+OS_Error_t
 CryptoLibAgreement_init(
     CryptoLibAgreement_t**         self,
     const CryptoLibKey_t*          prvKey,
     const OS_CryptoAgreement_Alg_t algorithm,
     const OS_Crypto_Memory_t*      memory);
 
-seos_err_t
+OS_Error_t
 CryptoLibAgreement_agree(
     CryptoLibAgreement_t* self,
     CryptoLibRng_t*       rng,
@@ -40,7 +40,7 @@ CryptoLibAgreement_agree(
     void*                 shared,
     size_t*               sharedSize);
 
-seos_err_t
+OS_Error_t
 CryptoLibAgreement_free(
     CryptoLibAgreement_t*     self,
     const OS_Crypto_Memory_t* memory);

@@ -58,7 +58,7 @@ struct CryptoLibServer
 
 // -------------------------------- RNG API ------------------------------------
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Rng_getBytes(
     unsigned int flags,
     size_t       bufSize)
@@ -69,7 +69,7 @@ CryptoLibServer_Rng_getBytes(
     return CALL(self, Rng_getBytes, flags, self->dataPort, bufSize);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Rng_reseed(
     size_t seedSize)
 {
@@ -81,7 +81,7 @@ CryptoLibServer_Rng_reseed(
 
 // ------------------------------ Digest API -----------------------------------
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Mac_init(
     CryptoLibMac_ptr*  pMacObj,
     OS_CryptoMac_Alg_t algorithm)
@@ -92,7 +92,7 @@ CryptoLibServer_Mac_init(
     return CALL(self, Mac_init, pMacObj, algorithm);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Mac_free(
     CryptoLibMac_ptr macObj)
 {
@@ -102,7 +102,7 @@ CryptoLibServer_Mac_free(
     return CALL(self, Mac_free, macObj);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Mac_start(
     CryptoLibMac_ptr macObj,
     size_t           secretSize)
@@ -113,7 +113,7 @@ CryptoLibServer_Mac_start(
     return CALL(self, Mac_start, macObj, self->dataPort, secretSize);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Mac_process(
     CryptoLibMac_ptr macObj,
     size_t           dataSize)
@@ -124,7 +124,7 @@ CryptoLibServer_Mac_process(
     return CALL(self, Mac_process, macObj, self->dataPort, dataSize);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Mac_finalize(
     CryptoLibMac_ptr macObj,
     size_t*          macSize)
@@ -140,7 +140,7 @@ CryptoLibServer_Mac_finalize(
 
 // ------------------------------ Digest API -----------------------------------
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Digest_init(
     CryptoLibDigest_ptr*  pDigestObj,
     OS_CryptoDigest_Alg_t algorithm)
@@ -151,7 +151,7 @@ CryptoLibServer_Digest_init(
     return CALL(self, Digest_init, pDigestObj, algorithm);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Digest_free(
     CryptoLibDigest_ptr digestObj)
 {
@@ -161,7 +161,7 @@ CryptoLibServer_Digest_free(
     return CALL(self, Digest_free, digestObj);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Digest_clone(
     CryptoLibDigest_ptr  dstDigHandle,
     CryptoLibDigest_cptr srcDigHandle)
@@ -172,7 +172,7 @@ CryptoLibServer_Digest_clone(
     return CALL(self, Digest_clone, dstDigHandle, srcDigHandle);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Digest_process(
     CryptoLibDigest_ptr digestObj,
     size_t              inSize)
@@ -183,7 +183,7 @@ CryptoLibServer_Digest_process(
     return CALL(self, Digest_process, digestObj, self->dataPort, inSize);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Digest_finalize(
     CryptoLibDigest_ptr digestObj,
     size_t*             digestSize)
@@ -199,7 +199,7 @@ CryptoLibServer_Digest_finalize(
 
 // -------------------------------- Key API ------------------------------------
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Key_generate(
     CryptoLibKey_ptr* pKeyObj)
 {
@@ -209,7 +209,7 @@ CryptoLibServer_Key_generate(
     return CALL(self, Key_generate, pKeyObj, self->dataPort);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Key_makePublic(
     CryptoLibKey_ptr* pPubKeyHandle,
     CryptoLibKey_cptr prvKeyHandle)
@@ -220,7 +220,7 @@ CryptoLibServer_Key_makePublic(
     return CALL(self, Key_makePublic, pPubKeyHandle, prvKeyHandle, self->dataPort);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Key_import(
     CryptoLibKey_ptr* pKeyObj)
 {
@@ -230,11 +230,11 @@ CryptoLibServer_Key_import(
     return CALL(self, Key_import, pKeyObj, self->dataPort);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Key_export(
     CryptoLibKey_cptr keyObj)
 {
-    seos_err_t err;
+    OS_Error_t err;
     OS_CryptoKey_Attrib_t attribs;
     CryptoLibServer_t* self;
 
@@ -256,7 +256,7 @@ CryptoLibServer_Key_export(
            CALL(self, Key_export, keyObj, self->dataPort);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Key_getParams(
     CryptoLibKey_cptr keyObj,
     size_t*           paramSize)
@@ -270,7 +270,7 @@ CryptoLibServer_Key_getParams(
     return CALL(self, Key_getParams, keyObj, self->dataPort, paramSize);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Key_getAttribs(
     CryptoLibKey_cptr keyObj)
 {
@@ -280,7 +280,7 @@ CryptoLibServer_Key_getAttribs(
     return CALL(self, Key_getAttribs, keyObj, self->dataPort);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Key_loadParams(
     OS_CryptoKey_Param_t name,
     size_t*              paramSize)
@@ -294,7 +294,7 @@ CryptoLibServer_Key_loadParams(
     return CALL(self, Key_loadParams, name, self->dataPort, paramSize);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Key_free(
     CryptoLibKey_ptr keyObj)
 {
@@ -306,7 +306,7 @@ CryptoLibServer_Key_free(
 
 // ----------------------------- Agreement API ---------------------------------
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Agreement_init(
     CryptoLibAgreement_ptr*  pAgrObj,
     CryptoLibKey_cptr        prvKey,
@@ -318,7 +318,7 @@ CryptoLibServer_Agreement_init(
     return CALL(self, Agreement_init, pAgrObj, prvKey, algorithm);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Agreement_agree(
     CryptoLibAgreement_ptr agrObj,
     CryptoLibKey_cptr      pubKey,
@@ -333,7 +333,7 @@ CryptoLibServer_Agreement_agree(
     return CALL(self, Agreement_agree, agrObj, pubKey, self->dataPort, sharedSize);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Agreement_free(
     CryptoLibAgreement_ptr agrObj)
 {
@@ -345,7 +345,7 @@ CryptoLibServer_Agreement_free(
 
 // ----------------------------- Signature API ---------------------------------
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Signature_init(
     CryptoLibSignature_ptr*  pObj,
     CryptoLibKey_cptr        prvKey,
@@ -359,7 +359,7 @@ CryptoLibServer_Signature_init(
     return CALL(self, Signature_init, pObj, prvKey, pubKey, algorithm, digest);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Signature_verify(
     CryptoLibSignature_ptr obj,
     size_t                 hashSize,
@@ -372,7 +372,7 @@ CryptoLibServer_Signature_verify(
                 self->dataPort + hashSize, signatureSize);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Signature_sign(
     CryptoLibSignature_ptr obj,
     size_t                 hashSize,
@@ -388,7 +388,7 @@ CryptoLibServer_Signature_sign(
                 self->dataPort, signatureSize);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Signature_free(
     CryptoLibSignature_ptr obj)
 {
@@ -400,7 +400,7 @@ CryptoLibServer_Signature_free(
 
 // ------------------------------- Cipher API ----------------------------------
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Cipher_init(
     CryptoLibCipher_ptr*  pCipherObj,
     CryptoLibKey_cptr     key,
@@ -414,7 +414,7 @@ CryptoLibServer_Cipher_init(
                 ivSize);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Cipher_free(
     CryptoLibCipher_ptr cipherObj)
 {
@@ -424,7 +424,7 @@ CryptoLibServer_Cipher_free(
     return CALL(self, Cipher_free, cipherObj);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Cipher_process(
     CryptoLibCipher_ptr cipherObj,
     size_t              inputSize,
@@ -440,7 +440,7 @@ CryptoLibServer_Cipher_process(
                 self->dataPort, outputSize);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Cipher_start(
     CryptoLibCipher_ptr cipherObj,
     size_t              len)
@@ -451,7 +451,7 @@ CryptoLibServer_Cipher_start(
     return CALL(self, Cipher_start, cipherObj, self->dataPort, len);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_Cipher_finalize(
     CryptoLibCipher_ptr cipherObj,
     size_t*             tagSize)
@@ -467,7 +467,7 @@ CryptoLibServer_Cipher_finalize(
 
 // ------------------------------- init/free -----------------------------------
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_init(
     CryptoLibServer_t**             ctx,
     const Crypto_Impl_t*            client,
@@ -496,7 +496,7 @@ CryptoLibServer_init(
     return SEOS_SUCCESS;
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibServer_free(
     CryptoLibServer_t* self)
 {

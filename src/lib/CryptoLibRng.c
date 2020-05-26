@@ -17,14 +17,14 @@ struct CryptoLibRng
 
 // Public Functions ------------------------------------------------------------
 
-seos_err_t
+OS_Error_t
 CryptoLibRng_init(
     CryptoLibRng_t**                 self,
     const OS_CryptoRng_Entropy_func* entropyFunc,
     void*                            entropyCtx,
     const OS_Crypto_Memory_t*        memory)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
     CryptoLibRng_t* rng;
 
     if (NULL == memory || NULL == self || NULL == entropyFunc)
@@ -61,7 +61,7 @@ err0:
     return err;
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibRng_free(
     CryptoLibRng_t*           self,
     const OS_Crypto_Memory_t* memory)
@@ -77,7 +77,7 @@ CryptoLibRng_free(
     return SEOS_SUCCESS;
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibRng_getBytes(
     CryptoLibRng_t*           self,
     const OS_CryptoRng_Flag_t flags,
@@ -97,7 +97,7 @@ CryptoLibRng_getBytes(
            SEOS_ERROR_ABORTED : SEOS_SUCCESS;
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibRng_reSeed(
     CryptoLibRng_t* self,
     const void*     seed,

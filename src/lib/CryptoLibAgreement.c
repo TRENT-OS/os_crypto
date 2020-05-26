@@ -25,14 +25,14 @@ struct CryptoLibAgreement
 
 // Private Functions -----------------------------------------------------------
 
-static seos_err_t
+static OS_Error_t
 initImpl(
     CryptoLibAgreement_t**         self,
     const CryptoLibKey_t*          prvKey,
     const OS_CryptoAgreement_Alg_t algorithm,
     const OS_Crypto_Memory_t*      memory)
 {
-    seos_err_t err;
+    OS_Error_t err;
     CryptoLibAgreement_t* agr;
 
     if ((agr = memory->calloc(1, sizeof(CryptoLibAgreement_t))) == NULL)
@@ -67,12 +67,12 @@ initImpl(
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 freeImpl(
     CryptoLibAgreement_t*     self,
     const OS_Crypto_Memory_t* memory)
 {
-    seos_err_t err;
+    OS_Error_t err;
 
     err = SEOS_SUCCESS;
     switch (self->algorithm)
@@ -93,11 +93,11 @@ freeImpl(
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 setKeyImpl(
     CryptoLibAgreement_t* self)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
@@ -120,7 +120,7 @@ setKeyImpl(
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 agreeImpl(
     CryptoLibAgreement_t* self,
     CryptoLibRng_t*       rng,
@@ -129,7 +129,7 @@ agreeImpl(
     size_t*               bufSize)
 {
     void* rngFunc = (NULL != rng) ? CryptoLibRng_getBytesMbedtls : NULL;
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
@@ -179,14 +179,14 @@ agreeImpl(
 
 // Public Functions ------------------------------------------------------------
 
-seos_err_t
+OS_Error_t
 CryptoLibAgreement_init(
     CryptoLibAgreement_t**         self,
     const CryptoLibKey_t*          prvKey,
     const OS_CryptoAgreement_Alg_t algorithm,
     const OS_Crypto_Memory_t*      memory)
 {
-    seos_err_t err;
+    OS_Error_t err;
 
     if (NULL == self || NULL == prvKey || NULL == memory)
     {
@@ -204,7 +204,7 @@ CryptoLibAgreement_init(
     return err;
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibAgreement_free(
     CryptoLibAgreement_t*     self,
     const OS_Crypto_Memory_t* memory)
@@ -217,7 +217,7 @@ CryptoLibAgreement_free(
     return freeImpl(self, memory);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibAgreement_agree(
     CryptoLibAgreement_t* self,
     CryptoLibRng_t*       rng,

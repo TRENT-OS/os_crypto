@@ -25,7 +25,7 @@ typedef struct CryptoLibSignature CryptoLibSignature_t;
 
 // Exported functions ----------------------------------------------------------
 
-seos_err_t
+OS_Error_t
 CryptoLibSignature_init(
     CryptoLibSignature_t**         self,
     const CryptoLibKey_t*          prvKey,
@@ -34,12 +34,12 @@ CryptoLibSignature_init(
     const OS_CryptoDigest_Alg_t    digest,
     const OS_Crypto_Memory_t*      memory);
 
-seos_err_t
+OS_Error_t
 CryptoLibSignature_free(
     CryptoLibSignature_t*     self,
     const OS_Crypto_Memory_t* memory);
 
-seos_err_t
+OS_Error_t
 CryptoLibSignature_sign(
     CryptoLibSignature_t* self,
     const void*           hash,
@@ -48,7 +48,7 @@ CryptoLibSignature_sign(
     size_t*               signatureSize,
     CryptoLibRng_t*       rng);
 
-seos_err_t
+OS_Error_t
 CryptoLibSignature_verify(
     CryptoLibSignature_t* self,
     const void*           hash,

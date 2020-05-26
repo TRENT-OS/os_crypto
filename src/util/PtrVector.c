@@ -30,7 +30,7 @@ PtrVector_hasPtr(
     return (obj == NULL) ? false : PtrVector_find(v, obj) != -1;
 }
 
-seos_err_t
+OS_Error_t
 PtrVector_remove(
     PtrVector*  v,
     const void* obj)
@@ -48,7 +48,7 @@ PtrVector_remove(
     return SEOS_SUCCESS;
 }
 
-seos_err_t
+OS_Error_t
 PtrVector_add(
     PtrVector* v,
     void*      obj)
@@ -64,7 +64,7 @@ PtrVector_free(
     PointerVector_dtor(v);
 }
 
-seos_err_t
+OS_Error_t
 PtrVector_init(
     PtrVector* v)
 {

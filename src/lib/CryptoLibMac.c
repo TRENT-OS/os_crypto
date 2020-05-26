@@ -26,13 +26,13 @@ struct CryptoLibMac
 
 // Private Functions -----------------------------------------------------------
 
-static seos_err_t
+static OS_Error_t
 initImpl(
     CryptoLibMac_t**          self,
     const OS_CryptoMac_Alg_t  algorithm,
     const OS_Crypto_Memory_t* memory)
 {
-    seos_err_t err;
+    OS_Error_t err;
     CryptoLibMac_t* mac;
     mbedtls_md_type_t type;
 
@@ -78,12 +78,12 @@ err0:
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 freeImpl(
     CryptoLibMac_t*           self,
     const OS_Crypto_Memory_t* memory)
 {
-    seos_err_t err;
+    OS_Error_t err;
 
     err = SEOS_SUCCESS;
     switch (self->algorithm)
@@ -101,13 +101,13 @@ freeImpl(
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 startImpl(
     CryptoLibMac_t* self,
     const void*     secret,
     const size_t    secretSize)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
@@ -123,13 +123,13 @@ startImpl(
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 processImpl(
     CryptoLibMac_t* self,
     const void*     data,
     const size_t    dataSize)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
@@ -145,13 +145,13 @@ processImpl(
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 finalizeImpl(
     CryptoLibMac_t* self,
     void*           mac,
     size_t*         macSize)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
 
     err = SEOS_SUCCESS;
     switch (self->algorithm)
@@ -188,7 +188,7 @@ finalizeImpl(
 
 // Public Functions ------------------------------------------------------------
 
-seos_err_t
+OS_Error_t
 CryptoLibMac_init(
     CryptoLibMac_t**          self,
     const OS_CryptoMac_Alg_t  algorithm,
@@ -202,7 +202,7 @@ CryptoLibMac_init(
     return initImpl(self, algorithm, memory);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibMac_free(
     CryptoLibMac_t*           self,
     const OS_Crypto_Memory_t* memory)
@@ -215,13 +215,13 @@ CryptoLibMac_free(
     return freeImpl(self, memory);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibMac_start(
     CryptoLibMac_t* self,
     const void*     secret,
     const size_t    secretSize)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
 
     if (NULL == self || NULL == secret || 0 == secretSize)
     {
@@ -235,13 +235,13 @@ CryptoLibMac_start(
     return err;
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibMac_process(
     CryptoLibMac_t* self,
     const void*     data,
     const size_t    dataSize)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
 
     if (NULL == self || NULL == data || 0 == dataSize)
     {
@@ -255,13 +255,13 @@ CryptoLibMac_process(
     return err;
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibMac_finalize(
     CryptoLibMac_t* self,
     void*           mac,
     size_t*         macSize)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
 
     if (NULL == self || NULL == mac || NULL == macSize || 0 == *macSize)
     {

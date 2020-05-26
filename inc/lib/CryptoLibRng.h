@@ -24,27 +24,27 @@ typedef struct CryptoLibRng CryptoLibRng_t;
 
 // Exported functions ----------------------------------------------------------
 
-seos_err_t
+OS_Error_t
 CryptoLibRng_init(
     CryptoLibRng_t**                 self,
     const OS_CryptoRng_Entropy_func* entropyFunc,
     void*                            entropyCtx,
     const OS_Crypto_Memory_t*        memory);
 
-seos_err_t
+OS_Error_t
 CryptoLibRng_getBytes(
     CryptoLibRng_t*           self,
     const OS_CryptoRng_Flag_t flags,
     void*                     buf,
     const size_t              bufSize);
 
-seos_err_t
+OS_Error_t
 CryptoLibRng_reSeed(
     CryptoLibRng_t* self,
     const void*     seed,
     const size_t    seedSize);
 
-seos_err_t
+OS_Error_t
 CryptoLibRng_free(
     CryptoLibRng_t*           self,
     const OS_Crypto_Memory_t* memory);

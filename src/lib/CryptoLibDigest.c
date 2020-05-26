@@ -36,13 +36,13 @@ Debug_STATIC_ASSERT((int)OS_CryptoDigest_ALG_SHA256   ==
 
 // Private Functions -----------------------------------------------------------
 
-static seos_err_t
+static OS_Error_t
 initImpl(
     CryptoLibDigest_t**         self,
     const OS_CryptoDigest_Alg_t algorithm,
     const OS_Crypto_Memory_t*   memory)
 {
-    seos_err_t err;
+    OS_Error_t err;
     CryptoLibDigest_t* dig;
 
     if ((dig = memory->calloc(1, sizeof(CryptoLibDigest_t))) == NULL)
@@ -80,12 +80,12 @@ initImpl(
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 freeImpl(
     CryptoLibDigest_t*        self,
     const OS_Crypto_Memory_t* memory)
 {
-    seos_err_t err;
+    OS_Error_t err;
 
     err = SEOS_SUCCESS;
     switch (self->algorithm)
@@ -105,13 +105,13 @@ freeImpl(
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 finalizeImpl(
     CryptoLibDigest_t* self,
     void*              digest,
     size_t*            digestSize)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
@@ -148,7 +148,7 @@ finalizeImpl(
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 processImpl(
     CryptoLibDigest_t* self,
     const void*        data,
@@ -169,7 +169,7 @@ processImpl(
     return SEOS_ERROR_GENERIC;
 }
 
-static seos_err_t
+static OS_Error_t
 cloneImpl(
     CryptoLibDigest_t*       self,
     const CryptoLibDigest_t* source)
@@ -191,7 +191,7 @@ cloneImpl(
 
 // Public Functions ------------------------------------------------------------
 
-seos_err_t
+OS_Error_t
 CryptoLibDigest_init(
     CryptoLibDigest_t**         self,
     const OS_CryptoDigest_Alg_t algorithm,
@@ -205,7 +205,7 @@ CryptoLibDigest_init(
     return initImpl(self, algorithm, memory);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibDigest_free(
     CryptoLibDigest_t*        self,
     const OS_Crypto_Memory_t* memory)
@@ -218,7 +218,7 @@ CryptoLibDigest_free(
     return freeImpl(self, memory);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibDigest_clone(
     CryptoLibDigest_t*       self,
     const CryptoLibDigest_t* source)
@@ -233,13 +233,13 @@ CryptoLibDigest_clone(
     return cloneImpl(self, source);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibDigest_process(
     CryptoLibDigest_t* self,
     const void*        data,
     const size_t       len)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
 
     if (NULL == self || NULL == data || 0 == len)
     {
@@ -252,13 +252,13 @@ CryptoLibDigest_process(
     return err;
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibDigest_finalize(
     CryptoLibDigest_t* self,
     void*              digest,
     size_t*            digestSize)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
 
     if (NULL == self || NULL == digest || NULL == digestSize || 0 == *digestSize)
     {

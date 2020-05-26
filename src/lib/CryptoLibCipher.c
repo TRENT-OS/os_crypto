@@ -31,7 +31,7 @@ struct CryptoLibCipher
 
 // Private static functions ----------------------------------------------------
 
-static seos_err_t
+static OS_Error_t
 initImpl(
     CryptoLibCipher_t**         self,
     const CryptoLibKey_t*       key,
@@ -39,7 +39,7 @@ initImpl(
     const OS_Crypto_Memory_t*   memory)
 {
     CryptoLibCipher_t* ciph;
-    seos_err_t err;
+    OS_Error_t err;
 
     if ((ciph = memory->calloc(1, sizeof(CryptoLibCipher_t))) == NULL)
     {
@@ -84,12 +84,12 @@ initImpl(
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 freeImpl(
     CryptoLibCipher_t*        self,
     const OS_Crypto_Memory_t* memory)
 {
-    seos_err_t err;
+    OS_Error_t err;
 
     err = SEOS_SUCCESS;
     switch (self->algorithm)
@@ -113,12 +113,12 @@ freeImpl(
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 setKeyImpl(
     CryptoLibCipher_t* self)
 {
     OS_CryptoKey_Aes_t* aesKey;
-    seos_err_t err = SEOS_SUCCESS;
+    OS_Error_t err = SEOS_SUCCESS;
 
     switch (self->algorithm)
     {
@@ -166,13 +166,13 @@ setKeyImpl(
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 setIvImpl(
     CryptoLibCipher_t* self,
     const void*        iv,
     const size_t       ivSize)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
@@ -205,7 +205,7 @@ setIvImpl(
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 processImpl(
     CryptoLibCipher_t* self,
     const void*        input,
@@ -213,7 +213,7 @@ processImpl(
     void*              output,
     size_t*            outputSize)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
 
     if (*outputSize < inputSize)
     {
@@ -288,7 +288,7 @@ processImpl(
     return err;
 }
 
-static seos_err_t
+static OS_Error_t
 startImpl(
     CryptoLibCipher_t* self,
     const void*        ad,
@@ -337,13 +337,13 @@ cmemcmp(
     return ((int)diff);
 }
 
-static seos_err_t
+static OS_Error_t
 finalizeImpl(
     CryptoLibCipher_t* self,
     void*              buf,
     size_t*            bufSize)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
@@ -390,7 +390,7 @@ finalizeImpl(
 
 // Public functions ------------------------------------------------------------
 
-seos_err_t
+OS_Error_t
 CryptoLibCipher_init(
     CryptoLibCipher_t**         self,
     const CryptoLibKey_t*       key,
@@ -399,7 +399,7 @@ CryptoLibCipher_init(
     const size_t                ivSize,
     const OS_Crypto_Memory_t*   memory)
 {
-    seos_err_t err;
+    OS_Error_t err;
 
     if (NULL == memory || NULL == self || NULL == key)
     {
@@ -418,7 +418,7 @@ CryptoLibCipher_init(
     return err;
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibCipher_free(
     CryptoLibCipher_t*        self,
     const OS_Crypto_Memory_t* memory)
@@ -431,13 +431,13 @@ CryptoLibCipher_free(
     return freeImpl(self, memory);
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibCipher_start(
     CryptoLibCipher_t* self,
     const void*        input,
     const size_t       inputSize)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
 
     if (NULL == self)
     {
@@ -450,7 +450,7 @@ CryptoLibCipher_start(
     return err;
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibCipher_process(
     CryptoLibCipher_t* self,
     const void*        input,
@@ -458,7 +458,7 @@ CryptoLibCipher_process(
     void*              output,
     size_t*            outputSize)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
 
     if (NULL == self || NULL == input || 0 == inputSize || NULL == output
         || NULL == outputSize || 0 == *outputSize)
@@ -475,13 +475,13 @@ CryptoLibCipher_process(
     return err;
 }
 
-seos_err_t
+OS_Error_t
 CryptoLibCipher_finalize(
     CryptoLibCipher_t* self,
     void*              buf,
     size_t*            bufSize)
 {
-    seos_err_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = SEOS_ERROR_GENERIC;
 
     if (NULL == self || NULL == buf || NULL == bufSize || 0 == *bufSize)
     {

@@ -11,13 +11,13 @@
 #define PROXY_GET_PTR(p) \
     (CryptoLibDigest_t**) PROXY_GET_OBJ_PTR(p)
 
-seos_err_t
+OS_Error_t
 OS_CryptoDigest_init(
     OS_CryptoDigest_Handle_t*   self,
     const OS_Crypto_Handle_t    hCrypto,
     const OS_CryptoDigest_Alg_t algorithm)
 {
-    seos_err_t err;
+    OS_Error_t err;
 
     if (NULL == hCrypto)
     {
@@ -34,11 +34,11 @@ OS_CryptoDigest_init(
     return err;
 }
 
-seos_err_t
+OS_Error_t
 OS_CryptoDigest_free(
     OS_CryptoDigest_Handle_t self)
 {
-    seos_err_t err;
+    OS_Error_t err;
 
     err = PROXY_CALL(self, Digest_free, PROXY_GET_OBJ(self));
     PROXY_FREE(self);
@@ -46,7 +46,7 @@ OS_CryptoDigest_free(
     return err;
 }
 
-seos_err_t
+OS_Error_t
 OS_CryptoDigest_clone(
     OS_CryptoDigest_Handle_t       self,
     const OS_CryptoDigest_Handle_t hSrcDigest)
@@ -55,7 +55,7 @@ OS_CryptoDigest_clone(
                       PROXY_GET_OBJ(hSrcDigest));
 }
 
-seos_err_t
+OS_Error_t
 OS_CryptoDigest_process(
     OS_CryptoDigest_Handle_t self,
     const void*              data,
@@ -65,7 +65,7 @@ OS_CryptoDigest_process(
                       dataSize);
 }
 
-seos_err_t
+OS_Error_t
 OS_CryptoDigest_finalize(
     OS_CryptoDigest_Handle_t self,
     void*                    digest,
