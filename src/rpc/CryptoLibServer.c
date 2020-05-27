@@ -2,7 +2,7 @@
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 
-#if defined(SEOS_CRYPTO_WITH_RPC_SERVER)
+#if defined(OS_CRYPTO_WITH_RPC_SERVER)
 
 #include "OS_Crypto.h"
 
@@ -14,7 +14,7 @@
 // -------------------------- defines/types/variables --------------------------
 
 /*
- * Host of SEOS Crypto API RPC server has to provide a client's RPC context.
+ * Host of OS Crypto API RPC server has to provide a client's RPC context.
  * This way, it is up to the host (e.g., the CryptoServer) to implement its own
  * way of handling multiple clients and their respective contextx.
  */
@@ -510,4 +510,4 @@ CryptoLibServer_free(
     return OS_SUCCESS;
 }
 
-#endif /* SEOS_CRYPTO_WITH_RPC_SERVER */
+#endif /* OS_CRYPTO_WITH_RPC_SERVER */

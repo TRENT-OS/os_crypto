@@ -2,7 +2,7 @@
 
 ## Overview
 
-SEOS Crypto Library provides a library that allows components to run crypto
+OS Crypto Library provides a library that allows components to run crypto
 routines either locally or via the CryptoServer
 
 ## Usage

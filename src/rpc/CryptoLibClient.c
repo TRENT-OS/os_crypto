@@ -2,7 +2,7 @@
  * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 
-#if defined(SEOS_CRYPTO_WITH_RPC_CLIENT)
+#if defined(OS_CRYPTO_WITH_RPC_CLIENT)
 
 #include "rpc/CryptoLibClient.h"
 #include "rpc/CryptoLibServer.h"
@@ -752,4 +752,4 @@ CryptoLibClient_free(
     return OS_SUCCESS;
 }
 
-#endif /* SEOS_CRYPTO_WITH_RPC_CLIENT */
+#endif /* OS_CRYPTO_WITH_RPC_CLIENT */

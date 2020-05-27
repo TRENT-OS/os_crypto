@@ -6,7 +6,7 @@
  *
  * @file CryptoLibClient.h
  *
- * @brief RPC client object and functions to access a SEOS Crypto API instance
+ * @brief RPC client object and functions to access a OS Crypto API instance
  * running as RPC server in another component. If configured to act as RPC client,
  * API calls will transparently be mapped to RPC calls and thus to execute
  * in isolation (e.g., on the RPC server running in its own component).

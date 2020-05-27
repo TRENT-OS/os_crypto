@@ -6,7 +6,7 @@
  *
  * @file CryptoLibServer.h
  *
- * @brief RPC server object and functions to provide a SEOS Crypto API RPC server
+ * @brief RPC server object and functions to provide a OS Crypto API RPC server
  * which can be used from a RPC client instance. Calls to this object are mapped
  * to an implementation (e.g., a crypto library).
  *

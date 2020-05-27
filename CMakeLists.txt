@@ -1,22 +1,22 @@
 #
-# SEOS Crypto Library
+# OS Crypto Library
 #
 # We have three library targets:
-# 1. SEOS_CRYPTO:
+# 1. OS_CRYPTO:
 #    Provides only functionality of the crypto library behind calls to the API.
-# 2. SEOS_CRYPTO_WITH_RPC_CLIENT:
+# 2. OS_CRYPTO_WITH_RPC_CLIENT:
 #    Provides library functionality to execute crypto locally, but also allows
 #    to operate crypto API in RPC client mode, where calls to the API are
 #    transparently mapped to an RPC interface and executed in a separate component
 #    (e.g., the CryptoServer)
-# 3. SEOS_CRYPTO_WITH_RPC_SEVER:
+# 3. OS_CRYPTO_WITH_RPC_SEVER:
 #    Provides library functionality to execute crypto locally, but also allows
 #    to instantiate the crypto API as RPC server easily, which can then be used
 #    to serve RPC requests from a crypto API RPC client.
 #
 
 # We need to build 3rdparty/mbedtls for this and would like to avoid
-# all users of SEOS_CRYPTO to include this as well, so we do it here
+# all users of OS_CRYPTO to include this as well, so we do it here
 seos_use_libs(
     3RDPARTY_MBEDTLS_FOR_CRYPTO
 )
@@ -123,7 +123,7 @@ target_compile_definitions(${PROJECT_NAME}
 target_compile_options(${PROJECT_NAME}
     INTERFACE
        ${COMPILE_OPTIONS}
-       -DSEOS_CRYPTO_WITH_RPC_CLIENT
+       -DOS_CRYPTO_WITH_RPC_CLIENT
 )
 
 target_include_directories(${PROJECT_NAME}
@@ -158,7 +158,7 @@ target_compile_definitions(${PROJECT_NAME}
 target_compile_options(${PROJECT_NAME}
     INTERFACE
        ${COMPILE_OPTIONS}
-       -DSEOS_CRYPTO_WITH_RPC_SERVER
+       -DOS_CRYPTO_WITH_RPC_SERVER
 )
 
 target_include_directories(${PROJECT_NAME}
@@ -175,7 +175,7 @@ target_link_libraries(${PROJECT_NAME}
 
 #------------------------------------------------------------------------------
 
-# if invoked from the SEOS sandbox, provide a documentation build target
+# if invoked from the OS sandbox, provide a documentation build target
 if (COMMAND seos_create_doxygen_target)
 
     seos_create_doxygen_target( seos_crypto_doc
