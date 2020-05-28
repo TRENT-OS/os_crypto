@@ -45,11 +45,11 @@ Rng_getBytes(
 
     if (NULL == ctx)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (bufSize > CryptoLib_SIZE_BUFFER)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     return CryptoLibRng_getBytes(self->rng, flags, buf, bufSize);
@@ -65,11 +65,11 @@ Rng_reseed(
 
     if (NULL == ctx)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (seedSize > CryptoLib_SIZE_BUFFER)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     return CryptoLibRng_reSeed(self->rng, seed, seedSize);
@@ -83,26 +83,26 @@ Mac_init(
     CryptoLibMac_t**         pMacObj,
     const OS_CryptoMac_Alg_t algorithm)
 {
-    OS_Error_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pMacObj)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     if ((err = CryptoLibMac_init(pMacObj, algorithm,
-                                 &self->memory)) != SEOS_SUCCESS)
+                                 &self->memory)) != OS_SUCCESS)
     {
         return err;
     }
 
-    if ((err = PtrVector_add(&self->macObjects, *pMacObj)) != SEOS_SUCCESS)
+    if ((err = PtrVector_add(&self->macObjects, *pMacObj)) != OS_SUCCESS)
     {
         goto err0;
     }
 
-    return SEOS_SUCCESS;
+    return OS_SUCCESS;
 
 err0:
     CryptoLibMac_free(*pMacObj, &self->memory);
@@ -119,12 +119,12 @@ Mac_free(
 
     if (NULL == ctx)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     if (!PtrVector_hasPtr(&self->macObjects, macObj))
     {
-        return SEOS_ERROR_INVALID_HANDLE;
+        return OS_ERROR_INVALID_HANDLE;
     }
 
     PtrVector_remove(&self->macObjects, macObj);
@@ -143,15 +143,15 @@ Mac_start(
 
     if (NULL == ctx)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (secretSize > CryptoLib_SIZE_BUFFER)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     return !PtrVector_hasPtr(&self->macObjects, macObj) ?
-           SEOS_ERROR_INVALID_HANDLE :
+           OS_ERROR_INVALID_HANDLE :
            CryptoLibMac_start(macObj, secret, secretSize);
 }
 
@@ -166,15 +166,15 @@ Mac_process(
 
     if (NULL == ctx)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (dataSize > CryptoLib_SIZE_BUFFER)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     return !PtrVector_hasPtr(&self->macObjects, macObj) ?
-           SEOS_ERROR_INVALID_HANDLE :
+           OS_ERROR_INVALID_HANDLE :
            CryptoLibMac_process(macObj, data, dataSize);
 }
 
@@ -189,15 +189,15 @@ Mac_finalize(
 
     if (NULL == ctx || NULL == macSize)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (*macSize > CryptoLib_SIZE_BUFFER)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     return !PtrVector_hasPtr(&self->macObjects, macObj) ?
-           SEOS_ERROR_INVALID_HANDLE :
+           OS_ERROR_INVALID_HANDLE :
            CryptoLibMac_finalize(macObj, mac, macSize);
 }
 
@@ -209,26 +209,26 @@ Digest_init(
     CryptoLibDigest_t**         pDigObj,
     const OS_CryptoDigest_Alg_t algorithm)
 {
-    OS_Error_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pDigObj)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     if ((err = CryptoLibDigest_init(pDigObj, algorithm,
-                                    &self->memory)) != SEOS_SUCCESS)
+                                    &self->memory)) != OS_SUCCESS)
     {
         return err;
     }
 
-    if ((err = PtrVector_add(&self->digestObjects, *pDigObj)) != SEOS_SUCCESS)
+    if ((err = PtrVector_add(&self->digestObjects, *pDigObj)) != OS_SUCCESS)
     {
         goto err0;
     }
 
-    return SEOS_SUCCESS;
+    return OS_SUCCESS;
 
 err0:
     CryptoLibDigest_free(*pDigObj, &self->memory);
@@ -245,12 +245,12 @@ Digest_free(
 
     if (NULL == ctx)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     if (!PtrVector_hasPtr(&self->digestObjects, digObj))
     {
-        return SEOS_ERROR_INVALID_HANDLE;
+        return OS_ERROR_INVALID_HANDLE;
     }
 
     PtrVector_remove(&self->digestObjects, digObj);
@@ -268,12 +268,12 @@ Digest_clone(
 
     if (NULL == ctx)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     return !PtrVector_hasPtr(&self->digestObjects, dstDigObj) ||
            !PtrVector_hasPtr(&self->digestObjects, srcDigObj) ?
-           SEOS_ERROR_INVALID_HANDLE :
+           OS_ERROR_INVALID_HANDLE :
            CryptoLibDigest_clone(dstDigObj, srcDigObj);
 }
 
@@ -288,15 +288,15 @@ Digest_process(
 
     if (NULL == ctx)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (dataSize > CryptoLib_SIZE_BUFFER)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     return !PtrVector_hasPtr(&self->digestObjects, digObj) ?
-           SEOS_ERROR_INVALID_HANDLE :
+           OS_ERROR_INVALID_HANDLE :
            CryptoLibDigest_process(digObj, data, dataSize);
 }
 
@@ -311,15 +311,15 @@ Digest_finalize(
 
     if (NULL == ctx || NULL == digestSize)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (*digestSize > CryptoLib_SIZE_BUFFER)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     return !PtrVector_hasPtr(&self->digestObjects, digObj) ?
-           SEOS_ERROR_INVALID_HANDLE :
+           OS_ERROR_INVALID_HANDLE :
            CryptoLibDigest_finalize(digObj, digest, digestSize);
 }
 
@@ -334,30 +334,30 @@ Signature_init(
     const OS_CryptoSignature_Alg_t algorithm,
     const OS_CryptoDigest_Alg_t    digest)
 {
-    OS_Error_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pSigObj)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     if (prvKey != NULL && !PtrVector_hasPtr(&self->keyObjects, prvKey))
     {
-        return SEOS_ERROR_INVALID_HANDLE;
+        return OS_ERROR_INVALID_HANDLE;
     }
     else if (pubKey != NULL && !PtrVector_hasPtr(&self->keyObjects, pubKey))
     {
-        return SEOS_ERROR_INVALID_HANDLE;
+        return OS_ERROR_INVALID_HANDLE;
     }
 
     if ((err = CryptoLibSignature_init(pSigObj, prvKey, pubKey, algorithm, digest,
-                                       &self->memory)) != SEOS_SUCCESS)
+                                       &self->memory)) != OS_SUCCESS)
     {
         return err;
     }
 
-    if ((err = PtrVector_add(&self->signatureObjects, *pSigObj)) != SEOS_SUCCESS)
+    if ((err = PtrVector_add(&self->signatureObjects, *pSigObj)) != OS_SUCCESS)
     {
         goto err0;
     }
@@ -379,12 +379,12 @@ Signature_free(
 
     if (NULL == ctx)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     if (!PtrVector_hasPtr(&self->signatureObjects, sigObj))
     {
-        return SEOS_ERROR_INVALID_HANDLE;
+        return OS_ERROR_INVALID_HANDLE;
     }
 
     PtrVector_remove(&self->signatureObjects, sigObj);
@@ -405,18 +405,18 @@ Signature_sign(
 
     if (NULL == ctx || NULL == hash || NULL == signatureSize)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (hashSize > CryptoLib_SIZE_BUFFER ||
              *signatureSize > CryptoLib_SIZE_BUFFER)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     // Make local copy of input buffer, to allow overlapping hash/signature buffers
     memcpy(self->buffer, hash, hashSize);
     return !PtrVector_hasPtr(&self->signatureObjects, sigObj) ?
-           SEOS_ERROR_INVALID_HANDLE :
+           OS_ERROR_INVALID_HANDLE :
            CryptoLibSignature_sign(sigObj, self->buffer, hashSize, signature,
                                    signatureSize, self->rng);
 }
@@ -434,15 +434,15 @@ Signature_verify(
 
     if (NULL == ctx)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (hashSize + signatureSize > CryptoLib_SIZE_BUFFER)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     return !PtrVector_hasPtr(&self->signatureObjects, sigObj) ?
-           SEOS_ERROR_INVALID_HANDLE :
+           OS_ERROR_INVALID_HANDLE :
            CryptoLibSignature_verify(sigObj, hash, hashSize, signature, signatureSize,
                                      self->rng);
 }
@@ -456,31 +456,31 @@ Agreement_init(
     const CryptoLibKey_t*          prvKey,
     const OS_CryptoAgreement_Alg_t algorithm)
 {
-    OS_Error_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pAgrObj)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     if (!PtrVector_hasPtr(&self->keyObjects, prvKey))
     {
-        return SEOS_ERROR_INVALID_HANDLE;
+        return OS_ERROR_INVALID_HANDLE;
     }
 
     if ((err = CryptoLibAgreement_init(pAgrObj, prvKey, algorithm,
-                                       &self->memory)) != SEOS_SUCCESS)
+                                       &self->memory)) != OS_SUCCESS)
     {
         return err;
     }
 
-    if ((err = PtrVector_add(&self->agreementObjects, *pAgrObj)) != SEOS_SUCCESS)
+    if ((err = PtrVector_add(&self->agreementObjects, *pAgrObj)) != OS_SUCCESS)
     {
         goto err0;
     }
 
-    return SEOS_SUCCESS;
+    return OS_SUCCESS;
 
 err0:
     CryptoLibAgreement_free(*pAgrObj, &self->memory);
@@ -497,12 +497,12 @@ Agreement_free(
 
     if (NULL == ctx)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     if (!PtrVector_hasPtr(&self->agreementObjects, agrObj))
     {
-        return SEOS_ERROR_INVALID_HANDLE;
+        return OS_ERROR_INVALID_HANDLE;
     }
 
     PtrVector_remove(&self->agreementObjects, agrObj);
@@ -522,20 +522,20 @@ Agreement_agree(
 
     if (NULL == ctx || NULL == sharedSize)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (*sharedSize > CryptoLib_SIZE_BUFFER)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     if (!PtrVector_hasPtr(&self->keyObjects, pubKey))
     {
-        return SEOS_ERROR_INVALID_HANDLE;
+        return OS_ERROR_INVALID_HANDLE;
     }
 
     return !PtrVector_hasPtr(&self->agreementObjects, agrObj) ?
-           SEOS_ERROR_INVALID_HANDLE :
+           OS_ERROR_INVALID_HANDLE :
            CryptoLibAgreement_agree(agrObj, self->rng, pubKey, shared,
                                     sharedSize);
 }
@@ -548,26 +548,26 @@ Key_generate(
     CryptoLibKey_t**           pKeyObj,
     const OS_CryptoKey_Spec_t* spec)
 {
-    OS_Error_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pKeyObj)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     if ((err = CryptoLibKey_generate(pKeyObj, spec, &self->memory,
-                                     self->rng)) != SEOS_SUCCESS)
+                                     self->rng)) != OS_SUCCESS)
     {
         return err;
     }
 
-    if ((err = PtrVector_add(&self->keyObjects, *pKeyObj)) != SEOS_SUCCESS)
+    if ((err = PtrVector_add(&self->keyObjects, *pKeyObj)) != OS_SUCCESS)
     {
         goto err0;
     }
 
-    return SEOS_SUCCESS;
+    return OS_SUCCESS;
 
 err0:
     CryptoLibKey_free(*pKeyObj, &self->memory);
@@ -581,26 +581,26 @@ Key_import(
     CryptoLibKey_t**           pKeyObj,
     const OS_CryptoKey_Data_t* keyData)
 {
-    OS_Error_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pKeyObj)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     if ((err = CryptoLibKey_import(pKeyObj, keyData,
-                                   &self->memory)) != SEOS_SUCCESS)
+                                   &self->memory)) != OS_SUCCESS)
     {
         return err;
     }
 
-    if ((err = PtrVector_add(&self->keyObjects, *pKeyObj)) != SEOS_SUCCESS)
+    if ((err = PtrVector_add(&self->keyObjects, *pKeyObj)) != OS_SUCCESS)
     {
         goto err0;
     }
 
-    return SEOS_SUCCESS;
+    return OS_SUCCESS;
 
 err0:
     CryptoLibKey_free(*pKeyObj, &self->memory);
@@ -615,31 +615,31 @@ Key_makePublic(
     const CryptoLibKey_t*        prvKeyObj,
     const OS_CryptoKey_Attrib_t* attribs)
 {
-    OS_Error_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pPubKeyObj)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     if (!PtrVector_hasPtr(&self->keyObjects, prvKeyObj))
     {
-        return SEOS_ERROR_INVALID_HANDLE;
+        return OS_ERROR_INVALID_HANDLE;
     }
 
     if ((err = CryptoLibKey_makePublic(pPubKeyObj, prvKeyObj, attribs,
-                                       &self->memory)) != SEOS_SUCCESS)
+                                       &self->memory)) != OS_SUCCESS)
     {
         return err;
     }
 
-    if ((err = PtrVector_add(&self->keyObjects, *pPubKeyObj)) != SEOS_SUCCESS)
+    if ((err = PtrVector_add(&self->keyObjects, *pPubKeyObj)) != OS_SUCCESS)
     {
         goto err0;
     }
 
-    return SEOS_SUCCESS;
+    return OS_SUCCESS;
 
 err0:
     CryptoLibKey_free(*pPubKeyObj, &self->memory);
@@ -656,12 +656,12 @@ Key_free(
 
     if (NULL == ctx)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     if (!PtrVector_hasPtr(&self->keyObjects, keyObj))
     {
-        return SEOS_ERROR_INVALID_HANDLE;
+        return OS_ERROR_INVALID_HANDLE;
     }
 
     PtrVector_remove(&self->keyObjects, keyObj);
@@ -679,11 +679,11 @@ Key_export(
 
     if (NULL == ctx)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     return !PtrVector_hasPtr(&self->keyObjects, keyObj) ?
-           SEOS_ERROR_INVALID_HANDLE :
+           OS_ERROR_INVALID_HANDLE :
            CryptoLibKey_export(keyObj, keyData);
 }
 
@@ -698,15 +698,15 @@ Key_getParams(
 
     if (NULL == ctx || NULL == paramSize)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (*paramSize > CryptoLib_SIZE_BUFFER)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     return !PtrVector_hasPtr(&self->keyObjects, keyObj) ?
-           SEOS_ERROR_INVALID_HANDLE :
+           OS_ERROR_INVALID_HANDLE :
            CryptoLibKey_getParams(keyObj, keyParams, paramSize);
 }
 
@@ -720,11 +720,11 @@ Key_getAttribs(
 
     if (NULL == ctx || NULL == attribs)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     return !PtrVector_hasPtr(&self->keyObjects, keyObj) ?
-           SEOS_ERROR_INVALID_HANDLE :
+           OS_ERROR_INVALID_HANDLE :
            CryptoLibKey_getAttribs(keyObj, attribs);
 }
 
@@ -737,11 +737,11 @@ Key_loadParams(
 {
     if (NULL == ctx || NULL == paramSize)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (*paramSize > CryptoLib_SIZE_BUFFER)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     return CryptoLibKey_loadParams(name, keyParams, paramSize);
@@ -758,35 +758,35 @@ Cipher_init(
     const void*                 iv,
     const size_t                ivSize)
 {
-    OS_Error_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pCipherObj)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (ivSize > CryptoLib_SIZE_BUFFER)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     if (!PtrVector_hasPtr(&self->keyObjects, key))
     {
-        return SEOS_ERROR_INVALID_HANDLE;
+        return OS_ERROR_INVALID_HANDLE;
     }
 
     if ((err = CryptoLibCipher_init(pCipherObj, key, algorithm, iv, ivSize,
-                                    &self->memory)) != SEOS_SUCCESS)
+                                    &self->memory)) != OS_SUCCESS)
     {
         return err;
     }
 
-    if ((err = PtrVector_add(&self->cipherObjects, *pCipherObj)) != SEOS_SUCCESS)
+    if ((err = PtrVector_add(&self->cipherObjects, *pCipherObj)) != OS_SUCCESS)
     {
         goto err0;
     }
 
-    return SEOS_SUCCESS;
+    return OS_SUCCESS;
 
 err0:
     CryptoLibCipher_free(*pCipherObj, &self->memory);
@@ -803,12 +803,12 @@ Cipher_free(
 
     if (NULL == ctx)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     if (!PtrVector_hasPtr(&self->cipherObjects, cipherObj))
     {
-        return SEOS_ERROR_INVALID_HANDLE;
+        return OS_ERROR_INVALID_HANDLE;
     }
 
     PtrVector_remove(&self->cipherObjects, cipherObj);
@@ -829,18 +829,18 @@ Cipher_process(
 
     if (NULL == ctx || NULL == input || NULL == outputSize)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (inputSize > CryptoLib_SIZE_BUFFER ||
              *outputSize > CryptoLib_SIZE_BUFFER)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     // Make local copy of input buffer, to allow overlapping input/output buffers
     memcpy(self->buffer, input, inputSize);
     return !PtrVector_hasPtr(&self->cipherObjects, cipherObj) ?
-           SEOS_ERROR_INVALID_HANDLE :
+           OS_ERROR_INVALID_HANDLE :
            CryptoLibCipher_process(cipherObj, self->buffer, inputSize, output,
                                    outputSize);
 }
@@ -856,15 +856,15 @@ Cipher_start(
 
     if (NULL == ctx)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (adSize > CryptoLib_SIZE_BUFFER)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     return !PtrVector_hasPtr(&self->cipherObjects, cipherObj) ?
-           SEOS_ERROR_INVALID_HANDLE :
+           OS_ERROR_INVALID_HANDLE :
            CryptoLibCipher_start(cipherObj, ad, adSize);
 }
 
@@ -879,15 +879,15 @@ Cipher_finalize(
 
     if (NULL == ctx || NULL == outputSize)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (*outputSize > CryptoLib_SIZE_BUFFER)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     return !PtrVector_hasPtr(&self->cipherObjects, cipherObj) ?
-           SEOS_ERROR_INVALID_HANDLE :
+           OS_ERROR_INVALID_HANDLE :
            CryptoLibCipher_finalize(cipherObj, output, outputSize);
 }
 
@@ -935,12 +935,12 @@ CryptoLib_init(
     const OS_Crypto_Memory_t* memory,
     const CryptoLib_Config_t* cfg)
 {
-    OS_Error_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLib_t* self;
 
     if (NULL == impl || NULL == memory || NULL == cfg || NULL == cfg->rng.entropy)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     // Make sure mbedtls uses our own calloc/free functions; this can be set
@@ -948,39 +948,39 @@ CryptoLib_init(
     // Crypto API).
     if (mbedtls_platform_set_calloc_free(memory->calloc, memory->free) != 0)
     {
-        return SEOS_ERROR_ABORTED;
+        return OS_ERROR_ABORTED;
     }
 
     if ((self = memory->calloc(1, sizeof(CryptoLib_t))) == NULL)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     impl->context = self;
     impl->vtable  = &CryptoLib_vtable;
     self->memory  = *memory;
 
-    if ((err = PtrVector_init(&self->digestObjects)) != SEOS_SUCCESS)
+    if ((err = PtrVector_init(&self->digestObjects)) != OS_SUCCESS)
     {
         goto err0;
     }
-    else if ((err = PtrVector_init(&self->macObjects)) != SEOS_SUCCESS)
+    else if ((err = PtrVector_init(&self->macObjects)) != OS_SUCCESS)
     {
         goto err1;
     }
-    else if ((err = PtrVector_init(&self->keyObjects)) != SEOS_SUCCESS)
+    else if ((err = PtrVector_init(&self->keyObjects)) != OS_SUCCESS)
     {
         goto err2;
     }
-    else if ((err = PtrVector_init(&self->cipherObjects) != SEOS_SUCCESS))
+    else if ((err = PtrVector_init(&self->cipherObjects) != OS_SUCCESS))
     {
         goto err3;
     }
-    else if ((err = PtrVector_init(&self->signatureObjects) != SEOS_SUCCESS))
+    else if ((err = PtrVector_init(&self->signatureObjects) != OS_SUCCESS))
     {
         goto err4;
     }
-    else if ((err = PtrVector_init(&self->agreementObjects) != SEOS_SUCCESS))
+    else if ((err = PtrVector_init(&self->agreementObjects) != OS_SUCCESS))
     {
         goto err5;
     }
@@ -989,12 +989,12 @@ CryptoLib_init(
                    &self->rng,
                    (const OS_CryptoRng_Entropy_func*) cfg->rng.entropy,
                    cfg->rng.context,
-                   &self->memory)) != SEOS_SUCCESS)
+                   &self->memory)) != OS_SUCCESS)
     {
         goto err6;
     }
 
-    return SEOS_SUCCESS;
+    return OS_SUCCESS;
 
 err6:
     PtrVector_free(&self->agreementObjects);
@@ -1020,7 +1020,7 @@ CryptoLib_free(
 {
     if (NULL == self)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     CryptoLibRng_free(self->rng, &self->memory);
@@ -1034,5 +1034,5 @@ CryptoLib_free(
 
     self->memory.free(self);
 
-    return SEOS_SUCCESS;
+    return OS_SUCCESS;
 }

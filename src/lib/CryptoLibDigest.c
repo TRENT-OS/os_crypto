@@ -47,7 +47,7 @@ initImpl(
 
     if ((dig = memory->calloc(1, sizeof(CryptoLibDigest_t))) == NULL)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     memset(dig, 0, sizeof(CryptoLibDigest_t));
@@ -59,18 +59,18 @@ initImpl(
     case OS_CryptoDigest_ALG_MD5:
         mbedtls_md5_init(&dig->mbedtls.md5);
         err = mbedtls_md5_starts_ret(&dig->mbedtls.md5) ?
-              SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+              OS_ERROR_ABORTED : OS_SUCCESS;
         break;
     case OS_CryptoDigest_ALG_SHA256:
         mbedtls_sha256_init(&dig->mbedtls.sha256);
         err = mbedtls_sha256_starts_ret(&dig->mbedtls.sha256, 0) ?
-              SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+              OS_ERROR_ABORTED : OS_SUCCESS;
         break;
     default:
-        err = SEOS_ERROR_NOT_SUPPORTED;
+        err = OS_ERROR_NOT_SUPPORTED;
     }
 
-    if (err != SEOS_SUCCESS)
+    if (err != OS_SUCCESS)
     {
         memory->free(dig);
     }
@@ -87,7 +87,7 @@ freeImpl(
 {
     OS_Error_t err;
 
-    err = SEOS_SUCCESS;
+    err = OS_SUCCESS;
     switch (self->algorithm)
     {
     case OS_CryptoDigest_ALG_MD5:
@@ -97,7 +97,7 @@ freeImpl(
         mbedtls_sha256_free(&self->mbedtls.sha256);
         break;
     default:
-        err = SEOS_ERROR_NOT_SUPPORTED;
+        err = OS_ERROR_NOT_SUPPORTED;
     }
 
     memory->free(self);
@@ -111,38 +111,38 @@ finalizeImpl(
     void*              digest,
     size_t*            digestSize)
 {
-    OS_Error_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = OS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
     case OS_CryptoDigest_ALG_MD5:
         if (*digestSize < OS_CryptoDigest_SIZE_MD5)
         {
-            err = SEOS_ERROR_BUFFER_TOO_SMALL;
+            err = OS_ERROR_BUFFER_TOO_SMALL;
         }
         else
         {
             err = mbedtls_md5_finish_ret(&self->mbedtls.md5, digest) ||
                   mbedtls_md5_starts_ret(&self->mbedtls.md5) ?
-                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+                  OS_ERROR_ABORTED : OS_SUCCESS;
         }
         *digestSize = OS_CryptoDigest_SIZE_MD5;
         break;
     case OS_CryptoDigest_ALG_SHA256:
         if (*digestSize < OS_CryptoDigest_SIZE_SHA256)
         {
-            err = SEOS_ERROR_BUFFER_TOO_SMALL;
+            err = OS_ERROR_BUFFER_TOO_SMALL;
         }
         else
         {
             err = mbedtls_sha256_finish_ret(&self->mbedtls.sha256, digest) ||
                   mbedtls_sha256_starts_ret(&self->mbedtls.sha256, 0) ?
-                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+                  OS_ERROR_ABORTED : OS_SUCCESS;
         }
         *digestSize = OS_CryptoDigest_SIZE_SHA256;
         break;
     default:
-        err = SEOS_ERROR_NOT_SUPPORTED;
+        err = OS_ERROR_NOT_SUPPORTED;
     }
 
     return err;
@@ -158,15 +158,15 @@ processImpl(
     {
     case OS_CryptoDigest_ALG_MD5:
         return mbedtls_md5_update_ret(&self->mbedtls.md5, data, len) ?
-               SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+               OS_ERROR_ABORTED : OS_SUCCESS;
     case OS_CryptoDigest_ALG_SHA256:
         return mbedtls_sha256_update_ret(&self->mbedtls.sha256, data, len) ?
-               SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+               OS_ERROR_ABORTED : OS_SUCCESS;
     default:
-        return SEOS_ERROR_NOT_SUPPORTED;
+        return OS_ERROR_NOT_SUPPORTED;
     }
 
-    return SEOS_ERROR_GENERIC;
+    return OS_ERROR_GENERIC;
 }
 
 static OS_Error_t
@@ -183,10 +183,10 @@ cloneImpl(
         mbedtls_sha256_clone(&self->mbedtls.sha256, &source->mbedtls.sha256);
         break;
     default:
-        return SEOS_ERROR_NOT_SUPPORTED;
+        return OS_ERROR_NOT_SUPPORTED;
     }
 
-    return SEOS_SUCCESS;
+    return OS_SUCCESS;
 }
 
 // Public Functions ------------------------------------------------------------
@@ -199,7 +199,7 @@ CryptoLibDigest_init(
 {
     if (NULL == memory || NULL == self)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     return initImpl(self, algorithm, memory);
@@ -212,7 +212,7 @@ CryptoLibDigest_free(
 {
     if (NULL == memory || NULL == self)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     return freeImpl(self, memory);
@@ -225,7 +225,7 @@ CryptoLibDigest_clone(
 {
     if (NULL == self || NULL == source || self->algorithm != source->algorithm)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     self->processed = source->processed;
@@ -239,15 +239,15 @@ CryptoLibDigest_process(
     const void*        data,
     const size_t       len)
 {
-    OS_Error_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = OS_ERROR_GENERIC;
 
     if (NULL == self || NULL == data || 0 == len)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     err = processImpl(self, data, len);
-    self->processed |= (SEOS_SUCCESS == err);
+    self->processed |= (OS_SUCCESS == err);
 
     return err;
 }
@@ -258,18 +258,18 @@ CryptoLibDigest_finalize(
     void*              digest,
     size_t*            digestSize)
 {
-    OS_Error_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = OS_ERROR_GENERIC;
 
     if (NULL == self || NULL == digest || NULL == digestSize || 0 == *digestSize)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     err = !self->processed ?
-          SEOS_ERROR_ABORTED : finalizeImpl(self, digest, digestSize);
+          OS_ERROR_ABORTED : finalizeImpl(self, digest, digestSize);
 
     // We want to be able to re-use the digest object after finalizing it
-    if (SEOS_SUCCESS == err)
+    if (OS_SUCCESS == err)
     {
         self->processed = false;
     }

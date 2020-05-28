@@ -26,13 +26,13 @@ OS_CryptoSignature_init(
     // We are actually not using this; lets check it anyways for consistency.
     if (NULL == hCrypto)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     if (NULL == hPrvKey && NULL == hPubKey)
     {
         // We should at least have one key
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (NULL != hPrvKey && NULL != hPubKey
              && (hPrvKey->impl->context != hPubKey->impl->context
@@ -40,14 +40,14 @@ OS_CryptoSignature_init(
     {
         // If we have two keys, we need to make sure that they are both associated
         // with the same LIB instance
-        return SEOS_ERROR_INVALID_HANDLE;
+        return OS_ERROR_INVALID_HANDLE;
     }
 
     key = (hPubKey != NULL) ? hPubKey : hPrvKey;
     PROXY_INIT_FROM_KEY(*self, key);
     if ((err = PROXY_CALL(*self, Signature_init, PROXY_GET_PTR(*self),
                           PROXY_GET_OBJ(hPrvKey), PROXY_GET_OBJ(hPubKey),
-                          sigAlgorithm, digAlgorithm)) != SEOS_SUCCESS)
+                          sigAlgorithm, digAlgorithm)) != OS_SUCCESS)
     {
         PROXY_FREE(*self);
     }

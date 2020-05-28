@@ -33,14 +33,14 @@ OS_Crypto_getServer(
     if (((a = CryptoLibServer_getCrypto()) == NULL) ||  \
         ((s = OS_Crypto_getServer(a)) == NULL) )        \
     {                                                   \
-        return SEOS_ERROR_INVALID_PARAMETER;            \
+        return OS_ERROR_INVALID_PARAMETER;            \
     }                                                   \
 }
 
 // Call function pointer to LIB, make sure it is defined
 #define CALL(s, f, ...)                                 \
     (NULL == s->client.vtable->f) ?                     \
-    SEOS_ERROR_NOT_SUPPORTED :                          \
+    OS_ERROR_NOT_SUPPORTED :                          \
     s->client.vtable->f(s->client.context, __VA_ARGS__)
 
 struct CryptoLibServer
@@ -246,13 +246,13 @@ CryptoLibServer_Key_export(
      * only way is to use this RPC call so this is where this attribute is
      * checked.
      */
-    if ((err = CALL(self, Key_getAttribs, keyObj, &attribs)) != SEOS_SUCCESS)
+    if ((err = CALL(self, Key_getAttribs, keyObj, &attribs)) != OS_SUCCESS)
     {
         return err;
     }
 
     return !attribs.exportable ?
-           SEOS_ERROR_OPERATION_DENIED :
+           OS_ERROR_OPERATION_DENIED :
            CALL(self, Key_export, keyObj, self->dataPort);
 }
 
@@ -479,12 +479,12 @@ CryptoLibServer_init(
     if (NULL == ctx || NULL == client || NULL == memory || NULL == cfg
         || NULL == cfg->dataPort)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     if ((svr = memory->calloc(1, sizeof(CryptoLibServer_t))) == NULL)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     *ctx = svr;
@@ -493,7 +493,7 @@ CryptoLibServer_init(
     svr->memory    = *memory;
     svr->client   = *client;
 
-    return SEOS_SUCCESS;
+    return OS_SUCCESS;
 }
 
 OS_Error_t
@@ -502,12 +502,12 @@ CryptoLibServer_free(
 {
     if (NULL == self)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     self->memory.free(self);
 
-    return SEOS_SUCCESS;
+    return OS_SUCCESS;
 }
 
 #endif /* SEOS_CRYPTO_WITH_RPC_SERVER */

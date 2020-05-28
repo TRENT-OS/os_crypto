@@ -24,17 +24,17 @@ CryptoLibRng_init(
     void*                            entropyCtx,
     const OS_Crypto_Memory_t*        memory)
 {
-    OS_Error_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLibRng_t* rng;
 
     if (NULL == memory || NULL == self || NULL == entropyFunc)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     if ((rng = memory->calloc(1, sizeof(CryptoLibRng_t))) == NULL)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     *self = rng;
@@ -44,7 +44,7 @@ CryptoLibRng_init(
 
     if (mbedtls_ctr_drbg_seed(&rng->drbg, entropyFunc, entropyCtx, NULL, 0) != 0)
     {
-        err = SEOS_ERROR_ABORTED;
+        err = OS_ERROR_ABORTED;
         goto err0;
     }
 
@@ -52,7 +52,7 @@ CryptoLibRng_init(
     // obtained *some* amount of randomness from the DRBG)
     mbedtls_ctr_drbg_set_prediction_resistance(&rng->drbg, MBEDTLS_CTR_DRBG_PR_ON);
 
-    return SEOS_SUCCESS;
+    return OS_SUCCESS;
 
 err0:
     mbedtls_ctr_drbg_free(&rng->drbg);
@@ -68,13 +68,13 @@ CryptoLibRng_free(
 {
     if (NULL == memory || NULL == self)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     mbedtls_ctr_drbg_free(&self->drbg);
     memory->free(self);
 
-    return SEOS_SUCCESS;
+    return OS_SUCCESS;
 }
 
 OS_Error_t
@@ -86,15 +86,15 @@ CryptoLibRng_getBytes(
 {
     if (NULL == self || NULL == buf || 0 == bufSize)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (flags != 0)
     {
-        return SEOS_ERROR_NOT_SUPPORTED;
+        return OS_ERROR_NOT_SUPPORTED;
     }
 
     return (mbedtls_ctr_drbg_random(&self->drbg, buf, bufSize) != 0) ?
-           SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+           OS_ERROR_ABORTED : OS_SUCCESS;
 }
 
 OS_Error_t
@@ -105,16 +105,16 @@ CryptoLibRng_reSeed(
 {
     if (NULL == seed || 0 == seedSize)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     // Update RNG state with additional seed data
     if (mbedtls_ctr_drbg_update_ret(&self->drbg, seed, seedSize) != 0)
     {
-        return SEOS_ERROR_ABORTED;
+        return OS_ERROR_ABORTED;
     }
 
-    return SEOS_SUCCESS;
+    return OS_SUCCESS;
 }
 
 /** @} */

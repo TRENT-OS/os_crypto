@@ -32,19 +32,19 @@ Rng_getBytes(
     void*                     buf,
     const size_t              bufSize)
 {
-    OS_Error_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
     if (NULL == self || NULL == buf)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (bufSize > OS_Crypto_SIZE_DATAPORT)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((err = CryptoLibServer_Rng_getBytes(flags, bufSize)) == SEOS_SUCCESS)
+    if ((err = CryptoLibServer_Rng_getBytes(flags, bufSize)) == OS_SUCCESS)
     {
         memcpy(buf, self->dataPort, bufSize);
     }
@@ -62,11 +62,11 @@ Rng_reseed(
 
     if (NULL == self || NULL == seed)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (seedSize > OS_Crypto_SIZE_DATAPORT)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     memcpy(self->dataPort, seed, seedSize);
@@ -105,11 +105,11 @@ Mac_start(
 
     if (NULL == self || NULL == secret)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (secretSize > OS_Crypto_SIZE_DATAPORT)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     memcpy(self->dataPort, secret, secretSize);
@@ -127,11 +127,11 @@ Mac_process(
 
     if (NULL == self || NULL == data)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (dataSize > OS_Crypto_SIZE_DATAPORT)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     memcpy(self->dataPort, data, dataSize);
@@ -145,19 +145,19 @@ Mac_finalize(
     void*           mac,
     size_t*         macSize)
 {
-    OS_Error_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
     if (NULL == self || NULL == mac || NULL == macSize)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (*macSize > OS_Crypto_SIZE_DATAPORT)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((err = CryptoLibServer_Mac_finalize(macObj, macSize)) == SEOS_SUCCESS)
+    if ((err = CryptoLibServer_Mac_finalize(macObj, macSize)) == OS_SUCCESS)
     {
         memcpy(mac, self->dataPort, *macSize);
     }
@@ -207,11 +207,11 @@ Digest_process(
 
     if (NULL == self || NULL == data)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (dataSize > OS_Crypto_SIZE_DATAPORT)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     memcpy(self->dataPort, data, dataSize);
@@ -225,20 +225,20 @@ Digest_finalize(
     void*              digest,
     size_t*            digestSize)
 {
-    OS_Error_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
     if (NULL == self || NULL == digest || NULL == digestSize)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (*digestSize > OS_Crypto_SIZE_DATAPORT)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     if ((err = CryptoLibServer_Digest_finalize(digestObj,
-                                               digestSize)) == SEOS_SUCCESS)
+                                               digestSize)) == OS_SUCCESS)
     {
         memcpy(digest, self->dataPort, *digestSize);
     }
@@ -280,25 +280,25 @@ Signature_sign(
     void*                 signature,
     size_t*               signatureSize)
 {
-    OS_Error_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
     if (NULL == self || NULL == hash || NULL == signature || NULL == signatureSize)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (hashSize > OS_Crypto_SIZE_DATAPORT)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
     else if (*signatureSize > OS_Crypto_SIZE_DATAPORT)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     memcpy(self->dataPort, hash, hashSize);
     if ((err = CryptoLibServer_Signature_sign(sigObj, hashSize,
-                                              signatureSize)) == SEOS_SUCCESS)
+                                              signatureSize)) == OS_SUCCESS)
     {
         memcpy(signature, self->dataPort, *signatureSize);
     }
@@ -319,11 +319,11 @@ Signature_verify(
 
     if (NULL == ctx || NULL == hash || NULL == signature)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (hashSize + signatureSize > OS_Crypto_SIZE_DATAPORT)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     memcpy(self->dataPort, hash, hashSize);
@@ -361,20 +361,20 @@ Agreement_agree(
     void*                 shared,
     size_t*               sharedSize)
 {
-    OS_Error_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
     if (NULL == self || NULL == shared || NULL == sharedSize)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (*sharedSize > OS_Crypto_SIZE_DATAPORT)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     if ((err = CryptoLibServer_Agreement_agree(agrObj, pubKey,
-                                               sharedSize)) == SEOS_SUCCESS)
+                                               sharedSize)) == OS_SUCCESS)
     {
         memcpy(shared, self->dataPort, *sharedSize);
     }
@@ -394,7 +394,7 @@ Key_generate(
 
     if (NULL == self || NULL == pKeyObj || NULL == spec)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     memcpy(self->dataPort, spec, sizeof(OS_CryptoKey_Spec_t));
@@ -412,7 +412,7 @@ Key_makePublic(
 
     if (NULL == self || NULL == pPubKeyObj || NULL == attribs)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     memcpy(self->dataPort, attribs, sizeof(OS_CryptoKey_Attrib_t));
@@ -429,7 +429,7 @@ Key_import(
 
     if (NULL == self || NULL == pKeyObj || NULL == keyData)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     memcpy(self->dataPort, keyData, sizeof(OS_CryptoKey_Data_t));
@@ -443,14 +443,14 @@ Key_export(
     OS_CryptoKey_Data_t*  keyData)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
-    OS_Error_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = OS_ERROR_GENERIC;
 
     if (NULL == self || NULL == keyData)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((err = CryptoLibServer_Key_export(keyObj)) == SEOS_SUCCESS)
+    if ((err = CryptoLibServer_Key_export(keyObj)) == OS_SUCCESS)
     {
         memcpy(keyData, self->dataPort, sizeof(OS_CryptoKey_Data_t));
     }
@@ -466,19 +466,19 @@ Key_getParams(
     size_t*               paramSize)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
-    OS_Error_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = OS_ERROR_GENERIC;
 
     if (NULL == self || NULL == keyParams || NULL == paramSize)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (*paramSize > OS_Crypto_SIZE_DATAPORT)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     if ((err = CryptoLibServer_Key_getParams(keyObj,
-                                             paramSize)) == SEOS_SUCCESS)
+                                             paramSize)) == OS_SUCCESS)
     {
         memcpy(keyParams, self->dataPort, *paramSize);
     }
@@ -493,14 +493,14 @@ Key_getAttribs(
     OS_CryptoKey_Attrib_t* attribs)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
-    OS_Error_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = OS_ERROR_GENERIC;
 
     if (NULL == self || NULL == attribs)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((err = CryptoLibServer_Key_getAttribs(keyObj)) == SEOS_SUCCESS)
+    if ((err = CryptoLibServer_Key_getAttribs(keyObj)) == OS_SUCCESS)
     {
         memcpy(attribs, self->dataPort, sizeof(OS_CryptoKey_Attrib_t));
     }
@@ -516,19 +516,19 @@ Key_loadParams(
     size_t*                    paramSize)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
-    OS_Error_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = OS_ERROR_GENERIC;
 
     if (NULL == self || NULL == keyParams || NULL == paramSize)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (*paramSize > OS_Crypto_SIZE_DATAPORT)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     if ((err = CryptoLibServer_Key_loadParams(name,
-                                              paramSize)) == SEOS_SUCCESS)
+                                              paramSize)) == OS_SUCCESS)
     {
         memcpy(keyParams, self->dataPort, *paramSize);
     }
@@ -560,14 +560,14 @@ Cipher_init(
 
     if (NULL == self || NULL == pCipherObj)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     if (iv != NULL)
     {
         if (ivSize > OS_Crypto_SIZE_DATAPORT)
         {
-            return SEOS_ERROR_INSUFFICIENT_SPACE;
+            return OS_ERROR_INSUFFICIENT_SPACE;
         }
         memcpy(self->dataPort, iv, ivSize);
     }
@@ -593,25 +593,25 @@ Cipher_process(
     void*              output,
     size_t*            outputSize)
 {
-    OS_Error_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
     if (NULL == self || NULL == input || NULL == output || NULL == outputSize)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (inputSize > OS_Crypto_SIZE_DATAPORT)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
     else if (*outputSize > OS_Crypto_SIZE_DATAPORT)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     memcpy(self->dataPort, input, inputSize);
     if ((err = CryptoLibServer_Cipher_process(cipherObj, inputSize,
-                                              outputSize)) == SEOS_SUCCESS)
+                                              outputSize)) == OS_SUCCESS)
     {
         memcpy(output, self->dataPort, *outputSize);
     }
@@ -630,14 +630,14 @@ Cipher_start(
 
     if (NULL == self)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     if (NULL != data)
     {
         if (dataSize > OS_Crypto_SIZE_DATAPORT)
         {
-            return SEOS_ERROR_INSUFFICIENT_SPACE;
+            return OS_ERROR_INSUFFICIENT_SPACE;
         }
         memcpy(self->dataPort, data, dataSize);
     }
@@ -652,21 +652,21 @@ Cipher_finalize(
     void*              tag,
     size_t*            tagSize)
 {
-    OS_Error_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
     if (NULL == self || NULL == tag || NULL == tagSize)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (*tagSize > OS_Crypto_SIZE_DATAPORT)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     memcpy(self->dataPort, tag, *tagSize);
     if ((err = CryptoLibServer_Cipher_finalize(cipherObj,
-                                               tagSize)) == SEOS_SUCCESS)
+                                               tagSize)) == OS_SUCCESS)
     {
         memcpy(tag, self->dataPort, *tagSize);
     }
@@ -722,12 +722,12 @@ CryptoLibClient_init(
 
     if (NULL == impl || NULL == memory || NULL == cfg || NULL == cfg->dataPort)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     if ((self = memory->calloc(1, sizeof(CryptoLibClient_t))) == NULL)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     impl->context  = self;
@@ -735,7 +735,7 @@ CryptoLibClient_init(
     self->dataPort = cfg->dataPort;
     self->memory    = *memory;
 
-    return SEOS_SUCCESS;
+    return OS_SUCCESS;
 }
 
 OS_Error_t
@@ -744,12 +744,12 @@ CryptoLibClient_free(
 {
     if (NULL == self)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     self->memory.free(self);
 
-    return SEOS_SUCCESS;
+    return OS_SUCCESS;
 }
 
 #endif /* SEOS_CRYPTO_WITH_RPC_CLIENT */

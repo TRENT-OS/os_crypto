@@ -25,12 +25,12 @@ OS_CryptoCipher_init(
     // We are actually not using this; lets check it anyways for consistency.
     if (NULL == hCrypto)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     PROXY_INIT_FROM_KEY(*self, hKey);
     if ((err = PROXY_CALL(*self, Cipher_init, PROXY_GET_PTR(*self),
-                          PROXY_GET_OBJ(hKey), algorithm, iv, ivSize)) != SEOS_SUCCESS)
+                          PROXY_GET_OBJ(hKey), algorithm, iv, ivSize)) != OS_SUCCESS)
     {
         PROXY_FREE(*self);
     }

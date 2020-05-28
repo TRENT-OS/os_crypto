@@ -21,14 +21,14 @@ OS_CryptoKey_generate(
 
     if (NULL == spec || hCrypto == NULL)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT_ONLY
                || (hCrypto->mode == OS_Crypto_MODE_CLIENT &&
                    !spec->key.attribs.exportable));
     if ((err = PROXY_CALL(*self, Key_generate, PROXY_GET_PTR(*self),
-                          spec)) != SEOS_SUCCESS)
+                          spec)) != OS_SUCCESS)
     {
         PROXY_FREE(*self);
     }
@@ -46,14 +46,14 @@ OS_CryptoKey_import(
 
     if (NULL == keyData || hCrypto == NULL)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT_ONLY
                || (hCrypto->mode == OS_Crypto_MODE_CLIENT &&
                    !keyData->attribs.exportable));
     if ((err = PROXY_CALL(*self, Key_import, PROXY_GET_PTR(*self),
-                          keyData)) != SEOS_SUCCESS)
+                          keyData)) != OS_SUCCESS)
     {
         PROXY_FREE(*self);
     }
@@ -73,14 +73,14 @@ OS_CryptoKey_makePublic(
 
     if (NULL == attribs || hCrypto == NULL)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (NULL == hPrvKey)
     {
-        return SEOS_ERROR_INVALID_HANDLE;
+        return OS_ERROR_INVALID_HANDLE;
     }
     else if ((err = PROXY_CALL(hPrvKey, Key_getAttribs, PROXY_GET_OBJ(hPrvKey),
-                               &srcAttribs)) != SEOS_SUCCESS)
+                               &srcAttribs)) != OS_SUCCESS)
     {
         return err;
     }
@@ -96,14 +96,14 @@ OS_CryptoKey_makePublic(
     if (hCrypto->mode == OS_Crypto_MODE_CLIENT &&
         attribs->exportable != srcAttribs.exportable)
     {
-        return SEOS_ERROR_NOT_SUPPORTED;
+        return OS_ERROR_NOT_SUPPORTED;
     }
 
     PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT_ONLY
                || (hCrypto->mode == OS_Crypto_MODE_CLIENT &&
                    !attribs->exportable));
     if ((err = PROXY_CALL(*self, Key_makePublic, PROXY_GET_PTR(*self),
-                          PROXY_GET_OBJ(hPrvKey), attribs)) != SEOS_SUCCESS)
+                          PROXY_GET_OBJ(hPrvKey), attribs)) != OS_SUCCESS)
     {
         PROXY_FREE(*self);
     }

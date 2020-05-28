@@ -21,12 +21,12 @@ OS_CryptoDigest_init(
 
     if (NULL == hCrypto)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT_ONLY);
     if ((err = PROXY_CALL(*self, Digest_init, PROXY_GET_PTR(*self),
-                          algorithm)) != SEOS_SUCCESS)
+                          algorithm)) != OS_SUCCESS)
     {
         PROXY_FREE(*self);
     }

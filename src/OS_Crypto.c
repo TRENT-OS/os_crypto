@@ -24,12 +24,12 @@ OS_Crypto_init(
 
     if (NULL == self || NULL == cfg)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     if ((NULL == cfg->memory.calloc && NULL != cfg->memory.free) ||
         (NULL != cfg->memory.calloc && NULL == cfg->memory.free))
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     // If both are NULL, use calloc/freem from stdin.h, otherwise use the ones
@@ -38,12 +38,12 @@ OS_Crypto_init(
     {
         if ((ctx = calloc(1, sizeof(OS_Crypto_t))) == NULL)
         {
-            return SEOS_ERROR_INSUFFICIENT_SPACE;
+            return OS_ERROR_INSUFFICIENT_SPACE;
         }
     }
     else if ((ctx = cfg->memory.calloc(1, sizeof(OS_Crypto_t))) == NULL)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     *self = ctx;
@@ -60,7 +60,7 @@ OS_Crypto_init(
     {
         if ((err = CryptoLib_init(&ctx->library,
                                   &ctx->memory,
-                                  &cfg->library)) != SEOS_SUCCESS)
+                                  &cfg->library)) != OS_SUCCESS)
         {
             goto err0;
         }
@@ -76,7 +76,7 @@ OS_Crypto_init(
     case OS_Crypto_MODE_CLIENT:
         if ((err = CryptoLibClient_init(&ctx->rpc.client,
                                         &ctx->memory,
-                                        &cfg->rpc.client)) != SEOS_SUCCESS)
+                                        &cfg->rpc.client)) != OS_SUCCESS)
         {
             goto err1;
         }
@@ -87,18 +87,18 @@ OS_Crypto_init(
         if ((err = CryptoLibServer_init(&ctx->rpc.server,
                                         &ctx->library,
                                         &ctx->memory,
-                                        &cfg->rpc.server)) != SEOS_SUCCESS)
+                                        &cfg->rpc.server)) != OS_SUCCESS)
         {
             goto err1;
         }
         break;
 #endif /* SEOS_CRYPTO_WITH_RPC_SERVER */
     default:
-        err = SEOS_ERROR_NOT_SUPPORTED;
+        err = OS_ERROR_NOT_SUPPORTED;
         goto err1;
     }
 
-    return SEOS_SUCCESS;
+    return OS_SUCCESS;
 
 err1:
     if (cfg->mode != OS_Crypto_MODE_CLIENT_ONLY)
@@ -119,12 +119,12 @@ OS_Crypto_free(
 
     if (NULL == self)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     if (self->mode != OS_Crypto_MODE_CLIENT_ONLY)
     {
-        if ((err = CryptoLib_free(self->library.context)) != SEOS_SUCCESS)
+        if ((err = CryptoLib_free(self->library.context)) != OS_SUCCESS)
         {
             return err;
         }
@@ -147,7 +147,7 @@ OS_Crypto_free(
         break;
 #endif /* SEOS_CRYPTO_WITH_RPC_SERVER */
     default:
-        err = SEOS_ERROR_NOT_SUPPORTED;
+        err = OS_ERROR_NOT_SUPPORTED;
     }
 
     return err;
@@ -183,19 +183,19 @@ OS_Crypto_migrateLibObject(
 
     if (NULL == self || NULL == ptr)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (!local && self->mode == OS_Crypto_MODE_LIBRARY_ONLY)
     {
         // If it is a remote object, then we can only access it through the
         // RPC client, so "library only" will not work.
-        return SEOS_ERROR_INVALID_STATE;
+        return OS_ERROR_INVALID_STATE;
     }
 
     PROXY_INIT(*proxy, self, !local);
     (*proxy)->obj = ptr;
 
-    return SEOS_SUCCESS;
+    return OS_SUCCESS;
 }
 
 OS_Crypto_Mode_t

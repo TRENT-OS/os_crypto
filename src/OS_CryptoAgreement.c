@@ -23,12 +23,12 @@ OS_CryptoAgreement_init(
     // We are actually not using this; lets check it anyways for consistency.
     if (NULL == hCrypto)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     PROXY_INIT_FROM_KEY(*self, hPrvKey);
     if ((err = PROXY_CALL(*self, Agreement_init, PROXY_GET_PTR(*self),
-                          PROXY_GET_OBJ(hPrvKey), algorithm)) != SEOS_SUCCESS)
+                          PROXY_GET_OBJ(hPrvKey), algorithm)) != OS_SUCCESS)
     {
         PROXY_FREE(*self);
     }

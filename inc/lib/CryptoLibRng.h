@@ -69,7 +69,7 @@ CryptoLibRng_getBytesMbedtls(
     // Simple wrapper for mbedTLS, to allow the buffered use of the getRandomData()
     // function as is common, but also to directly pass a function to mbedTLS
     return CryptoLibRng_getBytes(self, 0, buf,
-                                 bufSize) == SEOS_SUCCESS ? 0 : 1;
+                                 bufSize) == OS_SUCCESS ? 0 : 1;
 }
 
 /** @} */

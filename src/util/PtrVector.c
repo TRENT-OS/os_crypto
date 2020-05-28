@@ -39,13 +39,13 @@ PtrVector_remove(
 
     if ((pos = PtrVector_find(v, obj)) == -1)
     {
-        return SEOS_ERROR_NOT_FOUND;
+        return OS_ERROR_NOT_FOUND;
     }
 
     PointerVector_replaceElementAt(v, pos, PointerVector_getBack(v));
     PointerVector_popBack(v);
 
-    return SEOS_SUCCESS;
+    return OS_SUCCESS;
 }
 
 OS_Error_t
@@ -54,7 +54,7 @@ PtrVector_add(
     void*      obj)
 {
     return !PointerVector_pushBack(v, obj) ?
-           SEOS_ERROR_INSUFFICIENT_SPACE : SEOS_SUCCESS;
+           OS_ERROR_INSUFFICIENT_SPACE : OS_SUCCESS;
 }
 
 void
@@ -68,5 +68,5 @@ OS_Error_t
 PtrVector_init(
     PtrVector* v)
 {
-    return !PointerVector_ctor(v, 1) ? SEOS_ERROR_INSUFFICIENT_SPACE : SEOS_SUCCESS;
+    return !PointerVector_ctor(v, 1) ? OS_ERROR_INSUFFICIENT_SPACE : OS_SUCCESS;
 }

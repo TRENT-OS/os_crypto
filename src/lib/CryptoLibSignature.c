@@ -40,12 +40,12 @@ initImpl(
     // We can have one of those keys be empty, but not both
     if (NULL == memory || NULL == self || (NULL == prvKey && NULL == pubKey))
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     if ((sig = memory->calloc(1, sizeof(CryptoLibSignature_t))) == NULL)
     {
-        return SEOS_ERROR_INSUFFICIENT_SPACE;
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     memset(sig, 0, sizeof(CryptoLibSignature_t));
@@ -63,7 +63,7 @@ initImpl(
         padding = MBEDTLS_RSA_PKCS_V21;
         break;
     default:
-        err = SEOS_ERROR_NOT_SUPPORTED;
+        err = OS_ERROR_NOT_SUPPORTED;
         goto err0;
     }
 
@@ -75,7 +75,7 @@ initImpl(
     case OS_CryptoDigest_ALG_SHA256:
         break;
     default:
-        err = SEOS_ERROR_NOT_SUPPORTED;
+        err = OS_ERROR_NOT_SUPPORTED;
         goto err0;
     }
 
@@ -84,7 +84,7 @@ initImpl(
 
     *self = sig;
 
-    return SEOS_SUCCESS;
+    return OS_SUCCESS;
 
 err0:
     memory->free(sig);
@@ -99,7 +99,7 @@ freeImpl(
 {
     OS_Error_t err;
 
-    err = SEOS_SUCCESS;
+    err = OS_SUCCESS;
     switch (self->algorithm)
     {
     case OS_CryptoSignature_ALG_RSA_PKCS1_V15:
@@ -108,7 +108,7 @@ freeImpl(
         break;
     default:
 
-        err = SEOS_ERROR_NOT_SUPPORTED;
+        err = OS_ERROR_NOT_SUPPORTED;
     }
 
     memory->free(self);
@@ -122,7 +122,7 @@ setKeyImpl(
 {
     OS_Error_t err;
 
-    err = SEOS_SUCCESS;
+    err = OS_SUCCESS;
     switch (self->algorithm)
     {
     case OS_CryptoSignature_ALG_RSA_PKCS1_V15:
@@ -131,21 +131,21 @@ setKeyImpl(
         {
             if (CryptoLibKey_getType(self->pubKey) != OS_CryptoKey_TYPE_RSA_PUB)
             {
-                return SEOS_ERROR_INVALID_PARAMETER;
+                return OS_ERROR_INVALID_PARAMETER;
             }
             err = CryptoLibKey_writeRsaPub(self->pubKey, &self->mbedtls.rsa);
         }
-        if (SEOS_SUCCESS == err && NULL != self->prvKey)
+        if (OS_SUCCESS == err && NULL != self->prvKey)
         {
             if (CryptoLibKey_getType(self->prvKey) != OS_CryptoKey_TYPE_RSA_PRV)
             {
-                return SEOS_ERROR_INVALID_PARAMETER;
+                return OS_ERROR_INVALID_PARAMETER;
             }
             err = CryptoLibKey_writeRsaPrv(self->prvKey, &self->mbedtls.rsa);
         }
         break;
     default:
-        err = SEOS_ERROR_NOT_SUPPORTED;
+        err = OS_ERROR_NOT_SUPPORTED;
     }
 
     return err;
@@ -161,7 +161,7 @@ verifyHashImpl(
     CryptoLibRng_t*       rng)
 {
     void* rngFunc = (NULL != rng) ? CryptoLibRng_getBytesMbedtls : NULL;
-    OS_Error_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = OS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
@@ -169,7 +169,7 @@ verifyHashImpl(
     case OS_CryptoSignature_ALG_RSA_PKCS1_V21:
         if (self->mbedtls.rsa.len != signatureSize)
         {
-            err = SEOS_ERROR_INVALID_PARAMETER;
+            err = OS_ERROR_INVALID_PARAMETER;
         }
         else
         {
@@ -177,11 +177,11 @@ verifyHashImpl(
             err = mbedtls_rsa_pkcs1_verify(&self->mbedtls.rsa, rngFunc, rng,
                                            MBEDTLS_RSA_PUBLIC, self->digest, hashSize,
                                            hash, signature) != 0 ?
-                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+                  OS_ERROR_ABORTED : OS_SUCCESS;
         }
         break;
     default:
-        return SEOS_ERROR_NOT_SUPPORTED;
+        return OS_ERROR_NOT_SUPPORTED;
     }
 
     return err;
@@ -197,7 +197,7 @@ signHashImpl(
     CryptoLibRng_t*       rng)
 {
     void* rngFunc = (NULL != rng) ? CryptoLibRng_getBytesMbedtls : NULL;
-    OS_Error_t err = SEOS_ERROR_GENERIC;
+    OS_Error_t err = OS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
@@ -205,7 +205,7 @@ signHashImpl(
     case OS_CryptoSignature_ALG_RSA_PKCS1_V21:
         if (self->mbedtls.rsa.len > *signatureSize)
         {
-            err = SEOS_ERROR_BUFFER_TOO_SMALL;
+            err = OS_ERROR_BUFFER_TOO_SMALL;
         }
         else
         {
@@ -213,11 +213,11 @@ signHashImpl(
             err = mbedtls_rsa_pkcs1_sign(&self->mbedtls.rsa, rngFunc, rng,
                                          MBEDTLS_RSA_PRIVATE, self->digest, hashSize,
                                          hash, signature) != 0 ?
-                  SEOS_ERROR_ABORTED : SEOS_SUCCESS;
+                  OS_ERROR_ABORTED : OS_SUCCESS;
         }
         break;
     default:
-        err = SEOS_ERROR_NOT_SUPPORTED;
+        err = OS_ERROR_NOT_SUPPORTED;
     }
 
     *signatureSize = self->mbedtls.rsa.len;
@@ -241,13 +241,13 @@ CryptoLibSignature_init(
     // We can have one of those keys be empty, but not both
     if (NULL == memory || NULL == self || (NULL == prvKey && NULL == pubKey))
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     if ((err = initImpl(self, prvKey, pubKey, algorithm, digest,
-                        memory)) == SEOS_SUCCESS)
+                        memory)) == OS_SUCCESS)
     {
-        if ((err = setKeyImpl(*self)) != SEOS_SUCCESS)
+        if ((err = setKeyImpl(*self)) != OS_SUCCESS)
         {
             freeImpl(*self, memory);
         }
@@ -263,7 +263,7 @@ CryptoLibSignature_free(
 {
     if (NULL == self || NULL == memory)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     return freeImpl(self, memory);
@@ -281,12 +281,12 @@ CryptoLibSignature_sign(
     if (NULL == self || NULL == hash || 0 == hashSize || NULL == signature
         || NULL == signatureSize)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     return (self->prvKey != NULL) ?
            signHashImpl(self, hash, hashSize, signature, signatureSize, rng) :
-           SEOS_ERROR_ABORTED;
+           OS_ERROR_ABORTED;
 }
 
 OS_Error_t
@@ -301,10 +301,10 @@ CryptoLibSignature_verify(
     if (NULL == self || NULL == hash || 0 == hashSize || NULL == signature
         || 0 == signatureSize)
     {
-        return SEOS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     return (self->pubKey != NULL) ?
            verifyHashImpl(self, hash, hashSize, signature, signatureSize, rng) :
-           SEOS_ERROR_ABORTED;
+           OS_ERROR_ABORTED;
 }
