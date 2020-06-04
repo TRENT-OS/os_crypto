@@ -140,4 +140,8 @@ OS_CryptoKey_Aes_t*
 CryptoLibKey_getAes(
     const CryptoLibKey_t* key);
 
+OS_CryptoKey_Mac_t*
+CryptoLibKey_getMac(
+    const CryptoLibKey_t* key);
+
 ///@}

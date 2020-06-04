@@ -445,6 +445,9 @@ initImpl(
     case OS_CryptoKey_TYPE_AES:
         size = sizeof(OS_CryptoKey_Aes_t);
         break;
+    case OS_CryptoKey_TYPE_MAC:
+        size = sizeof(OS_CryptoKey_Mac_t);
+        break;
     case OS_CryptoKey_TYPE_RSA_PRV:
         size = sizeof(OS_CryptoKey_RsaRrv_t);
         break;
@@ -506,6 +509,18 @@ generateImpl(
             || ((128 != spec->key.params.bits)
                 && (192 != spec->key.params.bits)
                 && (256 != spec->key.params.bits)))
+        {
+            return OS_ERROR_INVALID_PARAMETER;
+        }
+        key->len = spec->key.params.bits >> 3;
+        return CryptoLibRng_getBytes(rng, 0, key->bytes, key->len);
+    }
+
+    case OS_CryptoKey_TYPE_MAC:
+    {
+        OS_CryptoKey_Mac_t* key = (OS_CryptoKey_Mac_t*) self->data;
+        if ((OS_CryptoKey_SPECTYPE_BITS != spec->type)
+            || (spec->key.params.bits > (OS_CryptoKey_SIZE_MAC_MAX * 8)))
         {
             return OS_ERROR_INVALID_PARAMETER;
         }
@@ -678,6 +693,13 @@ importImpl(
         }
         bits = key->data.aes.len * 8;
         if (bits != 128 && bits != 192 && bits != 256)
+        {
+            return OS_ERROR_INVALID_PARAMETER;
+        }
+        break;
+
+    case OS_CryptoKey_TYPE_MAC:
+        if (key->data.mac.len > sizeof(key->data.mac.bytes))
         {
             return OS_ERROR_INVALID_PARAMETER;
         }
@@ -1130,4 +1152,11 @@ CryptoLibKey_getAes(
     const CryptoLibKey_t* key)
 {
     return (OS_CryptoKey_Aes_t*) key->data;
+}
+
+OS_CryptoKey_Mac_t*
+CryptoLibKey_getMac(
+    const CryptoLibKey_t* key)
+{
+    return (OS_CryptoKey_Mac_t*) key->data;
 }
