@@ -20,7 +20,7 @@ struct CryptoLibMac
         mbedtls_md_context_t md;
     } mbedtls;
     OS_CryptoMac_Alg_t algorithm;
-    bool started;
+    const CryptoLibKey_t* key;
     bool processed;
 };
 
@@ -29,6 +29,7 @@ struct CryptoLibMac
 static OS_Error_t
 initImpl(
     CryptoLibMac_t**          self,
+    const CryptoLibKey_t*     key,
     const OS_CryptoMac_Alg_t  algorithm,
     const OS_Crypto_Memory_t* memory)
 {
@@ -43,7 +44,7 @@ initImpl(
 
     memset(mac, 0, sizeof(CryptoLibMac_t));
     mac->algorithm = algorithm;
-    mac->started   = false;
+    mac->key       = key;
     mac->processed = false;
 
     switch (mac->algorithm)
@@ -103,17 +104,21 @@ freeImpl(
 
 static OS_Error_t
 startImpl(
-    CryptoLibMac_t* self,
-    const void*     secret,
-    const size_t    secretSize)
+    CryptoLibMac_t* self)
 {
+    OS_CryptoKey_Mac_t* macKey;
     OS_Error_t err = OS_ERROR_GENERIC;
 
     switch (self->algorithm)
     {
     case OS_CryptoMac_ALG_HMAC_MD5:
     case OS_CryptoMac_ALG_HMAC_SHA256:
-        err = mbedtls_md_hmac_starts(&self->mbedtls.md, secret, secretSize) ?
+        if (CryptoLibKey_getType(self->key) != OS_CryptoKey_TYPE_MAC ||
+            (macKey = CryptoLibKey_getMac(self->key)) == NULL)
+        {
+            return OS_ERROR_INVALID_PARAMETER;
+        }
+        err = mbedtls_md_hmac_starts(&self->mbedtls.md, macKey->bytes, macKey->len) ?
               OS_ERROR_ABORTED : OS_SUCCESS;
         break;
     default:
@@ -191,15 +196,26 @@ finalizeImpl(
 OS_Error_t
 CryptoLibMac_init(
     CryptoLibMac_t**          self,
+    const CryptoLibKey_t*     key,
     const OS_CryptoMac_Alg_t  algorithm,
     const OS_Crypto_Memory_t* memory)
 {
-    if (NULL == memory || NULL == self)
+    OS_Error_t err;
+
+    if (NULL == memory || NULL == key || NULL == self)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    return initImpl(self, algorithm, memory);
+    if ((err = initImpl(self, key, algorithm, memory)) == OS_SUCCESS)
+    {
+        if ((err = startImpl(*self)) != OS_SUCCESS)
+        {
+            freeImpl(*self, memory);
+        }
+    }
+
+    return err;
 }
 
 OS_Error_t
@@ -216,26 +232,6 @@ CryptoLibMac_free(
 }
 
 OS_Error_t
-CryptoLibMac_start(
-    CryptoLibMac_t* self,
-    const void*     secret,
-    const size_t    secretSize)
-{
-    OS_Error_t err = OS_ERROR_GENERIC;
-
-    if (NULL == self || NULL == secret || 0 == secretSize)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-
-    err = self->started || self->processed ?
-          OS_ERROR_ABORTED : startImpl(self, secret, secretSize);
-    self->started |= (OS_SUCCESS == err);
-
-    return err;
-}
-
-OS_Error_t
 CryptoLibMac_process(
     CryptoLibMac_t* self,
     const void*     data,
@@ -248,8 +244,7 @@ CryptoLibMac_process(
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    err = !self->started ?
-          OS_ERROR_ABORTED : processImpl(self, data, dataSize);
+    err = processImpl(self, data, dataSize);
     self->processed |= (OS_SUCCESS == err);
 
     return err;
@@ -268,15 +263,15 @@ CryptoLibMac_finalize(
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    err = !self->started || !self->processed ?
+    err = !self->processed ?
           OS_ERROR_ABORTED : finalizeImpl(self, mac, macSize);
 
     // Finalize also resets the underlying algorithms, so that we can re-use the
     // MAC object again
     if (err == OS_SUCCESS)
     {
-        self->started = false;
         self->processed = false;
+        err = startImpl(self);
     }
 
     return err;

@@ -84,12 +84,13 @@ CryptoLibServer_Rng_reseed(
 OS_Error_t
 CryptoLibServer_Mac_init(
     CryptoLibMac_ptr*  pMacObj,
+    CryptoLibKey_cptr  keyObj,
     OS_CryptoMac_Alg_t algorithm)
 {
     CryptoLibServer_t* self;
 
     GET_SELF(self);
-    return CALL(self, Mac_init, pMacObj, algorithm);
+    return CALL(self, Mac_init, pMacObj, keyObj, algorithm);
 }
 
 OS_Error_t
@@ -100,17 +101,6 @@ CryptoLibServer_Mac_free(
 
     GET_SELF(self);
     return CALL(self, Mac_free, macObj);
-}
-
-OS_Error_t
-CryptoLibServer_Mac_start(
-    CryptoLibMac_ptr macObj,
-    size_t           secretSize)
-{
-    CryptoLibServer_t* self;
-
-    GET_SELF(self);
-    return CALL(self, Mac_start, macObj, self->dataPort, secretSize);
 }
 
 OS_Error_t

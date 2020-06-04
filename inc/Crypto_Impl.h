@@ -32,19 +32,13 @@ typedef OS_Error_t
 (*Mac_init_func)(
     void*,
     CryptoLibMac_t**,
+    const CryptoLibKey_t*,
     const OS_CryptoMac_Alg_t);
 
 typedef OS_Error_t
 (*Mac_free_func)(
     void*,
     CryptoLibMac_t*);
-
-typedef OS_Error_t
-(*Mac_start_func)(
-    void*,
-    CryptoLibMac_t*,
-    const void*,
-    const size_t);
 
 typedef OS_Error_t
 (*Mac_process_func)(
@@ -248,7 +242,6 @@ typedef struct
     Rng_reseed_func Rng_reseed;
     Mac_init_func Mac_init;
     Mac_free_func Mac_free;
-    Mac_start_func Mac_start;
     Mac_process_func Mac_process;
     Mac_finalize_func Mac_finalize;
     Digest_init_func Digest_init;

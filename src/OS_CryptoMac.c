@@ -13,20 +13,22 @@
 
 OS_Error_t
 OS_CryptoMac_init(
-    OS_CryptoMac_Handle_t*   self,
-    const OS_Crypto_Handle_t hCrypto,
-    const OS_CryptoMac_Alg_t algorithm)
+    OS_CryptoMac_Handle_t*      self,
+    const OS_Crypto_Handle_t    hCrypto,
+    const OS_CryptoKey_Handle_t hKey,
+    const OS_CryptoMac_Alg_t    algorithm)
 {
     OS_Error_t err;
 
+    // We are actually not using this; lets check it anyways for consistency.
     if (NULL == hCrypto)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT_ONLY);
+    PROXY_INIT_FROM_KEY(*self, hKey);
     if ((err = PROXY_CALL(*self, Mac_init, PROXY_GET_PTR(*self),
-                          algorithm)) != OS_SUCCESS)
+                          PROXY_GET_OBJ(hKey), algorithm)) != OS_SUCCESS)
     {
         PROXY_FREE(*self);
     }
@@ -44,15 +46,6 @@ OS_CryptoMac_free(
     PROXY_FREE(self);
 
     return err;
-}
-
-OS_Error_t
-OS_CryptoMac_start(
-    OS_CryptoMac_Handle_t self,
-    const void*           secret,
-    const size_t          secretSize)
-{
-    return PROXY_CALL(self, Mac_start, PROXY_GET_OBJ(self), secret, secretSize);
 }
 
 OS_Error_t

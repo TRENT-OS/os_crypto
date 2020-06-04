@@ -81,6 +81,7 @@ static OS_Error_t
 Mac_init(
     void*                    ctx,
     CryptoLibMac_t**         pMacObj,
+    const CryptoLibKey_t*    keyObj,
     const OS_CryptoMac_Alg_t algorithm)
 {
     OS_Error_t err = OS_ERROR_GENERIC;
@@ -90,8 +91,12 @@ Mac_init(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
+    if (!PtrVector_hasPtr(&self->keyObjects, keyObj))
+    {
+        return OS_ERROR_INVALID_HANDLE;
+    }
 
-    if ((err = CryptoLibMac_init(pMacObj, algorithm,
+    if ((err = CryptoLibMac_init(pMacObj, keyObj, algorithm,
                                  &self->memory)) != OS_SUCCESS)
     {
         return err;
@@ -130,29 +135,6 @@ Mac_free(
     PtrVector_remove(&self->macObjects, macObj);
 
     return CryptoLibMac_free(macObj, &self->memory);
-}
-
-static OS_Error_t
-Mac_start(
-    void*           ctx,
-    CryptoLibMac_t* macObj,
-    const void*     secret,
-    const size_t    secretSize)
-{
-    CryptoLib_t* self = (CryptoLib_t*) ctx;
-
-    if (NULL == ctx)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    else if (secretSize > CryptoLib_SIZE_BUFFER)
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
-
-    return !PtrVector_hasPtr(&self->macObjects, macObj) ?
-           OS_ERROR_INVALID_HANDLE :
-           CryptoLibMac_start(macObj, secret, secretSize);
 }
 
 static OS_Error_t
@@ -917,7 +899,6 @@ static const Crypto_Vtable_t CryptoLib_vtable =
     .Rng_reseed          = Rng_reseed,
     .Mac_init            = Mac_init,
     .Mac_free            = Mac_free,
-    .Mac_start           = Mac_start,
     .Mac_process         = Mac_process,
     .Mac_finalize        = Mac_finalize,
     .Digest_init         = Digest_init,

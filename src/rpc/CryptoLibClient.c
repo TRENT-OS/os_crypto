@@ -79,10 +79,11 @@ static OS_Error_t
 Mac_init(
     void*                    ctx,
     CryptoLibMac_t**         pMacObj,
+    const CryptoLibKey_t*    keyObj,
     const OS_CryptoMac_Alg_t algorithm)
 {
     UNUSED_VAR(ctx);
-    return CryptoLibServer_Mac_init(pMacObj, algorithm);
+    return CryptoLibServer_Mac_init(pMacObj, keyObj, algorithm);
 }
 
 static OS_Error_t
@@ -92,28 +93,6 @@ Mac_free(
 {
     UNUSED_VAR(ctx);
     return CryptoLibServer_Mac_free(macObj);
-}
-
-static OS_Error_t
-Mac_start(
-    void*           ctx,
-    CryptoLibMac_t* macObj,
-    const void*     secret,
-    const size_t    secretSize)
-{
-    CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
-
-    if (NULL == self || NULL == secret)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    else if (secretSize > OS_Crypto_SIZE_DATAPORT)
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
-
-    memcpy(self->dataPort, secret, secretSize);
-    return CryptoLibServer_Mac_start(macObj, secretSize);
 }
 
 static OS_Error_t
@@ -682,7 +661,6 @@ static const Crypto_Vtable_t CryptoLibClient_vtable =
     .Rng_reseed          = Rng_reseed,
     .Mac_init            = Mac_init,
     .Mac_free            = Mac_free,
-    .Mac_start           = Mac_start,
     .Mac_process         = Mac_process,
     .Mac_finalize        = Mac_finalize,
     .Digest_init         = Digest_init,

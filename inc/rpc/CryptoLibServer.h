@@ -44,64 +44,6 @@ OS_Error_t
 CryptoLibServer_Rng_reseed(
     size_t seedSize);
 
-// -------------------------------- MAC API ------------------------------------
-
-typedef CryptoLibMac_t* CryptoLibMac_ptr;
-typedef const CryptoLibMac_t* CryptoLibMac_cptr;
-
-OS_Error_t
-CryptoLibServer_Mac_init(
-    CryptoLibMac_ptr*  pMacPtr,
-    OS_CryptoMac_Alg_t algorithm);
-
-OS_Error_t
-CryptoLibServer_Mac_free(
-    CryptoLibMac_ptr macPtr);
-
-OS_Error_t
-CryptoLibServer_Mac_start(
-    CryptoLibMac_ptr macPtr,
-    size_t           secretSize);
-
-OS_Error_t
-CryptoLibServer_Mac_process(
-    CryptoLibMac_ptr macPtr,
-    size_t           dataSize);
-
-OS_Error_t
-CryptoLibServer_Mac_finalize(
-    CryptoLibMac_ptr macPtr,
-    size_t*          macSize);
-
-// ------------------------------ Digest API -----------------------------------
-
-typedef CryptoLibDigest_t* CryptoLibDigest_ptr;
-typedef const CryptoLibDigest_t* CryptoLibDigest_cptr;
-
-OS_Error_t
-CryptoLibServer_Digest_init(
-    CryptoLibDigest_ptr*  pDigPtr,
-    OS_CryptoDigest_Alg_t algorithm);
-
-OS_Error_t
-CryptoLibServer_Digest_clone(
-    CryptoLibDigest_ptr* pDigPtr,
-    CryptoLibDigest_cptr srcDigPtr);
-
-OS_Error_t
-CryptoLibServer_Digest_free(
-    CryptoLibDigest_ptr digPtr);
-
-OS_Error_t
-CryptoLibServer_Digest_process(
-    CryptoLibDigest_ptr digPtr,
-    size_t              inSize);
-
-OS_Error_t
-CryptoLibServer_Digest_finalize(
-    CryptoLibDigest_ptr digPtr,
-    size_t*             digestSize);
-
 // -------------------------------- Key API ------------------------------------
 
 typedef CryptoLibKey_t* CryptoLibKey_ptr;
@@ -141,6 +83,60 @@ CryptoLibServer_Key_loadParams(
 OS_Error_t
 CryptoLibServer_Key_free(
     CryptoLibKey_ptr keyPtr);
+
+// -------------------------------- MAC API ------------------------------------
+
+typedef CryptoLibMac_t* CryptoLibMac_ptr;
+typedef const CryptoLibMac_t* CryptoLibMac_cptr;
+
+OS_Error_t
+CryptoLibServer_Mac_init(
+    CryptoLibMac_ptr*  pMacPtr,
+    CryptoLibKey_cptr  keyPtr,
+    OS_CryptoMac_Alg_t algorithm);
+
+OS_Error_t
+CryptoLibServer_Mac_free(
+    CryptoLibMac_ptr macPtr);
+
+OS_Error_t
+CryptoLibServer_Mac_process(
+    CryptoLibMac_ptr macPtr,
+    size_t           dataSize);
+
+OS_Error_t
+CryptoLibServer_Mac_finalize(
+    CryptoLibMac_ptr macPtr,
+    size_t*          macSize);
+
+// ------------------------------ Digest API -----------------------------------
+
+typedef CryptoLibDigest_t* CryptoLibDigest_ptr;
+typedef const CryptoLibDigest_t* CryptoLibDigest_cptr;
+
+OS_Error_t
+CryptoLibServer_Digest_init(
+    CryptoLibDigest_ptr*  pDigPtr,
+    OS_CryptoDigest_Alg_t algorithm);
+
+OS_Error_t
+CryptoLibServer_Digest_clone(
+    CryptoLibDigest_ptr* pDigPtr,
+    CryptoLibDigest_cptr srcDigPtr);
+
+OS_Error_t
+CryptoLibServer_Digest_free(
+    CryptoLibDigest_ptr digPtr);
+
+OS_Error_t
+CryptoLibServer_Digest_process(
+    CryptoLibDigest_ptr digPtr,
+    size_t              inSize);
+
+OS_Error_t
+CryptoLibServer_Digest_finalize(
+    CryptoLibDigest_ptr digPtr,
+    size_t*             digestSize);
 
 // ----------------------------- Signature API ---------------------------------
 

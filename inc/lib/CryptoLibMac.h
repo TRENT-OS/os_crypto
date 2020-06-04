@@ -14,6 +14,8 @@
 
 #include "OS_Crypto.h"
 
+#include "lib/CryptoLibKey.h"
+
 #include <stddef.h>
 
 // Exported types/defines/enums ------------------------------------------------
@@ -25,6 +27,7 @@ typedef struct CryptoLibMac CryptoLibMac_t;
 OS_Error_t
 CryptoLibMac_init(
     CryptoLibMac_t**          self,
+    const CryptoLibKey_t*     key,
     const OS_CryptoMac_Alg_t  algorithm,
     const OS_Crypto_Memory_t* memory);
 
@@ -32,12 +35,6 @@ OS_Error_t
 CryptoLibMac_free(
     CryptoLibMac_t*           self,
     const OS_Crypto_Memory_t* memory);
-
-OS_Error_t
-CryptoLibMac_start(
-    CryptoLibMac_t* self,
-    const void*     secret,
-    const size_t    secretSize);
 
 OS_Error_t
 CryptoLibMac_process(
