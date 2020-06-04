@@ -206,6 +206,31 @@ CryptoLibDigest_init(
 }
 
 OS_Error_t
+CryptoLibDigest_clone(
+    CryptoLibDigest_t**       self,
+    const CryptoLibDigest_t*  source,
+    const OS_Crypto_Memory_t* memory)
+{
+    OS_Error_t err;
+
+    if (NULL == self || NULL == source)
+    {
+        return OS_ERROR_INVALID_PARAMETER;
+    }
+
+    if ((err = initImpl(self, source->algorithm, memory)) == OS_SUCCESS)
+    {
+        (*self)->processed = source->processed;
+        if ((err = cloneImpl(*self, source)) != OS_SUCCESS)
+        {
+            freeImpl(*self, memory);
+        }
+    }
+
+    return err;
+}
+
+OS_Error_t
 CryptoLibDigest_free(
     CryptoLibDigest_t*        self,
     const OS_Crypto_Memory_t* memory)
@@ -216,21 +241,6 @@ CryptoLibDigest_free(
     }
 
     return freeImpl(self, memory);
-}
-
-OS_Error_t
-CryptoLibDigest_clone(
-    CryptoLibDigest_t*       self,
-    const CryptoLibDigest_t* source)
-{
-    if (NULL == self || NULL == source || self->algorithm != source->algorithm)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-
-    self->processed = source->processed;
-
-    return cloneImpl(self, source);
 }
 
 OS_Error_t

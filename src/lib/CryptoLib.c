@@ -261,20 +261,38 @@ Digest_free(
 static OS_Error_t
 Digest_clone(
     void*                    ctx,
-    CryptoLibDigest_t*       dstDigObj,
+    CryptoLibDigest_t**      pDigObj,
     const CryptoLibDigest_t* srcDigObj)
 {
+    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
-    if (NULL == ctx)
+    if (NULL == ctx || NULL == pDigObj)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
+    if (!PtrVector_hasPtr(&self->digestObjects, srcDigObj))
+    {
+        return OS_ERROR_INVALID_HANDLE;
+    }
 
-    return !PtrVector_hasPtr(&self->digestObjects, dstDigObj) ||
-           !PtrVector_hasPtr(&self->digestObjects, srcDigObj) ?
-           OS_ERROR_INVALID_HANDLE :
-           CryptoLibDigest_clone(dstDigObj, srcDigObj);
+    if ((err = CryptoLibDigest_clone(pDigObj, srcDigObj,
+                                     &self->memory)) != OS_SUCCESS)
+    {
+        return err;
+    }
+
+    if ((err = PtrVector_add(&self->digestObjects, *pDigObj)) != OS_SUCCESS)
+    {
+        goto err0;
+    }
+
+    return OS_SUCCESS;
+
+err0:
+    CryptoLibDigest_free(*pDigObj, &self->memory);
+
+    return err;
 }
 
 static OS_Error_t

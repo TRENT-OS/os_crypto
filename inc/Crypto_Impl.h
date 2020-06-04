@@ -76,7 +76,7 @@ typedef OS_Error_t
 typedef OS_Error_t
 (*Digest_clone_func)(
     void*,
-    CryptoLibDigest_t*,
+    CryptoLibDigest_t**,
     const CryptoLibDigest_t*);
 
 typedef OS_Error_t

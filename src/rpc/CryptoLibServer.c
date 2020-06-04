@@ -79,7 +79,7 @@ CryptoLibServer_Rng_reseed(
     return CALL(self, Rng_reseed, self->dataPort, seedSize);
 }
 
-// ------------------------------ Digest API -----------------------------------
+// ------------------------------- MAC API -------------------------------------
 
 OS_Error_t
 CryptoLibServer_Mac_init(
@@ -163,13 +163,13 @@ CryptoLibServer_Digest_free(
 
 OS_Error_t
 CryptoLibServer_Digest_clone(
-    CryptoLibDigest_ptr  dstDigHandle,
-    CryptoLibDigest_cptr srcDigHandle)
+    CryptoLibDigest_ptr* pDigestObj,
+    CryptoLibDigest_cptr srcDigestObj)
 {
     CryptoLibServer_t* self;
 
     GET_SELF(self);
-    return CALL(self, Digest_clone, dstDigHandle, srcDigHandle);
+    return CALL(self, Digest_clone, pDigestObj, srcDigestObj);
 }
 
 OS_Error_t

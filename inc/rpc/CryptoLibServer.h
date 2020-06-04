@@ -84,13 +84,13 @@ CryptoLibServer_Digest_init(
     OS_CryptoDigest_Alg_t algorithm);
 
 OS_Error_t
-CryptoLibServer_Digest_free(
-    CryptoLibDigest_ptr digPtr);
+CryptoLibServer_Digest_clone(
+    CryptoLibDigest_ptr* pDigPtr,
+    CryptoLibDigest_cptr srcDigPtr);
 
 OS_Error_t
-CryptoLibServer_Digest_clone(
-    CryptoLibDigest_ptr  dstDigPtr,
-    CryptoLibDigest_cptr srcDigPtr);
+CryptoLibServer_Digest_free(
+    CryptoLibDigest_ptr digPtr);
 
 OS_Error_t
 CryptoLibServer_Digest_process(

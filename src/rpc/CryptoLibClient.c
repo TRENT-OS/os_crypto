@@ -178,22 +178,22 @@ Digest_init(
 }
 
 static OS_Error_t
+Digest_clone(
+    void*                    ctx,
+    CryptoLibDigest_t**      pDigestObj,
+    const CryptoLibDigest_t* srcDigObj)
+{
+    UNUSED_VAR(ctx);
+    return CryptoLibServer_Digest_clone(pDigestObj, srcDigObj);
+}
+
+static OS_Error_t
 Digest_free(
     void*              ctx,
     CryptoLibDigest_t* digestObj)
 {
     UNUSED_VAR(ctx);
     return CryptoLibServer_Digest_free(digestObj);
-}
-
-static OS_Error_t
-Digest_clone(
-    void*                    ctx,
-    CryptoLibDigest_t*       dstDigObj,
-    const CryptoLibDigest_t* srcDigObj)
-{
-    UNUSED_VAR(ctx);
-    return CryptoLibServer_Digest_clone(dstDigObj, srcDigObj);
 }
 
 static OS_Error_t

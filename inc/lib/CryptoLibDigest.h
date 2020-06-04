@@ -31,14 +31,15 @@ CryptoLibDigest_init(
     const OS_Crypto_Memory_t*   memory);
 
 OS_Error_t
-CryptoLibDigest_free(
-    CryptoLibDigest_t*        self,
+CryptoLibDigest_clone(
+    CryptoLibDigest_t**       self,
+    const CryptoLibDigest_t*  source,
     const OS_Crypto_Memory_t* memory);
 
 OS_Error_t
-CryptoLibDigest_clone(
-    CryptoLibDigest_t*       self,
-    const CryptoLibDigest_t* source);
+CryptoLibDigest_free(
+    CryptoLibDigest_t*        self,
+    const OS_Crypto_Memory_t* memory);
 
 OS_Error_t
 CryptoLibDigest_process(

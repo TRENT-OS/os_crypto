@@ -35,6 +35,29 @@ OS_CryptoDigest_init(
 }
 
 OS_Error_t
+OS_CryptoDigest_clone(
+    OS_CryptoDigest_Handle_t*      self,
+    const OS_Crypto_Handle_t       hCrypto,
+    const OS_CryptoDigest_Handle_t hSrcDigest)
+{
+    OS_Error_t err;
+
+    if (NULL == hCrypto)
+    {
+        return OS_ERROR_INVALID_PARAMETER;
+    }
+
+    PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT_ONLY);
+    if ((err = PROXY_CALL(*self, Digest_clone, PROXY_GET_PTR(*self),
+                          PROXY_GET_OBJ(hSrcDigest))) != OS_SUCCESS)
+    {
+        PROXY_FREE(*self);
+    }
+
+    return err;
+}
+
+OS_Error_t
 OS_CryptoDigest_free(
     OS_CryptoDigest_Handle_t self)
 {
@@ -44,15 +67,6 @@ OS_CryptoDigest_free(
     PROXY_FREE(self);
 
     return err;
-}
-
-OS_Error_t
-OS_CryptoDigest_clone(
-    OS_CryptoDigest_Handle_t       self,
-    const OS_CryptoDigest_Handle_t hSrcDigest)
-{
-    return PROXY_CALL(self, Digest_clone, PROXY_GET_OBJ(self),
-                      PROXY_GET_OBJ(hSrcDigest));
 }
 
 OS_Error_t
