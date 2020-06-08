@@ -33,15 +33,15 @@ OS_Crypto_getServer(
     if (((a = CryptoLibServer_getCrypto()) == NULL) ||  \
         ((s = OS_Crypto_getServer(a)) == NULL) )        \
     {                                                   \
-        return OS_ERROR_INVALID_PARAMETER;            \
+        return OS_ERROR_INVALID_PARAMETER;              \
     }                                                   \
 }
 
 // Call function pointer to LIB, make sure it is defined
-#define CALL(s, f, ...)                                 \
-    (NULL == s->client.vtable->f) ?                     \
-    OS_ERROR_NOT_SUPPORTED :                          \
-    s->client.vtable->f(s->client.context, __VA_ARGS__)
+#define CALL(s, f, ...)                                     \
+    (NULL == s->client.vtable->f) ?                         \
+        OS_ERROR_NOT_SUPPORTED :                            \
+        s->client.vtable->f(s->client.context, __VA_ARGS__)
 
 struct CryptoLibServer
 {

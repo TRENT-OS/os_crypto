@@ -711,7 +711,7 @@ CryptoLibClient_init(
     impl->context  = self;
     impl->vtable   = &CryptoLibClient_vtable;
     self->dataPort = cfg->dataPort;
-    self->memory    = *memory;
+    self->memory   = *memory;
 
     return OS_SUCCESS;
 }
