@@ -15,31 +15,16 @@
 #    to serve RPC requests from a crypto API RPC client.
 #
 
+cmake_minimum_required(VERSION 3.13.0)
+
+# enable new behavior introduced in CMake 3.13, where relative paths will be
+# converted into absolute paths in target_sources(INTERFACE ....)
+cmake_policy(SET CMP0076 NEW)
+
 # We need to build 3rdparty/mbedtls for this and would like to avoid
 # all users of OS_CRYPTO to include this as well, so we do it here
 os_use_libs(
     3RDPARTY_MBEDTLS_FOR_CRYPTO
-)
-
-# These are the sources we ALWAYS compile, for all targets
-set(SOURCES
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/OS_Crypto.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/OS_CryptoAgreement.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/OS_CryptoCipher.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/OS_CryptoDigest.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/OS_CryptoKey.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/OS_CryptoMac.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/OS_CryptoRng.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/OS_CryptoSignature.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/lib/CryptoLib.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/lib/CryptoLibAgreement.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/lib/CryptoLibRng.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/lib/CryptoLibDigest.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/lib/CryptoLibMac.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/lib/CryptoLibCipher.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/lib/CryptoLibSignature.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/lib/CryptoLibKey.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/util/PtrVector.c"
 )
 
 
@@ -50,7 +35,23 @@ add_library(${PROJECT_NAME} INTERFACE)
 
 target_sources(${PROJECT_NAME}
     INTERFACE
-        ${SOURCES}
+        "src/OS_Crypto.c"
+        "src/OS_CryptoAgreement.c"
+        "src/OS_CryptoCipher.c"
+        "src/OS_CryptoDigest.c"
+        "src/OS_CryptoKey.c"
+        "src/OS_CryptoMac.c"
+        "src/OS_CryptoRng.c"
+        "src/OS_CryptoSignature.c"
+        "src/lib/CryptoLib.c"
+        "src/lib/CryptoLibAgreement.c"
+        "src/lib/CryptoLibRng.c"
+        "src/lib/CryptoLibDigest.c"
+        "src/lib/CryptoLibMac.c"
+        "src/lib/CryptoLibCipher.c"
+        "src/lib/CryptoLibSignature.c"
+        "src/lib/CryptoLibKey.c"
+        "src/util/PtrVector.c"
 )
 
 target_include_directories(${PROJECT_NAME}
@@ -73,8 +74,7 @@ add_library(${PROJECT_NAME} INTERFACE)
 
 target_sources(${PROJECT_NAME}
     INTERFACE
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/rpc/CryptoLibClient.c"
-        ${SOURCES}
+        "src/rpc/CryptoLibClient.c"
 )
 
 target_compile_definitions(${PROJECT_NAME}
@@ -82,16 +82,9 @@ target_compile_definitions(${PROJECT_NAME}
        OS_CRYPTO_WITH_RPC_CLIENT
 )
 
-target_include_directories(${PROJECT_NAME}
-    INTERFACE
-        "inc"
-)
-
 target_link_libraries(${PROJECT_NAME}
     INTERFACE
-        3rdparty_mbedtls_for_crypto
-        os_core_api
-        os_libs
+        os_crypto
 )
 
 
@@ -102,8 +95,7 @@ add_library(${PROJECT_NAME} INTERFACE)
 
 target_sources(${PROJECT_NAME}
     INTERFACE
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/rpc/CryptoLibServer.c"
-        ${SOURCES}
+        "src/rpc/CryptoLibServer.c"
 )
 
 target_compile_definitions(${PROJECT_NAME}
@@ -111,16 +103,9 @@ target_compile_definitions(${PROJECT_NAME}
        OS_CRYPTO_WITH_RPC_SERVER
 )
 
-target_include_directories(${PROJECT_NAME}
-    INTERFACE
-        "inc"
-)
-
 target_link_libraries(${PROJECT_NAME}
     INTERFACE
-        3rdparty_mbedtls_for_crypto
-        os_core_api
-        os_libs
+        os_crypto
 )
 
 
