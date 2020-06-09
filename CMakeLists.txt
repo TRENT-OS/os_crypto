@@ -42,11 +42,6 @@ set(SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/util/PtrVector.c"
 )
 
-if (ENABLE_LINT)
-    set(CMAKE_C_CPPCHECK "cppcheck;--enable=warning;--inline-suppr")
-    set(CMAKE_C_CLANG_TIDY "clang-tidy;-checks=*")
-endif()
-
 
 #------------------------------------------------------------------------------
 project(os_crypto C)
