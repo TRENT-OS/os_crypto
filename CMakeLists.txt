@@ -72,7 +72,7 @@ endif()
 
 #------------------------------------------------------------------------------
 
-project(seos_crypto C)
+project(os_crypto C)
 
 add_library(${PROJECT_NAME} INTERFACE)
 
@@ -99,13 +99,13 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     INTERFACE
         3rdparty_mbedtls_for_crypto
-        seos_core_api
-        seos_libs
+        os_core_api
+        os_libs
 )
 
 #------------------------------------------------------------------------------
 
-project(seos_crypto_with_rpc_client C)
+project(os_crypto_with_rpc_client C)
 
 add_library(${PROJECT_NAME} INTERFACE)
 
@@ -134,13 +134,13 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     INTERFACE
         3rdparty_mbedtls_for_crypto
-        seos_core_api
-        seos_libs
+        os_core_api
+        os_libs
 )
 
 #------------------------------------------------------------------------------
 
-project(seos_crypto_with_rpc_server C)
+project(os_crypto_with_rpc_server C)
 
 add_library(${PROJECT_NAME} INTERFACE)
 
@@ -169,8 +169,8 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     INTERFACE
         3rdparty_mbedtls_for_crypto
-        seos_core_api
-        seos_libs
+        os_core_api
+        os_libs
 )
 
 #------------------------------------------------------------------------------
@@ -179,9 +179,9 @@ target_link_libraries(${PROJECT_NAME}
 if (COMMAND os_create_doxygen_target)
 
     os_create_doxygen_target( os_crypto_doc
-        # API header is documented as part of seos_core_api, so we do nothing
+        # API header is documented as part of os_core_api, so we do nothing
         "echo"
-        # API header is documented as part of seos_core_api, so we do nothing
+        # API header is documented as part of os_core_api, so we do nothing
         "echo"
     )
 
