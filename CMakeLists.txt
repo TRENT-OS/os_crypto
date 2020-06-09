@@ -42,29 +42,6 @@ set(SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/util/PtrVector.c"
 )
 
-set(COMPILE_DEFINITIONS)
-
-set(COMPILE_OTIONS
-    -Wall
-)
-
-# when building for the x64 architecture, some warnings are reported (i.e. printf
-# formatting) that the code is full of, and that are otherwise not reported, so as
-# a quick fix we don't add -Werror when compiling in this situation
-if(NO_KERNEL_BUILD)
-    # since PAGE_SIZE is normally defined as part of musllibc (which is missing
-    # here) we have to define it
-    set(COMPILE_OTIONS
-        ${COMPILE_OTIONS}
-        PAGE_SIZE=${PAGE_SIZE_VALUE}
-    )
-else()
-    set(COMPILE_OTIONS
-        ${COMPILE_OTIONS}
-        -Werror
-    )
-endif(NO_KERNEL_BUILD)
-
 if (ENABLE_LINT)
     set(CMAKE_C_CPPCHECK "cppcheck;--enable=warning;--inline-suppr")
     set(CMAKE_C_CLANG_TIDY "clang-tidy;-checks=*")
@@ -79,16 +56,6 @@ add_library(${PROJECT_NAME} INTERFACE)
 target_sources(${PROJECT_NAME}
     INTERFACE
         ${SOURCES}
-)
-
-target_compile_definitions(${PROJECT_NAME}
-    INTERFACE
-        ${COMPILE_DEFINITIONS}
-)
-
-target_compile_options(${PROJECT_NAME}
-    INTERFACE
-       ${COMPILE_OPTIONS}
 )
 
 target_include_directories(${PROJECT_NAME}
@@ -117,13 +84,7 @@ target_sources(${PROJECT_NAME}
 
 target_compile_definitions(${PROJECT_NAME}
     INTERFACE
-        ${COMPILE_DEFINITIONS}
-)
-
-target_compile_options(${PROJECT_NAME}
-    INTERFACE
-       ${COMPILE_OPTIONS}
-       -DOS_CRYPTO_WITH_RPC_CLIENT
+       OS_CRYPTO_WITH_RPC_CLIENT
 )
 
 target_include_directories(${PROJECT_NAME}
@@ -152,13 +113,7 @@ target_sources(${PROJECT_NAME}
 
 target_compile_definitions(${PROJECT_NAME}
     INTERFACE
-        ${COMPILE_DEFINITIONS}
-)
-
-target_compile_options(${PROJECT_NAME}
-    INTERFACE
-       ${COMPILE_OPTIONS}
-       -DOS_CRYPTO_WITH_RPC_SERVER
+       OS_CRYPTO_WITH_RPC_SERVER
 )
 
 target_include_directories(${PROJECT_NAME}
