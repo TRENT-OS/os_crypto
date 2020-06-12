@@ -14,9 +14,9 @@
 // -------------------------- defines/types/variables --------------------------
 
 /*
- * Host of OS Crypto API RPC server has to provide a client's RPC context.
- * This way, it is up to the host (e.g., the CryptoServer) to implement its own
- * way of handling multiple clients and their respective contextx.
+ * Host of OS Crypto API RPC server has to provide an implementation's RPC
+ * context. This way, it is up to the host (e.g., the CryptoServer) to implement
+ * its own way of handling multiple clients and their respective contextx.
  */
 extern OS_Crypto_Handle_t
 CryptoLibServer_getCrypto(
@@ -38,10 +38,10 @@ OS_Crypto_getServer(
 }
 
 // Call function pointer to LIB, make sure it is defined
-#define CALL(s, f, ...)                                     \
-    (NULL == s->client.vtable->f) ?                         \
-        OS_ERROR_NOT_SUPPORTED :                            \
-        s->client.vtable->f(s->client.context, __VA_ARGS__)
+#define CALL(s, f, ...)                                 \
+    (NULL == s->impl.vtable->f) ?                       \
+        OS_ERROR_NOT_SUPPORTED :                        \
+        s->impl.vtable->f(s->impl.context, __VA_ARGS__)
 
 struct CryptoLibServer
 {
@@ -50,9 +50,9 @@ struct CryptoLibServer
      */
     void* dataPort;
     /**
-     * Context and function pointers of CLIENT implementation
+     * Context and function pointers of implementation
      */
-    Crypto_Impl_t client;
+    Crypto_Impl_t impl;
     OS_Crypto_Memory_t memory;
 };
 
@@ -460,13 +460,13 @@ CryptoLibServer_Cipher_finalize(
 OS_Error_t
 CryptoLibServer_init(
     CryptoLibServer_t**             ctx,
-    const Crypto_Impl_t*            client,
+    const Crypto_Impl_t*            impl,
     const OS_Crypto_Memory_t*       memory,
     const CryptoLibServer_Config_t* cfg)
 {
     CryptoLibServer_t* svr;
 
-    if (NULL == ctx || NULL == client || NULL == memory || NULL == cfg
+    if (NULL == ctx || NULL == impl || NULL == memory || NULL == cfg
         || NULL == cfg->dataPort)
     {
         return OS_ERROR_INVALID_PARAMETER;
@@ -479,9 +479,9 @@ CryptoLibServer_init(
 
     *ctx = svr;
 
-    svr->dataPort = cfg->dataPort;
-    svr->memory    = *memory;
-    svr->client   = *client;
+    svr->dataport = cfg->dataport;
+    svr->memory   = *memory;
+    svr->impl     = *impl;
 
     return OS_SUCCESS;
 }
