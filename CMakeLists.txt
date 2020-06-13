@@ -1,6 +1,8 @@
 #
 # OS Crypto Library
 #
+# Copyright (C) 2019-2020, Hensoldt Cyber GmbH
+#
 # We have three library targets:
 # 1. OS_CRYPTO:
 #    Provides only functionality of the crypto library behind calls to the API.
