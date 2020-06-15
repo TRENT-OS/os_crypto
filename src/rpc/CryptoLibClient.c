@@ -712,14 +712,14 @@ static const Crypto_Vtable_t CryptoLibClient_vtable =
 
 OS_Error_t
 CryptoLibClient_init(
-    Crypto_Impl_t*                  impl,
-    const OS_Crypto_Memory_t*       memory,
-    const CryptoLibClient_Config_t* cfg)
+    Crypto_Impl_t*            impl,
+    const OS_Crypto_Memory_t* memory,
+    const OS_Dataport_t*      dataport)
 {
     CryptoLibClient_t* self;
 
-    if (NULL == impl || NULL == memory || NULL == cfg
-        || OS_Dataport_isUnset(cfg->dataport))
+    if (NULL == impl || NULL == memory || NULL == dataport
+        || OS_Dataport_isUnset(*dataport))
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
@@ -731,7 +731,7 @@ CryptoLibClient_init(
 
     impl->context  = self;
     impl->vtable   = &CryptoLibClient_vtable;
-    self->dataport = cfg->dataport;
+    self->dataport = *dataport;
     self->memory   = *memory;
 
     return OS_SUCCESS;

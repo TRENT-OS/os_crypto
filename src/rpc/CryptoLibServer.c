@@ -463,15 +463,15 @@ CryptoLibServer_Cipher_finalize(
 
 OS_Error_t
 CryptoLibServer_init(
-    CryptoLibServer_t**             ctx,
-    const Crypto_Impl_t*            impl,
-    const OS_Crypto_Memory_t*       memory,
-    const CryptoLibServer_Config_t* cfg)
+    CryptoLibServer_t**       ctx,
+    const Crypto_Impl_t*      impl,
+    const OS_Crypto_Memory_t* memory,
+    const OS_Dataport_t*      dataport)
 {
     CryptoLibServer_t* svr;
 
-    if (NULL == ctx || NULL == impl || NULL == memory || NULL == cfg
-        || OS_Dataport_isUnset(cfg->dataport))
+    if (NULL == ctx || NULL == impl || NULL == memory || NULL == dataport
+        || OS_Dataport_isUnset(*dataport))
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
@@ -483,7 +483,7 @@ CryptoLibServer_init(
 
     *ctx = svr;
 
-    svr->dataport = cfg->dataport;
+    svr->dataport = *dataport;
     svr->memory   = *memory;
     svr->impl     = *impl;
 

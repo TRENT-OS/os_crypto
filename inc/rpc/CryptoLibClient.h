@@ -27,9 +27,9 @@ typedef struct CryptoLibClient CryptoLibClient_t;
 
 OS_Error_t
 CryptoLibClient_init(
-    Crypto_Impl_t*                  impl,
-    const OS_Crypto_Memory_t*       memory,
-    const CryptoLibClient_Config_t* cfg);
+    Crypto_Impl_t*            impl,
+    const OS_Crypto_Memory_t* memory,
+    const OS_Dataport_t*      dataport);
 
 OS_Error_t
 CryptoLibClient_free(
