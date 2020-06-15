@@ -39,7 +39,7 @@ Rng_getBytes(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (bufSize > OS_Dataport_getSize(self->dataport))
+    if (bufSize > OS_Dataport_getSize(self->dataport))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -64,7 +64,7 @@ Rng_reseed(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (seedSize > OS_Dataport_getSize(self->dataport))
+    if (seedSize > OS_Dataport_getSize(self->dataport))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -108,7 +108,7 @@ Mac_process(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (dataSize > OS_Dataport_getSize(self->dataport))
+    if (dataSize > OS_Dataport_getSize(self->dataport))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -131,7 +131,7 @@ Mac_finalize(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (*macSize > OS_Dataport_getSize(self->dataport))
+    if (*macSize > OS_Dataport_getSize(self->dataport))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -188,7 +188,7 @@ Digest_process(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (dataSize > OS_Dataport_getSize(self->dataport))
+    if (dataSize > OS_Dataport_getSize(self->dataport))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -211,7 +211,7 @@ Digest_finalize(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (*digestSize > OS_Dataport_getSize(self->dataport))
+    if (*digestSize > OS_Dataport_getSize(self->dataport))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -266,11 +266,8 @@ Signature_sign(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (hashSize > OS_Dataport_getSize(self->dataport))
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
-    else if (*signatureSize > OS_Dataport_getSize(self->dataport))
+    if (hashSize > OS_Dataport_getSize(self->dataport) ||
+        *signatureSize > OS_Dataport_getSize(self->dataport))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -300,7 +297,7 @@ Signature_verify(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (hashSize + signatureSize > OS_Dataport_getSize(self->dataport))
+    if (hashSize + signatureSize > OS_Dataport_getSize(self->dataport))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -348,7 +345,7 @@ Agreement_agree(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (*sharedSize > OS_Dataport_getSize(self->dataport))
+    if (*sharedSize > OS_Dataport_getSize(self->dataport))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -376,7 +373,7 @@ Key_generate(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (sizeof(OS_CryptoKey_Spec_t) > OS_Dataport_getSize(self->dataport))
+    if (sizeof(OS_CryptoKey_Spec_t) > OS_Dataport_getSize(self->dataport))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -416,7 +413,7 @@ Key_import(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (sizeof(OS_CryptoKey_Data_t) > OS_Dataport_getSize(self->dataport))
+    if (sizeof(OS_CryptoKey_Data_t) > OS_Dataport_getSize(self->dataport))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -439,7 +436,7 @@ Key_export(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (sizeof(OS_CryptoKey_Data_t) > OS_Dataport_getSize(self->dataport))
+    if (sizeof(OS_CryptoKey_Data_t) > OS_Dataport_getSize(self->dataport))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -467,7 +464,7 @@ Key_getParams(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (*paramSize > OS_Dataport_getSize(self->dataport))
+    if (*paramSize > OS_Dataport_getSize(self->dataport))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -493,7 +490,7 @@ Key_getAttribs(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (sizeof(OS_CryptoKey_Attrib_t) > OS_Dataport_getSize(self->dataport))
+    if (sizeof(OS_CryptoKey_Attrib_t) > OS_Dataport_getSize(self->dataport))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -521,7 +518,7 @@ Key_loadParams(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (*paramSize > OS_Dataport_getSize(self->dataport))
+    if (*paramSize > OS_Dataport_getSize(self->dataport))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -599,11 +596,8 @@ Cipher_process(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (inputSize > OS_Dataport_getSize(self->dataport))
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
-    else if (*outputSize > OS_Dataport_getSize(self->dataport))
+    if (inputSize > OS_Dataport_getSize(self->dataport) ||
+        *outputSize > OS_Dataport_getSize(self->dataport))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -658,7 +652,7 @@ Cipher_finalize(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (*tagSize > OS_Dataport_getSize(self->dataport))
+    if (*tagSize > OS_Dataport_getSize(self->dataport))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
