@@ -48,7 +48,7 @@ struct CryptoLibServer
     /**
      * The server's address of the dataport shared with the client
      */
-    OS_Dataport_t dataPort;
+    OS_Dataport_t dataport;
     /**
      * Context and function pointers of implementation
      */
@@ -66,7 +66,7 @@ CryptoLibServer_Rng_getBytes(
     CryptoLibServer_t* self;
 
     GET_SELF(self);
-    return CALL(self, Rng_getBytes, flags, OS_Dataport_getBuf(self->dataPort),
+    return CALL(self, Rng_getBytes, flags, OS_Dataport_getBuf(self->dataport),
                 bufSize);
 }
 
@@ -77,7 +77,7 @@ CryptoLibServer_Rng_reseed(
     CryptoLibServer_t* self;
 
     GET_SELF(self);
-    return CALL(self, Rng_reseed, OS_Dataport_getBuf(self->dataPort), seedSize);
+    return CALL(self, Rng_reseed, OS_Dataport_getBuf(self->dataport), seedSize);
 }
 
 // ------------------------------- MAC API -------------------------------------
@@ -112,7 +112,7 @@ CryptoLibServer_Mac_process(
     CryptoLibServer_t* self;
 
     GET_SELF(self);
-    return CALL(self, Mac_process, macObj, OS_Dataport_getBuf(self->dataPort),
+    return CALL(self, Mac_process, macObj, OS_Dataport_getBuf(self->dataport),
                 dataSize);
 }
 
@@ -124,9 +124,9 @@ CryptoLibServer_Mac_finalize(
     CryptoLibServer_t* self;
 
     GET_SELF(self);
-    *macSize = (*macSize <= OS_Dataport_getSize(self->dataPort)) ?
-               *macSize : OS_Dataport_getSize(self->dataPort);
-    return CALL(self, Mac_finalize, macObj, OS_Dataport_getBuf(self->dataPort),
+    *macSize = (*macSize <= OS_Dataport_getSize(self->dataport)) ?
+               *macSize : OS_Dataport_getSize(self->dataport);
+    return CALL(self, Mac_finalize, macObj, OS_Dataport_getBuf(self->dataport),
                 macSize);
 }
 
@@ -173,7 +173,7 @@ CryptoLibServer_Digest_process(
 
     GET_SELF(self);
     return CALL(self, Digest_process, digestObj,
-                OS_Dataport_getBuf(self->dataPort), inSize);
+                OS_Dataport_getBuf(self->dataport), inSize);
 }
 
 OS_Error_t
@@ -184,10 +184,10 @@ CryptoLibServer_Digest_finalize(
     CryptoLibServer_t* self;
 
     GET_SELF(self);
-    *digestSize = (*digestSize <= OS_Dataport_getSize(self->dataPort)) ?
-                  *digestSize : OS_Dataport_getSize(self->dataPort);
+    *digestSize = (*digestSize <= OS_Dataport_getSize(self->dataport)) ?
+                  *digestSize : OS_Dataport_getSize(self->dataport);
     return CALL(self, Digest_finalize, digestObj,
-                OS_Dataport_getBuf(self->dataPort), digestSize);
+                OS_Dataport_getBuf(self->dataport), digestSize);
 }
 
 // -------------------------------- Key API ------------------------------------
@@ -199,7 +199,7 @@ CryptoLibServer_Key_generate(
     CryptoLibServer_t* self;
 
     GET_SELF(self);
-    return CALL(self, Key_generate, pKeyObj, OS_Dataport_getBuf(self->dataPort));
+    return CALL(self, Key_generate, pKeyObj, OS_Dataport_getBuf(self->dataport));
 }
 
 OS_Error_t
@@ -211,7 +211,7 @@ CryptoLibServer_Key_makePublic(
 
     GET_SELF(self);
     return CALL(self, Key_makePublic, pPubKeyHandle, prvKeyHandle,
-                OS_Dataport_getBuf(self->dataPort));
+                OS_Dataport_getBuf(self->dataport));
 }
 
 OS_Error_t
@@ -221,7 +221,7 @@ CryptoLibServer_Key_import(
     CryptoLibServer_t* self;
 
     GET_SELF(self);
-    return CALL(self, Key_import, pKeyObj, OS_Dataport_getBuf(self->dataPort));
+    return CALL(self, Key_import, pKeyObj, OS_Dataport_getBuf(self->dataport));
 }
 
 OS_Error_t
@@ -247,7 +247,7 @@ CryptoLibServer_Key_export(
 
     return !attribs.exportable ?
            OS_ERROR_OPERATION_DENIED :
-           CALL(self, Key_export, keyObj, OS_Dataport_getBuf(self->dataPort));
+           CALL(self, Key_export, keyObj, OS_Dataport_getBuf(self->dataport));
 }
 
 OS_Error_t
@@ -258,9 +258,9 @@ CryptoLibServer_Key_getParams(
     CryptoLibServer_t* self;
 
     GET_SELF(self);
-    *paramSize = (*paramSize <= OS_Dataport_getSize(self->dataPort)) ?
-                 *paramSize : OS_Dataport_getSize(self->dataPort);
-    return CALL(self, Key_getParams, keyObj, OS_Dataport_getBuf(self->dataPort),
+    *paramSize = (*paramSize <= OS_Dataport_getSize(self->dataport)) ?
+                 *paramSize : OS_Dataport_getSize(self->dataport);
+    return CALL(self, Key_getParams, keyObj, OS_Dataport_getBuf(self->dataport),
                 paramSize);
 }
 
@@ -271,7 +271,7 @@ CryptoLibServer_Key_getAttribs(
     CryptoLibServer_t* self;
 
     GET_SELF(self);
-    return CALL(self, Key_getAttribs, keyObj, OS_Dataport_getBuf(self->dataPort));
+    return CALL(self, Key_getAttribs, keyObj, OS_Dataport_getBuf(self->dataport));
 }
 
 OS_Error_t
@@ -282,9 +282,9 @@ CryptoLibServer_Key_loadParams(
     CryptoLibServer_t* self;
 
     GET_SELF(self);
-    *paramSize = (*paramSize <= OS_Dataport_getSize(self->dataPort)) ?
-                 *paramSize : OS_Dataport_getSize(self->dataPort);
-    return CALL(self, Key_loadParams, name, OS_Dataport_getBuf(self->dataPort),
+    *paramSize = (*paramSize <= OS_Dataport_getSize(self->dataport)) ?
+                 *paramSize : OS_Dataport_getSize(self->dataport);
+    return CALL(self, Key_loadParams, name, OS_Dataport_getBuf(self->dataport),
                 paramSize);
 }
 
@@ -321,10 +321,10 @@ CryptoLibServer_Agreement_agree(
     CryptoLibServer_t* self;
 
     GET_SELF(self);
-    *sharedSize = (*sharedSize <= OS_Dataport_getSize(self->dataPort)) ?
-                  *sharedSize : OS_Dataport_getSize(self->dataPort);
+    *sharedSize = (*sharedSize <= OS_Dataport_getSize(self->dataport)) ?
+                  *sharedSize : OS_Dataport_getSize(self->dataport);
     return CALL(self, Agreement_agree, agrObj, pubKey,
-                OS_Dataport_getBuf(self->dataPort), sharedSize);
+                OS_Dataport_getBuf(self->dataport), sharedSize);
 }
 
 OS_Error_t
@@ -362,8 +362,8 @@ CryptoLibServer_Signature_verify(
     CryptoLibServer_t* self;
 
     GET_SELF(self);
-    return CALL(self, Signature_verify, obj, OS_Dataport_getBuf(self->dataPort),
-                hashSize, OS_Dataport_getBuf(self->dataPort) + hashSize, signatureSize);
+    return CALL(self, Signature_verify, obj, OS_Dataport_getBuf(self->dataport),
+                hashSize, OS_Dataport_getBuf(self->dataport) + hashSize, signatureSize);
 }
 
 OS_Error_t
@@ -375,10 +375,10 @@ CryptoLibServer_Signature_sign(
     CryptoLibServer_t* self;
 
     GET_SELF(self);
-    *signatureSize = (*signatureSize <= OS_Dataport_getSize(self->dataPort)) ?
-                     *signatureSize : OS_Dataport_getSize(self->dataPort);
-    return CALL(self, Signature_sign, obj, OS_Dataport_getBuf(self->dataPort),
-                hashSize, OS_Dataport_getBuf(self->dataPort), signatureSize);
+    *signatureSize = (*signatureSize <= OS_Dataport_getSize(self->dataport)) ?
+                     *signatureSize : OS_Dataport_getSize(self->dataport);
+    return CALL(self, Signature_sign, obj, OS_Dataport_getBuf(self->dataport),
+                hashSize, OS_Dataport_getBuf(self->dataport), signatureSize);
 }
 
 OS_Error_t
@@ -404,7 +404,7 @@ CryptoLibServer_Cipher_init(
 
     GET_SELF(self);
     return CALL(self, Cipher_init, pCipherObj, key, algorithm,
-                OS_Dataport_getBuf(self->dataPort), ivSize);
+                OS_Dataport_getBuf(self->dataport), ivSize);
 }
 
 OS_Error_t
@@ -426,11 +426,11 @@ CryptoLibServer_Cipher_process(
     CryptoLibServer_t* self;
 
     GET_SELF(self);
-    *outputSize = (*outputSize <= OS_Dataport_getSize(self->dataPort)) ?
-                  *outputSize : OS_Dataport_getSize(self->dataPort);
+    *outputSize = (*outputSize <= OS_Dataport_getSize(self->dataport)) ?
+                  *outputSize : OS_Dataport_getSize(self->dataport);
     return CALL(self, Cipher_process, cipherObj,
-                OS_Dataport_getBuf(self->dataPort), inputSize,
-                OS_Dataport_getBuf(self->dataPort), outputSize);
+                OS_Dataport_getBuf(self->dataport), inputSize,
+                OS_Dataport_getBuf(self->dataport), outputSize);
 }
 
 OS_Error_t
@@ -441,7 +441,7 @@ CryptoLibServer_Cipher_start(
     CryptoLibServer_t* self;
 
     GET_SELF(self);
-    return CALL(self, Cipher_start, cipherObj, OS_Dataport_getBuf(self->dataPort),
+    return CALL(self, Cipher_start, cipherObj, OS_Dataport_getBuf(self->dataport),
                 len);
 }
 
@@ -453,10 +453,10 @@ CryptoLibServer_Cipher_finalize(
     CryptoLibServer_t* self;
 
     GET_SELF(self);
-    *tagSize = (*tagSize <= OS_Dataport_getSize(self->dataPort)) ?
-               *tagSize : OS_Dataport_getSize(self->dataPort);
+    *tagSize = (*tagSize <= OS_Dataport_getSize(self->dataport)) ?
+               *tagSize : OS_Dataport_getSize(self->dataport);
     return CALL(self, Cipher_finalize, cipherObj,
-                OS_Dataport_getBuf(self->dataPort), tagSize);
+                OS_Dataport_getBuf(self->dataport), tagSize);
 }
 
 // ------------------------------- init/free -----------------------------------
@@ -471,7 +471,7 @@ CryptoLibServer_init(
     CryptoLibServer_t* svr;
 
     if (NULL == ctx || NULL == impl || NULL == memory || NULL == cfg
-        || OS_Dataport_isUnset(cfg->dataPort))
+        || OS_Dataport_isUnset(cfg->dataport))
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
