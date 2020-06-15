@@ -27,13 +27,6 @@ struct CryptoLibKey
     uint32_t size;
 };
 
-// Make sure that these structs are smaller than the width of the dataport so
-// that we do not have any problem when passing them via RPC
-Debug_STATIC_ASSERT(sizeof(OS_CryptoKey_Spec_t) <=
-                    OS_Crypto_SIZE_DATAPORT);
-Debug_STATIC_ASSERT(sizeof(OS_CryptoKey_Data_t) <=
-                    OS_Crypto_SIZE_DATAPORT);
-
 // Private static functions ----------------------------------------------------
 
 // This implementation should never be optimized out by the compiler

@@ -376,6 +376,10 @@ Key_generate(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
+    else if (sizeof(OS_CryptoKey_Spec_t) > OS_Dataport_getSize(self->dataPort))
+    {
+        return OS_ERROR_INSUFFICIENT_SPACE;
+    }
 
     memcpy(OS_Dataport_getBuf(self->dataPort), spec, sizeof(OS_CryptoKey_Spec_t));
     return CryptoLibServer_Key_generate(pKeyObj);
@@ -412,6 +416,10 @@ Key_import(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
+    else if (sizeof(OS_CryptoKey_Data_t) > OS_Dataport_getSize(self->dataPort))
+    {
+        return OS_ERROR_INSUFFICIENT_SPACE;
+    }
 
     memcpy(OS_Dataport_getBuf(self->dataPort), keyData,
            sizeof(OS_CryptoKey_Data_t));
@@ -430,6 +438,10 @@ Key_export(
     if (NULL == self || NULL == keyData)
     {
         return OS_ERROR_INVALID_PARAMETER;
+    }
+    else if (sizeof(OS_CryptoKey_Data_t) > OS_Dataport_getSize(self->dataPort))
+    {
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     if ((err = CryptoLibServer_Key_export(keyObj)) == OS_SUCCESS)
@@ -480,6 +492,10 @@ Key_getAttribs(
     if (NULL == self || NULL == attribs)
     {
         return OS_ERROR_INVALID_PARAMETER;
+    }
+    else if (sizeof(OS_CryptoKey_Attrib_t) > OS_Dataport_getSize(self->dataPort))
+    {
+        return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     if ((err = CryptoLibServer_Key_getAttribs(keyObj)) == OS_SUCCESS)
