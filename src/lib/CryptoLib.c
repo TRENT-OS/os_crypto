@@ -12,7 +12,11 @@
 
 // -------------------------- defines/types/variables --------------------------
 
-#define CryptoLib_SIZE_BUFFER OS_Crypto_SIZE_DATAPORT
+/*
+ * For the API to behave similarly in all modes (RPC and local), this buffer size
+ * needs to be equal to the size of a dataport, which currently is PAGE_SIZE.
+ */
+#define CryptoLib_SIZE_BUFFER OS_DATAPORT_DEFAULT_SIZE
 
 struct CryptoLib
 {

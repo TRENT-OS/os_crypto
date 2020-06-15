@@ -20,7 +20,7 @@ struct CryptoLibClient
     /**
      * The client's address of the dataport shared with the server
      */
-    void* dataPort;
+    OS_Dataport_t dataPort;
 };
 
 // -------------------------------- RNG API ------------------------------------
@@ -39,14 +39,14 @@ Rng_getBytes(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (bufSize > OS_Crypto_SIZE_DATAPORT)
+    else if (bufSize > OS_Dataport_getSize(self->dataPort))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     if ((err = CryptoLibServer_Rng_getBytes(flags, bufSize)) == OS_SUCCESS)
     {
-        memcpy(buf, self->dataPort, bufSize);
+        memcpy(buf, OS_Dataport_getBuf(self->dataPort), bufSize);
     }
 
     return err;
@@ -64,12 +64,12 @@ Rng_reseed(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (seedSize > OS_Crypto_SIZE_DATAPORT)
+    else if (seedSize > OS_Dataport_getSize(self->dataPort))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    memcpy(self->dataPort, seed, seedSize);
+    memcpy(OS_Dataport_getBuf(self->dataPort), seed, seedSize);
     return CryptoLibServer_Rng_reseed(seedSize);
 }
 
@@ -108,12 +108,12 @@ Mac_process(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (dataSize > OS_Crypto_SIZE_DATAPORT)
+    else if (dataSize > OS_Dataport_getSize(self->dataPort))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    memcpy(self->dataPort, data, dataSize);
+    memcpy(OS_Dataport_getBuf(self->dataPort), data, dataSize);
     return CryptoLibServer_Mac_process(macObj, dataSize);
 }
 
@@ -131,14 +131,14 @@ Mac_finalize(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (*macSize > OS_Crypto_SIZE_DATAPORT)
+    else if (*macSize > OS_Dataport_getSize(self->dataPort))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
     if ((err = CryptoLibServer_Mac_finalize(macObj, macSize)) == OS_SUCCESS)
     {
-        memcpy(mac, self->dataPort, *macSize);
+        memcpy(mac, OS_Dataport_getBuf(self->dataPort), *macSize);
     }
 
     return err;
@@ -188,12 +188,12 @@ Digest_process(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (dataSize > OS_Crypto_SIZE_DATAPORT)
+    else if (dataSize > OS_Dataport_getSize(self->dataPort))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    memcpy(self->dataPort, data, dataSize);
+    memcpy(OS_Dataport_getBuf(self->dataPort), data, dataSize);
     return CryptoLibServer_Digest_process(digestObj, dataSize);
 }
 
@@ -211,7 +211,7 @@ Digest_finalize(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (*digestSize > OS_Crypto_SIZE_DATAPORT)
+    else if (*digestSize > OS_Dataport_getSize(self->dataPort))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -219,7 +219,7 @@ Digest_finalize(
     if ((err = CryptoLibServer_Digest_finalize(digestObj,
                                                digestSize)) == OS_SUCCESS)
     {
-        memcpy(digest, self->dataPort, *digestSize);
+        memcpy(digest, OS_Dataport_getBuf(self->dataPort), *digestSize);
     }
 
     return err;
@@ -266,20 +266,20 @@ Signature_sign(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (hashSize > OS_Crypto_SIZE_DATAPORT)
+    else if (hashSize > OS_Dataport_getSize(self->dataPort))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
-    else if (*signatureSize > OS_Crypto_SIZE_DATAPORT)
+    else if (*signatureSize > OS_Dataport_getSize(self->dataPort))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    memcpy(self->dataPort, hash, hashSize);
+    memcpy(OS_Dataport_getBuf(self->dataPort), hash, hashSize);
     if ((err = CryptoLibServer_Signature_sign(sigObj, hashSize,
                                               signatureSize)) == OS_SUCCESS)
     {
-        memcpy(signature, self->dataPort, *signatureSize);
+        memcpy(signature, OS_Dataport_getBuf(self->dataPort), *signatureSize);
     }
 
     return err;
@@ -300,13 +300,14 @@ Signature_verify(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (hashSize + signatureSize > OS_Crypto_SIZE_DATAPORT)
+    else if (hashSize + signatureSize > OS_Dataport_getSize(self->dataPort))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    memcpy(self->dataPort, hash, hashSize);
-    memcpy(self->dataPort + hashSize, signature, signatureSize);
+    memcpy(OS_Dataport_getBuf(self->dataPort), hash, hashSize);
+    memcpy(OS_Dataport_getBuf(self->dataPort) + hashSize, signature,
+           signatureSize);
     return CryptoLibServer_Signature_verify(sigObj, hashSize, signatureSize);
 }
 
@@ -347,7 +348,7 @@ Agreement_agree(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (*sharedSize > OS_Crypto_SIZE_DATAPORT)
+    else if (*sharedSize > OS_Dataport_getSize(self->dataPort))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -355,7 +356,7 @@ Agreement_agree(
     if ((err = CryptoLibServer_Agreement_agree(agrObj, pubKey,
                                                sharedSize)) == OS_SUCCESS)
     {
-        memcpy(shared, self->dataPort, *sharedSize);
+        memcpy(shared, OS_Dataport_getBuf(self->dataPort), *sharedSize);
     }
 
     return err;
@@ -376,7 +377,7 @@ Key_generate(
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    memcpy(self->dataPort, spec, sizeof(OS_CryptoKey_Spec_t));
+    memcpy(OS_Dataport_getBuf(self->dataPort), spec, sizeof(OS_CryptoKey_Spec_t));
     return CryptoLibServer_Key_generate(pKeyObj);
 }
 
@@ -394,7 +395,8 @@ Key_makePublic(
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    memcpy(self->dataPort, attribs, sizeof(OS_CryptoKey_Attrib_t));
+    memcpy(OS_Dataport_getBuf(self->dataPort), attribs,
+           sizeof(OS_CryptoKey_Attrib_t));
     return CryptoLibServer_Key_makePublic(pPubKeyObj, prvKeyObj);
 }
 
@@ -411,7 +413,8 @@ Key_import(
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    memcpy(self->dataPort, keyData, sizeof(OS_CryptoKey_Data_t));
+    memcpy(OS_Dataport_getBuf(self->dataPort), keyData,
+           sizeof(OS_CryptoKey_Data_t));
     return CryptoLibServer_Key_import(pKeyObj);
 }
 
@@ -431,7 +434,8 @@ Key_export(
 
     if ((err = CryptoLibServer_Key_export(keyObj)) == OS_SUCCESS)
     {
-        memcpy(keyData, self->dataPort, sizeof(OS_CryptoKey_Data_t));
+        memcpy(keyData, OS_Dataport_getBuf(self->dataPort),
+               sizeof(OS_CryptoKey_Data_t));
     }
 
     return err;
@@ -451,15 +455,14 @@ Key_getParams(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (*paramSize > OS_Crypto_SIZE_DATAPORT)
+    else if (*paramSize > OS_Dataport_getSize(self->dataPort))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((err = CryptoLibServer_Key_getParams(keyObj,
-                                             paramSize)) == OS_SUCCESS)
+    if ((err = CryptoLibServer_Key_getParams(keyObj, paramSize)) == OS_SUCCESS)
     {
-        memcpy(keyParams, self->dataPort, *paramSize);
+        memcpy(keyParams, OS_Dataport_getBuf(self->dataPort), *paramSize);
     }
 
     return err;
@@ -481,7 +484,8 @@ Key_getAttribs(
 
     if ((err = CryptoLibServer_Key_getAttribs(keyObj)) == OS_SUCCESS)
     {
-        memcpy(attribs, self->dataPort, sizeof(OS_CryptoKey_Attrib_t));
+        memcpy(attribs, OS_Dataport_getBuf(self->dataPort),
+               sizeof(OS_CryptoKey_Attrib_t));
     }
 
     return err;
@@ -501,7 +505,7 @@ Key_loadParams(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (*paramSize > OS_Crypto_SIZE_DATAPORT)
+    else if (*paramSize > OS_Dataport_getSize(self->dataPort))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
@@ -509,7 +513,7 @@ Key_loadParams(
     if ((err = CryptoLibServer_Key_loadParams(name,
                                               paramSize)) == OS_SUCCESS)
     {
-        memcpy(keyParams, self->dataPort, *paramSize);
+        memcpy(keyParams, OS_Dataport_getBuf(self->dataPort), *paramSize);
     }
 
     return err;
@@ -544,11 +548,11 @@ Cipher_init(
 
     if (iv != NULL)
     {
-        if (ivSize > OS_Crypto_SIZE_DATAPORT)
+        if (ivSize > OS_Dataport_getSize(self->dataPort))
         {
             return OS_ERROR_INSUFFICIENT_SPACE;
         }
-        memcpy(self->dataPort, iv, ivSize);
+        memcpy(OS_Dataport_getBuf(self->dataPort), iv, ivSize);
     }
 
     return CryptoLibServer_Cipher_init(pCipherObj, key, algorithm, ivSize);
@@ -579,20 +583,20 @@ Cipher_process(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (inputSize > OS_Crypto_SIZE_DATAPORT)
+    else if (inputSize > OS_Dataport_getSize(self->dataPort))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
-    else if (*outputSize > OS_Crypto_SIZE_DATAPORT)
+    else if (*outputSize > OS_Dataport_getSize(self->dataPort))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    memcpy(self->dataPort, input, inputSize);
+    memcpy(OS_Dataport_getBuf(self->dataPort), input, inputSize);
     if ((err = CryptoLibServer_Cipher_process(cipherObj, inputSize,
                                               outputSize)) == OS_SUCCESS)
     {
-        memcpy(output, self->dataPort, *outputSize);
+        memcpy(output, OS_Dataport_getBuf(self->dataPort), *outputSize);
     }
 
     return err;
@@ -614,11 +618,11 @@ Cipher_start(
 
     if (NULL != data)
     {
-        if (dataSize > OS_Crypto_SIZE_DATAPORT)
+        if (dataSize > OS_Dataport_getSize(self->dataPort))
         {
             return OS_ERROR_INSUFFICIENT_SPACE;
         }
-        memcpy(self->dataPort, data, dataSize);
+        memcpy(OS_Dataport_getBuf(self->dataPort), data, dataSize);
     }
 
     return CryptoLibServer_Cipher_start(cipherObj, dataSize);
@@ -638,16 +642,16 @@ Cipher_finalize(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (*tagSize > OS_Crypto_SIZE_DATAPORT)
+    else if (*tagSize > OS_Dataport_getSize(self->dataPort))
     {
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    memcpy(self->dataPort, tag, *tagSize);
+    memcpy(OS_Dataport_getBuf(self->dataPort), tag, *tagSize);
     if ((err = CryptoLibServer_Cipher_finalize(cipherObj,
                                                tagSize)) == OS_SUCCESS)
     {
-        memcpy(tag, self->dataPort, *tagSize);
+        memcpy(tag, OS_Dataport_getBuf(self->dataPort), *tagSize);
     }
 
     return err;
@@ -698,7 +702,8 @@ CryptoLibClient_init(
 {
     CryptoLibClient_t* self;
 
-    if (NULL == impl || NULL == memory || NULL == cfg || NULL == cfg->dataPort)
+    if (NULL == impl || NULL == memory || NULL == cfg
+        || OS_Dataport_isUnset(cfg->dataPort))
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
