@@ -48,10 +48,6 @@ CryptoLibRng_init(
         goto err0;
     }
 
-    // Force mbedTLS to reseed drbg frequently (e.g., after every time we have
-    // obtained *some* amount of randomness from the DRBG)
-    mbedtls_ctr_drbg_set_prediction_resistance(&rng->drbg, MBEDTLS_CTR_DRBG_PR_ON);
-
     return OS_SUCCESS;
 
 err0:
