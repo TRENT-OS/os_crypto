@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019, Hensoldt Cyber GmbH
+ * Copyright (C) 2019-2020, Hensoldt Cyber GmbH
  */
 
 #if defined(OS_CRYPTO_WITH_RPC_SERVER)
