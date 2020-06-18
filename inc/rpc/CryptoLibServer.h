@@ -1,15 +1,5 @@
 /**
  * Copyright (C) 2019, Hensoldt Cyber GmbH
- *
- * @addtogroup RPC
- * @{
- *
- * @file CryptoLibServer.h
- *
- * @brief RPC server object and functions to provide a OS Crypto API RPC server
- * which can be used from a RPC client instance. Calls to this object are mapped
- * to an implementation (e.g., a crypto library).
- *
  */
 
 #pragma once
@@ -219,5 +209,3 @@ OS_Error_t
 CryptoLibServer_Cipher_finalize(
     CryptoLibCipher_ptr cipherPtr,
     size_t*             len);
-
-/** @} */

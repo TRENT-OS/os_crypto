@@ -1,13 +1,5 @@
 /**
- * Copyright(C) 2019, Hensoldt Cyber GmbH
- *
- * @addtogroup Crypto
- * @{
- *
- * @file CryptoLibDigest.h
- *
- * @brief Crypto library implementation of Digest functions
- *
+ * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 
 #pragma once
@@ -52,5 +44,3 @@ CryptoLibDigest_finalize(
     CryptoLibDigest_t* self,
     void*              digest,
     size_t*            digestSize);
-
-/** @} */

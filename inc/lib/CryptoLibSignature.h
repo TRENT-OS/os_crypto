@@ -1,13 +1,5 @@
 /**
  * Copyright (C) 2019, Hensoldt Cyber GmbH
- *
- * @addtogroup Crypto
- * @{
- *
- * @file CryptoLibSignature_t.h
- *
- * @brief Crypto library implementation of Signature functions
- *
  */
 
 #pragma once
@@ -56,5 +48,3 @@ CryptoLibSignature_verify(
     const void*           signature,
     const size_t          signatureSize,
     CryptoLibRng_t*       rng);
-
-/** @} */

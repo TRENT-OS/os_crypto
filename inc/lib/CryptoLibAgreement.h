@@ -1,13 +1,5 @@
 /**
- * Copyright(C) 2019, Hensoldt Cyber GmbH
- *
- * @addtogroup Crypto
- * @{
- *
- * @file CryptoLibAgreement.h
- *
- * @brief Crypto library implementation of Agreement functions
- *
+ * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 
 #pragma once
@@ -44,5 +36,3 @@ OS_Error_t
 CryptoLibAgreement_free(
     CryptoLibAgreement_t*     self,
     const OS_Crypto_Memory_t* memory);
-
-/** @} */

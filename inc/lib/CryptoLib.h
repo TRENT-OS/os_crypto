@@ -1,13 +1,5 @@
 /**
  * Copyright (C) 2019, Hensoldt Cyber GmbH
- *
- * @addtogroup Crypto
- * @{
- *
- * @file CryptoLib.h
- *
- * @brief Crypto library core module
- *
  */
 
 #pragma once
@@ -31,5 +23,3 @@ CryptoLib_init(
 OS_Error_t
 CryptoLib_free(
     CryptoLib_t* self);
-
-/** @} */

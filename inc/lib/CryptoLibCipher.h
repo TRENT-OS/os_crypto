@@ -1,13 +1,5 @@
 /**
  * Copyright (C) 2019, Hensoldt Cyber GmbH
- *
- * @addtogroup Crypto
- * @{
- *
- * @file CryptoLibCipher.h
- *
- * @brief Crypto library implementation of Cipher functions
- *
  */
 
 #pragma once
@@ -57,5 +49,3 @@ CryptoLibCipher_finalize(
     CryptoLibCipher_t* self,
     void*              output,
     size_t*            outputSize);
-
-/** @} */

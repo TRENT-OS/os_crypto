@@ -1,13 +1,5 @@
 /**
- * Copyright(C) 2019, Hensoldt Cyber GmbH
- *
- * @addtogroup Crypto
- * @{
- *
- * @file CryptoLibMac.h
- *
- * @brief Crypto library implementation of Message Authentication Code (MAC) functions
- *
+ * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 
 #pragma once
@@ -47,5 +39,3 @@ CryptoLibMac_finalize(
     CryptoLibMac_t* self,
     void*           mac,
     size_t*         macSize);
-
-/** @} */

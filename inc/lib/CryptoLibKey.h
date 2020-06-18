@@ -1,13 +1,5 @@
 /**
- * Copyright(C) 2019, Hensoldt Cyber GmbH
- *
- * @addtogroup Crypto
- * @{
- *
- * @file CryptoLibKey.h
- *
- * @brief Crypto library implementation of Key functions
- *
+ * Copyright (C) 2019, Hensoldt Cyber GmbH
  */
 
 #pragma once
@@ -143,5 +135,3 @@ CryptoLibKey_getAes(
 OS_CryptoKey_Mac_t*
 CryptoLibKey_getMac(
     const CryptoLibKey_t* key);
-
-///@}

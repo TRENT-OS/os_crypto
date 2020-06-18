@@ -1,13 +1,5 @@
 /**
  * Copyright (C) 2019, Hensoldt Cyber GmbH
- *
- * @addtogroup Crypto
- * @{
- *
- * @file CryptoLibRng_t.h
- *
- * @brief Crypto library implementation of RNG functions
- *
  */
 
 #pragma once
@@ -49,17 +41,7 @@ CryptoLibRng_free(
     CryptoLibRng_t*           self,
     const OS_Crypto_Memory_t* memory);
 
-/**
- * @brief Get random bytes for mbedTLS wrapper
- *
- * @param self (required) pointer to context
- * @param buf (required) pointer to the destination buffer
- * @param bufSize size of the destination buffer
- *
- * @return an error code
- * @retval 0 if all right
- *
- */
+// Get random bytes for mbedTLS wrapper
 INLINE int
 CryptoLibRng_getBytesMbedtls(
     void*          self,
@@ -68,8 +50,5 @@ CryptoLibRng_getBytesMbedtls(
 {
     // Simple wrapper for mbedTLS, to allow the buffered use of the getRandomData()
     // function as is common, but also to directly pass a function to mbedTLS
-    return CryptoLibRng_getBytes(self, 0, buf,
-                                 bufSize) == OS_SUCCESS ? 0 : 1;
+    return CryptoLibRng_getBytes(self, 0, buf, bufSize) == OS_SUCCESS ? 0 : 1;
 }
-
-/** @} */

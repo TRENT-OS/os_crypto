@@ -116,5 +116,3 @@ CryptoLibRng_reSeed(
 
     return OS_SUCCESS;
 }
-
-/** @} */
