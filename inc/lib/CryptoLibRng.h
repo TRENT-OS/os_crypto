@@ -19,8 +19,7 @@ typedef struct CryptoLibRng CryptoLibRng_t;
 OS_Error_t
 CryptoLibRng_init(
     CryptoLibRng_t**                 self,
-    const OS_CryptoRng_Entropy_func* entropyFunc,
-    void*                            entropyCtx,
+    const OS_Crypto_Entropy_t*       entropy,
     const OS_Crypto_Memory_t*        memory);
 
 OS_Error_t

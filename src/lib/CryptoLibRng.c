@@ -13,21 +13,40 @@
 struct CryptoLibRng
 {
     mbedtls_ctr_drbg_context drbg;
+    OS_Crypto_Entropy_t entropy;
 };
+
+// Private Functions -----------------------------------------------------------
+
+static int
+entropyWrapper(
+    void*          ctx,
+    unsigned char* buf,
+    size_t         len)
+{
+    CryptoLibRng_t* self = (CryptoLibRng_t*) ctx;
+    size_t s;
+
+    s = self->entropy.read(len);
+    memcpy(buf, OS_Dataport_getBuf(self->entropy.dataport), s);
+
+    // If we cannot return as many bytes as requested, produce an error
+    return (s == len) ? 0 : -1;
+}
 
 // Public Functions ------------------------------------------------------------
 
 OS_Error_t
 CryptoLibRng_init(
     CryptoLibRng_t**                 self,
-    const OS_CryptoRng_Entropy_func* entropyFunc,
-    void*                            entropyCtx,
+    const OS_Crypto_Entropy_t*       entropy,
     const OS_Crypto_Memory_t*        memory)
 {
     OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLibRng_t* rng;
 
-    if (NULL == memory || NULL == self || NULL == entropyFunc)
+    if (NULL == memory || NULL == self || NULL == entropy || NULL == entropy->read
+        || OS_Dataport_isUnset(entropy->dataport))
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
@@ -39,10 +58,10 @@ CryptoLibRng_init(
 
     *self = rng;
 
-    memset(rng, 0, sizeof(CryptoLibRng_t));
+    rng->entropy = *entropy;
     mbedtls_ctr_drbg_init(&rng->drbg);
 
-    if (mbedtls_ctr_drbg_seed(&rng->drbg, entropyFunc, entropyCtx, NULL, 0) != 0)
+    if (mbedtls_ctr_drbg_seed(&rng->drbg, entropyWrapper, rng, NULL, 0) != 0)
     {
         err = OS_ERROR_ABORTED;
         goto err0;

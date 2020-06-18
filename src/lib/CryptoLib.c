@@ -941,7 +941,7 @@ CryptoLib_init(
     OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLib_t* self;
 
-    if (NULL == impl || NULL == memory || NULL == cfg || NULL == cfg->rng.entropy)
+    if (NULL == impl || NULL == memory || NULL == cfg)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
@@ -988,11 +988,8 @@ CryptoLib_init(
         goto err5;
     }
 
-    if ((err = CryptoLibRng_init(
-                   &self->rng,
-                   (const OS_CryptoRng_Entropy_func*) cfg->rng.entropy,
-                   cfg->rng.context,
-                   &self->memory)) != OS_SUCCESS)
+    if ((err = CryptoLibRng_init(&self->rng, &cfg->entropy,
+                                 &self->memory)) != OS_SUCCESS)
     {
         goto err6;
     }
