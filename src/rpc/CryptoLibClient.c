@@ -44,7 +44,7 @@ Rng_getBytes(
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((err = CryptoLibServer_Rng_getBytes(flags, bufSize)) == OS_SUCCESS)
+    if ((err = crypto_rpc_Rng_getBytes(flags, bufSize)) == OS_SUCCESS)
     {
         memcpy(buf, OS_Dataport_getBuf(self->dataport), bufSize);
     }
@@ -70,7 +70,7 @@ Rng_reseed(
     }
 
     memcpy(OS_Dataport_getBuf(self->dataport), seed, seedSize);
-    return CryptoLibServer_Rng_reseed(seedSize);
+    return crypto_rpc_Rng_reseed(seedSize);
 }
 
 // ------------------------------- MAC API -------------------------------------
@@ -83,7 +83,7 @@ Mac_init(
     const OS_CryptoMac_Alg_t algorithm)
 {
     UNUSED_VAR(ctx);
-    return CryptoLibServer_Mac_init(pMacObj, keyObj, algorithm);
+    return crypto_rpc_Mac_init(pMacObj, keyObj, algorithm);
 }
 
 static OS_Error_t
@@ -92,7 +92,7 @@ Mac_free(
     CryptoLibMac_t* macObj)
 {
     UNUSED_VAR(ctx);
-    return CryptoLibServer_Mac_free(macObj);
+    return crypto_rpc_Mac_free(macObj);
 }
 
 static OS_Error_t
@@ -114,7 +114,7 @@ Mac_process(
     }
 
     memcpy(OS_Dataport_getBuf(self->dataport), data, dataSize);
-    return CryptoLibServer_Mac_process(macObj, dataSize);
+    return crypto_rpc_Mac_process(macObj, dataSize);
 }
 
 static OS_Error_t
@@ -136,7 +136,7 @@ Mac_finalize(
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((err = CryptoLibServer_Mac_finalize(macObj, macSize)) == OS_SUCCESS)
+    if ((err = crypto_rpc_Mac_finalize(macObj, macSize)) == OS_SUCCESS)
     {
         memcpy(mac, OS_Dataport_getBuf(self->dataport), *macSize);
     }
@@ -153,7 +153,7 @@ Digest_init(
     const OS_CryptoDigest_Alg_t algorithm)
 {
     UNUSED_VAR(ctx);
-    return CryptoLibServer_Digest_init(pDigestObj, algorithm);
+    return crypto_rpc_Digest_init(pDigestObj, algorithm);
 }
 
 static OS_Error_t
@@ -163,7 +163,7 @@ Digest_clone(
     const CryptoLibDigest_t* srcDigObj)
 {
     UNUSED_VAR(ctx);
-    return CryptoLibServer_Digest_clone(pDigestObj, srcDigObj);
+    return crypto_rpc_Digest_clone(pDigestObj, srcDigObj);
 }
 
 static OS_Error_t
@@ -172,7 +172,7 @@ Digest_free(
     CryptoLibDigest_t* digestObj)
 {
     UNUSED_VAR(ctx);
-    return CryptoLibServer_Digest_free(digestObj);
+    return crypto_rpc_Digest_free(digestObj);
 }
 
 static OS_Error_t
@@ -194,7 +194,7 @@ Digest_process(
     }
 
     memcpy(OS_Dataport_getBuf(self->dataport), data, dataSize);
-    return CryptoLibServer_Digest_process(digestObj, dataSize);
+    return crypto_rpc_Digest_process(digestObj, dataSize);
 }
 
 static OS_Error_t
@@ -216,8 +216,8 @@ Digest_finalize(
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((err = CryptoLibServer_Digest_finalize(digestObj,
-                                               digestSize)) == OS_SUCCESS)
+    if ((err = crypto_rpc_Digest_finalize(digestObj,
+                                          digestSize)) == OS_SUCCESS)
     {
         memcpy(digest, OS_Dataport_getBuf(self->dataport), *digestSize);
     }
@@ -237,8 +237,8 @@ Signature_init(
     const OS_CryptoDigest_Alg_t    digest)
 {
     UNUSED_VAR(ctx);
-    return CryptoLibServer_Signature_init(pSigObj, prvKey, pubKey, algorithm,
-                                          digest);
+    return crypto_rpc_Signature_init(pSigObj, prvKey, pubKey, algorithm,
+                                     digest);
 }
 
 static OS_Error_t
@@ -247,7 +247,7 @@ Signature_free(
     CryptoLibSignature_t* sigObj)
 {
     UNUSED_VAR(ctx);
-    return CryptoLibServer_Signature_free(sigObj);
+    return crypto_rpc_Signature_free(sigObj);
 }
 
 static OS_Error_t
@@ -273,8 +273,8 @@ Signature_sign(
     }
 
     memcpy(OS_Dataport_getBuf(self->dataport), hash, hashSize);
-    if ((err = CryptoLibServer_Signature_sign(sigObj, hashSize,
-                                              signatureSize)) == OS_SUCCESS)
+    if ((err = crypto_rpc_Signature_sign(sigObj, hashSize,
+                                         signatureSize)) == OS_SUCCESS)
     {
         memcpy(signature, OS_Dataport_getBuf(self->dataport), *signatureSize);
     }
@@ -305,7 +305,7 @@ Signature_verify(
     memcpy(OS_Dataport_getBuf(self->dataport), hash, hashSize);
     memcpy(OS_Dataport_getBuf(self->dataport) + hashSize, signature,
            signatureSize);
-    return CryptoLibServer_Signature_verify(sigObj, hashSize, signatureSize);
+    return crypto_rpc_Signature_verify(sigObj, hashSize, signatureSize);
 }
 
 // ----------------------------- Agreement API ---------------------------------
@@ -318,7 +318,7 @@ Agreement_init(
     const OS_CryptoAgreement_Alg_t algorithm)
 {
     UNUSED_VAR(ctx);
-    return CryptoLibServer_Agreement_init(pAgrObj, prvKey, algorithm);
+    return crypto_rpc_Agreement_init(pAgrObj, prvKey, algorithm);
 }
 
 static OS_Error_t
@@ -327,7 +327,7 @@ Agreement_free(
     CryptoLibAgreement_t* agrObj)
 {
     UNUSED_VAR(ctx);
-    return CryptoLibServer_Agreement_free(agrObj);
+    return crypto_rpc_Agreement_free(agrObj);
 }
 
 static OS_Error_t
@@ -350,8 +350,8 @@ Agreement_agree(
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((err = CryptoLibServer_Agreement_agree(agrObj, pubKey,
-                                               sharedSize)) == OS_SUCCESS)
+    if ((err = crypto_rpc_Agreement_agree(agrObj, pubKey,
+                                          sharedSize)) == OS_SUCCESS)
     {
         memcpy(shared, OS_Dataport_getBuf(self->dataport), *sharedSize);
     }
@@ -379,7 +379,7 @@ Key_generate(
     }
 
     memcpy(OS_Dataport_getBuf(self->dataport), spec, sizeof(OS_CryptoKey_Spec_t));
-    return CryptoLibServer_Key_generate(pKeyObj);
+    return crypto_rpc_Key_generate(pKeyObj);
 }
 
 static OS_Error_t
@@ -398,7 +398,7 @@ Key_makePublic(
 
     memcpy(OS_Dataport_getBuf(self->dataport), attribs,
            sizeof(OS_CryptoKey_Attrib_t));
-    return CryptoLibServer_Key_makePublic(pPubKeyObj, prvKeyObj);
+    return crypto_rpc_Key_makePublic(pPubKeyObj, prvKeyObj);
 }
 
 static OS_Error_t
@@ -420,7 +420,7 @@ Key_import(
 
     memcpy(OS_Dataport_getBuf(self->dataport), keyData,
            sizeof(OS_CryptoKey_Data_t));
-    return CryptoLibServer_Key_import(pKeyObj);
+    return crypto_rpc_Key_import(pKeyObj);
 }
 
 static OS_Error_t
@@ -441,7 +441,7 @@ Key_export(
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((err = CryptoLibServer_Key_export(keyObj)) == OS_SUCCESS)
+    if ((err = crypto_rpc_Key_export(keyObj)) == OS_SUCCESS)
     {
         memcpy(keyData, OS_Dataport_getBuf(self->dataport),
                sizeof(OS_CryptoKey_Data_t));
@@ -469,7 +469,7 @@ Key_getParams(
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((err = CryptoLibServer_Key_getParams(keyObj, paramSize)) == OS_SUCCESS)
+    if ((err = crypto_rpc_Key_getParams(keyObj, paramSize)) == OS_SUCCESS)
     {
         memcpy(keyParams, OS_Dataport_getBuf(self->dataport), *paramSize);
     }
@@ -495,7 +495,7 @@ Key_getAttribs(
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((err = CryptoLibServer_Key_getAttribs(keyObj)) == OS_SUCCESS)
+    if ((err = crypto_rpc_Key_getAttribs(keyObj)) == OS_SUCCESS)
     {
         memcpy(attribs, OS_Dataport_getBuf(self->dataport),
                sizeof(OS_CryptoKey_Attrib_t));
@@ -523,8 +523,8 @@ Key_loadParams(
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if ((err = CryptoLibServer_Key_loadParams(name,
-                                              paramSize)) == OS_SUCCESS)
+    if ((err = crypto_rpc_Key_loadParams(name,
+                                         paramSize)) == OS_SUCCESS)
     {
         memcpy(keyParams, OS_Dataport_getBuf(self->dataport), *paramSize);
     }
@@ -538,7 +538,7 @@ Key_free(
     CryptoLibKey_t* keyObj)
 {
     UNUSED_VAR(ctx);
-    return CryptoLibServer_Key_free(keyObj);
+    return crypto_rpc_Key_free(keyObj);
 }
 
 // ------------------------------ Cipher API -----------------------------------
@@ -568,7 +568,7 @@ Cipher_init(
         memcpy(OS_Dataport_getBuf(self->dataport), iv, ivSize);
     }
 
-    return CryptoLibServer_Cipher_init(pCipherObj, key, algorithm, ivSize);
+    return crypto_rpc_Cipher_init(pCipherObj, key, algorithm, ivSize);
 }
 
 static OS_Error_t
@@ -577,7 +577,7 @@ Cipher_free(
     CryptoLibCipher_t* cipherObj)
 {
     UNUSED_VAR(ctx);
-    return CryptoLibServer_Cipher_free(cipherObj);
+    return crypto_rpc_Cipher_free(cipherObj);
 }
 
 static OS_Error_t
@@ -603,8 +603,8 @@ Cipher_process(
     }
 
     memcpy(OS_Dataport_getBuf(self->dataport), input, inputSize);
-    if ((err = CryptoLibServer_Cipher_process(cipherObj, inputSize,
-                                              outputSize)) == OS_SUCCESS)
+    if ((err = crypto_rpc_Cipher_process(cipherObj, inputSize,
+                                         outputSize)) == OS_SUCCESS)
     {
         memcpy(output, OS_Dataport_getBuf(self->dataport), *outputSize);
     }
@@ -635,7 +635,7 @@ Cipher_start(
         memcpy(OS_Dataport_getBuf(self->dataport), data, dataSize);
     }
 
-    return CryptoLibServer_Cipher_start(cipherObj, dataSize);
+    return crypto_rpc_Cipher_start(cipherObj, dataSize);
 }
 
 static OS_Error_t
@@ -658,8 +658,8 @@ Cipher_finalize(
     }
 
     memcpy(OS_Dataport_getBuf(self->dataport), tag, *tagSize);
-    if ((err = CryptoLibServer_Cipher_finalize(cipherObj,
-                                               tagSize)) == OS_SUCCESS)
+    if ((err = crypto_rpc_Cipher_finalize(cipherObj,
+                                          tagSize)) == OS_SUCCESS)
     {
         memcpy(tag, OS_Dataport_getBuf(self->dataport), *tagSize);
     }

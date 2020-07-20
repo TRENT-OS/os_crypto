@@ -19,7 +19,7 @@
  * its own way of handling multiple clients and their respective contextx.
  */
 extern OS_Crypto_Handle_t
-CryptoLibServer_getCrypto(
+crypto_rpc_getCrypto(
     void);
 
 // This is not exposed via header intentionally
@@ -30,7 +30,7 @@ OS_Crypto_getServer(
 // Get Crypto API context host of Crypto API in RPC_SERVER mode
 #define GET_SELF(s) {                                   \
     OS_Crypto_t *a;                                     \
-    if (((a = CryptoLibServer_getCrypto()) == NULL) ||  \
+    if (((a = crypto_rpc_getCrypto()) == NULL) ||       \
         ((s = OS_Crypto_getServer(a)) == NULL) )        \
     {                                                   \
         return OS_ERROR_INVALID_PARAMETER;              \
@@ -59,7 +59,7 @@ struct CryptoLibServer
 // -------------------------------- RNG API ------------------------------------
 
 OS_Error_t
-CryptoLibServer_Rng_getBytes(
+crypto_rpc_Rng_getBytes(
     unsigned int flags,
     size_t       bufSize)
 {
@@ -71,7 +71,7 @@ CryptoLibServer_Rng_getBytes(
 }
 
 OS_Error_t
-CryptoLibServer_Rng_reseed(
+crypto_rpc_Rng_reseed(
     size_t seedSize)
 {
     CryptoLibServer_t* self;
@@ -83,7 +83,7 @@ CryptoLibServer_Rng_reseed(
 // ------------------------------- MAC API -------------------------------------
 
 OS_Error_t
-CryptoLibServer_Mac_init(
+crypto_rpc_Mac_init(
     CryptoLibMac_ptr*  pMacObj,
     CryptoLibKey_cptr  keyObj,
     OS_CryptoMac_Alg_t algorithm)
@@ -95,7 +95,7 @@ CryptoLibServer_Mac_init(
 }
 
 OS_Error_t
-CryptoLibServer_Mac_free(
+crypto_rpc_Mac_free(
     CryptoLibMac_ptr macObj)
 {
     CryptoLibServer_t* self;
@@ -105,7 +105,7 @@ CryptoLibServer_Mac_free(
 }
 
 OS_Error_t
-CryptoLibServer_Mac_process(
+crypto_rpc_Mac_process(
     CryptoLibMac_ptr macObj,
     size_t           dataSize)
 {
@@ -117,7 +117,7 @@ CryptoLibServer_Mac_process(
 }
 
 OS_Error_t
-CryptoLibServer_Mac_finalize(
+crypto_rpc_Mac_finalize(
     CryptoLibMac_ptr macObj,
     size_t*          macSize)
 {
@@ -133,7 +133,7 @@ CryptoLibServer_Mac_finalize(
 // ------------------------------ Digest API -----------------------------------
 
 OS_Error_t
-CryptoLibServer_Digest_init(
+crypto_rpc_Digest_init(
     CryptoLibDigest_ptr*  pDigestObj,
     OS_CryptoDigest_Alg_t algorithm)
 {
@@ -144,7 +144,7 @@ CryptoLibServer_Digest_init(
 }
 
 OS_Error_t
-CryptoLibServer_Digest_free(
+crypto_rpc_Digest_free(
     CryptoLibDigest_ptr digestObj)
 {
     CryptoLibServer_t* self;
@@ -154,7 +154,7 @@ CryptoLibServer_Digest_free(
 }
 
 OS_Error_t
-CryptoLibServer_Digest_clone(
+crypto_rpc_Digest_clone(
     CryptoLibDigest_ptr* pDigestObj,
     CryptoLibDigest_cptr srcDigestObj)
 {
@@ -165,7 +165,7 @@ CryptoLibServer_Digest_clone(
 }
 
 OS_Error_t
-CryptoLibServer_Digest_process(
+crypto_rpc_Digest_process(
     CryptoLibDigest_ptr digestObj,
     size_t              inSize)
 {
@@ -177,7 +177,7 @@ CryptoLibServer_Digest_process(
 }
 
 OS_Error_t
-CryptoLibServer_Digest_finalize(
+crypto_rpc_Digest_finalize(
     CryptoLibDigest_ptr digestObj,
     size_t*             digestSize)
 {
@@ -193,7 +193,7 @@ CryptoLibServer_Digest_finalize(
 // -------------------------------- Key API ------------------------------------
 
 OS_Error_t
-CryptoLibServer_Key_generate(
+crypto_rpc_Key_generate(
     CryptoLibKey_ptr* pKeyObj)
 {
     CryptoLibServer_t* self;
@@ -203,7 +203,7 @@ CryptoLibServer_Key_generate(
 }
 
 OS_Error_t
-CryptoLibServer_Key_makePublic(
+crypto_rpc_Key_makePublic(
     CryptoLibKey_ptr* pPubKeyHandle,
     CryptoLibKey_cptr prvKeyHandle)
 {
@@ -215,7 +215,7 @@ CryptoLibServer_Key_makePublic(
 }
 
 OS_Error_t
-CryptoLibServer_Key_import(
+crypto_rpc_Key_import(
     CryptoLibKey_ptr* pKeyObj)
 {
     CryptoLibServer_t* self;
@@ -225,7 +225,7 @@ CryptoLibServer_Key_import(
 }
 
 OS_Error_t
-CryptoLibServer_Key_export(
+crypto_rpc_Key_export(
     CryptoLibKey_cptr keyObj)
 {
     OS_Error_t err;
@@ -251,7 +251,7 @@ CryptoLibServer_Key_export(
 }
 
 OS_Error_t
-CryptoLibServer_Key_getParams(
+crypto_rpc_Key_getParams(
     CryptoLibKey_cptr keyObj,
     size_t*           paramSize)
 {
@@ -265,7 +265,7 @@ CryptoLibServer_Key_getParams(
 }
 
 OS_Error_t
-CryptoLibServer_Key_getAttribs(
+crypto_rpc_Key_getAttribs(
     CryptoLibKey_cptr keyObj)
 {
     CryptoLibServer_t* self;
@@ -275,7 +275,7 @@ CryptoLibServer_Key_getAttribs(
 }
 
 OS_Error_t
-CryptoLibServer_Key_loadParams(
+crypto_rpc_Key_loadParams(
     OS_CryptoKey_Param_t name,
     size_t*              paramSize)
 {
@@ -289,7 +289,7 @@ CryptoLibServer_Key_loadParams(
 }
 
 OS_Error_t
-CryptoLibServer_Key_free(
+crypto_rpc_Key_free(
     CryptoLibKey_ptr keyObj)
 {
     CryptoLibServer_t* self;
@@ -301,7 +301,7 @@ CryptoLibServer_Key_free(
 // ----------------------------- Agreement API ---------------------------------
 
 OS_Error_t
-CryptoLibServer_Agreement_init(
+crypto_rpc_Agreement_init(
     CryptoLibAgreement_ptr*  pAgrObj,
     CryptoLibKey_cptr        prvKey,
     OS_CryptoAgreement_Alg_t algorithm)
@@ -313,7 +313,7 @@ CryptoLibServer_Agreement_init(
 }
 
 OS_Error_t
-CryptoLibServer_Agreement_agree(
+crypto_rpc_Agreement_agree(
     CryptoLibAgreement_ptr agrObj,
     CryptoLibKey_cptr      pubKey,
     size_t*                sharedSize)
@@ -328,7 +328,7 @@ CryptoLibServer_Agreement_agree(
 }
 
 OS_Error_t
-CryptoLibServer_Agreement_free(
+crypto_rpc_Agreement_free(
     CryptoLibAgreement_ptr agrObj)
 {
     CryptoLibServer_t* self;
@@ -340,7 +340,7 @@ CryptoLibServer_Agreement_free(
 // ----------------------------- Signature API ---------------------------------
 
 OS_Error_t
-CryptoLibServer_Signature_init(
+crypto_rpc_Signature_init(
     CryptoLibSignature_ptr*  pObj,
     CryptoLibKey_cptr        prvKey,
     CryptoLibKey_cptr        pubKey,
@@ -354,7 +354,7 @@ CryptoLibServer_Signature_init(
 }
 
 OS_Error_t
-CryptoLibServer_Signature_verify(
+crypto_rpc_Signature_verify(
     CryptoLibSignature_ptr obj,
     size_t                 hashSize,
     size_t                 signatureSize)
@@ -367,7 +367,7 @@ CryptoLibServer_Signature_verify(
 }
 
 OS_Error_t
-CryptoLibServer_Signature_sign(
+crypto_rpc_Signature_sign(
     CryptoLibSignature_ptr obj,
     size_t                 hashSize,
     size_t*                signatureSize)
@@ -382,7 +382,7 @@ CryptoLibServer_Signature_sign(
 }
 
 OS_Error_t
-CryptoLibServer_Signature_free(
+crypto_rpc_Signature_free(
     CryptoLibSignature_ptr obj)
 {
     CryptoLibServer_t* self;
@@ -394,7 +394,7 @@ CryptoLibServer_Signature_free(
 // ------------------------------- Cipher API ----------------------------------
 
 OS_Error_t
-CryptoLibServer_Cipher_init(
+crypto_rpc_Cipher_init(
     CryptoLibCipher_ptr*  pCipherObj,
     CryptoLibKey_cptr     key,
     OS_CryptoCipher_Alg_t algorithm,
@@ -408,7 +408,7 @@ CryptoLibServer_Cipher_init(
 }
 
 OS_Error_t
-CryptoLibServer_Cipher_free(
+crypto_rpc_Cipher_free(
     CryptoLibCipher_ptr cipherObj)
 {
     CryptoLibServer_t* self;
@@ -418,7 +418,7 @@ CryptoLibServer_Cipher_free(
 }
 
 OS_Error_t
-CryptoLibServer_Cipher_process(
+crypto_rpc_Cipher_process(
     CryptoLibCipher_ptr cipherObj,
     size_t              inputSize,
     size_t*             outputSize)
@@ -434,7 +434,7 @@ CryptoLibServer_Cipher_process(
 }
 
 OS_Error_t
-CryptoLibServer_Cipher_start(
+crypto_rpc_Cipher_start(
     CryptoLibCipher_ptr cipherObj,
     size_t              len)
 {
@@ -446,7 +446,7 @@ CryptoLibServer_Cipher_start(
 }
 
 OS_Error_t
-CryptoLibServer_Cipher_finalize(
+crypto_rpc_Cipher_finalize(
     CryptoLibCipher_ptr cipherObj,
     size_t*             tagSize)
 {
