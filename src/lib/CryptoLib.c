@@ -934,14 +934,15 @@ static const Crypto_Vtable_t CryptoLib_vtable =
 
 OS_Error_t
 CryptoLib_init(
-    Crypto_Impl_t*            impl,
-    const OS_Crypto_Memory_t* memory,
-    const CryptoLib_Config_t* cfg)
+    Crypto_Impl_t*             impl,
+    const OS_Crypto_Memory_t*  memory,
+    const OS_Crypto_Entropy_t* entropy)
 {
     OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLib_t* self;
 
-    if (NULL == impl || NULL == memory || NULL == cfg)
+    if (NULL == impl || NULL == memory || NULL == entropy->read
+        || OS_Dataport_isUnset(entropy->dataport))
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
@@ -988,8 +989,7 @@ CryptoLib_init(
         goto err5;
     }
 
-    if ((err = CryptoLibRng_init(&self->rng, &cfg->entropy,
-                                 &self->memory)) != OS_SUCCESS)
+    if ((err = CryptoLibRng_init(&self->rng, entropy, &self->memory)) != OS_SUCCESS)
     {
         goto err6;
     }
