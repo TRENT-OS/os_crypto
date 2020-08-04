@@ -7,7 +7,6 @@
 
 #include "lib/CryptoLib.h"
 #include "rpc/CryptoLibClient.h"
-#include "rpc/CryptoLibServer.h"
 
 #include <stdlib.h>
 
@@ -70,28 +69,15 @@ OS_Crypto_init(
     case  OS_Crypto_MODE_LIBRARY_ONLY:
         // This is already set up.
         break;
-#if defined(OS_CRYPTO_WITH_RPC_CLIENT)
     case OS_Crypto_MODE_CLIENT_ONLY:
     case OS_Crypto_MODE_CLIENT:
-        if ((err = CryptoLibClient_init(&ctx->rpc.client,
+        if ((err = CryptoLibClient_init(&ctx->client,
                                         &ctx->memory,
                                         &cfg->crypto)) != OS_SUCCESS)
         {
             goto err1;
         }
         break;
-#endif /* OS_CRYPTO_WITH_RPC_CLIENT */
-#if defined(OS_CRYPTO_WITH_RPC_SERVER)
-    case OS_Crypto_MODE_SERVER:
-        if ((err = CryptoLibServer_init(&ctx->rpc.server,
-                                        &ctx->library,
-                                        &ctx->memory,
-                                        &cfg->dataport)) != OS_SUCCESS)
-        {
-            goto err1;
-        }
-        break;
-#endif /* OS_CRYPTO_WITH_RPC_SERVER */
     default:
         err = OS_ERROR_NOT_SUPPORTED;
         goto err1;
@@ -134,30 +120,15 @@ OS_Crypto_free(
     case OS_Crypto_MODE_LIBRARY_ONLY:
         // Nothing more to do.
         break;
-#if defined(OS_CRYPTO_WITH_RPC_CLIENT)
     case OS_Crypto_MODE_CLIENT_ONLY:
     case OS_Crypto_MODE_CLIENT:
-        err = CryptoLibClient_free(self->rpc.client.context);
+        err = CryptoLibClient_free(self->client.context);
         break;
-#endif /* OS_CRYPTO_WITH_RPC_CLIENT */
-#if defined(OS_CRYPTO_WITH_RPC_SERVER)
-    case OS_Crypto_MODE_SERVER:
-        err = CryptoLibServer_free(self->rpc.server);
-        break;
-#endif /* OS_CRYPTO_WITH_RPC_SERVER */
     default:
         err = OS_ERROR_NOT_SUPPORTED;
     }
 
     return err;
-}
-
-void*
-OS_Crypto_getServer(
-    const OS_Crypto_Handle_t self)
-{
-    return (NULL == self || self->mode != OS_Crypto_MODE_SERVER) ?
-           NULL : self->rpc.server;
 }
 
 CryptoLib_Object_ptr*

@@ -3,19 +3,6 @@
 #
 # Copyright (C) 2019-2020, Hensoldt Cyber GmbH
 #
-# We have three library targets:
-# 1. OS_CRYPTO:
-#    Provides only functionality of the crypto library behind calls to the API.
-# 2. OS_CRYPTO_WITH_RPC_CLIENT:
-#    Provides library functionality to execute crypto locally, but also allows
-#    to operate crypto API in RPC client mode, where calls to the API are
-#    transparently mapped to an RPC interface and executed in a separate component
-#    (e.g., the CryptoServer)
-# 3. OS_CRYPTO_WITH_RPC_SEVER:
-#    Provides library functionality to execute crypto locally, but also allows
-#    to instantiate the crypto API as RPC server easily, which can then be used
-#    to serve RPC requests from a crypto API RPC client.
-#
 
 cmake_minimum_required(VERSION 3.13.0)
 
@@ -48,6 +35,7 @@ target_sources(${PROJECT_NAME}
         "src/lib/CryptoLibSignature.c"
         "src/lib/CryptoLibKey.c"
         "src/util/PtrVector.c"
+        "src/rpc/CryptoLibClient.c"
 )
 
 target_include_directories(${PROJECT_NAME}
@@ -60,46 +48,4 @@ target_link_libraries(${PROJECT_NAME}
         3rdparty_mbedtls_for_crypto
         os_core_api
         os_libs
-)
-
-
-#------------------------------------------------------------------------------
-project(os_crypto_with_rpc_client C)
-
-add_library(${PROJECT_NAME} INTERFACE)
-
-target_sources(${PROJECT_NAME}
-    INTERFACE
-        "src/rpc/CryptoLibClient.c"
-)
-
-target_compile_definitions(${PROJECT_NAME}
-    INTERFACE
-       OS_CRYPTO_WITH_RPC_CLIENT
-)
-
-target_link_libraries(${PROJECT_NAME}
-    INTERFACE
-        os_crypto
-)
-
-
-#------------------------------------------------------------------------------
-project(os_crypto_with_rpc_server C)
-
-add_library(${PROJECT_NAME} INTERFACE)
-
-target_sources(${PROJECT_NAME}
-    INTERFACE
-        "src/rpc/CryptoLibServer.c"
-)
-
-target_compile_definitions(${PROJECT_NAME}
-    INTERFACE
-       OS_CRYPTO_WITH_RPC_SERVER
-)
-
-target_link_libraries(${PROJECT_NAME}
-    INTERFACE
-        os_crypto
 )

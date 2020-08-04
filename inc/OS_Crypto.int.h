@@ -13,18 +13,16 @@
 #include "lib/CryptoLibSignature.h"
 #include "lib/CryptoLibAgreement.h"
 
-#include "rpc/CryptoLibServer.h"
-
 // Call LIB or CLI, based on mode of API
-#define CALL(s, f, ...)                                                             \
-    (NULL == (s)) ?                                                                 \
-        OS_ERROR_INVALID_PARAMETER :                                                \
-        ((s)->mode == OS_Crypto_MODE_CLIENT_ONLY) ?                                 \
-            (NULL == (s)->rpc.client.vtable->f) ?                                   \
-                OS_ERROR_NOT_SUPPORTED :                                            \
-                (s)->rpc.client.vtable->f((s)->rpc.client.context, __VA_ARGS__) :   \
-            (NULL == (s)->library.vtable->f) ?                                      \
-                OS_ERROR_NOT_SUPPORTED :                                            \
+#define CALL(s, f, ...)                                                     \
+    (NULL == (s)) ?                                                         \
+        OS_ERROR_INVALID_PARAMETER :                                        \
+        ((s)->mode == OS_Crypto_MODE_CLIENT_ONLY) ?                         \
+            (NULL == (s)->client.vtable->f) ?                               \
+                OS_ERROR_NOT_SUPPORTED :                                    \
+                (s)->client.vtable->f((s)->client.context, __VA_ARGS__) :   \
+            (NULL == (s)->library.vtable->f) ?                              \
+                OS_ERROR_NOT_SUPPORTED :                                    \
                 (s)->library.vtable->f((s)->library.context, __VA_ARGS__)
 
 // Allocate proxy object from crypto handle and set its impl according to
@@ -37,7 +35,7 @@
         return OS_ERROR_INSUFFICIENT_SPACE;                                 \
     }                                                                       \
     (p)->parent = (s);                                                      \
-    (p)->impl   = (c) ? &(s)->rpc.client : &(s)->library;
+    (p)->impl   = (c) ? &(s)->client : &(s)->library;
 
 // Allocate proxy object from key proxy and simply copy the impl
 #define PROXY_INIT_FROM_KEY(p, k)                                                   \
@@ -136,11 +134,7 @@ struct OS_Crypto
     OS_Crypto_Mode_t mode;
     OS_Crypto_Memory_t memory;
     Crypto_Impl_t library;
-    union
-    {
-        Crypto_Impl_t client;
-        CryptoLibServer_t* server;
-    } rpc;
+    Crypto_Impl_t client;
 };
 
 struct OS_Crypto_Object
