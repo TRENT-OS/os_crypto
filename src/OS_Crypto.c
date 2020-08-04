@@ -3,8 +3,7 @@
  */
 
 #include "OS_Crypto.h"
-
-#include "OS_Crypto_Object.h"
+#include "OS_Crypto.int.h"
 
 #include "lib/CryptoLib.h"
 #include "rpc/CryptoLibClient.h"

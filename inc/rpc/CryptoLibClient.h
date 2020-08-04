@@ -5,8 +5,7 @@
 #pragma once
 
 #include "OS_Crypto.h"
-
-#include "Crypto_Impl.h"
+#include "OS_Crypto.int.h"
 
 // -------------------------- defines/types/variables --------------------------
 

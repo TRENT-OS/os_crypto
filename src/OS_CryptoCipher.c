@@ -3,10 +3,7 @@
  */
 
 #include "OS_Crypto.h"
-
-#include "OS_Crypto_Object.h"
-
-#include "lib/CryptoLibCipher.h"
+#include "OS_Crypto.int.h"
 
 #define PROXY_GET_PTR(p) \
     (CryptoLibCipher_t**) PROXY_GET_OBJ_PTR(p)

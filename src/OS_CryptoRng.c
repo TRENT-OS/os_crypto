@@ -3,10 +3,7 @@
  */
 
 #include "OS_Crypto.h"
-
-#include "OS_Crypto_Object.h"
-
-#include "lib/CryptoLibRng.h"
+#include "OS_Crypto.int.h"
 
 OS_Error_t
 OS_CryptoRng_getBytes(
