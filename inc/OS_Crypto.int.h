@@ -139,5 +139,5 @@ struct OS_Crypto_Object
 {
     OS_Crypto_t* parent;
     Crypto_Impl_t* impl;
-    CryptoLib_Object_ptr obj;
+    void* obj;
 };

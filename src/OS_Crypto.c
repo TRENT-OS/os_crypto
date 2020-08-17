@@ -131,18 +131,18 @@ OS_Crypto_free(
     return err;
 }
 
-CryptoLib_Object_ptr*
-OS_Crypto_getLibObject(
+void*
+OS_Crypto_getProxyPtr(
     const OS_Crypto_Object_t* proxy)
 {
     return (NULL == proxy) ? NULL : proxy->obj;
 }
 
 OS_Error_t
-OS_Crypto_migrateLibObject(
+OS_Crypto_createProxy(
     OS_Crypto_Object_t**       proxy,
     const OS_Crypto_Handle_t   self,
-    const CryptoLib_Object_ptr ptr,
+    const void*                ptr,
     const bool                 local)
 {
     /*
@@ -151,11 +151,16 @@ OS_Crypto_migrateLibObject(
      * the proxy objects needs to know the appropriate vtable/context.
      */
 
-    if (NULL == self || NULL == ptr)
+    if (NULL == self)
+    {
+        return OS_ERROR_INVALID_HANDLE;
+    }
+    if (NULL == ptr)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (!local && self->mode == OS_Crypto_MODE_LIBRARY_ONLY)
+
+    if (!local && self->mode == OS_Crypto_MODE_LIBRARY_ONLY)
     {
         // If it is a remote object, then we can only access it through the
         // RPC client, so "library only" will not work.
@@ -163,7 +168,7 @@ OS_Crypto_migrateLibObject(
     }
 
     PROXY_INIT(*proxy, self, !local);
-    (*proxy)->obj = ptr;
+    (*proxy)->obj = (void*)ptr;
 
     return OS_SUCCESS;
 }
