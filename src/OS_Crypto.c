@@ -60,7 +60,7 @@ OS_Crypto_init(
     {
         if ((err = CryptoLib_init(&ctx->library,
                                   &ctx->memory,
-                                  &cfg->library.entropy)) != OS_SUCCESS)
+                                  &cfg->entropy)) != OS_SUCCESS)
         {
             goto err0;
         }

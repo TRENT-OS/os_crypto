@@ -13,7 +13,7 @@
 struct CryptoLibRng
 {
     mbedtls_ctr_drbg_context drbg;
-    OS_Crypto_Entropy_t entropy;
+    if_OS_Entropy_t entropy;
 };
 
 // Private Functions -----------------------------------------------------------
@@ -38,9 +38,9 @@ entropyWrapper(
 
 OS_Error_t
 CryptoLibRng_init(
-    CryptoLibRng_t**                 self,
-    const OS_Crypto_Entropy_t*       entropy,
-    const OS_Crypto_Memory_t*        memory)
+    CryptoLibRng_t**          self,
+    const if_OS_Entropy_t*    entropy,
+    const OS_Crypto_Memory_t* memory)
 {
     OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLibRng_t* rng;
