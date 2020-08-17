@@ -57,6 +57,14 @@ OS_CryptoAgreement_agree(
         return OS_ERROR_INVALID_HANDLE;
     }
 
+    // Make sure public key is where the agreement object is by checking that
+    // they are either both local or both in the client instance
+    if (self->impl->context != hPubKey->impl->context
+        || self->impl->vtable != hPubKey->impl->vtable)
+    {
+        return OS_ERROR_INVALID_HANDLE;
+    }
+
     return PROXY_CALL(self, Agreement_agree, PROXY_GET_OBJ(self),
                       PROXY_GET_OBJ(hPubKey), shared, sharedSize);
 }
