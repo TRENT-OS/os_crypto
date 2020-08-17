@@ -16,7 +16,11 @@ OS_CryptoKey_generate(
 {
     OS_Error_t err;
 
-    if (NULL == spec || hCrypto == NULL)
+    if (NULL == hCrypto)
+    {
+        return OS_ERROR_INVALID_HANDLE;
+    }
+    if (NULL == spec)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
@@ -41,7 +45,11 @@ OS_CryptoKey_import(
 {
     OS_Error_t err;
 
-    if (NULL == keyData || hCrypto == NULL)
+    if (NULL == hCrypto)
+    {
+        return OS_ERROR_INVALID_HANDLE;
+    }
+    if (NULL == keyData)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
@@ -68,16 +76,17 @@ OS_CryptoKey_makePublic(
     OS_CryptoKey_Attrib_t srcAttribs;
     OS_Error_t err;
 
-    if (NULL == attribs || hCrypto == NULL)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    else if (NULL == hPrvKey)
+    if (NULL == hCrypto || NULL == hPrvKey)
     {
         return OS_ERROR_INVALID_HANDLE;
     }
-    else if ((err = PROXY_CALL(hPrvKey, Key_getAttribs, PROXY_GET_OBJ(hPrvKey),
-                               &srcAttribs)) != OS_SUCCESS)
+    if (NULL == attribs)
+    {
+        return OS_ERROR_INVALID_PARAMETER;
+    }
+
+    if ((err = PROXY_CALL(hPrvKey, Key_getAttribs, PROXY_GET_OBJ(hPrvKey),
+                          &srcAttribs)) != OS_SUCCESS)
     {
         return err;
     }

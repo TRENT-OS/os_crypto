@@ -20,7 +20,7 @@ OS_CryptoMac_init(
     // We are actually not using this; lets check it anyways for consistency.
     if (NULL == hCrypto)
     {
-        return OS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_HANDLE;
     }
 
     PROXY_INIT_FROM_KEY(*self, hKey);

@@ -23,13 +23,13 @@ OS_CryptoSignature_init(
     // We are actually not using this; lets check it anyways for consistency.
     if (NULL == hCrypto)
     {
-        return OS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_HANDLE;
     }
 
     if (NULL == hPrvKey && NULL == hPubKey)
     {
         // We should at least have one key
-        return OS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_HANDLE;
     }
     else if (NULL != hPrvKey && NULL != hPubKey
              && (hPrvKey->impl->context != hPubKey->impl->context

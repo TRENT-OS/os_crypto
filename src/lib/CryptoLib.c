@@ -248,15 +248,6 @@ Signature_init(
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    if (prvKey != NULL)
-    {
-        return OS_ERROR_INVALID_HANDLE;
-    }
-    else if (pubKey != NULL)
-    {
-        return OS_ERROR_INVALID_HANDLE;
-    }
-
     return CryptoLibSignature_init(pSigObj, prvKey, pubKey, algorithm, digest,
                                    &self->memory);
 }

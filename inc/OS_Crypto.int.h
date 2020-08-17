@@ -16,7 +16,7 @@
 // Call LIB or CLI, based on mode of API
 #define CALL(s, f, ...)                                                     \
     (NULL == (s)) ?                                                         \
-        OS_ERROR_INVALID_PARAMETER :                                        \
+        OS_ERROR_INVALID_HANDLE :                                           \
         ((s)->mode == OS_Crypto_MODE_CLIENT_ONLY) ?                         \
             (NULL == (s)->client.vtable->f) ?                               \
                 OS_ERROR_NOT_SUPPORTED :                                    \
@@ -29,7 +29,7 @@
 // the c flag
 #define PROXY_INIT(p, s, c)                                                 \
     if (NULL == &(p) || NULL == (s)) {                                      \
-        return OS_ERROR_INVALID_PARAMETER;                                  \
+        return OS_ERROR_INVALID_HANDLE;                                     \
     }                                                                       \
     if(((p) = s->memory.calloc(1, sizeof(OS_Crypto_Object_t))) == NULL) {   \
         return OS_ERROR_INSUFFICIENT_SPACE;                                 \
@@ -39,9 +39,7 @@
 
 // Allocate proxy object from key proxy and simply copy the impl
 #define PROXY_INIT_FROM_KEY(p, k)                                                   \
-    if (NULL == &(p)) {                                                             \
-        return OS_ERROR_INVALID_PARAMETER;                                          \
-    } else if (NULL == (k)) {                                                       \
+    if (NULL == &(p) || NULL == (k)) {                                              \
         return OS_ERROR_INVALID_HANDLE;                                             \
     }                                                                               \
     if(((p) = k->parent->memory.calloc(1, sizeof(OS_Crypto_Object_t))) == NULL) {   \
@@ -53,14 +51,14 @@
 // Free proxy object with associated API context's mem IF
 #define PROXY_FREE(p)                           \
     if (NULL == (p)) {                          \
-        return OS_ERROR_INVALID_PARAMETER;      \
+        return OS_ERROR_INVALID_HANDLE;         \
     }                                           \
     (p)->parent->memory.free(p);
 
 // Call function from proxy objects API handle
 #define PROXY_CALL(p, f, ...)                       \
     (NULL == (p)) ?                                 \
-        OS_ERROR_INVALID_PARAMETER :                \
+        OS_ERROR_INVALID_HANDLE :                   \
         (NULL == (p)->impl->vtable->f) ?            \
             OS_ERROR_NOT_SUPPORTED :                \
             (p)->impl->vtable->f(                   \

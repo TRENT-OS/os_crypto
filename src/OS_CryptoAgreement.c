@@ -18,9 +18,9 @@ OS_CryptoAgreement_init(
     OS_Error_t err;
 
     // We are actually not using this; lets check it anyways for consistency.
-    if (NULL == hCrypto)
+    if (NULL == hCrypto || NULL == hPrvKey)
     {
-        return OS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_HANDLE;
     }
 
     PROXY_INIT_FROM_KEY(*self, hPrvKey);
@@ -52,6 +52,11 @@ OS_CryptoAgreement_agree(
     void*                       shared,
     size_t*                     sharedSize)
 {
+    if (NULL == self || NULL == hPubKey)
+    {
+        return OS_ERROR_INVALID_HANDLE;
+    }
+
     return PROXY_CALL(self, Agreement_agree, PROXY_GET_OBJ(self),
                       PROXY_GET_OBJ(hPubKey), shared, sharedSize);
 }

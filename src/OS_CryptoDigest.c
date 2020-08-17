@@ -18,7 +18,7 @@ OS_CryptoDigest_init(
 
     if (NULL == hCrypto)
     {
-        return OS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_HANDLE;
     }
 
     PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT_ONLY);
@@ -39,9 +39,9 @@ OS_CryptoDigest_clone(
 {
     OS_Error_t err;
 
-    if (NULL == hCrypto)
+    if (NULL == hCrypto || NULL == hSrcDigest)
     {
-        return OS_ERROR_INVALID_PARAMETER;
+        return OS_ERROR_INVALID_HANDLE;
     }
 
     PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT_ONLY);
