@@ -84,7 +84,7 @@ OS_CryptoKey_makePublic(
 
     /*
      * For now we need to make sure both have the same "exportablity" when
-     * running in router mode, because they have to live in the same address
+     * running in CLIENT mode, because they have to live in the same address
      * space..
      * We could enable some of the cases where exportability differs by simply
      * creating a temporary copy of the src/dst key to execute the makePublic()
