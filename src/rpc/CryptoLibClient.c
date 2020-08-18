@@ -72,33 +72,33 @@ Rng_reseed(
 static OS_Error_t
 Mac_init(
     void*                    ctx,
-    void**                   pMacObj,
-    const void*              keyObj,
+    void**                   pMacHandle,
+    const void*              keyHandle,
     const OS_CryptoMac_Alg_t algorithm)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
     return NULL == self ? OS_ERROR_INVALID_PARAMETER :
            self->rpc.Mac_init(
-               (OS_CryptoMac_Handle_t*)pMacObj,
-               (OS_CryptoKey_Handle_t)keyObj,
+               (OS_CryptoMac_Handle_t*)pMacHandle,
+               (OS_CryptoKey_Handle_t)keyHandle,
                algorithm);
 }
 
 static OS_Error_t
 Mac_free(
     void* ctx,
-    void* macObj)
+    void* macHandle)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
     return NULL == self ? OS_ERROR_INVALID_PARAMETER :
            self->rpc.Mac_free(
-               (OS_CryptoMac_Handle_t)macObj);
+               (OS_CryptoMac_Handle_t)macHandle);
 }
 
 static OS_Error_t
 Mac_process(
     void*        ctx,
-    void*        macObj,
+    void*        macHandle,
     const void*  data,
     const size_t dataSize)
 {
@@ -115,14 +115,14 @@ Mac_process(
 
     memcpy(OS_Dataport_getBuf(self->rpc.dataport), data, dataSize);
     return self->rpc.Mac_process(
-               (OS_CryptoMac_Handle_t)macObj,
+               (OS_CryptoMac_Handle_t)macHandle,
                dataSize);
 }
 
 static OS_Error_t
 Mac_finalize(
     void*   ctx,
-    void*   macObj,
+    void*   macHandle,
     void*   mac,
     size_t* macSize)
 {
@@ -139,7 +139,7 @@ Mac_finalize(
     }
 
     if ((err = self->rpc.Mac_finalize(
-                   (OS_CryptoMac_Handle_t)macObj,
+                   (OS_CryptoMac_Handle_t)macHandle,
                    macSize)) == OS_SUCCESS)
     {
         memcpy(mac, OS_Dataport_getBuf(self->rpc.dataport), *macSize);
@@ -153,44 +153,44 @@ Mac_finalize(
 static OS_Error_t
 Digest_init(
     void*                       ctx,
-    void**                      pDigestObj,
+    void**                      pDigestHandle,
     const OS_CryptoDigest_Alg_t algorithm)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
     return NULL == self ? OS_ERROR_INVALID_PARAMETER :
            self->rpc.Digest_init(
-               (OS_CryptoDigest_Handle_t*)pDigestObj,
+               (OS_CryptoDigest_Handle_t*)pDigestHandle,
                algorithm);
 }
 
 static OS_Error_t
 Digest_clone(
     void*       ctx,
-    void**      pDigestObj,
-    const void* srcDigObj)
+    void**      pDigestHandle,
+    const void* srcDigHandle)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
     return NULL == self ? OS_ERROR_INVALID_PARAMETER :
            self->rpc.Digest_clone(
-               (OS_CryptoDigest_Handle_t*)pDigestObj,
-               (OS_CryptoDigest_Handle_t)srcDigObj);
+               (OS_CryptoDigest_Handle_t*)pDigestHandle,
+               (OS_CryptoDigest_Handle_t)srcDigHandle);
 }
 
 static OS_Error_t
 Digest_free(
     void* ctx,
-    void* digestObj)
+    void* digestHandle)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
     return NULL == self ? OS_ERROR_INVALID_PARAMETER :
            self->rpc.Digest_free(
-               (OS_CryptoDigest_Handle_t)digestObj);
+               (OS_CryptoDigest_Handle_t)digestHandle);
 }
 
 static OS_Error_t
 Digest_process(
     void*        ctx,
-    void*        digestObj,
+    void*        digestHandle,
     const void*  data,
     const size_t dataSize)
 {
@@ -208,14 +208,14 @@ Digest_process(
     memcpy(OS_Dataport_getBuf(self->rpc.dataport), data, dataSize);
     return NULL == self ? OS_ERROR_INVALID_PARAMETER :
            self->rpc.Digest_process(
-               (OS_CryptoDigest_Handle_t)digestObj,
+               (OS_CryptoDigest_Handle_t)digestHandle,
                dataSize);
 }
 
 static OS_Error_t
 Digest_finalize(
     void*   ctx,
-    void*   digestObj,
+    void*   digestHandle,
     void*   digest,
     size_t* digestSize)
 {
@@ -232,7 +232,7 @@ Digest_finalize(
     }
 
     if ((err = self->rpc.Digest_finalize(
-                   (OS_CryptoDigest_Handle_t)digestObj,
+                   (OS_CryptoDigest_Handle_t)digestHandle,
                    digestSize)) == OS_SUCCESS)
     {
         memcpy(digest, OS_Dataport_getBuf(self->rpc.dataport), *digestSize);
@@ -246,18 +246,18 @@ Digest_finalize(
 static OS_Error_t
 Signature_init(
     void*                          ctx,
-    void**                         pSigObj,
-    const void*                    prvKey,
-    const void*                    pubKey,
+    void**                         pSigHandle,
+    const void*                    prvKeyHandle,
+    const void*                    pubKeyHandle,
     const OS_CryptoSignature_Alg_t algorithm,
     const OS_CryptoDigest_Alg_t    digest)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
     return NULL == self ? OS_ERROR_INVALID_PARAMETER :
            self->rpc.Signature_init(
-               (OS_CryptoSignature_Handle_t*)pSigObj,
-               (OS_CryptoKey_Handle_t)prvKey,
-               (OS_CryptoKey_Handle_t)pubKey,
+               (OS_CryptoSignature_Handle_t*)pSigHandle,
+               (OS_CryptoKey_Handle_t)prvKeyHandle,
+               (OS_CryptoKey_Handle_t)pubKeyHandle,
                algorithm,
                digest);
 }
@@ -265,18 +265,18 @@ Signature_init(
 static OS_Error_t
 Signature_free(
     void* ctx,
-    void* sigObj)
+    void* sigHandle)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
     return NULL == self ? OS_ERROR_INVALID_PARAMETER :
            self->rpc.Signature_free(
-               (OS_CryptoSignature_Handle_t)sigObj);
+               (OS_CryptoSignature_Handle_t)sigHandle);
 }
 
 static OS_Error_t
 Signature_sign(
     void*        ctx,
-    void*        sigObj,
+    void*        sigHandle,
     const void*  hash,
     const size_t hashSize,
     void*        signature,
@@ -297,7 +297,7 @@ Signature_sign(
 
     memcpy(OS_Dataport_getBuf(self->rpc.dataport), hash, hashSize);
     if ((err = self->rpc.Signature_sign(
-                   (OS_CryptoSignature_Handle_t)sigObj,
+                   (OS_CryptoSignature_Handle_t)sigHandle,
                    hashSize,
                    signatureSize)) == OS_SUCCESS)
     {
@@ -310,7 +310,7 @@ Signature_sign(
 static OS_Error_t
 Signature_verify(
     void*        ctx,
-    void*        sigObj,
+    void*        sigHandle,
     const void*  hash,
     const size_t hashSize,
     const void*  signature,
@@ -331,7 +331,7 @@ Signature_verify(
     memcpy(OS_Dataport_getBuf(self->rpc.dataport) + hashSize, signature,
            signatureSize);
     return self->rpc.Signature_verify(
-               (OS_CryptoSignature_Handle_t)sigObj,
+               (OS_CryptoSignature_Handle_t)sigHandle,
                hashSize,
                signatureSize);
 }
@@ -341,34 +341,34 @@ Signature_verify(
 static OS_Error_t
 Agreement_init(
     void*                          ctx,
-    void**                         pAgrObj,
-    const void*                    prvKey,
+    void**                         pAgrHandle,
+    const void*                    prvKeyHandle,
     const OS_CryptoAgreement_Alg_t algorithm)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
     return NULL == self ? OS_ERROR_INVALID_PARAMETER :
            self->rpc.Agreement_init(
-               (OS_CryptoAgreement_Handle_t*)pAgrObj,
-               (OS_CryptoKey_Handle_t)prvKey,
+               (OS_CryptoAgreement_Handle_t*)pAgrHandle,
+               (OS_CryptoKey_Handle_t)prvKeyHandle,
                algorithm);
 }
 
 static OS_Error_t
 Agreement_free(
     void* ctx,
-    void* agrObj)
+    void* agrHandle)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
     return NULL == self ? OS_ERROR_INVALID_PARAMETER :
            self->rpc.Agreement_free(
-               (OS_CryptoAgreement_Handle_t)agrObj);
+               (OS_CryptoAgreement_Handle_t)agrHandle);
 }
 
 static OS_Error_t
 Agreement_agree(
     void*       ctx,
-    void*       agrObj,
-    const void* pubKey,
+    void*       agrHandle,
+    const void* pubKeyHandle,
     void*       shared,
     size_t*     sharedSize)
 {
@@ -385,8 +385,8 @@ Agreement_agree(
     }
 
     if ((err = self->rpc.Agreement_agree(
-                   (OS_CryptoAgreement_Handle_t)agrObj,
-                   (OS_CryptoKey_Handle_t)pubKey,
+                   (OS_CryptoAgreement_Handle_t)agrHandle,
+                   (OS_CryptoKey_Handle_t)pubKeyHandle,
                    sharedSize)) == OS_SUCCESS)
     {
         memcpy(shared, OS_Dataport_getBuf(self->rpc.dataport), *sharedSize);
@@ -400,12 +400,12 @@ Agreement_agree(
 static OS_Error_t
 Key_generate(
     void*                      ctx,
-    void**                     pKeyObj,
+    void**                     pKeyHandle,
     const OS_CryptoKey_Spec_t* spec)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
-    if (NULL == self || NULL == pKeyObj || NULL == spec)
+    if (NULL == self || NULL == pKeyHandle || NULL == spec)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
@@ -417,19 +417,19 @@ Key_generate(
     memcpy(OS_Dataport_getBuf(self->rpc.dataport), spec,
            sizeof(OS_CryptoKey_Spec_t));
     return self->rpc.Key_generate(
-               (OS_CryptoKey_Handle_t*)pKeyObj);
+               (OS_CryptoKey_Handle_t*)pKeyHandle);
 }
 
 static OS_Error_t
 Key_makePublic(
     void*                        ctx,
-    void**                       pPubKeyObj,
-    const void*                  prvKeyObj,
+    void**                       pPubKeyHandle,
+    const void*                  prvKeyHandle,
     const OS_CryptoKey_Attrib_t* attribs)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
-    if (NULL == self || NULL == pPubKeyObj || NULL == attribs)
+    if (NULL == self || NULL == pPubKeyHandle || NULL == attribs)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
@@ -437,19 +437,19 @@ Key_makePublic(
     memcpy(OS_Dataport_getBuf(self->rpc.dataport), attribs,
            sizeof(OS_CryptoKey_Attrib_t));
     return self->rpc.Key_makePublic(
-               (OS_CryptoKey_Handle_t*)pPubKeyObj,
-               (OS_CryptoKey_Handle_t)prvKeyObj);
+               (OS_CryptoKey_Handle_t*)pPubKeyHandle,
+               (OS_CryptoKey_Handle_t)prvKeyHandle);
 }
 
 static OS_Error_t
 Key_import(
     void*                      ctx,
-    void**                     pKeyObj,
+    void**                     pKeyHandle,
     const OS_CryptoKey_Data_t* keyData)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
-    if (NULL == self || NULL == pKeyObj || NULL == keyData)
+    if (NULL == self || NULL == pKeyHandle || NULL == keyData)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
@@ -461,13 +461,13 @@ Key_import(
     memcpy(OS_Dataport_getBuf(self->rpc.dataport), keyData,
            sizeof(OS_CryptoKey_Data_t));
     return self->rpc.Key_import(
-               (OS_CryptoKey_Handle_t*)pKeyObj);
+               (OS_CryptoKey_Handle_t*)pKeyHandle);
 }
 
 static OS_Error_t
 Key_export(
     void*                ctx,
-    const void*          keyObj,
+    const void*          keyHandle,
     OS_CryptoKey_Data_t* keyData)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
@@ -483,7 +483,7 @@ Key_export(
     }
 
     if ((err = self->rpc.Key_export(
-                   (OS_CryptoKey_Handle_t)keyObj)) == OS_SUCCESS)
+                   (OS_CryptoKey_Handle_t)keyHandle)) == OS_SUCCESS)
     {
         memcpy(keyData, OS_Dataport_getBuf(self->rpc.dataport),
                sizeof(OS_CryptoKey_Data_t));
@@ -495,7 +495,7 @@ Key_export(
 static OS_Error_t
 Key_getParams(
     void*       ctx,
-    const void* keyObj,
+    const void* keyHandle,
     void*       keyParams,
     size_t*     paramSize)
 {
@@ -512,7 +512,7 @@ Key_getParams(
     }
 
     if ((err = self->rpc.Key_getParams(
-                   (OS_CryptoKey_Handle_t)keyObj,
+                   (OS_CryptoKey_Handle_t)keyHandle,
                    paramSize)) == OS_SUCCESS)
     {
         memcpy(keyParams, OS_Dataport_getBuf(self->rpc.dataport), *paramSize);
@@ -524,7 +524,7 @@ Key_getParams(
 static OS_Error_t
 Key_getAttribs(
     void*                  ctx,
-    const void*            keyObj,
+    const void*            keyHandle,
     OS_CryptoKey_Attrib_t* attribs)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
@@ -540,7 +540,7 @@ Key_getAttribs(
     }
 
     if ((err = self->rpc.Key_getAttribs(
-                   (OS_CryptoKey_Handle_t)keyObj)) == OS_SUCCESS)
+                   (OS_CryptoKey_Handle_t)keyHandle)) == OS_SUCCESS)
     {
         memcpy(attribs, OS_Dataport_getBuf(self->rpc.dataport),
                sizeof(OS_CryptoKey_Attrib_t));
@@ -579,12 +579,12 @@ Key_loadParams(
 static OS_Error_t
 Key_free(
     void* ctx,
-    void* keyObj)
+    void* keyHandle)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
     return NULL == self ? OS_ERROR_INVALID_PARAMETER :
            self->rpc.Key_free(
-               (OS_CryptoKey_Handle_t)keyObj);
+               (OS_CryptoKey_Handle_t)keyHandle);
 }
 
 // ------------------------------ Cipher API -----------------------------------
@@ -592,15 +592,15 @@ Key_free(
 static OS_Error_t
 Cipher_init(
     void*                       ctx,
-    void**                      pCipherObj,
-    const void*                 key,
+    void**                      pCipherHandle,
+    const void*                 keyHandle,
     const OS_CryptoCipher_Alg_t algorithm,
     const void*                 iv,
     const size_t                ivSize)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
-    if (NULL == self || NULL == pCipherObj)
+    if (NULL == self || NULL == pCipherHandle)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
@@ -615,8 +615,8 @@ Cipher_init(
     }
 
     return self->rpc.Cipher_init(
-               (OS_CryptoCipher_Handle_t*)pCipherObj,
-               (OS_CryptoKey_Handle_t)key,
+               (OS_CryptoCipher_Handle_t*)pCipherHandle,
+               (OS_CryptoKey_Handle_t)keyHandle,
                algorithm,
                ivSize);
 }
@@ -624,18 +624,18 @@ Cipher_init(
 static OS_Error_t
 Cipher_free(
     void* ctx,
-    void* cipherObj)
+    void* cipherHandle)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
     return NULL == self ? OS_ERROR_INVALID_PARAMETER :
            self->rpc.Cipher_free(
-               (OS_CryptoCipher_Handle_t)cipherObj);
+               (OS_CryptoCipher_Handle_t)cipherHandle);
 }
 
 static OS_Error_t
 Cipher_process(
     void*        ctx,
-    void*        cipherObj,
+    void*        cipherHandle,
     const void*  input,
     const size_t inputSize,
     void*        output,
@@ -656,7 +656,7 @@ Cipher_process(
 
     memcpy(OS_Dataport_getBuf(self->rpc.dataport), input, inputSize);
     if ((err = self->rpc.Cipher_process(
-                   (OS_CryptoCipher_Handle_t)cipherObj,
+                   (OS_CryptoCipher_Handle_t)cipherHandle,
                    inputSize,
                    outputSize)) == OS_SUCCESS)
     {
@@ -669,7 +669,7 @@ Cipher_process(
 static OS_Error_t
 Cipher_start(
     void*        ctx,
-    void*        cipherObj,
+    void*        cipherHandle,
     const void*  data,
     const size_t dataSize)
 {
@@ -691,14 +691,14 @@ Cipher_start(
 
     return NULL == self ? OS_ERROR_INVALID_PARAMETER :
            self->rpc.Cipher_start(
-               (OS_CryptoCipher_Handle_t)cipherObj,
+               (OS_CryptoCipher_Handle_t)cipherHandle,
                dataSize);
 }
 
 static OS_Error_t
 Cipher_finalize(
     void*   ctx,
-    void*   cipherObj,
+    void*   cipherHandle,
     void*   tag,
     size_t* tagSize)
 {
@@ -716,7 +716,7 @@ Cipher_finalize(
 
     memcpy(OS_Dataport_getBuf(self->rpc.dataport), tag, *tagSize);
     if ((err = self->rpc.Cipher_finalize(
-                   (OS_CryptoCipher_Handle_t)cipherObj,
+                   (OS_CryptoCipher_Handle_t)cipherHandle,
                    tagSize)) == OS_SUCCESS)
     {
         memcpy(tag, OS_Dataport_getBuf(self->rpc.dataport), *tagSize);
