@@ -5,9 +5,6 @@
 #include "OS_Crypto.h"
 #include "OS_Crypto.int.h"
 
-#define PROXY_GET_PTR(p) \
-    (CryptoLibMac_t**) PROXY_GET_OBJ_PTR(p)
-
 OS_Error_t
 OS_CryptoMac_init(
     OS_CryptoMac_Handle_t*      self,
@@ -24,7 +21,7 @@ OS_CryptoMac_init(
     }
 
     PROXY_INIT_FROM_KEY(*self, hKey);
-    if ((err = PROXY_CALL(*self, Mac_init, PROXY_GET_PTR(*self),
+    if ((err = PROXY_CALL(*self, Mac_init, PROXY_GET_OBJ_PTR(*self),
                           PROXY_GET_OBJ(hKey), algorithm)) != OS_SUCCESS)
     {
         PROXY_FREE(*self);

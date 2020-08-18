@@ -5,9 +5,6 @@
 #include "OS_Crypto.h"
 #include "OS_Crypto.int.h"
 
-#define PROXY_GET_PTR(p) \
-    (CryptoLibAgreement_t**) PROXY_GET_OBJ_PTR(p)
-
 OS_Error_t
 OS_CryptoAgreement_init(
     OS_CryptoAgreement_Handle_t*   self,
@@ -24,7 +21,7 @@ OS_CryptoAgreement_init(
     }
 
     PROXY_INIT_FROM_KEY(*self, hPrvKey);
-    if ((err = PROXY_CALL(*self, Agreement_init, PROXY_GET_PTR(*self),
+    if ((err = PROXY_CALL(*self, Agreement_init, PROXY_GET_OBJ_PTR(*self),
                           PROXY_GET_OBJ(hPrvKey), algorithm)) != OS_SUCCESS)
     {
         PROXY_FREE(*self);

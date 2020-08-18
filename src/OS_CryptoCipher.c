@@ -5,9 +5,6 @@
 #include "OS_Crypto.h"
 #include "OS_Crypto.int.h"
 
-#define PROXY_GET_PTR(p) \
-    (CryptoLibCipher_t**) PROXY_GET_OBJ_PTR(p)
-
 OS_Error_t
 OS_CryptoCipher_init(
     OS_CryptoCipher_Handle_t*   self,
@@ -26,7 +23,7 @@ OS_CryptoCipher_init(
     }
 
     PROXY_INIT_FROM_KEY(*self, hKey);
-    if ((err = PROXY_CALL(*self, Cipher_init, PROXY_GET_PTR(*self),
+    if ((err = PROXY_CALL(*self, Cipher_init, PROXY_GET_OBJ_PTR(*self),
                           PROXY_GET_OBJ(hKey), algorithm, iv, ivSize)) != OS_SUCCESS)
     {
         PROXY_FREE(*self);

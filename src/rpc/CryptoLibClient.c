@@ -72,8 +72,8 @@ Rng_reseed(
 static OS_Error_t
 Mac_init(
     void*                    ctx,
-    CryptoLibMac_t**         pMacObj,
-    const CryptoLibKey_t*    keyObj,
+    void**                   pMacObj,
+    const void*              keyObj,
     const OS_CryptoMac_Alg_t algorithm)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
@@ -86,8 +86,8 @@ Mac_init(
 
 static OS_Error_t
 Mac_free(
-    void*           ctx,
-    CryptoLibMac_t* macObj)
+    void* ctx,
+    void* macObj)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
     return NULL == self ? OS_ERROR_INVALID_PARAMETER :
@@ -97,10 +97,10 @@ Mac_free(
 
 static OS_Error_t
 Mac_process(
-    void*           ctx,
-    CryptoLibMac_t* macObj,
-    const void*     data,
-    const size_t    dataSize)
+    void*        ctx,
+    void*        macObj,
+    const void*  data,
+    const size_t dataSize)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
@@ -121,10 +121,10 @@ Mac_process(
 
 static OS_Error_t
 Mac_finalize(
-    void*           ctx,
-    CryptoLibMac_t* macObj,
-    void*           mac,
-    size_t*         macSize)
+    void*   ctx,
+    void*   macObj,
+    void*   mac,
+    size_t* macSize)
 {
     OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
@@ -153,7 +153,7 @@ Mac_finalize(
 static OS_Error_t
 Digest_init(
     void*                       ctx,
-    CryptoLibDigest_t**         pDigestObj,
+    void**                      pDigestObj,
     const OS_CryptoDigest_Alg_t algorithm)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
@@ -165,9 +165,9 @@ Digest_init(
 
 static OS_Error_t
 Digest_clone(
-    void*                    ctx,
-    CryptoLibDigest_t**      pDigestObj,
-    const CryptoLibDigest_t* srcDigObj)
+    void*       ctx,
+    void**      pDigestObj,
+    const void* srcDigObj)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
     return NULL == self ? OS_ERROR_INVALID_PARAMETER :
@@ -178,8 +178,8 @@ Digest_clone(
 
 static OS_Error_t
 Digest_free(
-    void*              ctx,
-    CryptoLibDigest_t* digestObj)
+    void* ctx,
+    void* digestObj)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
     return NULL == self ? OS_ERROR_INVALID_PARAMETER :
@@ -189,10 +189,10 @@ Digest_free(
 
 static OS_Error_t
 Digest_process(
-    void*              ctx,
-    CryptoLibDigest_t* digestObj,
-    const void*        data,
-    const size_t       dataSize)
+    void*        ctx,
+    void*        digestObj,
+    const void*  data,
+    const size_t dataSize)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
@@ -214,10 +214,10 @@ Digest_process(
 
 static OS_Error_t
 Digest_finalize(
-    void*              ctx,
-    CryptoLibDigest_t* digestObj,
-    void*              digest,
-    size_t*            digestSize)
+    void*   ctx,
+    void*   digestObj,
+    void*   digest,
+    size_t* digestSize)
 {
     OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
@@ -246,9 +246,9 @@ Digest_finalize(
 static OS_Error_t
 Signature_init(
     void*                          ctx,
-    CryptoLibSignature_t**         pSigObj,
-    const CryptoLibKey_t*          prvKey,
-    const CryptoLibKey_t*          pubKey,
+    void**                         pSigObj,
+    const void*                    prvKey,
+    const void*                    pubKey,
     const OS_CryptoSignature_Alg_t algorithm,
     const OS_CryptoDigest_Alg_t    digest)
 {
@@ -264,8 +264,8 @@ Signature_init(
 
 static OS_Error_t
 Signature_free(
-    void*                 ctx,
-    CryptoLibSignature_t* sigObj)
+    void* ctx,
+    void* sigObj)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
     return NULL == self ? OS_ERROR_INVALID_PARAMETER :
@@ -275,12 +275,12 @@ Signature_free(
 
 static OS_Error_t
 Signature_sign(
-    void*                 ctx,
-    CryptoLibSignature_t* sigObj,
-    const void*           hash,
-    const size_t          hashSize,
-    void*                 signature,
-    size_t*               signatureSize)
+    void*        ctx,
+    void*        sigObj,
+    const void*  hash,
+    const size_t hashSize,
+    void*        signature,
+    size_t*      signatureSize)
 {
     OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
@@ -309,12 +309,12 @@ Signature_sign(
 
 static OS_Error_t
 Signature_verify(
-    void*                 ctx,
-    CryptoLibSignature_t* sigObj,
-    const void*           hash,
-    const size_t          hashSize,
-    const void*           signature,
-    const size_t          signatureSize)
+    void*        ctx,
+    void*        sigObj,
+    const void*  hash,
+    const size_t hashSize,
+    const void*  signature,
+    const size_t signatureSize)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
@@ -341,8 +341,8 @@ Signature_verify(
 static OS_Error_t
 Agreement_init(
     void*                          ctx,
-    CryptoLibAgreement_t**         pAgrObj,
-    const CryptoLibKey_t*          prvKey,
+    void**                         pAgrObj,
+    const void*                    prvKey,
     const OS_CryptoAgreement_Alg_t algorithm)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
@@ -355,8 +355,8 @@ Agreement_init(
 
 static OS_Error_t
 Agreement_free(
-    void*                 ctx,
-    CryptoLibAgreement_t* agrObj)
+    void* ctx,
+    void* agrObj)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
     return NULL == self ? OS_ERROR_INVALID_PARAMETER :
@@ -366,11 +366,11 @@ Agreement_free(
 
 static OS_Error_t
 Agreement_agree(
-    void*                 ctx,
-    CryptoLibAgreement_t* agrObj,
-    const CryptoLibKey_t* pubKey,
-    void*                 shared,
-    size_t*               sharedSize)
+    void*       ctx,
+    void*       agrObj,
+    const void* pubKey,
+    void*       shared,
+    size_t*     sharedSize)
 {
     OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
@@ -400,7 +400,7 @@ Agreement_agree(
 static OS_Error_t
 Key_generate(
     void*                      ctx,
-    CryptoLibKey_t**           pKeyObj,
+    void**                     pKeyObj,
     const OS_CryptoKey_Spec_t* spec)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
@@ -423,8 +423,8 @@ Key_generate(
 static OS_Error_t
 Key_makePublic(
     void*                        ctx,
-    CryptoLibKey_t**             pPubKeyObj,
-    const CryptoLibKey_t*        prvKeyObj,
+    void**                       pPubKeyObj,
+    const void*                  prvKeyObj,
     const OS_CryptoKey_Attrib_t* attribs)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
@@ -444,7 +444,7 @@ Key_makePublic(
 static OS_Error_t
 Key_import(
     void*                      ctx,
-    CryptoLibKey_t**           pKeyObj,
+    void**                     pKeyObj,
     const OS_CryptoKey_Data_t* keyData)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
@@ -466,9 +466,9 @@ Key_import(
 
 static OS_Error_t
 Key_export(
-    void*                 ctx,
-    const CryptoLibKey_t* keyObj,
-    OS_CryptoKey_Data_t*  keyData)
+    void*                ctx,
+    const void*          keyObj,
+    OS_CryptoKey_Data_t* keyData)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
     OS_Error_t err = OS_ERROR_GENERIC;
@@ -494,10 +494,10 @@ Key_export(
 
 static OS_Error_t
 Key_getParams(
-    void*                 ctx,
-    const CryptoLibKey_t* keyObj,
-    void*                 keyParams,
-    size_t*               paramSize)
+    void*       ctx,
+    const void* keyObj,
+    void*       keyParams,
+    size_t*     paramSize)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
     OS_Error_t err = OS_ERROR_GENERIC;
@@ -524,7 +524,7 @@ Key_getParams(
 static OS_Error_t
 Key_getAttribs(
     void*                  ctx,
-    const CryptoLibKey_t*  keyObj,
+    const void*            keyObj,
     OS_CryptoKey_Attrib_t* attribs)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
@@ -578,8 +578,8 @@ Key_loadParams(
 
 static OS_Error_t
 Key_free(
-    void*           ctx,
-    CryptoLibKey_t* keyObj)
+    void* ctx,
+    void* keyObj)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
     return NULL == self ? OS_ERROR_INVALID_PARAMETER :
@@ -592,8 +592,8 @@ Key_free(
 static OS_Error_t
 Cipher_init(
     void*                       ctx,
-    CryptoLibCipher_t**         pCipherObj,
-    const CryptoLibKey_t*       key,
+    void**                      pCipherObj,
+    const void*                 key,
     const OS_CryptoCipher_Alg_t algorithm,
     const void*                 iv,
     const size_t                ivSize)
@@ -623,8 +623,8 @@ Cipher_init(
 
 static OS_Error_t
 Cipher_free(
-    void*              ctx,
-    CryptoLibCipher_t* cipherObj)
+    void* ctx,
+    void* cipherObj)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
     return NULL == self ? OS_ERROR_INVALID_PARAMETER :
@@ -634,12 +634,12 @@ Cipher_free(
 
 static OS_Error_t
 Cipher_process(
-    void*              ctx,
-    CryptoLibCipher_t* cipherObj,
-    const void*        input,
-    const size_t       inputSize,
-    void*              output,
-    size_t*            outputSize)
+    void*        ctx,
+    void*        cipherObj,
+    const void*  input,
+    const size_t inputSize,
+    void*        output,
+    size_t*      outputSize)
 {
     OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
@@ -668,10 +668,10 @@ Cipher_process(
 
 static OS_Error_t
 Cipher_start(
-    void*              ctx,
-    CryptoLibCipher_t* cipherObj,
-    const void*        data,
-    const size_t       dataSize)
+    void*        ctx,
+    void*        cipherObj,
+    const void*  data,
+    const size_t dataSize)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
@@ -697,10 +697,10 @@ Cipher_start(
 
 static OS_Error_t
 Cipher_finalize(
-    void*              ctx,
-    CryptoLibCipher_t* cipherObj,
-    void*              tag,
-    size_t*            tagSize)
+    void*   ctx,
+    void*   cipherObj,
+    void*   tag,
+    size_t* tagSize)
 {
     OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;

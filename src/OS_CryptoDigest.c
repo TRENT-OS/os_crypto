@@ -5,9 +5,6 @@
 #include "OS_Crypto.h"
 #include "OS_Crypto.int.h"
 
-#define PROXY_GET_PTR(p) \
-    (CryptoLibDigest_t**) PROXY_GET_OBJ_PTR(p)
-
 OS_Error_t
 OS_CryptoDigest_init(
     OS_CryptoDigest_Handle_t*   self,
@@ -22,7 +19,7 @@ OS_CryptoDigest_init(
     }
 
     PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT_ONLY);
-    if ((err = PROXY_CALL(*self, Digest_init, PROXY_GET_PTR(*self),
+    if ((err = PROXY_CALL(*self, Digest_init, PROXY_GET_OBJ_PTR(*self),
                           algorithm)) != OS_SUCCESS)
     {
         PROXY_FREE(*self);
@@ -45,7 +42,7 @@ OS_CryptoDigest_clone(
     }
 
     PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT_ONLY);
-    if ((err = PROXY_CALL(*self, Digest_clone, PROXY_GET_PTR(*self),
+    if ((err = PROXY_CALL(*self, Digest_clone, PROXY_GET_OBJ_PTR(*self),
                           PROXY_GET_OBJ(hSrcDigest))) != OS_SUCCESS)
     {
         PROXY_FREE(*self);

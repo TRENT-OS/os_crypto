@@ -5,9 +5,6 @@
 #include "OS_Crypto.h"
 #include "OS_Crypto.int.h"
 
-#define PROXY_GET_PTR(p) \
-    (CryptoLibKey_t**) PROXY_GET_OBJ_PTR(p)
-
 OS_Error_t
 OS_CryptoKey_generate(
     OS_CryptoKey_Handle_t*     self,
@@ -28,7 +25,7 @@ OS_CryptoKey_generate(
     PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT_ONLY
                || (hCrypto->mode == OS_Crypto_MODE_CLIENT &&
                    !spec->key.attribs.keepLocal));
-    if ((err = PROXY_CALL(*self, Key_generate, PROXY_GET_PTR(*self),
+    if ((err = PROXY_CALL(*self, Key_generate, PROXY_GET_OBJ_PTR(*self),
                           spec)) != OS_SUCCESS)
     {
         PROXY_FREE(*self);
@@ -57,7 +54,7 @@ OS_CryptoKey_import(
     PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT_ONLY
                || (hCrypto->mode == OS_Crypto_MODE_CLIENT &&
                    !keyData->attribs.keepLocal));
-    if ((err = PROXY_CALL(*self, Key_import, PROXY_GET_PTR(*self),
+    if ((err = PROXY_CALL(*self, Key_import, PROXY_GET_OBJ_PTR(*self),
                           keyData)) != OS_SUCCESS)
     {
         PROXY_FREE(*self);
@@ -108,7 +105,7 @@ OS_CryptoKey_makePublic(
     PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT_ONLY
                || (hCrypto->mode == OS_Crypto_MODE_CLIENT &&
                    !attribs->keepLocal));
-    if ((err = PROXY_CALL(*self, Key_makePublic, PROXY_GET_PTR(*self),
+    if ((err = PROXY_CALL(*self, Key_makePublic, PROXY_GET_OBJ_PTR(*self),
                           PROXY_GET_OBJ(hPrvKey), attribs)) != OS_SUCCESS)
     {
         PROXY_FREE(*self);

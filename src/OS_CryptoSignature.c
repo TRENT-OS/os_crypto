@@ -5,9 +5,6 @@
 #include "OS_Crypto.h"
 #include "OS_Crypto.int.h"
 
-#define PROXY_GET_PTR(p) \
-    (CryptoLibSignature_t**) PROXY_GET_OBJ_PTR(p)
-
 OS_Error_t
 OS_CryptoSignature_init(
     OS_CryptoSignature_Handle_t*   self,
@@ -42,7 +39,7 @@ OS_CryptoSignature_init(
 
     key = (hPubKey != NULL) ? hPubKey : hPrvKey;
     PROXY_INIT_FROM_KEY(*self, key);
-    if ((err = PROXY_CALL(*self, Signature_init, PROXY_GET_PTR(*self),
+    if ((err = PROXY_CALL(*self, Signature_init, PROXY_GET_OBJ_PTR(*self),
                           PROXY_GET_OBJ(hPrvKey), PROXY_GET_OBJ(hPubKey),
                           sigAlgorithm, digAlgorithm)) != OS_SUCCESS)
     {
