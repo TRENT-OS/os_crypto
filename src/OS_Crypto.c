@@ -76,7 +76,7 @@ OS_Crypto_init(
     case OS_Crypto_MODE_CLIENT:
         if ((err = CryptoLibClient_init(&ctx->rpc.client,
                                         &ctx->memory,
-                                        &cfg->dataport)) != OS_SUCCESS)
+                                        &cfg->crypto)) != OS_SUCCESS)
         {
             goto err1;
         }
