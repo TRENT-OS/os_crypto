@@ -27,7 +27,7 @@ OS_CryptoKey_generate(
 
     PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT_ONLY
                || (hCrypto->mode == OS_Crypto_MODE_CLIENT &&
-                   !spec->key.attribs.exportable));
+                   !spec->key.attribs.keepLocal));
     if ((err = PROXY_CALL(*self, Key_generate, PROXY_GET_PTR(*self),
                           spec)) != OS_SUCCESS)
     {
@@ -56,7 +56,7 @@ OS_CryptoKey_import(
 
     PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT_ONLY
                || (hCrypto->mode == OS_Crypto_MODE_CLIENT &&
-                   !keyData->attribs.exportable));
+                   !keyData->attribs.keepLocal));
     if ((err = PROXY_CALL(*self, Key_import, PROXY_GET_PTR(*self),
                           keyData)) != OS_SUCCESS)
     {
@@ -100,14 +100,14 @@ OS_CryptoKey_makePublic(
      * and then putting it in the correct address space.
      */
     if (hCrypto->mode == OS_Crypto_MODE_CLIENT &&
-        attribs->exportable != srcAttribs.exportable)
+        attribs->keepLocal != srcAttribs.keepLocal)
     {
         return OS_ERROR_NOT_SUPPORTED;
     }
 
     PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT_ONLY
                || (hCrypto->mode == OS_Crypto_MODE_CLIENT &&
-                   !attribs->exportable));
+                   !attribs->keepLocal));
     if ((err = PROXY_CALL(*self, Key_makePublic, PROXY_GET_PTR(*self),
                           PROXY_GET_OBJ(hPrvKey), attribs)) != OS_SUCCESS)
     {
