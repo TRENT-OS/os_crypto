@@ -92,10 +92,10 @@ OS_CryptoKey_makePublic(
     }
 
     /*
-     * For now we need to make sure both have the same "exportablity" when
-     * running in CLIENT mode, because they have to live in the same address
-     * space..
-     * We could enable some of the cases where exportability differs by simply
+     * For now we need to make sure both keys are kept in the same address space;
+     * this is only relevant in CLIENT mode, where the attribute is evaluated..
+     *
+     * We could enable some of the cases where locality differs by simply
      * creating a temporary copy of the src/dst key to execute the makePublic()
      * and then putting it in the correct address space.
      */

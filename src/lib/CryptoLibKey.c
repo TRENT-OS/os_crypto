@@ -946,13 +946,6 @@ CryptoLibKey_export(
     const CryptoLibKey_t* self,
     OS_CryptoKey_Data_t*  keyData)
 {
-    /*
-     * Keys do have an "exportable" attribute. However, this is only meaningful
-     * when trying to export key data out of the component (via RPC). Anyone who
-     * has access to the memory of the LIBRARY instance can trivally read key data
-     * anyways, even if the library refuses to export it. Therefore, the check
-     * for "exportability" is done by the RPC server and not here!
-     */
     if (NULL == self || NULL == keyData)
     {
         return OS_ERROR_INVALID_PARAMETER;
