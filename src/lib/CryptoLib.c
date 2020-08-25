@@ -4,8 +4,6 @@
 
 #include "lib/CryptoLib.h"
 
-#include "util/PtrVector.h"
-
 #include "mbedtls/platform.h"
 
 #include <string.h>
@@ -22,12 +20,6 @@ struct CryptoLib
 {
     OS_Crypto_Memory_t memory;
     CryptoLibRng_t* rng;
-    PtrVector keyObjects;
-    PtrVector macObjects;
-    PtrVector digestObjects;
-    PtrVector cipherObjects;
-    PtrVector signatureObjects;
-    PtrVector agreementObjects;
     /**
      * When we have a function that takes an input buffer and produces an output
      * buffer, we copy the inputs to this buffer internally, so the caller can
@@ -88,35 +80,14 @@ Mac_init(
     const CryptoLibKey_t*    keyObj,
     const OS_CryptoMac_Alg_t algorithm)
 {
-    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pMacObj)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    if (!PtrVector_hasPtr(&self->keyObjects, keyObj))
-    {
-        return OS_ERROR_INVALID_HANDLE;
-    }
 
-    if ((err = CryptoLibMac_init(pMacObj, keyObj, algorithm,
-                                 &self->memory)) != OS_SUCCESS)
-    {
-        return err;
-    }
-
-    if ((err = PtrVector_add(&self->macObjects, *pMacObj)) != OS_SUCCESS)
-    {
-        goto err0;
-    }
-
-    return OS_SUCCESS;
-
-err0:
-    CryptoLibMac_free(*pMacObj, &self->memory);
-
-    return err;
+    return CryptoLibMac_init(pMacObj, keyObj, algorithm, &self->memory);
 }
 
 static OS_Error_t
@@ -131,13 +102,6 @@ Mac_free(
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    if (!PtrVector_hasPtr(&self->macObjects, macObj))
-    {
-        return OS_ERROR_INVALID_HANDLE;
-    }
-
-    PtrVector_remove(&self->macObjects, macObj);
-
     return CryptoLibMac_free(macObj, &self->memory);
 }
 
@@ -148,8 +112,6 @@ Mac_process(
     const void*     data,
     const size_t    dataSize)
 {
-    CryptoLib_t* self = (CryptoLib_t*) ctx;
-
     if (NULL == ctx)
     {
         return OS_ERROR_INVALID_PARAMETER;
@@ -159,9 +121,7 @@ Mac_process(
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return !PtrVector_hasPtr(&self->macObjects, macObj) ?
-           OS_ERROR_INVALID_HANDLE :
-           CryptoLibMac_process(macObj, data, dataSize);
+    return CryptoLibMac_process(macObj, data, dataSize);
 }
 
 static OS_Error_t
@@ -171,8 +131,6 @@ Mac_finalize(
     void*           mac,
     size_t*         macSize)
 {
-    CryptoLib_t* self = (CryptoLib_t*) ctx;
-
     if (NULL == ctx || NULL == macSize)
     {
         return OS_ERROR_INVALID_PARAMETER;
@@ -182,9 +140,7 @@ Mac_finalize(
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return !PtrVector_hasPtr(&self->macObjects, macObj) ?
-           OS_ERROR_INVALID_HANDLE :
-           CryptoLibMac_finalize(macObj, mac, macSize);
+    return CryptoLibMac_finalize(macObj, mac, macSize);
 }
 
 // ------------------------------ Digest API -----------------------------------
@@ -195,7 +151,6 @@ Digest_init(
     CryptoLibDigest_t**         pDigObj,
     const OS_CryptoDigest_Alg_t algorithm)
 {
-    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pDigObj)
@@ -203,23 +158,7 @@ Digest_init(
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((err = CryptoLibDigest_init(pDigObj, algorithm,
-                                    &self->memory)) != OS_SUCCESS)
-    {
-        return err;
-    }
-
-    if ((err = PtrVector_add(&self->digestObjects, *pDigObj)) != OS_SUCCESS)
-    {
-        goto err0;
-    }
-
-    return OS_SUCCESS;
-
-err0:
-    CryptoLibDigest_free(*pDigObj, &self->memory);
-
-    return err;
+    return CryptoLibDigest_init(pDigObj, algorithm, &self->memory);
 }
 
 static OS_Error_t
@@ -234,13 +173,6 @@ Digest_free(
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    if (!PtrVector_hasPtr(&self->digestObjects, digObj))
-    {
-        return OS_ERROR_INVALID_HANDLE;
-    }
-
-    PtrVector_remove(&self->digestObjects, digObj);
-
     return CryptoLibDigest_free(digObj, &self->memory);
 }
 
@@ -250,35 +182,14 @@ Digest_clone(
     CryptoLibDigest_t**      pDigObj,
     const CryptoLibDigest_t* srcDigObj)
 {
-    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pDigObj)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-    if (!PtrVector_hasPtr(&self->digestObjects, srcDigObj))
-    {
-        return OS_ERROR_INVALID_HANDLE;
-    }
 
-    if ((err = CryptoLibDigest_clone(pDigObj, srcDigObj,
-                                     &self->memory)) != OS_SUCCESS)
-    {
-        return err;
-    }
-
-    if ((err = PtrVector_add(&self->digestObjects, *pDigObj)) != OS_SUCCESS)
-    {
-        goto err0;
-    }
-
-    return OS_SUCCESS;
-
-err0:
-    CryptoLibDigest_free(*pDigObj, &self->memory);
-
-    return err;
+    return CryptoLibDigest_clone(pDigObj, srcDigObj, &self->memory);
 }
 
 static OS_Error_t
@@ -288,8 +199,6 @@ Digest_process(
     const void*        data,
     const size_t       dataSize)
 {
-    CryptoLib_t* self = (CryptoLib_t*) ctx;
-
     if (NULL == ctx)
     {
         return OS_ERROR_INVALID_PARAMETER;
@@ -299,9 +208,7 @@ Digest_process(
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return !PtrVector_hasPtr(&self->digestObjects, digObj) ?
-           OS_ERROR_INVALID_HANDLE :
-           CryptoLibDigest_process(digObj, data, dataSize);
+    return CryptoLibDigest_process(digObj, data, dataSize);
 }
 
 static OS_Error_t
@@ -311,8 +218,6 @@ Digest_finalize(
     void*              digest,
     size_t*            digestSize)
 {
-    CryptoLib_t* self = (CryptoLib_t*) ctx;
-
     if (NULL == ctx || NULL == digestSize)
     {
         return OS_ERROR_INVALID_PARAMETER;
@@ -322,9 +227,7 @@ Digest_finalize(
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return !PtrVector_hasPtr(&self->digestObjects, digObj) ?
-           OS_ERROR_INVALID_HANDLE :
-           CryptoLibDigest_finalize(digObj, digest, digestSize);
+    return CryptoLibDigest_finalize(digObj, digest, digestSize);
 }
 
 // ----------------------------- Signature API ---------------------------------
@@ -338,7 +241,6 @@ Signature_init(
     const OS_CryptoSignature_Alg_t algorithm,
     const OS_CryptoDigest_Alg_t    digest)
 {
-    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pSigObj)
@@ -346,32 +248,17 @@ Signature_init(
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    if (prvKey != NULL && !PtrVector_hasPtr(&self->keyObjects, prvKey))
+    if (prvKey != NULL)
     {
         return OS_ERROR_INVALID_HANDLE;
     }
-    else if (pubKey != NULL && !PtrVector_hasPtr(&self->keyObjects, pubKey))
+    else if (pubKey != NULL)
     {
         return OS_ERROR_INVALID_HANDLE;
     }
 
-    if ((err = CryptoLibSignature_init(pSigObj, prvKey, pubKey, algorithm, digest,
-                                       &self->memory)) != OS_SUCCESS)
-    {
-        return err;
-    }
-
-    if ((err = PtrVector_add(&self->signatureObjects, *pSigObj)) != OS_SUCCESS)
-    {
-        goto err0;
-    }
-
-    return err;
-
-err0:
-    CryptoLibSignature_free(*pSigObj, &self->memory);
-
-    return err;
+    return CryptoLibSignature_init(pSigObj, prvKey, pubKey, algorithm, digest,
+                                   &self->memory);
 }
 
 static OS_Error_t
@@ -385,13 +272,6 @@ Signature_free(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-
-    if (!PtrVector_hasPtr(&self->signatureObjects, sigObj))
-    {
-        return OS_ERROR_INVALID_HANDLE;
-    }
-
-    PtrVector_remove(&self->signatureObjects, sigObj);
 
     return CryptoLibSignature_free(sigObj, &self->memory);
 }
@@ -419,9 +299,7 @@ Signature_sign(
 
     // Make local copy of input buffer, to allow overlapping hash/signature buffers
     memcpy(self->buffer, hash, hashSize);
-    return !PtrVector_hasPtr(&self->signatureObjects, sigObj) ?
-           OS_ERROR_INVALID_HANDLE :
-           CryptoLibSignature_sign(sigObj, self->buffer, hashSize, signature,
+    return CryptoLibSignature_sign(sigObj, self->buffer, hashSize, signature,
                                    signatureSize, self->rng);
 }
 
@@ -445,10 +323,8 @@ Signature_verify(
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return !PtrVector_hasPtr(&self->signatureObjects, sigObj) ?
-           OS_ERROR_INVALID_HANDLE :
-           CryptoLibSignature_verify(sigObj, hash, hashSize, signature, signatureSize,
-                                     self->rng);
+    return CryptoLibSignature_verify(sigObj, hash, hashSize, signature,
+                                     signatureSize, self->rng);
 }
 
 // ----------------------------- Agreement API ---------------------------------
@@ -460,7 +336,6 @@ Agreement_init(
     const CryptoLibKey_t*          prvKey,
     const OS_CryptoAgreement_Alg_t algorithm)
 {
-    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pAgrObj)
@@ -468,28 +343,7 @@ Agreement_init(
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    if (!PtrVector_hasPtr(&self->keyObjects, prvKey))
-    {
-        return OS_ERROR_INVALID_HANDLE;
-    }
-
-    if ((err = CryptoLibAgreement_init(pAgrObj, prvKey, algorithm,
-                                       &self->memory)) != OS_SUCCESS)
-    {
-        return err;
-    }
-
-    if ((err = PtrVector_add(&self->agreementObjects, *pAgrObj)) != OS_SUCCESS)
-    {
-        goto err0;
-    }
-
-    return OS_SUCCESS;
-
-err0:
-    CryptoLibAgreement_free(*pAgrObj, &self->memory);
-
-    return err;
+    return CryptoLibAgreement_init(pAgrObj, prvKey, algorithm, &self->memory);
 }
 
 static OS_Error_t
@@ -503,13 +357,6 @@ Agreement_free(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-
-    if (!PtrVector_hasPtr(&self->agreementObjects, agrObj))
-    {
-        return OS_ERROR_INVALID_HANDLE;
-    }
-
-    PtrVector_remove(&self->agreementObjects, agrObj);
 
     return CryptoLibAgreement_free(agrObj, &self->memory);
 }
@@ -533,15 +380,7 @@ Agreement_agree(
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if (!PtrVector_hasPtr(&self->keyObjects, pubKey))
-    {
-        return OS_ERROR_INVALID_HANDLE;
-    }
-
-    return !PtrVector_hasPtr(&self->agreementObjects, agrObj) ?
-           OS_ERROR_INVALID_HANDLE :
-           CryptoLibAgreement_agree(agrObj, self->rng, pubKey, shared,
-                                    sharedSize);
+    return CryptoLibAgreement_agree(agrObj, self->rng, pubKey, shared, sharedSize);
 }
 
 // -------------------------------- Key API ------------------------------------
@@ -552,7 +391,6 @@ Key_generate(
     CryptoLibKey_t**           pKeyObj,
     const OS_CryptoKey_Spec_t* spec)
 {
-    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pKeyObj)
@@ -560,23 +398,7 @@ Key_generate(
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((err = CryptoLibKey_generate(pKeyObj, spec, &self->memory,
-                                     self->rng)) != OS_SUCCESS)
-    {
-        return err;
-    }
-
-    if ((err = PtrVector_add(&self->keyObjects, *pKeyObj)) != OS_SUCCESS)
-    {
-        goto err0;
-    }
-
-    return OS_SUCCESS;
-
-err0:
-    CryptoLibKey_free(*pKeyObj, &self->memory);
-
-    return err;
+    return CryptoLibKey_generate(pKeyObj, spec, &self->memory, self->rng);
 }
 
 static OS_Error_t
@@ -585,7 +407,6 @@ Key_import(
     CryptoLibKey_t**           pKeyObj,
     const OS_CryptoKey_Data_t* keyData)
 {
-    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pKeyObj)
@@ -593,23 +414,7 @@ Key_import(
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    if ((err = CryptoLibKey_import(pKeyObj, keyData,
-                                   &self->memory)) != OS_SUCCESS)
-    {
-        return err;
-    }
-
-    if ((err = PtrVector_add(&self->keyObjects, *pKeyObj)) != OS_SUCCESS)
-    {
-        goto err0;
-    }
-
-    return OS_SUCCESS;
-
-err0:
-    CryptoLibKey_free(*pKeyObj, &self->memory);
-
-    return err;
+    return CryptoLibKey_import(pKeyObj, keyData, &self->memory);
 }
 
 static OS_Error_t
@@ -619,7 +424,6 @@ Key_makePublic(
     const CryptoLibKey_t*        prvKeyObj,
     const OS_CryptoKey_Attrib_t* attribs)
 {
-    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pPubKeyObj)
@@ -627,28 +431,7 @@ Key_makePublic(
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    if (!PtrVector_hasPtr(&self->keyObjects, prvKeyObj))
-    {
-        return OS_ERROR_INVALID_HANDLE;
-    }
-
-    if ((err = CryptoLibKey_makePublic(pPubKeyObj, prvKeyObj, attribs,
-                                       &self->memory)) != OS_SUCCESS)
-    {
-        return err;
-    }
-
-    if ((err = PtrVector_add(&self->keyObjects, *pPubKeyObj)) != OS_SUCCESS)
-    {
-        goto err0;
-    }
-
-    return OS_SUCCESS;
-
-err0:
-    CryptoLibKey_free(*pPubKeyObj, &self->memory);
-
-    return err;
+    return CryptoLibKey_makePublic(pPubKeyObj, prvKeyObj, attribs, &self->memory);
 }
 
 static OS_Error_t
@@ -663,13 +446,6 @@ Key_free(
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    if (!PtrVector_hasPtr(&self->keyObjects, keyObj))
-    {
-        return OS_ERROR_INVALID_HANDLE;
-    }
-
-    PtrVector_remove(&self->keyObjects, keyObj);
-
     return CryptoLibKey_free(keyObj, &self->memory);
 }
 
@@ -679,16 +455,12 @@ Key_export(
     const CryptoLibKey_t* keyObj,
     OS_CryptoKey_Data_t*  keyData)
 {
-    CryptoLib_t* self = (CryptoLib_t*) ctx;
-
     if (NULL == ctx)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    return !PtrVector_hasPtr(&self->keyObjects, keyObj) ?
-           OS_ERROR_INVALID_HANDLE :
-           CryptoLibKey_export(keyObj, keyData);
+    return CryptoLibKey_export(keyObj, keyData);
 }
 
 static OS_Error_t
@@ -698,8 +470,6 @@ Key_getParams(
     void*                 keyParams,
     size_t*               paramSize)
 {
-    CryptoLib_t* self = (CryptoLib_t*) ctx;
-
     if (NULL == ctx || NULL == paramSize)
     {
         return OS_ERROR_INVALID_PARAMETER;
@@ -709,9 +479,7 @@ Key_getParams(
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return !PtrVector_hasPtr(&self->keyObjects, keyObj) ?
-           OS_ERROR_INVALID_HANDLE :
-           CryptoLibKey_getParams(keyObj, keyParams, paramSize);
+    return CryptoLibKey_getParams(keyObj, keyParams, paramSize);
 }
 
 static OS_Error_t
@@ -720,16 +488,12 @@ Key_getAttribs(
     const CryptoLibKey_t*  keyObj,
     OS_CryptoKey_Attrib_t* attribs)
 {
-    CryptoLib_t* self = (CryptoLib_t*) ctx;
-
     if (NULL == ctx || NULL == attribs)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    return !PtrVector_hasPtr(&self->keyObjects, keyObj) ?
-           OS_ERROR_INVALID_HANDLE :
-           CryptoLibKey_getAttribs(keyObj, attribs);
+    return CryptoLibKey_getAttribs(keyObj, attribs);
 }
 
 static OS_Error_t
@@ -762,7 +526,6 @@ Cipher_init(
     const void*                 iv,
     const size_t                ivSize)
 {
-    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
     if (NULL == ctx || NULL == pCipherObj)
@@ -774,28 +537,9 @@ Cipher_init(
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    if (!PtrVector_hasPtr(&self->keyObjects, key))
-    {
-        return OS_ERROR_INVALID_HANDLE;
-    }
+    return CryptoLibCipher_init(pCipherObj, key, algorithm, iv, ivSize,
+                                &self->memory);
 
-    if ((err = CryptoLibCipher_init(pCipherObj, key, algorithm, iv, ivSize,
-                                    &self->memory)) != OS_SUCCESS)
-    {
-        return err;
-    }
-
-    if ((err = PtrVector_add(&self->cipherObjects, *pCipherObj)) != OS_SUCCESS)
-    {
-        goto err0;
-    }
-
-    return OS_SUCCESS;
-
-err0:
-    CryptoLibCipher_free(*pCipherObj, &self->memory);
-
-    return err;
 }
 
 static OS_Error_t
@@ -809,13 +553,6 @@ Cipher_free(
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
-
-    if (!PtrVector_hasPtr(&self->cipherObjects, cipherObj))
-    {
-        return OS_ERROR_INVALID_HANDLE;
-    }
-
-    PtrVector_remove(&self->cipherObjects, cipherObj);
 
     return CryptoLibCipher_free(cipherObj, &self->memory);
 }
@@ -843,9 +580,7 @@ Cipher_process(
 
     // Make local copy of input buffer, to allow overlapping input/output buffers
     memcpy(self->buffer, input, inputSize);
-    return !PtrVector_hasPtr(&self->cipherObjects, cipherObj) ?
-           OS_ERROR_INVALID_HANDLE :
-           CryptoLibCipher_process(cipherObj, self->buffer, inputSize, output,
+    return CryptoLibCipher_process(cipherObj, self->buffer, inputSize, output,
                                    outputSize);
 }
 
@@ -856,8 +591,6 @@ Cipher_start(
     const void*        ad,
     const size_t       adSize)
 {
-    CryptoLib_t* self = (CryptoLib_t*) ctx;
-
     if (NULL == ctx)
     {
         return OS_ERROR_INVALID_PARAMETER;
@@ -867,9 +600,7 @@ Cipher_start(
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return !PtrVector_hasPtr(&self->cipherObjects, cipherObj) ?
-           OS_ERROR_INVALID_HANDLE :
-           CryptoLibCipher_start(cipherObj, ad, adSize);
+    return CryptoLibCipher_start(cipherObj, ad, adSize);
 }
 
 static OS_Error_t
@@ -879,8 +610,6 @@ Cipher_finalize(
     void*              output,
     size_t*            outputSize)
 {
-    CryptoLib_t* self = (CryptoLib_t*) ctx;
-
     if (NULL == ctx || NULL == outputSize)
     {
         return OS_ERROR_INVALID_PARAMETER;
@@ -890,9 +619,7 @@ Cipher_finalize(
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    return !PtrVector_hasPtr(&self->cipherObjects, cipherObj) ?
-           OS_ERROR_INVALID_HANDLE :
-           CryptoLibCipher_finalize(cipherObj, output, outputSize);
+    return CryptoLibCipher_finalize(cipherObj, output, outputSize);
 }
 
 // ------------------------------- init/free -----------------------------------
@@ -964,51 +691,14 @@ CryptoLib_init(
     impl->vtable  = &CryptoLib_vtable;
     self->memory  = *memory;
 
-    if ((err = PtrVector_init(&self->digestObjects)) != OS_SUCCESS)
-    {
-        goto err0;
-    }
-    else if ((err = PtrVector_init(&self->macObjects)) != OS_SUCCESS)
-    {
-        goto err1;
-    }
-    else if ((err = PtrVector_init(&self->keyObjects)) != OS_SUCCESS)
-    {
-        goto err2;
-    }
-    else if ((err = PtrVector_init(&self->cipherObjects) != OS_SUCCESS))
-    {
-        goto err3;
-    }
-    else if ((err = PtrVector_init(&self->signatureObjects) != OS_SUCCESS))
-    {
-        goto err4;
-    }
-    else if ((err = PtrVector_init(&self->agreementObjects) != OS_SUCCESS))
-    {
-        goto err5;
-    }
-
     if ((err = CryptoLibRng_init(&self->rng, entropy, &self->memory)) != OS_SUCCESS)
     {
-        goto err6;
+        goto err;
     }
 
     return OS_SUCCESS;
 
-err6:
-    PtrVector_free(&self->agreementObjects);
-err5:
-    PtrVector_free(&self->signatureObjects);
-err4:
-    PtrVector_free(&self->cipherObjects);
-err3:
-    PtrVector_free(&self->keyObjects);
-err2:
-    PtrVector_free(&self->macObjects);
-err1:
-    PtrVector_free(&self->digestObjects);
-err0:
+err:
     memory->free(self);
 
     return err;
@@ -1024,13 +714,6 @@ CryptoLib_free(
     }
 
     CryptoLibRng_free(self->rng, &self->memory);
-
-    PtrVector_free(&self->agreementObjects);
-    PtrVector_free(&self->signatureObjects);
-    PtrVector_free(&self->cipherObjects);
-    PtrVector_free(&self->keyObjects);
-    PtrVector_free(&self->macObjects);
-    PtrVector_free(&self->digestObjects);
 
     self->memory.free(self);
 
