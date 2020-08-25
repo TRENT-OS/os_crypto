@@ -27,33 +27,36 @@
 
 // Allocate proxy object from crypto handle and set its impl according to
 // the c flag
-#define PROXY_INIT(p, s, c)                                                 \
-    if (NULL == &(p) || NULL == (s)) {                                      \
-        return OS_ERROR_INVALID_HANDLE;                                     \
-    }                                                                       \
-    if(((p) = s->memory.calloc(1, sizeof(OS_Crypto_Object_t))) == NULL) {   \
-        return OS_ERROR_INSUFFICIENT_SPACE;                                 \
-    }                                                                       \
-    (p)->parent = (s);                                                      \
-    (p)->impl   = (c) ? &(s)->client : &(s)->library;
+#define PROXY_INIT(p, s, c) do {                                                \
+        if (NULL == &(p) || NULL == (s)) {                                      \
+            return OS_ERROR_INVALID_HANDLE;                                     \
+        }                                                                       \
+        if(((p) = s->memory.calloc(1, sizeof(OS_Crypto_Object_t))) == NULL) {   \
+            return OS_ERROR_INSUFFICIENT_SPACE;                                 \
+        }                                                                       \
+        (p)->parent = (s);                                                      \
+        (p)->impl   = (c) ? &(s)->client : &(s)->library;                       \
+    } while(0)
 
 // Allocate proxy object from key proxy and simply copy the impl
-#define PROXY_INIT_FROM_KEY(p, k)                                                   \
-    if (NULL == &(p) || NULL == (k)) {                                              \
-        return OS_ERROR_INVALID_HANDLE;                                             \
-    }                                                                               \
-    if(((p) = k->parent->memory.calloc(1, sizeof(OS_Crypto_Object_t))) == NULL) {   \
-        return OS_ERROR_INSUFFICIENT_SPACE;                                         \
-    }                                                                               \
-    (p)->parent = (k)->parent;                                                      \
-    (p)->impl   = (k)->impl;
+#define PROXY_INIT_FROM_KEY(p, k) do {                                                  \
+        if (NULL == &(p) || NULL == (k)) {                                              \
+            return OS_ERROR_INVALID_HANDLE;                                             \
+        }                                                                               \
+        if(((p) = k->parent->memory.calloc(1, sizeof(OS_Crypto_Object_t))) == NULL) {   \
+            return OS_ERROR_INSUFFICIENT_SPACE;                                         \
+        }                                                                               \
+        (p)->parent = (k)->parent;                                                      \
+        (p)->impl   = (k)->impl;                                                        \
+    } while(0)
 
 // Free proxy object with associated API context's mem IF
-#define PROXY_FREE(p)                           \
-    if (NULL == (p)) {                          \
-        return OS_ERROR_INVALID_HANDLE;         \
-    }                                           \
-    (p)->parent->memory.free(p);
+#define PROXY_FREE(p) do {                      \
+        if (NULL == (p)) {                      \
+            return OS_ERROR_INVALID_HANDLE;     \
+        }                                       \
+        (p)->parent->memory.free(p);            \
+    } while(0)
 
 // Call function from proxy objects API handle
 #define PROXY_CALL(p, f, ...)                       \
