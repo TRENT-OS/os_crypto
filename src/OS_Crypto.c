@@ -10,6 +10,73 @@
 
 #include <stdlib.h>
 
+// Private functions -----------------------------------------------------------
+static inline OS_Error_t
+initImpl(
+    OS_Crypto_t* ctx,
+    const OS_Crypto_Config_t* cfg)
+{
+    OS_Error_t err = OS_ERROR_GENERIC;
+    // We always need a library instance; unless we want to force the API to
+    // delegate everything to the server
+    if (cfg->mode != OS_Crypto_MODE_CLIENT_ONLY)
+    {
+        if ((err = CryptoLib_init(&ctx->library,
+                                  &ctx->memory,
+                                  &cfg->entropy)) != OS_SUCCESS)
+        {
+            return err;
+        }
+    }
+
+    switch (cfg->mode)
+    {
+    case  OS_Crypto_MODE_LIBRARY_ONLY:
+        // This is already set up.
+        break;
+    case OS_Crypto_MODE_CLIENT_ONLY:
+    case OS_Crypto_MODE_CLIENT:
+        if ((err = CryptoLibClient_init(&ctx->client,
+                                        &ctx->memory,
+                                        &cfg->crypto)) != OS_SUCCESS)
+        {
+            goto err;
+        }
+        break;
+    default:
+        err = OS_ERROR_NOT_SUPPORTED;
+        goto err;
+    }
+
+    return OS_SUCCESS;
+
+err:
+    if (cfg->mode != OS_Crypto_MODE_CLIENT_ONLY)
+    {
+        CryptoLib_free(ctx->library.context);
+    }
+    return err;
+}
+
+static inline bool
+isInitParametersOk(
+    OS_Crypto_Handle_t*       self,
+    const OS_Crypto_Config_t* cfg)
+{
+    if (NULL == self || NULL == cfg)
+    {
+        return false;
+    }
+
+    // either no memory handler is set or both handlers must be set
+    if ((NULL == cfg->memory.calloc && NULL != cfg->memory.free) ||
+        (NULL != cfg->memory.calloc && NULL == cfg->memory.free))
+    {
+        return false;
+    }
+    return true;
+}
+
 // Public functions ------------------------------------------------------------
 
 OS_Error_t
@@ -20,12 +87,7 @@ OS_Crypto_init(
     OS_Error_t err;
     OS_Crypto_t* ctx;
 
-    if (NULL == self || NULL == cfg)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    if ((NULL == cfg->memory.calloc && NULL != cfg->memory.free) ||
-        (NULL != cfg->memory.calloc && NULL == cfg->memory.free))
+    if (!isInitParametersOk(self, cfg))
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
@@ -52,47 +114,15 @@ OS_Crypto_init(
     ctx->memory.free = (cfg->memory.free == NULL) ?
                        free : cfg->memory.free;
 
-    // We always need a library instance; unless we want to force the API to
-    // delegate everything to the server
-    if (cfg->mode != OS_Crypto_MODE_CLIENT_ONLY)
+    err = initImpl(ctx, cfg);
+    if (err != OS_SUCCESS)
     {
-        if ((err = CryptoLib_init(&ctx->library,
-                                  &ctx->memory,
-                                  &cfg->entropy)) != OS_SUCCESS)
-        {
-            goto err0;
-        }
-    }
-
-    switch (cfg->mode)
-    {
-    case  OS_Crypto_MODE_LIBRARY_ONLY:
-        // This is already set up.
-        break;
-    case OS_Crypto_MODE_CLIENT_ONLY:
-    case OS_Crypto_MODE_CLIENT:
-        if ((err = CryptoLibClient_init(&ctx->client,
-                                        &ctx->memory,
-                                        &cfg->crypto)) != OS_SUCCESS)
-        {
-            goto err1;
-        }
-        break;
-    default:
-        err = OS_ERROR_NOT_SUPPORTED;
-        goto err1;
+        goto err;
     }
 
     return OS_SUCCESS;
-
-err1:
-    if (cfg->mode != OS_Crypto_MODE_CLIENT_ONLY)
-    {
-        CryptoLib_free(ctx->library.context);
-    }
-err0:
+err:
     ctx->memory.free(ctx);
-
     return err;
 }
 
