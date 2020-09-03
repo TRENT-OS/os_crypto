@@ -337,7 +337,34 @@ cmemcmp(
     return ((int)diff);
 }
 
-static OS_Error_t
+static inline OS_Error_t
+finalizeImpl_ALG_AES_GCM_DEC(
+    CryptoLibCipher_t* self,
+    void*              buf,
+    size_t*            bufSize)
+{
+    unsigned char check[OS_CryptoCipher_SIZE_AES_GCM_TAG_MAX];
+    // Recompute the tag and compare it; bufSize is used here as INPUT param,
+    // so we can compare at least TAG_SIZE bytes, but it can also be less
+    return ((*bufSize > OS_CryptoCipher_SIZE_AES_GCM_TAG_MAX) ||
+            !self->started || !self->processed || self->finalized ||
+            mbedtls_gcm_finish(&self->mbedtls.gcm, check, *bufSize) != 0 ||
+            cmemcmp(buf, check, *bufSize) != 0)
+           ? OS_ERROR_ABORTED : OS_SUCCESS;
+}
+
+static inline OS_Error_t
+finalizeImpl_ALG_AES_GCM_ENC(
+    CryptoLibCipher_t* self,
+    void*              buf,
+    size_t*            bufSize)
+{
+    return (!self->started || !self->processed || self->finalized ||
+            mbedtls_gcm_finish(&self->mbedtls.gcm, buf, *bufSize) != 0)
+           ? OS_ERROR_ABORTED : OS_SUCCESS;
+}
+
+static inline OS_Error_t
 finalizeImpl(
     CryptoLibCipher_t* self,
     void*              buf,
@@ -349,19 +376,11 @@ finalizeImpl(
     {
     case OS_CryptoCipher_ALG_AES_GCM_DEC:
     {
-        unsigned char check[OS_CryptoCipher_SIZE_AES_GCM_TAG_MAX];
-
         if (*bufSize < OS_CryptoCipher_SIZE_AES_GCM_TAG_MIN)
         {
             return OS_ERROR_INVALID_PARAMETER;
         }
-        // Recompute the tag and compare it; bufSize is used here as INPUT param,
-        // so we can compare at least TAG_SIZE bytes, but it can also be less
-        err = (*bufSize > OS_CryptoCipher_SIZE_AES_GCM_TAG_MAX) ||
-              !self->started || !self->processed || self->finalized ||
-              mbedtls_gcm_finish(&self->mbedtls.gcm, check, *bufSize) != 0 ||
-              cmemcmp(buf, check, *bufSize) != 0 ?
-              OS_ERROR_ABORTED : OS_SUCCESS;
+        err = finalizeImpl_ALG_AES_GCM_DEC(self, buf, bufSize);
         break;
     }
     case OS_CryptoCipher_ALG_AES_GCM_ENC:
@@ -376,9 +395,7 @@ finalizeImpl(
         // size of which is determined by the AES blocksize
         *bufSize = (*bufSize > OS_CryptoCipher_SIZE_AES_BLOCK) ?
                    OS_CryptoCipher_SIZE_AES_BLOCK : *bufSize;
-        err = !self->started || !self->processed || self->finalized ||
-              mbedtls_gcm_finish(&self->mbedtls.gcm, buf, *bufSize) != 0 ?
-              OS_ERROR_ABORTED : OS_SUCCESS;
+        err = finalizeImpl_ALG_AES_GCM_ENC(self, buf, bufSize);
         break;
     }
     default:
