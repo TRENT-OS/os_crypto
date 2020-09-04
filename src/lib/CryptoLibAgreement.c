@@ -120,6 +120,10 @@ setKeyImpl(
     return err;
 }
 
+// This function muxes a selection with a big switch-case construct. Those
+// kind of functions, when decomposed, often result in a less readable code.
+// Therefore we suppress the cyclomatic complexity analysis for this function.
+// metrix++: suppress std.code.complexity:cyclomatic
 static OS_Error_t
 agreeImpl(
     CryptoLibAgreement_t* self,

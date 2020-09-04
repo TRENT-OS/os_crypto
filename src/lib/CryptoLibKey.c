@@ -421,7 +421,10 @@ exit:
 }
 
 // -----------------------------------------------------------------------------
-
+// This function muxes a selection with a big switch-case construct. Those
+// kind of functions, when decomposed, often result in a less readable code.
+// Therefore we suppress the cyclomatic complexity analysis for this function.
+// metrix++: suppress std.code.complexity:cyclomatic
 static OS_Error_t
 initImpl(
     CryptoLibKey_t**             self,
@@ -485,6 +488,10 @@ initImpl(
     return err;
 }
 
+// This function muxes a selection with a big switch-case construct. Those
+// kind of functions, when decomposed, often result in a less readable code.
+// Therefore we suppress the cyclomatic complexity analysis for this function.
+// metrix++: suppress std.code.complexity:cyclomatic
 static OS_Error_t
 generateImpl(
     CryptoLibKey_t*            self,
@@ -594,6 +601,10 @@ makeImpl(
     }
 }
 
+// This function muxes a selection with a big switch-case construct. Those
+// kind of functions, when decomposed, often result in a less readable code.
+// Therefore we suppress the cyclomatic complexity analysis for this function.
+// metrix++: suppress std.code.complexity:cyclomatic
 static OS_Error_t
 importImpl(
     CryptoLibKey_t*            self,

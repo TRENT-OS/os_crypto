@@ -113,6 +113,10 @@ freeImpl(
     return err;
 }
 
+// This function muxes a selection with a big switch-case construct. Those
+// kind of functions, when decomposed, often result in a less readable code.
+// Therefore we suppress the cyclomatic complexity analysis for this function.
+// metrix++: suppress std.code.complexity:cyclomatic
 static OS_Error_t
 setKeyImpl(
     CryptoLibCipher_t* self)
@@ -166,6 +170,10 @@ setKeyImpl(
     return err;
 }
 
+// This function muxes a selection with a big switch-case construct. Those
+// kind of functions, when decomposed, often result in a less readable code.
+// Therefore we suppress the cyclomatic complexity analysis for this function.
+// metrix++: suppress std.code.complexity:cyclomatic
 static OS_Error_t
 setIvImpl(
     CryptoLibCipher_t* self,
@@ -205,6 +213,10 @@ setIvImpl(
     return err;
 }
 
+// This function muxes a selection with a big switch-case construct. Those
+// kind of functions, when decomposed, often result in a less readable code.
+// Therefore we suppress the cyclomatic complexity analysis for this function.
+// metrix++: suppress std.code.complexity:cyclomatic
 static OS_Error_t
 processImpl(
     CryptoLibCipher_t* self,
