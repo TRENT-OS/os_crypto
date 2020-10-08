@@ -93,9 +93,9 @@ cleanup:
 
 static OS_Error_t
 generate_DHParams(
-    CryptoLibRng_t*          rng,
     const size_t             bits,
-    OS_CryptoKey_DhParams_t* params)
+    OS_CryptoKey_DhParams_t* params,
+    CryptoLibRng_t*          rng)
 {
     OS_Error_t err = OS_ERROR_GENERIC;
     mbedtls_mpi Q, T, G, P;
@@ -279,8 +279,8 @@ exit:
 static OS_Error_t
 generate_RsaPrv(
     OS_CryptoKey_RsaRrv_t* key,
-    CryptoLibRng_t*        rng,
-    const size_t           bits)
+    const size_t           bits,
+    CryptoLibRng_t*        rng)
 {
     OS_Error_t err = OS_ERROR_GENERIC;
     mbedtls_rsa_context rsa;
@@ -495,8 +495,8 @@ initImpl(
 static OS_Error_t
 generateImpl(
     CryptoLibKey_t*            self,
-    CryptoLibRng_t*            rng,
-    const OS_CryptoKey_Spec_t* spec)
+    const OS_CryptoKey_Spec_t* spec,
+    CryptoLibRng_t*            rng)
 {
     OS_Error_t err = OS_ERROR_GENERIC;
 
@@ -535,7 +535,7 @@ generateImpl(
         {
             return OS_ERROR_NOT_SUPPORTED;
         }
-        return generate_RsaPrv(self->data, rng, spec->key.params.bits);
+        return generate_RsaPrv(self->data, spec->key.params.bits, rng);
 
     case OS_CryptoKey_TYPE_SECP256R1_PRV:
         // We can ignore all of the spec params, because the keytype defines
@@ -570,7 +570,7 @@ generateImpl(
         }
         else
         {
-            err = generate_DHParams(rng, bits, &key->params);
+            err = generate_DHParams(bits, &key->params, rng);
         }
         return (err == OS_SUCCESS) ?
                generate_DHPrv(key, rng) : err;
@@ -865,7 +865,7 @@ CryptoLibKey_generate(
     if ((err = initImpl(self, spec->key.type, &spec->key.attribs,
                         memory)) == OS_SUCCESS)
     {
-        if ((err = generateImpl(*self, rng, spec)) != OS_SUCCESS)
+        if ((err = generateImpl(*self, spec, rng)) != OS_SUCCESS)
         {
             freeImpl(*self, memory);
         }
