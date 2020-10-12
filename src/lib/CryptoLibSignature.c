@@ -160,7 +160,6 @@ verifyHashImpl(
     const size_t          signatureSize,
     CryptoLibRng_t*       rng)
 {
-    void* rngFunc = (NULL != rng) ? CryptoLibRng_getBytesMbedtls : NULL;
     OS_Error_t err = OS_ERROR_GENERIC;
 
     switch (self->algorithm)
@@ -174,7 +173,8 @@ verifyHashImpl(
         else
         {
             // digest is matched to mbedTLS constants
-            err = mbedtls_rsa_pkcs1_verify(&self->mbedtls.rsa, rngFunc, rng,
+            err = mbedtls_rsa_pkcs1_verify(&self->mbedtls.rsa,
+                                           CryptoLibRng_getBytesMbedtls, rng,
                                            MBEDTLS_RSA_PUBLIC, self->digest, hashSize,
                                            hash, signature) != 0 ?
                   OS_ERROR_ABORTED : OS_SUCCESS;
@@ -196,7 +196,6 @@ signHashImpl(
     size_t*               signatureSize,
     CryptoLibRng_t*       rng)
 {
-    void* rngFunc = (NULL != rng) ? CryptoLibRng_getBytesMbedtls : NULL;
     OS_Error_t err = OS_ERROR_GENERIC;
 
     switch (self->algorithm)
@@ -210,7 +209,8 @@ signHashImpl(
         else
         {
             // digest is matched to mbedTLS constants
-            err = mbedtls_rsa_pkcs1_sign(&self->mbedtls.rsa, rngFunc, rng,
+            err = mbedtls_rsa_pkcs1_sign(&self->mbedtls.rsa,
+                                         CryptoLibRng_getBytesMbedtls, rng,
                                          MBEDTLS_RSA_PRIVATE, self->digest, hashSize,
                                          hash, signature) != 0 ?
                   OS_ERROR_ABORTED : OS_SUCCESS;
@@ -279,7 +279,7 @@ CryptoLibSignature_sign(
     CryptoLibRng_t*       rng)
 {
     if (NULL == self || NULL == hash || 0 == hashSize || NULL == signature
-        || NULL == signatureSize)
+        || NULL == signatureSize || NULL == rng)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
@@ -299,7 +299,7 @@ CryptoLibSignature_verify(
     CryptoLibRng_t*       rng)
 {
     if (NULL == self || NULL == hash || 0 == hashSize || NULL == signature
-        || 0 == signatureSize)
+        || 0 == signatureSize || NULL == rng)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
