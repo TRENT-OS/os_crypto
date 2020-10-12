@@ -132,7 +132,6 @@ agreeImpl(
     size_t*               bufSize,
     CryptoLibRng_t*       rng)
 {
-    void* rngFunc = (NULL != rng) ? CryptoLibRng_getBytesMbedtls : NULL;
     OS_Error_t err = OS_ERROR_GENERIC;
 
     switch (self->algorithm)
@@ -151,7 +150,7 @@ agreeImpl(
         else
         {
             err = mbedtls_dhm_calc_secret(&self->mbedtls.dh, buf, *bufSize, bufSize,
-                                          rngFunc, rng) != 0 ?
+                                          CryptoLibRng_getBytesMbedtls, rng) != 0 ?
                   OS_ERROR_ABORTED : OS_SUCCESS;
         }
         break;
@@ -170,7 +169,7 @@ agreeImpl(
         else
         {
             err = mbedtls_ecdh_calc_secret(&self->mbedtls.ecdh, bufSize, buf, *bufSize,
-                                           rngFunc, rng) != 0 ?
+                                           CryptoLibRng_getBytesMbedtls, rng) != 0 ?
                   OS_ERROR_ABORTED : OS_SUCCESS;
         }
         break;
@@ -229,7 +228,8 @@ CryptoLibAgreement_agree(
     size_t*               sharedSize,
     CryptoLibRng_t*       rng)
 {
-    if (NULL == self || NULL == pubKey || NULL == shared || NULL == sharedSize)
+    if (NULL == self || NULL == pubKey || NULL == shared || NULL == sharedSize
+        || NULL == rng)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
