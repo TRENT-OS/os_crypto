@@ -33,7 +33,8 @@ CryptoLibKey_makePublic(
     CryptoLibKey_t**             self,
     const CryptoLibKey_t*        prvKey,
     const OS_CryptoKey_Attrib_t* attribs,
-    const OS_Crypto_Memory_t*    memory);
+    const OS_Crypto_Memory_t*    memory,
+    CryptoLibRng_t*              rng);
 
 OS_Error_t
 CryptoLibKey_import(

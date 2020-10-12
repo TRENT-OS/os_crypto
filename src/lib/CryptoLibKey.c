@@ -353,7 +353,8 @@ exit:
 static OS_Error_t
 make_SECP256r1Pub(
     OS_CryptoKey_Secp256r1Pub_t*       pubKey,
-    const OS_CryptoKey_Secp256r1Prv_t* prvKey)
+    const OS_CryptoKey_Secp256r1Prv_t* prvKey,
+    CryptoLibRng_t*                    rng)
 {
     OS_Error_t err;
     mbedtls_ecp_group grp;
@@ -370,7 +371,7 @@ make_SECP256r1Pub(
         goto exit;
     }
     if (mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1) != 0 ||
-        mbedtls_ecp_mul(&grp, &Q, &d, &grp.G, NULL, NULL) != 0)
+        mbedtls_ecp_mul(&grp, &Q, &d, &grp.G, CryptoLibRng_getBytesMbedtls, rng) != 0)
     {
         err = OS_ERROR_ABORTED;
         goto exit;
@@ -556,14 +557,15 @@ generateImpl(
 static OS_Error_t
 makeImpl(
     CryptoLibKey_t*       self,
-    const CryptoLibKey_t* prvKey)
+    const CryptoLibKey_t* prvKey,
+    CryptoLibRng_t*       rng)
 {
     switch (self->type)
     {
     case OS_CryptoKey_TYPE_RSA_PUB:
         return make_RsaPub(self->data, prvKey->data);
     case OS_CryptoKey_TYPE_SECP256R1_PUB:
-        return make_SECP256r1Pub(self->data, prvKey->data);
+        return make_SECP256r1Pub(self->data, prvKey->data, rng);
     case OS_CryptoKey_TYPE_DH_PUB:
         return make_DHPub(self->data, prvKey->data);
     default:
@@ -849,12 +851,14 @@ CryptoLibKey_makePublic(
     CryptoLibKey_t**             self,
     const CryptoLibKey_t*        prvKey,
     const OS_CryptoKey_Attrib_t* attribs,
-    const OS_Crypto_Memory_t*    memory)
+    const OS_Crypto_Memory_t*    memory,
+    CryptoLibRng_t*              rng)
 {
     OS_Error_t err = OS_ERROR_GENERIC;
     OS_CryptoKey_Type_t type;
 
-    if (NULL == self || NULL == memory || NULL == prvKey || NULL == attribs)
+    if (NULL == self || NULL == memory || NULL == prvKey || NULL == attribs
+        || NULL == rng)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
@@ -876,7 +880,7 @@ CryptoLibKey_makePublic(
 
     if ((err = initImpl(self, type, attribs, memory)) == OS_SUCCESS)
     {
-        if ((err = makeImpl(*self, prvKey)) != OS_SUCCESS)
+        if ((err = makeImpl(*self, prvKey, rng)) != OS_SUCCESS)
         {
             freeImpl(*self, memory);
         }

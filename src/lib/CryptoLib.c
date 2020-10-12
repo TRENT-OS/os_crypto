@@ -487,7 +487,8 @@ Key_makePublic(
                (CryptoLibKey_t**)pPubKeyObj,
                (CryptoLibKey_t*)prvKeyObj,
                attribs,
-               &self->memory);
+               &self->memory,
+               self->rng);
 }
 
 static OS_Error_t
