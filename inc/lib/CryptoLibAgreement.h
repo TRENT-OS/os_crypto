@@ -27,10 +27,10 @@ CryptoLibAgreement_init(
 OS_Error_t
 CryptoLibAgreement_agree(
     CryptoLibAgreement_t* self,
-    CryptoLibRng_t*       rng,
     const CryptoLibKey_t* pubKey,
     void*                 shared,
-    size_t*               sharedSize);
+    size_t*               sharedSize,
+    CryptoLibRng_t*       rng);
 
 OS_Error_t
 CryptoLibAgreement_free(

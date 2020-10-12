@@ -127,10 +127,10 @@ setKeyImpl(
 static OS_Error_t
 agreeImpl(
     CryptoLibAgreement_t* self,
-    CryptoLibRng_t*       rng,
     const CryptoLibKey_t* pubKey,
     void*                 buf,
-    size_t*               bufSize)
+    size_t*               bufSize,
+    CryptoLibRng_t*       rng)
 {
     void* rngFunc = (NULL != rng) ? CryptoLibRng_getBytesMbedtls : NULL;
     OS_Error_t err = OS_ERROR_GENERIC;
@@ -224,15 +224,15 @@ CryptoLibAgreement_free(
 OS_Error_t
 CryptoLibAgreement_agree(
     CryptoLibAgreement_t* self,
-    CryptoLibRng_t*       rng,
     const CryptoLibKey_t* pubKey,
     void*                 shared,
-    size_t*               sharedSize)
+    size_t*               sharedSize,
+    CryptoLibRng_t*       rng)
 {
     if (NULL == self || NULL == pubKey || NULL == shared || NULL == sharedSize)
     {
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    return agreeImpl(self, rng, pubKey, shared, sharedSize);
+    return agreeImpl(self, pubKey, shared, sharedSize, rng);
 }

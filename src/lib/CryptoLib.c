@@ -422,10 +422,10 @@ Agreement_agree(
 
     return CryptoLibAgreement_agree(
                (CryptoLibAgreement_t*)agrObj,
-               self->rng,
                (CryptoLibKey_t*)pubKey,
                shared,
-               sharedSize);
+               sharedSize,
+               self->rng);
 }
 
 // -------------------------------- Key API ------------------------------------
