@@ -328,7 +328,7 @@ make_RsaPub(
         err = OS_ERROR_INVALID_PARAMETER;
         goto exit;
     }
-    else if (mbedtls_mpi_mul_mpi(&N, &P, &Q) != 0)
+    if (mbedtls_mpi_mul_mpi(&N, &P, &Q) != 0)
     {
         err = OS_ERROR_ABORTED;
         goto exit;
@@ -399,8 +399,8 @@ make_SECP256r1Pub(
         err = OS_ERROR_INVALID_PARAMETER;
         goto exit;
     }
-    else if (mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1) != 0 ||
-             mbedtls_ecp_mul(&grp, &Q, &d, &grp.G, NULL, NULL) != 0)
+    if (mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1) != 0 ||
+        mbedtls_ecp_mul(&grp, &Q, &d, &grp.G, NULL, NULL) != 0)
     {
         err = OS_ERROR_ABORTED;
         goto exit;
