@@ -59,36 +59,6 @@ getMpiLen(
     return n;
 }
 
-// Check if param is within range: 2 < param < P - 2
-static OS_Error_t
-checkMpiRange(
-    const mbedtls_mpi* param,
-    const mbedtls_mpi* P)
-{
-    mbedtls_mpi L, U;
-    int ret = OS_SUCCESS;
-
-    mbedtls_mpi_init(&L);
-    mbedtls_mpi_init(&U);
-
-    if (mbedtls_mpi_lset(&L, 2) != 0 || mbedtls_mpi_sub_int(&U, P, 2) != 0)
-    {
-        ret = OS_ERROR_ABORTED;
-        goto cleanup;
-    }
-
-    if (mbedtls_mpi_cmp_mpi(param, &L) < 0 || mbedtls_mpi_cmp_mpi(param, &U) > 0)
-    {
-        ret = OS_ERROR_INVALID_PARAMETER;
-    }
-
-cleanup:
-    mbedtls_mpi_free(&U);
-    mbedtls_mpi_free(&L);
-
-    return ret;
-}
-
 // -------------------------------- DH Keys ------------------------------------
 
 static OS_Error_t
@@ -197,9 +167,9 @@ generate_DHPrv(
         }
 
         // Check X is in range, generate GX = G^X mod P and check that, too
-        if ((checkMpiRange(&X, &P) != 0) ||
+        if ((dhm_check_range(&X, &P) != 0) ||
             (mbedtls_mpi_exp_mod(&GX, &G, &X, &P, NULL) != 0) ||
-            (checkMpiRange(&GX, &P) != 0))
+            (dhm_check_range(&GX, &P) != 0))
         {
             continue;
         }
@@ -251,9 +221,9 @@ make_DHPub(
     }
 
     // Check X is in range, generate GX = G^X mod P and check that, too
-    if ((checkMpiRange(&X, &P) == 0) &&
+    if ((dhm_check_range(&X, &P) == 0) &&
         (mbedtls_mpi_exp_mod(&GX, &G, &X, &P, NULL) == 0) &&
-        (checkMpiRange(&GX, &P) == 0))
+        (dhm_check_range(&GX, &P) == 0))
     {
         memcpy(&pubKey->params, params, sizeof(OS_CryptoKey_DhParams_t));
         pubKey->gxLen = mbedtls_mpi_size(&GX);
@@ -1051,7 +1021,7 @@ CryptoLibKey_writeDhPub(
            || mbedtls_mpi_read_binary(&dh->G, dhKey->params.gBytes,
                                       dhKey->params.gLen) != 0
            || mbedtls_mpi_read_binary(&dh->GY, dhKey->gxBytes, dhKey->gxLen) != 0
-           || checkMpiRange(&dh->GY, &dh->P) != 0 ?
+           || dhm_check_range(&dh->GY, &dh->P) != 0 ?
            OS_ERROR_INVALID_PARAMETER : OS_SUCCESS;
 }
 
@@ -1066,7 +1036,7 @@ CryptoLibKey_writeDhPrv(
            || mbedtls_mpi_read_binary(&dh->G, dhKey->params.gBytes,
                                       dhKey->params.gLen) != 0
            || mbedtls_mpi_read_binary(&dh->X, dhKey->xBytes, dhKey->xLen) != 0
-           || checkMpiRange(&dh->X, &dh->P) != 0 ?
+           || dhm_check_range(&dh->X, &dh->P) != 0 ?
            OS_ERROR_INVALID_PARAMETER : OS_SUCCESS;
 }
 
