@@ -38,7 +38,7 @@ initImpl(
     case OS_Crypto_MODE_CLIENT:
         if ((err = CryptoLibClient_init(&ctx->client,
                                         &ctx->memory,
-                                        &cfg->crypto)) != OS_SUCCESS)
+                                        &cfg->rpc)) != OS_SUCCESS)
         {
             goto err;
         }
