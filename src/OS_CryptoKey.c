@@ -22,8 +22,8 @@ OS_CryptoKey_generate(
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT_ONLY
-               || (hCrypto->mode == OS_Crypto_MODE_CLIENT &&
+    PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT
+               || (hCrypto->mode == OS_Crypto_MODE_KEY_SWITCH &&
                    !spec->key.attribs.keepLocal));
     if ((err = PROXY_CALL(*self, Key_generate, PROXY_GET_OBJ_PTR(*self),
                           spec)) != OS_SUCCESS)
@@ -51,8 +51,8 @@ OS_CryptoKey_import(
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT_ONLY
-               || (hCrypto->mode == OS_Crypto_MODE_CLIENT &&
+    PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT
+               || (hCrypto->mode == OS_Crypto_MODE_KEY_SWITCH &&
                    !keyData->attribs.keepLocal));
     if ((err = PROXY_CALL(*self, Key_import, PROXY_GET_OBJ_PTR(*self),
                           keyData)) != OS_SUCCESS)
@@ -96,14 +96,14 @@ OS_CryptoKey_makePublic(
      * creating a temporary copy of the src/dst key to execute the makePublic()
      * and then putting it in the correct address space.
      */
-    if (hCrypto->mode == OS_Crypto_MODE_CLIENT &&
+    if (hCrypto->mode == OS_Crypto_MODE_KEY_SWITCH &&
         attribs->keepLocal != srcAttribs.keepLocal)
     {
         return OS_ERROR_NOT_SUPPORTED;
     }
 
-    PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT_ONLY
-               || (hCrypto->mode == OS_Crypto_MODE_CLIENT &&
+    PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT
+               || (hCrypto->mode == OS_Crypto_MODE_KEY_SWITCH &&
                    !attribs->keepLocal));
     if ((err = PROXY_CALL(*self, Key_makePublic, PROXY_GET_OBJ_PTR(*self),
                           PROXY_GET_OBJ(hPrvKey), attribs)) != OS_SUCCESS)

@@ -18,7 +18,7 @@ OS_CryptoDigest_init(
         return OS_ERROR_INVALID_HANDLE;
     }
 
-    PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT_ONLY);
+    PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT);
     if ((err = PROXY_CALL(*self, Digest_init, PROXY_GET_OBJ_PTR(*self),
                           algorithm)) != OS_SUCCESS)
     {
@@ -41,7 +41,7 @@ OS_CryptoDigest_clone(
         return OS_ERROR_INVALID_HANDLE;
     }
 
-    PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT_ONLY);
+    PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT);
     if ((err = PROXY_CALL(*self, Digest_clone, PROXY_GET_OBJ_PTR(*self),
                           PROXY_GET_OBJ(hSrcDigest))) != OS_SUCCESS)
     {

@@ -17,7 +17,7 @@
 #define CALL(s, f, ...)                                                     \
     (NULL == (s)) ?                                                         \
         OS_ERROR_INVALID_HANDLE :                                           \
-        ((s)->mode == OS_Crypto_MODE_CLIENT_ONLY) ?                         \
+        ((s)->mode == OS_Crypto_MODE_CLIENT) ?                              \
             (NULL == (s)->client.vtable->f) ?                               \
                 OS_ERROR_NOT_SUPPORTED :                                    \
                 (s)->client.vtable->f((s)->client.context, __VA_ARGS__) :   \

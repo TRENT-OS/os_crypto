@@ -19,7 +19,7 @@ initImpl(
     OS_Error_t err = OS_ERROR_GENERIC;
     // We always need a library instance; unless we want to force the API to
     // delegate everything to the server
-    if (cfg->mode != OS_Crypto_MODE_CLIENT_ONLY)
+    if (cfg->mode != OS_Crypto_MODE_CLIENT)
     {
         if ((err = CryptoLib_init(&ctx->library,
                                   &ctx->memory,
@@ -31,11 +31,11 @@ initImpl(
 
     switch (cfg->mode)
     {
-    case  OS_Crypto_MODE_LIBRARY_ONLY:
+    case  OS_Crypto_MODE_LIBRARY:
         // This is already set up.
         break;
-    case OS_Crypto_MODE_CLIENT_ONLY:
     case OS_Crypto_MODE_CLIENT:
+    case OS_Crypto_MODE_KEY_SWITCH:
         if ((err = CryptoLibClient_init(&ctx->client,
                                         &ctx->memory,
                                         &cfg->rpc)) != OS_SUCCESS)
@@ -51,7 +51,7 @@ initImpl(
     return OS_SUCCESS;
 
 err:
-    if (cfg->mode != OS_Crypto_MODE_CLIENT_ONLY)
+    if (cfg->mode != OS_Crypto_MODE_CLIENT)
     {
         CryptoLib_free(ctx->library.context);
     }
@@ -137,7 +137,7 @@ OS_Crypto_free(
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    if (self->mode != OS_Crypto_MODE_CLIENT_ONLY)
+    if (self->mode != OS_Crypto_MODE_CLIENT)
     {
         if ((err = CryptoLib_free(self->library.context)) != OS_SUCCESS)
         {
@@ -147,11 +147,11 @@ OS_Crypto_free(
 
     switch (self->mode)
     {
-    case OS_Crypto_MODE_LIBRARY_ONLY:
+    case OS_Crypto_MODE_LIBRARY:
         // Nothing more to do.
         break;
-    case OS_Crypto_MODE_CLIENT_ONLY:
     case OS_Crypto_MODE_CLIENT:
+    case OS_Crypto_MODE_KEY_SWITCH:
         err = CryptoLibClient_free(self->client.context);
         break;
     default:
@@ -190,7 +190,7 @@ OS_Crypto_createProxy(
         return OS_ERROR_INVALID_PARAMETER;
     }
 
-    if (!local && self->mode == OS_Crypto_MODE_LIBRARY_ONLY)
+    if (!local && self->mode == OS_Crypto_MODE_LIBRARY)
     {
         // If it is a remote object, then we can only access it through the
         // RPC client, so "library only" will not work.
