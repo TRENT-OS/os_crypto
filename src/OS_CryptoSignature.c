@@ -23,15 +23,17 @@ OS_CryptoSignature_init(
 
     if (NULL == hPrvKey && NULL == hPubKey)
     {
-        // We should at least have one key
+        Debug_LOG_ERROR("Must at least have non-NULL private or "
+                        "public key");
         return OS_ERROR_INVALID_PARAMETER;
     }
     else if (NULL != hPrvKey && NULL != hPubKey
              && (hPrvKey->impl->context != hPubKey->impl->context
                  || hPrvKey->impl->vtable != hPubKey->impl->vtable))
     {
-        // If we have two keys, we need to make sure that they are both associated
-        // with the same LIB instance
+        Debug_LOG_ERROR("Given keys are not managed by the same library "
+                        "instance, this may be because one is local and "
+                        "the other in a remote component");
         return OS_ERROR_INVALID_PARAMETER;
     }
 

@@ -51,11 +51,12 @@ OS_CryptoAgreement_agree(
     CHECK_PTR_NOT_NULL(self);
     CHECK_PTR_NOT_NULL(hPubKey);
 
-    // Make sure public key is where the agreement object is by checking that
-    // they are either both local or both in the client instance
     if (self->impl->context != hPubKey->impl->context
         || self->impl->vtable != hPubKey->impl->vtable)
     {
+        Debug_LOG_ERROR("Given keys are not managed by the same library "
+                        "instance, this may be because one is local and "
+                        "the other in a remote component");
         return OS_ERROR_INVALID_PARAMETER;
     }
 

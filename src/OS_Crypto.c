@@ -72,6 +72,8 @@ isInitParametersOk(
     if ((NULL == cfg->memory.calloc && NULL != cfg->memory.free) ||
         (NULL != cfg->memory.calloc && NULL == cfg->memory.free))
     {
+        Debug_LOG_ERROR("Cannot have only one of calloc/free set and the "
+                        "other NULL");
         return OS_ERROR_INVALID_PARAMETER;
     }
 
@@ -184,8 +186,9 @@ OS_Crypto_createProxy(
 
     if (!local && self->mode == OS_Crypto_MODE_LIBRARY)
     {
-        // If it is a remote object, then we can only access it through the
-        // RPC client, so "library only" will not work.
+        Debug_LOG_ERROR("Cannot create a remote proxy object, when library "
+                        "instance is configured in OS_Crypto_MODE_LIBRARY "
+                        "mode");
         return OS_ERROR_INVALID_STATE;
     }
 
