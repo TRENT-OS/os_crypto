@@ -24,7 +24,7 @@ OS_CryptoSignature_init(
     if (NULL == hPrvKey && NULL == hPubKey)
     {
         // We should at least have one key
-        return OS_ERROR_INVALID_HANDLE;
+        return OS_ERROR_INVALID_PARAMETER;
     }
     else if (NULL != hPrvKey && NULL != hPubKey
              && (hPrvKey->impl->context != hPubKey->impl->context
@@ -32,7 +32,7 @@ OS_CryptoSignature_init(
     {
         // If we have two keys, we need to make sure that they are both associated
         // with the same LIB instance
-        return OS_ERROR_INVALID_HANDLE;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     key = (hPubKey != NULL) ? hPubKey : hPrvKey;

@@ -56,7 +56,7 @@ OS_CryptoAgreement_agree(
     if (self->impl->context != hPubKey->impl->context
         || self->impl->vtable != hPubKey->impl->vtable)
     {
-        return OS_ERROR_INVALID_HANDLE;
+        return OS_ERROR_INVALID_PARAMETER;
     }
 
     return PROXY_CALL(self, Agreement_agree, PROXY_GET_OBJ(self),
