@@ -15,6 +15,7 @@ OS_CryptoKey_generate(
 {
     OS_Error_t err;
 
+    CHECK_PTR_NOT_NULL(self);
     CHECK_PTR_NOT_NULL(hCrypto);
     CHECK_PTR_NOT_NULL(spec);
 
@@ -38,6 +39,7 @@ OS_CryptoKey_import(
 {
     OS_Error_t err;
 
+    CHECK_PTR_NOT_NULL(self);
     CHECK_PTR_NOT_NULL(hCrypto);
     CHECK_PTR_NOT_NULL(keyData);
 
@@ -63,6 +65,7 @@ OS_CryptoKey_makePublic(
     OS_CryptoKey_Attrib_t srcAttribs;
     OS_Error_t err;
 
+    CHECK_PTR_NOT_NULL(self);
     CHECK_PTR_NOT_NULL(hCrypto);
     CHECK_PTR_NOT_NULL(hPrvKey);
     CHECK_PTR_NOT_NULL(attribs);
@@ -103,6 +106,8 @@ OS_Error_t
 OS_CryptoKey_free(
     OS_CryptoKey_Handle_t self)
 {
+    CHECK_PTR_NOT_NULL(self);
+
     return PROXY_CALL(self, Key_free, PROXY_GET_OBJ(self));
 }
 
@@ -111,6 +116,8 @@ OS_CryptoKey_export(
     const OS_CryptoKey_Handle_t self,
     OS_CryptoKey_Data_t*        keyData)
 {
+    CHECK_PTR_NOT_NULL(self);
+
     return PROXY_CALL(self, Key_export, PROXY_GET_OBJ(self), keyData);
 }
 
@@ -120,6 +127,8 @@ OS_CryptoKey_getParams(
     void*                       keyParams,
     size_t*                     paramSize)
 {
+    CHECK_PTR_NOT_NULL(self);
+
     return PROXY_CALL(self, Key_getParams, PROXY_GET_OBJ(self), keyParams,
                       paramSize);
 }
@@ -129,6 +138,8 @@ OS_CryptoKey_getAttribs(
     const OS_CryptoKey_Handle_t self,
     OS_CryptoKey_Attrib_t*      attribs)
 {
+    CHECK_PTR_NOT_NULL(self);
+
     return PROXY_CALL(self, Key_getAttribs, PROXY_GET_OBJ(self), attribs);
 }
 
@@ -139,5 +150,7 @@ OS_CryptoKey_loadParams(
     void*                      keyParams,
     size_t*                    paramSize)
 {
+    CHECK_PTR_NOT_NULL(hCrypto);
+
     return CALL(hCrypto, Key_loadParams, name, keyParams, paramSize);
 }

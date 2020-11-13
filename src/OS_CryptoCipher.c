@@ -18,7 +18,9 @@ OS_CryptoCipher_init(
 {
     OS_Error_t err;
 
+    CHECK_PTR_NOT_NULL(self);
     CHECK_PTR_NOT_NULL(hCrypto);
+    CHECK_PTR_NOT_NULL(hKey);
 
     PROXY_INIT_FROM_KEY(*self, hKey);
     if ((err = PROXY_CALL(*self, Cipher_init, PROXY_GET_OBJ_PTR(*self),
@@ -36,6 +38,8 @@ OS_CryptoCipher_free(
 {
     OS_Error_t err;
 
+    CHECK_PTR_NOT_NULL(self);
+
     err = PROXY_CALL(self, Cipher_free, PROXY_GET_OBJ(self));
     PROXY_FREE(self);
 
@@ -50,6 +54,8 @@ OS_CryptoCipher_process(
     void*                    output,
     size_t*                  outputSize)
 {
+    CHECK_PTR_NOT_NULL(self);
+
     return PROXY_CALL(self, Cipher_process, PROXY_GET_OBJ(self), input,
                       inputSize, output, outputSize);
 }
@@ -60,6 +66,8 @@ OS_CryptoCipher_start(
     const void*              ad,
     const size_t             adSize)
 {
+    CHECK_PTR_NOT_NULL(self);
+
     return PROXY_CALL(self, Cipher_start, PROXY_GET_OBJ(self), ad, adSize);
 }
 
@@ -69,6 +77,8 @@ OS_CryptoCipher_finalize(
     void*                    output,
     size_t*                  outputSize)
 {
+    CHECK_PTR_NOT_NULL(self);
+
     return PROXY_CALL(self, Cipher_finalize, PROXY_GET_OBJ(self), output,
                       outputSize);
 }

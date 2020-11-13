@@ -16,7 +16,9 @@ OS_CryptoMac_init(
 {
     OS_Error_t err;
 
+    CHECK_PTR_NOT_NULL(self);
     CHECK_PTR_NOT_NULL(hCrypto);
+    CHECK_PTR_NOT_NULL(hKey);
 
     PROXY_INIT_FROM_KEY(*self, hKey);
     if ((err = PROXY_CALL(*self, Mac_init, PROXY_GET_OBJ_PTR(*self),
@@ -34,6 +36,8 @@ OS_CryptoMac_free(
 {
     OS_Error_t err;
 
+    CHECK_PTR_NOT_NULL(self);
+
     err = PROXY_CALL(self, Mac_free, PROXY_GET_OBJ(self));
     PROXY_FREE(self);
 
@@ -46,6 +50,8 @@ OS_CryptoMac_process(
     const void*           data,
     const size_t          dataSize)
 {
+    CHECK_PTR_NOT_NULL(self);
+
     return PROXY_CALL(self, Mac_process, PROXY_GET_OBJ(self), data, dataSize);
 }
 
@@ -55,5 +61,7 @@ OS_CryptoMac_finalize(
     void*                 mac,
     size_t*               macSize)
 {
+    CHECK_PTR_NOT_NULL(self);
+
     return PROXY_CALL(self, Mac_finalize, PROXY_GET_OBJ(self), mac, macSize);
 }

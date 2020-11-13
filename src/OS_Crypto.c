@@ -181,6 +181,7 @@ OS_Crypto_createProxy(
      * the proxy objects needs to know the appropriate vtable/context.
      */
 
+    CHECK_PTR_NOT_NULL(proxy);
     CHECK_PTR_NOT_NULL(self);
     CHECK_PTR_NOT_NULL(ptr);
 

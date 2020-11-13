@@ -19,6 +19,7 @@ OS_CryptoSignature_init(
     OS_CryptoKey_Handle_t key;
     OS_Error_t err;
 
+    CHECK_PTR_NOT_NULL(self);
     CHECK_PTR_NOT_NULL(hCrypto);
 
     if (NULL == hPrvKey && NULL == hPubKey)
@@ -55,6 +56,8 @@ OS_CryptoSignature_free(
 {
     OS_Error_t err;
 
+    CHECK_PTR_NOT_NULL(self);
+
     err = PROXY_CALL(self, Signature_free, PROXY_GET_OBJ(self));
     PROXY_FREE(self);
 
@@ -69,6 +72,8 @@ OS_CryptoSignature_sign(
     void*                       signature,
     size_t*                     signatureSize)
 {
+    CHECK_PTR_NOT_NULL(self);
+
     return PROXY_CALL(self, Signature_sign, PROXY_GET_OBJ(self), hash, hashSize,
                       signature, signatureSize);
 }
@@ -81,6 +86,8 @@ OS_CryptoSignature_verify(
     const void*                 signature,
     const size_t                signatureSize)
 {
+    CHECK_PTR_NOT_NULL(self);
+
     return PROXY_CALL(self, Signature_verify, PROXY_GET_OBJ(self), hash, hashSize,
                       signature, signatureSize);
 }

@@ -16,6 +16,7 @@ OS_CryptoAgreement_init(
 {
     OS_Error_t err;
 
+    CHECK_PTR_NOT_NULL(self);
     CHECK_PTR_NOT_NULL(hCrypto);
     CHECK_PTR_NOT_NULL(hPrvKey);
 
@@ -34,6 +35,8 @@ OS_CryptoAgreement_free(
     OS_CryptoAgreement_Handle_t self)
 {
     OS_Error_t err;
+
+    CHECK_PTR_NOT_NULL(self);
 
     err = PROXY_CALL(self, Agreement_free, PROXY_GET_OBJ(self));
     PROXY_FREE(self);

@@ -15,6 +15,7 @@ OS_CryptoDigest_init(
 {
     OS_Error_t err;
 
+    CHECK_PTR_NOT_NULL(self);
     CHECK_PTR_NOT_NULL(hCrypto);
 
     PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT);
@@ -35,6 +36,7 @@ OS_CryptoDigest_clone(
 {
     OS_Error_t err;
 
+    CHECK_PTR_NOT_NULL(self);
     CHECK_PTR_NOT_NULL(hCrypto);
     CHECK_PTR_NOT_NULL(hSrcDigest);
 
@@ -54,6 +56,8 @@ OS_CryptoDigest_free(
 {
     OS_Error_t err;
 
+    CHECK_PTR_NOT_NULL(self);
+
     err = PROXY_CALL(self, Digest_free, PROXY_GET_OBJ(self));
     PROXY_FREE(self);
 
@@ -66,6 +70,8 @@ OS_CryptoDigest_process(
     const void*              data,
     const size_t             dataSize)
 {
+    CHECK_PTR_NOT_NULL(self);
+
     return PROXY_CALL(self, Digest_process, PROXY_GET_OBJ(self), data,
                       dataSize);
 }
@@ -76,6 +82,8 @@ OS_CryptoDigest_finalize(
     void*                    digest,
     size_t*                  digestSize)
 {
+    CHECK_PTR_NOT_NULL(self);
+
     return PROXY_CALL(self, Digest_finalize, PROXY_GET_OBJ(self), digest,
                       digestSize);
 }

@@ -14,59 +14,49 @@
 #include "lib/CryptoLibAgreement.h"
 
 // Call LIB or CLI, based on mode of API
-#define CALL(s, f, ...)                                                     \
-    (NULL == (s)) ?                                                         \
-        OS_ERROR_INVALID_HANDLE :                                           \
-        ((s)->mode == OS_Crypto_MODE_CLIENT) ?                              \
-            (NULL == (s)->client.vtable->f) ?                               \
-                OS_ERROR_NOT_SUPPORTED :                                    \
-                (s)->client.vtable->f((s)->client.context, __VA_ARGS__) :   \
-            (NULL == (s)->library.vtable->f) ?                              \
-                OS_ERROR_NOT_SUPPORTED :                                    \
-                (s)->library.vtable->f((s)->library.context, __VA_ARGS__)
+#define CALL(s, f, ...) \
+    ((s)->mode == OS_Crypto_MODE_CLIENT) ? \
+        (NULL == (s)->client.vtable->f) ? \
+            OS_ERROR_NOT_SUPPORTED : \
+            (s)->client.vtable->f((s)->client.context, __VA_ARGS__) : \
+        (NULL == (s)->library.vtable->f) ? \
+            OS_ERROR_NOT_SUPPORTED : \
+            (s)->library.vtable->f((s)->library.context, __VA_ARGS__)
 
 // Allocate proxy object from crypto handle and set its impl according to
 // the c flag
-#define PROXY_INIT(p, s, c) do {                                                \
-        if (NULL == &(p) || NULL == (s)) {                                      \
-            return OS_ERROR_INVALID_HANDLE;                                     \
-        }                                                                       \
-        if(((p) = s->memory.calloc(1, sizeof(OS_Crypto_Object_t))) == NULL) {   \
-            return OS_ERROR_INSUFFICIENT_SPACE;                                 \
-        }                                                                       \
-        (p)->parent = (s);                                                      \
-        (p)->impl   = (c) ? &(s)->client : &(s)->library;                       \
+#define PROXY_INIT(p, s, c) \
+    do { \
+        if(((p) = s->memory.calloc(1, sizeof(OS_Crypto_Object_t))) == NULL) { \
+            return OS_ERROR_INSUFFICIENT_SPACE; \
+        } \
+        (p)->parent = (s); \
+        (p)->impl   = (c) ? &(s)->client : &(s)->library; \
     } while(0)
 
 // Allocate proxy object from key proxy and simply copy the impl
-#define PROXY_INIT_FROM_KEY(p, k) do {                                                  \
-        if (NULL == &(p) || NULL == (k)) {                                              \
-            return OS_ERROR_INVALID_HANDLE;                                             \
-        }                                                                               \
-        if(((p) = k->parent->memory.calloc(1, sizeof(OS_Crypto_Object_t))) == NULL) {   \
-            return OS_ERROR_INSUFFICIENT_SPACE;                                         \
-        }                                                                               \
-        (p)->parent = (k)->parent;                                                      \
-        (p)->impl   = (k)->impl;                                                        \
+#define PROXY_INIT_FROM_KEY(p, k) \
+    do { \
+        if(((p) = k->parent->memory.calloc(1, sizeof(OS_Crypto_Object_t))) == NULL) { \
+            return OS_ERROR_INSUFFICIENT_SPACE; \
+        } \
+        (p)->parent = (k)->parent; \
+        (p)->impl   = (k)->impl; \
     } while(0)
 
 // Free proxy object with associated API context's mem IF
-#define PROXY_FREE(p) do {                      \
-        if (NULL == (p)) {                      \
-            return OS_ERROR_INVALID_HANDLE;     \
-        }                                       \
-        (p)->parent->memory.free(p);            \
+#define PROXY_FREE(p) \
+    do { \
+        (p)->parent->memory.free(p); \
     } while(0)
 
 // Call function from proxy objects API handle
-#define PROXY_CALL(p, f, ...)                       \
-    (NULL == (p)) ?                                 \
-        OS_ERROR_INVALID_HANDLE :                   \
-        (NULL == (p)->impl->vtable->f) ?            \
-            OS_ERROR_NOT_SUPPORTED :                \
-            (p)->impl->vtable->f(                   \
-                (p)->impl->context, __VA_ARGS__     \
-            )
+#define PROXY_CALL(p, f, ...) \
+    (NULL == (p)->impl->vtable->f) ? \
+        OS_ERROR_NOT_SUPPORTED : \
+        (p)->impl->vtable->f( \
+            (p)->impl->context, __VA_ARGS__ \
+        )
 
 // Get object from proxy
 #define PROXY_GET_OBJ(p) ((NULL == (p)) ? NULL : (p)->obj)

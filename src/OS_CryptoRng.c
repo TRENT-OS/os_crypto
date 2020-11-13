@@ -14,6 +14,8 @@ OS_CryptoRng_getBytes(
     void*                     buf,
     const size_t              bufSize)
 {
+    CHECK_PTR_NOT_NULL(hCrypto);
+
     return CALL(hCrypto, Rng_getBytes, flags, buf, bufSize);
 }
 
@@ -23,5 +25,7 @@ OS_CryptoRng_reseed(
     const void*        seed,
     const size_t       seedSize)
 {
+    CHECK_PTR_NOT_NULL(hCrypto);
+
     return CALL(hCrypto, Rng_reseed, seed, seedSize);
 }
