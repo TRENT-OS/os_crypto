@@ -5,6 +5,8 @@
 #include "OS_Crypto.h"
 #include "OS_Crypto.int.h"
 
+#include "LibMacros/Check.h"
+
 OS_Error_t
 OS_CryptoDigest_init(
     OS_CryptoDigest_Handle_t*   self,
@@ -13,10 +15,7 @@ OS_CryptoDigest_init(
 {
     OS_Error_t err;
 
-    if (NULL == hCrypto)
-    {
-        return OS_ERROR_INVALID_HANDLE;
-    }
+    CHECK_PTR_NOT_NULL(hCrypto);
 
     PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT);
     if ((err = PROXY_CALL(*self, Digest_init, PROXY_GET_OBJ_PTR(*self),
@@ -36,10 +35,8 @@ OS_CryptoDigest_clone(
 {
     OS_Error_t err;
 
-    if (NULL == hCrypto || NULL == hSrcDigest)
-    {
-        return OS_ERROR_INVALID_HANDLE;
-    }
+    CHECK_PTR_NOT_NULL(hCrypto);
+    CHECK_PTR_NOT_NULL(hSrcDigest);
 
     PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT);
     if ((err = PROXY_CALL(*self, Digest_clone, PROXY_GET_OBJ_PTR(*self),

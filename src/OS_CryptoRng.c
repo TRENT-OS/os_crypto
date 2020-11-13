@@ -5,6 +5,8 @@
 #include "OS_Crypto.h"
 #include "OS_Crypto.int.h"
 
+#include "LibMacros/Check.h"
+
 OS_Error_t
 OS_CryptoRng_getBytes(
     OS_Crypto_Handle_t        hCrypto,

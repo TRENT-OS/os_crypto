@@ -5,6 +5,8 @@
 #include "OS_Crypto.h"
 #include "OS_Crypto.int.h"
 
+#include "LibMacros/Check.h"
+
 OS_Error_t
 OS_CryptoCipher_init(
     OS_CryptoCipher_Handle_t*   self,
@@ -16,11 +18,7 @@ OS_CryptoCipher_init(
 {
     OS_Error_t err;
 
-    // We are actually not using this; lets check it anyways for consistency.
-    if (NULL == hCrypto)
-    {
-        return OS_ERROR_INVALID_HANDLE;
-    }
+    CHECK_PTR_NOT_NULL(hCrypto);
 
     PROXY_INIT_FROM_KEY(*self, hKey);
     if ((err = PROXY_CALL(*self, Cipher_init, PROXY_GET_OBJ_PTR(*self),

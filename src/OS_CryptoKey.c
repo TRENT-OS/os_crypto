@@ -5,6 +5,8 @@
 #include "OS_Crypto.h"
 #include "OS_Crypto.int.h"
 
+#include "LibMacros/Check.h"
+
 OS_Error_t
 OS_CryptoKey_generate(
     OS_CryptoKey_Handle_t*     self,
@@ -13,14 +15,8 @@ OS_CryptoKey_generate(
 {
     OS_Error_t err;
 
-    if (NULL == hCrypto)
-    {
-        return OS_ERROR_INVALID_HANDLE;
-    }
-    if (NULL == spec)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(hCrypto);
+    CHECK_PTR_NOT_NULL(spec);
 
     PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT
                || (hCrypto->mode == OS_Crypto_MODE_KEY_SWITCH &&
@@ -42,14 +38,8 @@ OS_CryptoKey_import(
 {
     OS_Error_t err;
 
-    if (NULL == hCrypto)
-    {
-        return OS_ERROR_INVALID_HANDLE;
-    }
-    if (NULL == keyData)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(hCrypto);
+    CHECK_PTR_NOT_NULL(keyData);
 
     PROXY_INIT(*self, hCrypto, hCrypto->mode == OS_Crypto_MODE_CLIENT
                || (hCrypto->mode == OS_Crypto_MODE_KEY_SWITCH &&
@@ -73,14 +63,9 @@ OS_CryptoKey_makePublic(
     OS_CryptoKey_Attrib_t srcAttribs;
     OS_Error_t err;
 
-    if (NULL == hCrypto || NULL == hPrvKey)
-    {
-        return OS_ERROR_INVALID_HANDLE;
-    }
-    if (NULL == attribs)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(hCrypto);
+    CHECK_PTR_NOT_NULL(hPrvKey);
+    CHECK_PTR_NOT_NULL(attribs);
 
     if ((err = PROXY_CALL(hPrvKey, Key_getAttribs, PROXY_GET_OBJ(hPrvKey),
                           &srcAttribs)) != OS_SUCCESS)

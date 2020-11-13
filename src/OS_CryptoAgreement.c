@@ -5,6 +5,8 @@
 #include "OS_Crypto.h"
 #include "OS_Crypto.int.h"
 
+#include "LibMacros/Check.h"
+
 OS_Error_t
 OS_CryptoAgreement_init(
     OS_CryptoAgreement_Handle_t*   self,
@@ -14,11 +16,8 @@ OS_CryptoAgreement_init(
 {
     OS_Error_t err;
 
-    // We are actually not using this; lets check it anyways for consistency.
-    if (NULL == hCrypto || NULL == hPrvKey)
-    {
-        return OS_ERROR_INVALID_HANDLE;
-    }
+    CHECK_PTR_NOT_NULL(hCrypto);
+    CHECK_PTR_NOT_NULL(hPrvKey);
 
     PROXY_INIT_FROM_KEY(*self, hPrvKey);
     if ((err = PROXY_CALL(*self, Agreement_init, PROXY_GET_OBJ_PTR(*self),
@@ -49,10 +48,8 @@ OS_CryptoAgreement_agree(
     void*                       shared,
     size_t*                     sharedSize)
 {
-    if (NULL == self || NULL == hPubKey)
-    {
-        return OS_ERROR_INVALID_HANDLE;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(hPubKey);
 
     // Make sure public key is where the agreement object is by checking that
     // they are either both local or both in the client instance

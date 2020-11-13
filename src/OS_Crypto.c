@@ -8,6 +8,8 @@
 #include "lib/CryptoLib.h"
 #include "rpc/CryptoLibClient.h"
 
+#include "LibMacros/Check.h"
+
 #include <stdlib.h>
 
 // Private functions -----------------------------------------------------------
@@ -58,23 +60,22 @@ err:
     return err;
 }
 
-static inline bool
+static inline OS_Error_t
 isInitParametersOk(
     OS_Crypto_Handle_t*       self,
     const OS_Crypto_Config_t* cfg)
 {
-    if (NULL == self || NULL == cfg)
-    {
-        return false;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(cfg);
 
     // either no memory handler is set or both handlers must be set
     if ((NULL == cfg->memory.calloc && NULL != cfg->memory.free) ||
         (NULL != cfg->memory.calloc && NULL == cfg->memory.free))
     {
-        return false;
+        return OS_ERROR_INVALID_PARAMETER;
     }
-    return true;
+
+    return OS_SUCCESS;
 }
 
 // Public functions ------------------------------------------------------------
@@ -87,9 +88,9 @@ OS_Crypto_init(
     OS_Error_t err;
     OS_Crypto_t* ctx;
 
-    if (!isInitParametersOk(self, cfg))
+    if ((err = isInitParametersOk(self, cfg)) != OS_SUCCESS)
     {
-        return OS_ERROR_INVALID_PARAMETER;
+        return err;
     }
 
     // If both are NULL, use calloc/freem from stdin.h, otherwise use the ones
@@ -132,10 +133,7 @@ OS_Crypto_free(
 {
     OS_Error_t err;
 
-    if (NULL == self)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
 
     if (self->mode != OS_Crypto_MODE_CLIENT)
     {
@@ -181,14 +179,8 @@ OS_Crypto_createProxy(
      * the proxy objects needs to know the appropriate vtable/context.
      */
 
-    if (NULL == self)
-    {
-        return OS_ERROR_INVALID_HANDLE;
-    }
-    if (NULL == ptr)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(ptr);
 
     if (!local && self->mode == OS_Crypto_MODE_LIBRARY)
     {

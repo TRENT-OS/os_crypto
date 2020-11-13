@@ -5,6 +5,8 @@
 #include "OS_Crypto.h"
 #include "OS_Crypto.int.h"
 
+#include "LibMacros/Check.h"
+
 OS_Error_t
 OS_CryptoSignature_init(
     OS_CryptoSignature_Handle_t*   self,
@@ -17,11 +19,7 @@ OS_CryptoSignature_init(
     OS_CryptoKey_Handle_t key;
     OS_Error_t err;
 
-    // We are actually not using this; lets check it anyways for consistency.
-    if (NULL == hCrypto)
-    {
-        return OS_ERROR_INVALID_HANDLE;
-    }
+    CHECK_PTR_NOT_NULL(hCrypto);
 
     if (NULL == hPrvKey && NULL == hPubKey)
     {
