@@ -103,7 +103,8 @@ CryptoLibRng_getBytes(
 
     if (flags != 0)
     {
-        return OS_ERROR_NOT_SUPPORTED;
+        Debug_LOG_WARNING("Flag value of %02x is being ignored; currently no "
+                          "flags are supported", flags);
     }
 
     return (mbedtls_ctr_drbg_random(&self->drbg, buf, bufSize) != 0) ?
