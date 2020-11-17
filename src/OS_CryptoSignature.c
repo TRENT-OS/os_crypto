@@ -28,9 +28,9 @@ OS_CryptoSignature_init(
                         "public key");
         return OS_ERROR_INVALID_PARAMETER;
     }
-    else if (NULL != hPrvKey && NULL != hPubKey
-             && (hPrvKey->impl->context != hPubKey->impl->context
-                 || hPrvKey->impl->vtable != hPubKey->impl->vtable))
+    if (NULL != hPrvKey && NULL != hPubKey
+        && (hPrvKey->impl->context != hPubKey->impl->context
+            || hPrvKey->impl->vtable != hPubKey->impl->vtable))
     {
         Debug_LOG_ERROR("Given keys are not managed by the same library "
                         "instance, this may be because one is local and "
