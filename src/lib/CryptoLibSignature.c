@@ -6,6 +6,8 @@
 
 #include <stdbool.h>
 
+#include "LibMacros/Check.h"
+
 #include <string.h>
 
 // Internal types/defines/enums ------------------------------------------------
@@ -36,12 +38,6 @@ initImpl(
     OS_Error_t err;
     CryptoLibSignature_t* sig;
     int padding;
-
-    // We can have one of those keys be empty, but not both
-    if (NULL == memory || NULL == self || (NULL == prvKey && NULL == pubKey))
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
 
     if ((sig = memory->calloc(1, sizeof(CryptoLibSignature_t))) == NULL)
     {
