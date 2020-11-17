@@ -7,6 +7,8 @@
 #include "mbedtls/aes.h"
 #include "mbedtls/gcm.h"
 
+#include "LibMacros/Check.h"
+
 #include <stdbool.h>
 #include <string.h>
 
@@ -430,10 +432,9 @@ CryptoLibCipher_init(
 {
     OS_Error_t err;
 
-    if (NULL == memory || NULL == self || NULL == key)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(key);
+    CHECK_PTR_NOT_NULL(memory);
 
     if ((err = initImpl(self, key, algorithm, memory)) == OS_SUCCESS)
     {
@@ -452,10 +453,8 @@ CryptoLibCipher_free(
     CryptoLibCipher_t*        self,
     const OS_Crypto_Memory_t* memory)
 {
-    if (NULL == memory || NULL == self)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(memory);
 
     return freeImpl(self, memory);
 }
@@ -468,10 +467,7 @@ CryptoLibCipher_start(
 {
     OS_Error_t err = OS_ERROR_GENERIC;
 
-    if (NULL == self)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
 
     err = startImpl(self, input, inputSize);
     self->started |= (OS_SUCCESS == err);
@@ -489,13 +485,15 @@ CryptoLibCipher_process(
 {
     OS_Error_t err = OS_ERROR_GENERIC;
 
-    if (NULL == self || NULL == input || 0 == inputSize || NULL == output
-        || NULL == outputSize || 0 == *outputSize)
-    {
-        err = OS_ERROR_INVALID_PARAMETER;
-    }
-    else if ((err = processImpl(self, input, inputSize, output,
-                                outputSize)) == OS_SUCCESS)
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(input);
+    CHECK_PTR_NOT_NULL(output);
+    CHECK_PTR_NOT_NULL(outputSize);
+    CHECK_VALUE_NOT_ZERO(inputSize);
+    CHECK_VALUE_NOT_ZERO(*outputSize);
+
+    if ((err = processImpl(self, input, inputSize, output,
+                           outputSize)) == OS_SUCCESS)
     {
         self->inputLen += inputSize;
         self->processed = true;
@@ -512,10 +510,10 @@ CryptoLibCipher_finalize(
 {
     OS_Error_t err = OS_ERROR_GENERIC;
 
-    if (NULL == self || NULL == buf || NULL == bufSize || 0 == *bufSize)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(buf);
+    CHECK_PTR_NOT_NULL(bufSize);
+    CHECK_VALUE_NOT_ZERO(*bufSize);
 
     err = finalizeImpl(self, buf, bufSize);
     self->finalized |= (OS_SUCCESS == err);

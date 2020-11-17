@@ -6,6 +6,8 @@
 
 #include "LibDebug/Debug.h"
 
+#include "LibMacros/Check.h"
+
 #include <string.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -829,10 +831,10 @@ CryptoLibKey_generate(
 {
     OS_Error_t err = OS_ERROR_GENERIC;
 
-    if (NULL == self || NULL == rng || NULL == memory || NULL == spec)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(spec);
+    CHECK_PTR_NOT_NULL(memory);
+    CHECK_PTR_NOT_NULL(rng);
 
     if ((err = initImpl(self, spec->key.type, &spec->key.attribs,
                         memory)) == OS_SUCCESS)
@@ -857,11 +859,11 @@ CryptoLibKey_makePublic(
     OS_Error_t err = OS_ERROR_GENERIC;
     OS_CryptoKey_Type_t type;
 
-    if (NULL == self || NULL == memory || NULL == prvKey || NULL == attribs
-        || NULL == rng)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(memory);
+    CHECK_PTR_NOT_NULL(prvKey);
+    CHECK_PTR_NOT_NULL(attribs);
+    CHECK_PTR_NOT_NULL(rng);
 
     switch (prvKey->type)
     {
@@ -897,10 +899,10 @@ CryptoLibKey_import(
 {
     OS_Error_t err = OS_ERROR_GENERIC;
 
-    if (NULL == self || NULL == memory || NULL == keyData)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(memory);
+    CHECK_PTR_NOT_NULL(keyData);
+
     if ((err = initImpl(self, keyData->type, &keyData->attribs,
                         memory)) == OS_SUCCESS)
     {
@@ -918,10 +920,8 @@ CryptoLibKey_free(
     CryptoLibKey_t*           self,
     const OS_Crypto_Memory_t* memory)
 {
-    if (NULL == memory || NULL == self)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(memory);
 
     return freeImpl(self, memory);
 }
@@ -931,10 +931,8 @@ CryptoLibKey_export(
     const CryptoLibKey_t* self,
     OS_CryptoKey_Data_t*  keyData)
 {
-    if (NULL == self || NULL == keyData)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(keyData);
 
     return exportImpl(self, keyData);
 }
@@ -945,10 +943,9 @@ CryptoLibKey_getParams(
     void*                 keyParams,
     size_t*               paramSize)
 {
-    if (NULL == self || NULL == keyParams || NULL == paramSize)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(keyParams);
+    CHECK_PTR_NOT_NULL(paramSize);
 
     return getParamsImpl(self, keyParams, paramSize);
 }
@@ -958,10 +955,8 @@ CryptoLibKey_getAttribs(
     const CryptoLibKey_t*  self,
     OS_CryptoKey_Attrib_t* attribs)
 {
-    if (NULL == self || NULL == attribs)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(attribs);
 
     return getAttribsImpl(self, attribs);
 }
@@ -972,10 +967,8 @@ CryptoLibKey_loadParams(
     void*                      keyParams,
     size_t*                    paramSize)
 {
-    if (NULL == keyParams || NULL == paramSize)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(keyParams);
+    CHECK_PTR_NOT_NULL(paramSize);
 
     return loadParamsImpl(name, keyParams, paramSize);
 }

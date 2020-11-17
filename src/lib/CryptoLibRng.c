@@ -6,6 +6,8 @@
 
 #include "mbedtls/ctr_drbg.h"
 
+#include "LibMacros/Check.h"
+
 #include <string.h>
 
 // Internal types/defines/enums ------------------------------------------------
@@ -45,11 +47,9 @@ CryptoLibRng_init(
     OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLibRng_t* rng;
 
-    if (NULL == memory || NULL == self || NULL == entropy || NULL == entropy->read
-        || OS_Dataport_isUnset(entropy->dataport))
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(entropy);
+    CHECK_PTR_NOT_NULL(memory);
 
     if ((rng = memory->calloc(1, sizeof(CryptoLibRng_t))) == NULL)
     {
@@ -81,10 +81,8 @@ CryptoLibRng_free(
     CryptoLibRng_t*           self,
     const OS_Crypto_Memory_t* memory)
 {
-    if (NULL == memory || NULL == self)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(memory);
 
     mbedtls_ctr_drbg_free(&self->drbg);
     memory->free(self);
@@ -99,11 +97,11 @@ CryptoLibRng_getBytes(
     void*                     buf,
     const size_t              bufSize)
 {
-    if (NULL == self || NULL == buf || 0 == bufSize)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    else if (flags != 0)
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(buf);
+    CHECK_VALUE_NOT_ZERO(bufSize);
+
+    if (flags != 0)
     {
         return OS_ERROR_NOT_SUPPORTED;
     }
@@ -118,10 +116,9 @@ CryptoLibRng_reSeed(
     const void*     seed,
     const size_t    seedSize)
 {
-    if (NULL == seed || 0 == seedSize)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(seed);
+    CHECK_VALUE_NOT_ZERO(seedSize);
 
     // Update RNG state with additional seed data
     if (mbedtls_ctr_drbg_update_ret(&self->drbg, seed, seedSize) != 0)

@@ -10,6 +10,8 @@
 
 #include "compiler.h"
 
+#include "LibMacros/Check.h"
+
 #include <stdbool.h>
 #include <string.h>
 
@@ -197,10 +199,8 @@ CryptoLibDigest_init(
     const OS_CryptoDigest_Alg_t algorithm,
     const OS_Crypto_Memory_t*   memory)
 {
-    if (NULL == memory || NULL == self)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(memory);
 
     return initImpl(self, algorithm, memory);
 }
@@ -213,10 +213,8 @@ CryptoLibDigest_clone(
 {
     OS_Error_t err;
 
-    if (NULL == self || NULL == source)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(source);
 
     if ((err = initImpl(self, source->algorithm, memory)) == OS_SUCCESS)
     {
@@ -235,10 +233,8 @@ CryptoLibDigest_free(
     CryptoLibDigest_t*        self,
     const OS_Crypto_Memory_t* memory)
 {
-    if (NULL == memory || NULL == self)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(memory);
 
     return freeImpl(self, memory);
 }
@@ -251,10 +247,9 @@ CryptoLibDigest_process(
 {
     OS_Error_t err = OS_ERROR_GENERIC;
 
-    if (NULL == self || NULL == data || 0 == len)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(data);
+    CHECK_VALUE_NOT_ZERO(len);
 
     err = processImpl(self, data, len);
     self->processed |= (OS_SUCCESS == err);
@@ -270,10 +265,10 @@ CryptoLibDigest_finalize(
 {
     OS_Error_t err = OS_ERROR_GENERIC;
 
-    if (NULL == self || NULL == digest || NULL == digestSize || 0 == *digestSize)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(digest);
+    CHECK_PTR_NOT_NULL(digestSize);
+    CHECK_VALUE_NOT_ZERO(*digestSize);
 
     err = !self->processed ?
           OS_ERROR_ABORTED : finalizeImpl(self, digest, digestSize);

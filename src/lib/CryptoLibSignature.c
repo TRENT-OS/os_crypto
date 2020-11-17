@@ -238,9 +238,14 @@ CryptoLibSignature_init(
 {
     OS_Error_t err;
 
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(memory);
+
     // We can have one of those keys be empty, but not both
-    if (NULL == memory || NULL == self || (NULL == prvKey && NULL == pubKey))
+    if (NULL == prvKey && NULL == pubKey)
     {
+        Debug_LOG_ERROR("Must at least have non-NULL private or "
+                        "public key");
         return OS_ERROR_INVALID_PARAMETER;
     }
 
@@ -261,10 +266,8 @@ CryptoLibSignature_free(
     CryptoLibSignature_t*     self,
     const OS_Crypto_Memory_t* memory)
 {
-    if (NULL == self || NULL == memory)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(memory);
 
     return freeImpl(self, memory);
 }
@@ -278,11 +281,12 @@ CryptoLibSignature_sign(
     size_t*               signatureSize,
     CryptoLibRng_t*       rng)
 {
-    if (NULL == self || NULL == hash || 0 == hashSize || NULL == signature
-        || NULL == signatureSize || NULL == rng)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(hash);
+    CHECK_PTR_NOT_NULL(signature);
+    CHECK_PTR_NOT_NULL(signatureSize);
+    CHECK_PTR_NOT_NULL(rng);
+    CHECK_VALUE_NOT_ZERO(hashSize);
 
     return (self->prvKey != NULL) ?
            signHashImpl(self, hash, hashSize, signature, signatureSize, rng) :
@@ -298,11 +302,12 @@ CryptoLibSignature_verify(
     const size_t          signatureSize,
     CryptoLibRng_t*       rng)
 {
-    if (NULL == self || NULL == hash || 0 == hashSize || NULL == signature
-        || 0 == signatureSize || NULL == rng)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(hash);
+    CHECK_PTR_NOT_NULL(signature);
+    CHECK_PTR_NOT_NULL(rng);
+    CHECK_VALUE_NOT_ZERO(hashSize);
+    CHECK_VALUE_NOT_ZERO(signatureSize);
 
     return (self->pubKey != NULL) ?
            verifyHashImpl(self, hash, hashSize, signature, signatureSize, rng) :

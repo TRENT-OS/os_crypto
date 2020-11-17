@@ -8,6 +8,8 @@
 #include "mbedtls/dhm.h"
 #include "mbedtls/ecdh.h"
 
+#include "LibMacros/Check.h"
+
 #include <string.h>
 
 // Internal types/defines/enums ------------------------------------------------
@@ -191,10 +193,9 @@ CryptoLibAgreement_init(
 {
     OS_Error_t err;
 
-    if (NULL == self || NULL == prvKey || NULL == memory)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(prvKey);
+    CHECK_PTR_NOT_NULL(memory);
 
     if ((err = initImpl(self, prvKey, algorithm, memory)) == OS_SUCCESS)
     {
@@ -212,10 +213,8 @@ CryptoLibAgreement_free(
     CryptoLibAgreement_t*     self,
     const OS_Crypto_Memory_t* memory)
 {
-    if (NULL == self || NULL == memory)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(memory);
 
     return freeImpl(self, memory);
 }
@@ -228,11 +227,11 @@ CryptoLibAgreement_agree(
     size_t*               sharedSize,
     CryptoLibRng_t*       rng)
 {
-    if (NULL == self || NULL == pubKey || NULL == shared || NULL == sharedSize
-        || NULL == rng)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(pubKey);
+    CHECK_PTR_NOT_NULL(shared);
+    CHECK_PTR_NOT_NULL(sharedSize);
+    CHECK_PTR_NOT_NULL(rng);
 
     return agreeImpl(self, pubKey, shared, sharedSize, rng);
 }

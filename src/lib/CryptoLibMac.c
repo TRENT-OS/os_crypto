@@ -8,6 +8,8 @@
 
 #include "compiler.h"
 
+#include "LibMacros/Check.h"
+
 #include <string.h>
 #include <stdbool.h>
 
@@ -202,10 +204,9 @@ CryptoLibMac_init(
 {
     OS_Error_t err;
 
-    if (NULL == memory || NULL == key || NULL == self)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(key);
+    CHECK_PTR_NOT_NULL(memory);
 
     if ((err = initImpl(self, key, algorithm, memory)) == OS_SUCCESS)
     {
@@ -223,10 +224,8 @@ CryptoLibMac_free(
     CryptoLibMac_t*           self,
     const OS_Crypto_Memory_t* memory)
 {
-    if (NULL == memory || NULL == self)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(memory);
 
     return freeImpl(self, memory);
 }
@@ -239,10 +238,9 @@ CryptoLibMac_process(
 {
     OS_Error_t err = OS_ERROR_GENERIC;
 
-    if (NULL == self || NULL == data || 0 == dataSize)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(data);
+    CHECK_VALUE_NOT_ZERO(dataSize);
 
     err = processImpl(self, data, dataSize);
     self->processed |= (OS_SUCCESS == err);
@@ -258,10 +256,10 @@ CryptoLibMac_finalize(
 {
     OS_Error_t err = OS_ERROR_GENERIC;
 
-    if (NULL == self || NULL == mac || NULL == macSize || 0 == *macSize)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(mac);
+    CHECK_PTR_NOT_NULL(macSize);
+    CHECK_VALUE_NOT_ZERO(*macSize);
 
     err = !self->processed ?
           OS_ERROR_ABORTED : finalizeImpl(self, mac, macSize);
