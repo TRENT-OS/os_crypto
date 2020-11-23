@@ -6,6 +6,8 @@
 
 #include "mbedtls/platform.h"
 
+#include "LibMacros/Check.h"
+
 #include <string.h>
 
 // -------------------------- defines/types/variables --------------------------
@@ -39,14 +41,7 @@ Rng_getBytes(
 {
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
-    if (NULL == ctx)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    else if (bufSize > CryptoLib_SIZE_BUFFER)
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibRng_getBytes(self->rng, flags, buf, bufSize);
 }
@@ -59,14 +54,7 @@ Rng_reseed(
 {
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
-    if (NULL == ctx)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    else if (seedSize > CryptoLib_SIZE_BUFFER)
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibRng_reSeed(self->rng, seed, seedSize);
 }
@@ -82,10 +70,7 @@ Mac_init(
 {
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
-    if (NULL == ctx || NULL == pMacObj)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibMac_init(
                (CryptoLibMac_t**)pMacObj,
@@ -101,10 +86,7 @@ Mac_free(
 {
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
-    if (NULL == ctx)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibMac_free(
                (CryptoLibMac_t*)macObj,
@@ -118,14 +100,7 @@ Mac_process(
     const void*  data,
     const size_t dataSize)
 {
-    if (NULL == ctx)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    else if (dataSize > CryptoLib_SIZE_BUFFER)
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibMac_process(
                (CryptoLibMac_t*)macObj,
@@ -140,14 +115,7 @@ Mac_finalize(
     void*   mac,
     size_t* macSize)
 {
-    if (NULL == ctx || NULL == macSize)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    else if (*macSize > CryptoLib_SIZE_BUFFER)
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibMac_finalize(
                (CryptoLibMac_t*)macObj,
@@ -165,10 +133,7 @@ Digest_init(
 {
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
-    if (NULL == ctx || NULL == pDigObj)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibDigest_init(
                (CryptoLibDigest_t**)pDigObj,
@@ -183,10 +148,7 @@ Digest_free(
 {
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
-    if (NULL == ctx)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibDigest_free(
                (CryptoLibDigest_t*)digObj,
@@ -201,10 +163,7 @@ Digest_clone(
 {
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
-    if (NULL == ctx || NULL == pDigObj)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibDigest_clone(
                (CryptoLibDigest_t**)pDigObj,
@@ -219,14 +178,7 @@ Digest_process(
     const void*  data,
     const size_t dataSize)
 {
-    if (NULL == ctx)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    else if (dataSize > CryptoLib_SIZE_BUFFER)
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibDigest_process(
                (CryptoLibDigest_t*)digObj,
@@ -241,14 +193,7 @@ Digest_finalize(
     void*   digest,
     size_t* digestSize)
 {
-    if (NULL == ctx || NULL == digestSize)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    else if (*digestSize > CryptoLib_SIZE_BUFFER)
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibDigest_finalize(
                (CryptoLibDigest_t*)digObj,
@@ -269,10 +214,7 @@ Signature_init(
 {
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
-    if (NULL == ctx || NULL == pSigObj)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibSignature_init(
                (CryptoLibSignature_t**)pSigObj,
@@ -290,10 +232,7 @@ Signature_free(
 {
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
-    if (NULL == ctx)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibSignature_free(
                (CryptoLibSignature_t*)sigObj,
@@ -311,18 +250,13 @@ Signature_sign(
 {
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
-    if (NULL == ctx || NULL == hash || NULL == signatureSize)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    else if (hashSize > CryptoLib_SIZE_BUFFER ||
-             *signatureSize > CryptoLib_SIZE_BUFFER)
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
+    CHECK_PTR_NOT_NULL(hash);
+    CHECK_VALUE_IN_CLOSED_INTERVAL(hashSize, 0, CryptoLib_SIZE_BUFFER);
 
     // Make local copy of input buffer, to allow overlapping hash/signature buffers
     memcpy(self->buffer, hash, hashSize);
+
     return CryptoLibSignature_sign(
                (CryptoLibSignature_t*)sigObj,
                self->buffer,
@@ -343,14 +277,7 @@ Signature_verify(
 {
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
-    if (NULL == ctx)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    else if (hashSize + signatureSize > CryptoLib_SIZE_BUFFER)
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibSignature_verify(
                (CryptoLibSignature_t*)sigObj,
@@ -372,10 +299,7 @@ Agreement_init(
 {
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
-    if (NULL == ctx || NULL == pAgrObj)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibAgreement_init(
                (CryptoLibAgreement_t**)pAgrObj,
@@ -391,10 +315,7 @@ Agreement_free(
 {
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
-    if (NULL == ctx)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibAgreement_free(
                (CryptoLibAgreement_t*)agrObj,
@@ -411,14 +332,7 @@ Agreement_agree(
 {
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
-    if (NULL == ctx || NULL == sharedSize)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    else if (*sharedSize > CryptoLib_SIZE_BUFFER)
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibAgreement_agree(
                (CryptoLibAgreement_t*)agrObj,
@@ -438,10 +352,7 @@ Key_generate(
 {
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
-    if (NULL == ctx || NULL == pKeyObj)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibKey_generate(
                (CryptoLibKey_t**)pKeyObj,
@@ -458,10 +369,7 @@ Key_import(
 {
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
-    if (NULL == ctx || NULL == pKeyObj)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibKey_import(
                (CryptoLibKey_t**)pKeyObj,
@@ -478,10 +386,7 @@ Key_makePublic(
 {
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
-    if (NULL == ctx || NULL == pPubKeyObj)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibKey_makePublic(
                (CryptoLibKey_t**)pPubKeyObj,
@@ -498,10 +403,7 @@ Key_free(
 {
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
-    if (NULL == ctx)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibKey_free(
                (CryptoLibKey_t*)keyObj,
@@ -514,10 +416,7 @@ Key_export(
     const void*          keyObj,
     OS_CryptoKey_Data_t* keyData)
 {
-    if (NULL == ctx)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibKey_export(
                (CryptoLibKey_t*)keyObj,
@@ -531,14 +430,7 @@ Key_getParams(
     void*       keyParams,
     size_t*     paramSize)
 {
-    if (NULL == ctx || NULL == paramSize)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    else if (*paramSize > CryptoLib_SIZE_BUFFER)
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibKey_getParams(
                (CryptoLibKey_t*)keyObj,
@@ -552,10 +444,7 @@ Key_getAttribs(
     const void*            keyObj,
     OS_CryptoKey_Attrib_t* attribs)
 {
-    if (NULL == ctx || NULL == attribs)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibKey_getAttribs(
                (CryptoLibKey_t*)keyObj,
@@ -569,14 +458,7 @@ Key_loadParams(
     void*                      keyParams,
     size_t*                    paramSize)
 {
-    if (NULL == ctx || NULL == paramSize)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    else if (*paramSize > CryptoLib_SIZE_BUFFER)
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibKey_loadParams(name, keyParams, paramSize);
 }
@@ -594,14 +476,7 @@ Cipher_init(
 {
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
-    if (NULL == ctx || NULL == pCipherObj)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    else if (ivSize > CryptoLib_SIZE_BUFFER)
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibCipher_init(
                (CryptoLibCipher_t**)pCipherObj,
@@ -620,10 +495,7 @@ Cipher_free(
 {
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
-    if (NULL == ctx)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibCipher_free(
                (CryptoLibCipher_t*)cipherObj,
@@ -641,18 +513,13 @@ Cipher_process(
 {
     CryptoLib_t* self = (CryptoLib_t*) ctx;
 
-    if (NULL == ctx || NULL == input || NULL == outputSize)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    else if (inputSize > CryptoLib_SIZE_BUFFER ||
-             *outputSize > CryptoLib_SIZE_BUFFER)
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
+    CHECK_PTR_NOT_NULL(input);
+    CHECK_VALUE_IN_CLOSED_INTERVAL(inputSize, 0, CryptoLib_SIZE_BUFFER);
 
     // Make local copy of input buffer, to allow overlapping input/output buffers
     memcpy(self->buffer, input, inputSize);
+
     return CryptoLibCipher_process(
                (CryptoLibCipher_t*)cipherObj,
                self->buffer,
@@ -668,14 +535,7 @@ Cipher_start(
     const void*  ad,
     const size_t adSize)
 {
-    if (NULL == ctx)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    else if (adSize > CryptoLib_SIZE_BUFFER)
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibCipher_start(
                (CryptoLibCipher_t*)cipherObj,
@@ -690,14 +550,7 @@ Cipher_finalize(
     void*   output,
     size_t* outputSize)
 {
-    if (NULL == ctx || NULL == outputSize)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    else if (*outputSize > CryptoLib_SIZE_BUFFER)
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     return CryptoLibCipher_finalize(
                (CryptoLibCipher_t*)cipherObj,
@@ -751,11 +604,10 @@ CryptoLib_init(
     OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLib_t* self;
 
-    if (NULL == impl || NULL == memory || NULL == entropy->read
-        || OS_Dataport_isUnset(entropy->dataport))
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(impl);
+    CHECK_PTR_NOT_NULL(memory);
+    CHECK_PTR_NOT_NULL(entropy->read);
+    CHECK_DATAPORT_SET(entropy->dataport);
 
     // Make sure mbedtls uses our own calloc/free functions; this can be set
     // multiple times (e.g., in case we have several parallel instances of the
@@ -791,10 +643,7 @@ OS_Error_t
 CryptoLib_free(
     CryptoLib_t* self)
 {
-    if (NULL == self)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
 
     CryptoLibRng_free(self->rng, &self->memory);
 
