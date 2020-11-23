@@ -6,6 +6,8 @@
 
 #include "compiler.h"
 
+#include "LibMacros/Check.h"
+
 #include <string.h>
 #include <sys/user.h>
 
@@ -29,14 +31,10 @@ Rng_getBytes(
     OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
-    if (NULL == self || NULL == buf)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    if (bufSize > OS_Dataport_getSize(self->rpc.dataport))
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
+    CHECK_PTR_NOT_NULL(buf);
+    CHECK_VALUE_IN_CLOSED_INTERVAL(bufSize, 0,
+                                   OS_Dataport_getSize(self->rpc.dataport));
 
     if ((err = self->rpc.Rng_getBytes(flags, bufSize)) == OS_SUCCESS)
     {
@@ -54,16 +52,13 @@ Rng_reseed(
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
-    if (NULL == self || NULL == seed)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    if (seedSize > OS_Dataport_getSize(self->rpc.dataport))
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
+    CHECK_PTR_NOT_NULL(seed);
+    CHECK_VALUE_IN_CLOSED_INTERVAL(seedSize, 0,
+                                   OS_Dataport_getSize(self->rpc.dataport));
 
     memcpy(OS_Dataport_getBuf(self->rpc.dataport), seed, seedSize);
+
     return self->rpc.Rng_reseed(seedSize);
 }
 
@@ -77,8 +72,10 @@ Mac_init(
     const OS_CryptoMac_Alg_t algorithm)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
-    return NULL == self ? OS_ERROR_INVALID_PARAMETER :
-           self->rpc.Mac_init(
+
+    CHECK_PTR_NOT_NULL(ctx);
+
+    return self->rpc.Mac_init(
                (OS_CryptoMac_Handle_t*)pMacHandle,
                (OS_CryptoKey_Handle_t)keyHandle,
                algorithm);
@@ -90,8 +87,10 @@ Mac_free(
     void* macHandle)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
-    return NULL == self ? OS_ERROR_INVALID_PARAMETER :
-           self->rpc.Mac_free(
+
+    CHECK_PTR_NOT_NULL(ctx);
+
+    return self->rpc.Mac_free(
                (OS_CryptoMac_Handle_t)macHandle);
 }
 
@@ -104,16 +103,13 @@ Mac_process(
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
-    if (NULL == self || NULL == data)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    if (dataSize > OS_Dataport_getSize(self->rpc.dataport))
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
+    CHECK_PTR_NOT_NULL(data);
+    CHECK_VALUE_IN_CLOSED_INTERVAL(dataSize, 0,
+                                   OS_Dataport_getSize(self->rpc.dataport));
 
     memcpy(OS_Dataport_getBuf(self->rpc.dataport), data, dataSize);
+
     return self->rpc.Mac_process(
                (OS_CryptoMac_Handle_t)macHandle,
                dataSize);
@@ -129,14 +125,11 @@ Mac_finalize(
     OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
-    if (NULL == self || NULL == mac || NULL == macSize)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    if (*macSize > OS_Dataport_getSize(self->rpc.dataport))
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
+    CHECK_PTR_NOT_NULL(mac);
+    CHECK_PTR_NOT_NULL(macSize);
+    CHECK_VALUE_IN_CLOSED_INTERVAL(*macSize, 0,
+                                   OS_Dataport_getSize(self->rpc.dataport));
 
     if ((err = self->rpc.Mac_finalize(
                    (OS_CryptoMac_Handle_t)macHandle,
@@ -157,8 +150,10 @@ Digest_init(
     const OS_CryptoDigest_Alg_t algorithm)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
-    return NULL == self ? OS_ERROR_INVALID_PARAMETER :
-           self->rpc.Digest_init(
+
+    CHECK_PTR_NOT_NULL(ctx);
+
+    return self->rpc.Digest_init(
                (OS_CryptoDigest_Handle_t*)pDigestHandle,
                algorithm);
 }
@@ -170,8 +165,10 @@ Digest_clone(
     const void* srcDigHandle)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
-    return NULL == self ? OS_ERROR_INVALID_PARAMETER :
-           self->rpc.Digest_clone(
+
+    CHECK_PTR_NOT_NULL(ctx);
+
+    return self->rpc.Digest_clone(
                (OS_CryptoDigest_Handle_t*)pDigestHandle,
                (OS_CryptoDigest_Handle_t)srcDigHandle);
 }
@@ -182,8 +179,10 @@ Digest_free(
     void* digestHandle)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
-    return NULL == self ? OS_ERROR_INVALID_PARAMETER :
-           self->rpc.Digest_free(
+
+    CHECK_PTR_NOT_NULL(ctx);
+
+    return self->rpc.Digest_free(
                (OS_CryptoDigest_Handle_t)digestHandle);
 }
 
@@ -196,18 +195,14 @@ Digest_process(
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
-    if (NULL == self || NULL == data)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    if (dataSize > OS_Dataport_getSize(self->rpc.dataport))
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
+    CHECK_PTR_NOT_NULL(data);
+    CHECK_VALUE_IN_CLOSED_INTERVAL(dataSize, 0,
+                                   OS_Dataport_getSize(self->rpc.dataport));
 
     memcpy(OS_Dataport_getBuf(self->rpc.dataport), data, dataSize);
-    return NULL == self ? OS_ERROR_INVALID_PARAMETER :
-           self->rpc.Digest_process(
+
+    return self->rpc.Digest_process(
                (OS_CryptoDigest_Handle_t)digestHandle,
                dataSize);
 }
@@ -222,14 +217,11 @@ Digest_finalize(
     OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
-    if (NULL == self || NULL == digest || NULL == digestSize)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    if (*digestSize > OS_Dataport_getSize(self->rpc.dataport))
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
+    CHECK_PTR_NOT_NULL(digest);
+    CHECK_PTR_NOT_NULL(digestSize);
+    CHECK_VALUE_IN_CLOSED_INTERVAL(*digestSize, 0,
+                                   OS_Dataport_getSize(self->rpc.dataport));
 
     if ((err = self->rpc.Digest_finalize(
                    (OS_CryptoDigest_Handle_t)digestHandle,
@@ -253,8 +245,10 @@ Signature_init(
     const OS_CryptoDigest_Alg_t    digest)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
-    return NULL == self ? OS_ERROR_INVALID_PARAMETER :
-           self->rpc.Signature_init(
+
+    CHECK_PTR_NOT_NULL(ctx);
+
+    return self->rpc.Signature_init(
                (OS_CryptoSignature_Handle_t*)pSigHandle,
                (OS_CryptoKey_Handle_t)prvKeyHandle,
                (OS_CryptoKey_Handle_t)pubKeyHandle,
@@ -268,8 +262,10 @@ Signature_free(
     void* sigHandle)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
-    return NULL == self ? OS_ERROR_INVALID_PARAMETER :
-           self->rpc.Signature_free(
+
+    CHECK_PTR_NOT_NULL(ctx);
+
+    return self->rpc.Signature_free(
                (OS_CryptoSignature_Handle_t)sigHandle);
 }
 
@@ -285,17 +281,17 @@ Signature_sign(
     OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
-    if (NULL == self || NULL == hash || NULL == signature || NULL == signatureSize)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    if (hashSize > OS_Dataport_getSize(self->rpc.dataport) ||
-        *signatureSize > OS_Dataport_getSize(self->rpc.dataport))
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
+    CHECK_PTR_NOT_NULL(hash);
+    CHECK_PTR_NOT_NULL(signature);
+    CHECK_PTR_NOT_NULL(signatureSize);
+    CHECK_VALUE_IN_CLOSED_INTERVAL(hashSize, 0,
+                                   OS_Dataport_getSize(self->rpc.dataport));
+    CHECK_VALUE_IN_CLOSED_INTERVAL(*signatureSize, 0,
+                                   OS_Dataport_getSize(self->rpc.dataport));
 
     memcpy(OS_Dataport_getBuf(self->rpc.dataport), hash, hashSize);
+
     if ((err = self->rpc.Signature_sign(
                    (OS_CryptoSignature_Handle_t)sigHandle,
                    hashSize,
@@ -318,18 +314,16 @@ Signature_verify(
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
-    if (NULL == ctx || NULL == hash || NULL == signature)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    if (hashSize + signatureSize > OS_Dataport_getSize(self->rpc.dataport))
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
+    CHECK_PTR_NOT_NULL(hash);
+    CHECK_PTR_NOT_NULL(signature);
+    CHECK_VALUE_IN_CLOSED_INTERVAL(hashSize + signatureSize, 0,
+                                   OS_Dataport_getSize(self->rpc.dataport));
 
     memcpy(OS_Dataport_getBuf(self->rpc.dataport), hash, hashSize);
     memcpy(OS_Dataport_getBuf(self->rpc.dataport) + hashSize, signature,
            signatureSize);
+
     return self->rpc.Signature_verify(
                (OS_CryptoSignature_Handle_t)sigHandle,
                hashSize,
@@ -346,8 +340,10 @@ Agreement_init(
     const OS_CryptoAgreement_Alg_t algorithm)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
-    return NULL == self ? OS_ERROR_INVALID_PARAMETER :
-           self->rpc.Agreement_init(
+
+    CHECK_PTR_NOT_NULL(ctx);
+
+    return self->rpc.Agreement_init(
                (OS_CryptoAgreement_Handle_t*)pAgrHandle,
                (OS_CryptoKey_Handle_t)prvKeyHandle,
                algorithm);
@@ -359,8 +355,10 @@ Agreement_free(
     void* agrHandle)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
-    return NULL == self ? OS_ERROR_INVALID_PARAMETER :
-           self->rpc.Agreement_free(
+
+    CHECK_PTR_NOT_NULL(ctx);
+
+    return self->rpc.Agreement_free(
                (OS_CryptoAgreement_Handle_t)agrHandle);
 }
 
@@ -375,14 +373,11 @@ Agreement_agree(
     OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
-    if (NULL == self || NULL == shared || NULL == sharedSize)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    if (*sharedSize > OS_Dataport_getSize(self->rpc.dataport))
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
+    CHECK_PTR_NOT_NULL(shared);
+    CHECK_PTR_NOT_NULL(sharedSize);
+    CHECK_VALUE_IN_CLOSED_INTERVAL(*sharedSize, 0,
+                                   OS_Dataport_getSize(self->rpc.dataport));
 
     if ((err = self->rpc.Agreement_agree(
                    (OS_CryptoAgreement_Handle_t)agrHandle,
@@ -405,17 +400,15 @@ Key_generate(
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
-    if (NULL == self || NULL == pKeyHandle || NULL == spec)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    if (sizeof(OS_CryptoKey_Spec_t) > OS_Dataport_getSize(self->rpc.dataport))
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
+    CHECK_PTR_NOT_NULL(spec);
+
+    Debug_ASSERT(sizeof(OS_CryptoKey_Spec_t) <= OS_Dataport_getSize(
+                     self->rpc.dataport));
 
     memcpy(OS_Dataport_getBuf(self->rpc.dataport), spec,
            sizeof(OS_CryptoKey_Spec_t));
+
     return self->rpc.Key_generate(
                (OS_CryptoKey_Handle_t*)pKeyHandle);
 }
@@ -429,13 +422,15 @@ Key_makePublic(
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
-    if (NULL == self || NULL == pPubKeyHandle || NULL == attribs)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
+    CHECK_PTR_NOT_NULL(attribs);
+
+    Debug_ASSERT(sizeof(OS_CryptoKey_Attrib_t) <= OS_Dataport_getSize(
+                     self->rpc.dataport));
 
     memcpy(OS_Dataport_getBuf(self->rpc.dataport), attribs,
            sizeof(OS_CryptoKey_Attrib_t));
+
     return self->rpc.Key_makePublic(
                (OS_CryptoKey_Handle_t*)pPubKeyHandle,
                (OS_CryptoKey_Handle_t)prvKeyHandle);
@@ -449,17 +444,15 @@ Key_import(
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
-    if (NULL == self || NULL == pKeyHandle || NULL == keyData)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    if (sizeof(OS_CryptoKey_Data_t) > OS_Dataport_getSize(self->rpc.dataport))
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
+    CHECK_PTR_NOT_NULL(keyData);
+
+    Debug_ASSERT(sizeof(OS_CryptoKey_Data_t) <= OS_Dataport_getSize(
+                     self->rpc.dataport));
 
     memcpy(OS_Dataport_getBuf(self->rpc.dataport), keyData,
            sizeof(OS_CryptoKey_Data_t));
+
     return self->rpc.Key_import(
                (OS_CryptoKey_Handle_t*)pKeyHandle);
 }
@@ -473,14 +466,11 @@ Key_export(
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
     OS_Error_t err = OS_ERROR_GENERIC;
 
-    if (NULL == self || NULL == keyData)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    if (sizeof(OS_CryptoKey_Data_t) > OS_Dataport_getSize(self->rpc.dataport))
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
+    CHECK_PTR_NOT_NULL(keyData);
+
+    Debug_ASSERT(sizeof(OS_CryptoKey_Data_t) <= OS_Dataport_getSize(
+                     self->rpc.dataport));
 
     if ((err = self->rpc.Key_export(
                    (OS_CryptoKey_Handle_t)keyHandle)) == OS_SUCCESS)
@@ -502,14 +492,11 @@ Key_getParams(
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
     OS_Error_t err = OS_ERROR_GENERIC;
 
-    if (NULL == self || NULL == keyParams || NULL == paramSize)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    if (*paramSize > OS_Dataport_getSize(self->rpc.dataport))
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
+    CHECK_PTR_NOT_NULL(keyParams);
+    CHECK_PTR_NOT_NULL(paramSize);
+    CHECK_VALUE_IN_CLOSED_INTERVAL(*paramSize, 0,
+                                   OS_Dataport_getSize(self->rpc.dataport));
 
     if ((err = self->rpc.Key_getParams(
                    (OS_CryptoKey_Handle_t)keyHandle,
@@ -530,14 +517,11 @@ Key_getAttribs(
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
     OS_Error_t err = OS_ERROR_GENERIC;
 
-    if (NULL == self || NULL == attribs)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    if (sizeof(OS_CryptoKey_Attrib_t) > OS_Dataport_getSize(self->rpc.dataport))
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
+    CHECK_PTR_NOT_NULL(attribs);
+
+    Debug_ASSERT(sizeof(OS_CryptoKey_Attrib_t) <= OS_Dataport_getSize(
+                     self->rpc.dataport));
 
     if ((err = self->rpc.Key_getAttribs(
                    (OS_CryptoKey_Handle_t)keyHandle)) == OS_SUCCESS)
@@ -559,14 +543,11 @@ Key_loadParams(
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
     OS_Error_t err = OS_ERROR_GENERIC;
 
-    if (NULL == self || NULL == keyParams || NULL == paramSize)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    if (*paramSize > OS_Dataport_getSize(self->rpc.dataport))
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
+    CHECK_PTR_NOT_NULL(keyParams);
+    CHECK_PTR_NOT_NULL(paramSize);
+    CHECK_VALUE_IN_CLOSED_INTERVAL(*paramSize, 0,
+                                   OS_Dataport_getSize(self->rpc.dataport));
 
     if ((err = self->rpc.Key_loadParams(name, paramSize)) == OS_SUCCESS)
     {
@@ -582,8 +563,10 @@ Key_free(
     void* keyHandle)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
-    return NULL == self ? OS_ERROR_INVALID_PARAMETER :
-           self->rpc.Key_free(
+
+    CHECK_PTR_NOT_NULL(ctx);
+
+    return self->rpc.Key_free(
                (OS_CryptoKey_Handle_t)keyHandle);
 }
 
@@ -600,17 +583,12 @@ Cipher_init(
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
-    if (NULL == self || NULL == pCipherHandle)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     if (iv != NULL)
     {
-        if (ivSize > OS_Dataport_getSize(self->rpc.dataport))
-        {
-            return OS_ERROR_INSUFFICIENT_SPACE;
-        }
+        CHECK_VALUE_IN_CLOSED_INTERVAL(ivSize, 0,
+                                       OS_Dataport_getSize(self->rpc.dataport));
         memcpy(OS_Dataport_getBuf(self->rpc.dataport), iv, ivSize);
     }
 
@@ -627,8 +605,10 @@ Cipher_free(
     void* cipherHandle)
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
-    return NULL == self ? OS_ERROR_INVALID_PARAMETER :
-           self->rpc.Cipher_free(
+
+    CHECK_PTR_NOT_NULL(ctx);
+
+    return self->rpc.Cipher_free(
                (OS_CryptoCipher_Handle_t)cipherHandle);
 }
 
@@ -644,17 +624,17 @@ Cipher_process(
     OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
-    if (NULL == self || NULL == input || NULL == output || NULL == outputSize)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    if (inputSize > OS_Dataport_getSize(self->rpc.dataport) ||
-        *outputSize > OS_Dataport_getSize(self->rpc.dataport))
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
+    CHECK_PTR_NOT_NULL(input);
+    CHECK_PTR_NOT_NULL(output);
+    CHECK_PTR_NOT_NULL(outputSize);
+    CHECK_VALUE_IN_CLOSED_INTERVAL(inputSize, 0,
+                                   OS_Dataport_getSize(self->rpc.dataport));
+    CHECK_VALUE_IN_CLOSED_INTERVAL(*outputSize, 0,
+                                   OS_Dataport_getSize(self->rpc.dataport));
 
     memcpy(OS_Dataport_getBuf(self->rpc.dataport), input, inputSize);
+
     if ((err = self->rpc.Cipher_process(
                    (OS_CryptoCipher_Handle_t)cipherHandle,
                    inputSize,
@@ -675,22 +655,16 @@ Cipher_start(
 {
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
-    if (NULL == self)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
 
     if (NULL != data)
     {
-        if (dataSize > OS_Dataport_getSize(self->rpc.dataport))
-        {
-            return OS_ERROR_INSUFFICIENT_SPACE;
-        }
+        CHECK_VALUE_IN_CLOSED_INTERVAL(dataSize, 0,
+                                       OS_Dataport_getSize(self->rpc.dataport));
         memcpy(OS_Dataport_getBuf(self->rpc.dataport), data, dataSize);
     }
 
-    return NULL == self ? OS_ERROR_INVALID_PARAMETER :
-           self->rpc.Cipher_start(
+    return self->rpc.Cipher_start(
                (OS_CryptoCipher_Handle_t)cipherHandle,
                dataSize);
 }
@@ -705,16 +679,14 @@ Cipher_finalize(
     OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLibClient_t* self = (CryptoLibClient_t*) ctx;
 
-    if (NULL == self || NULL == tag || NULL == tagSize)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
-    if (*tagSize > OS_Dataport_getSize(self->rpc.dataport))
-    {
-        return OS_ERROR_INSUFFICIENT_SPACE;
-    }
+    CHECK_PTR_NOT_NULL(ctx);
+    CHECK_PTR_NOT_NULL(tag);
+    CHECK_PTR_NOT_NULL(tagSize);
+    CHECK_VALUE_IN_CLOSED_INTERVAL(*tagSize, 0,
+                                   OS_Dataport_getSize(self->rpc.dataport));
 
     memcpy(OS_Dataport_getBuf(self->rpc.dataport), tag, *tagSize);
+
     if ((err = self->rpc.Cipher_finalize(
                    (OS_CryptoCipher_Handle_t)cipherHandle,
                    tagSize)) == OS_SUCCESS)
@@ -770,11 +742,10 @@ CryptoLibClient_init(
 {
     CryptoLibClient_t* self;
 
-    if (NULL == impl || NULL == memory || NULL == rpc
-        || OS_Dataport_isUnset(rpc->dataport))
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(impl);
+    CHECK_PTR_NOT_NULL(memory);
+    CHECK_PTR_NOT_NULL(rpc);
+    CHECK_DATAPORT_SET(rpc->dataport);
 
     if ((self = memory->calloc(1, sizeof(CryptoLibClient_t))) == NULL)
     {
@@ -793,10 +764,7 @@ OS_Error_t
 CryptoLibClient_free(
     CryptoLibClient_t* self)
 {
-    if (NULL == self)
-    {
-        return OS_ERROR_INVALID_PARAMETER;
-    }
+    CHECK_PTR_NOT_NULL(self);
 
     self->memory.free(self);
 
