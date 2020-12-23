@@ -8,7 +8,7 @@
 #include "lib/CryptoLib.h"
 #include "rpc/CryptoLibClient.h"
 
-#include "LibMacros/Check.h"
+#include "lib_macros/Check.h"
 
 #include <stdlib.h>
 

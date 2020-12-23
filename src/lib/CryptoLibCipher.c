@@ -7,7 +7,7 @@
 #include "mbedtls/aes.h"
 #include "mbedtls/gcm.h"
 
-#include "LibMacros/Check.h"
+#include "lib_macros/Check.h"
 
 #include <stdbool.h>
 #include <string.h>

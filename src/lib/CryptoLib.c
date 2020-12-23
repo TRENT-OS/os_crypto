@@ -6,7 +6,7 @@
 
 #include "mbedtls/platform.h"
 
-#include "LibMacros/Check.h"
+#include "lib_macros/Check.h"
 
 #include <string.h>
 

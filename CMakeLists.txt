@@ -45,6 +45,8 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     INTERFACE
         3rdparty_mbedtls_for_crypto
+        lib_compiler
+        lib_debug
+        lib_macros
         os_core_api
-        os_libs
 )

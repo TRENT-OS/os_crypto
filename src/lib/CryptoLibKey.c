@@ -4,9 +4,9 @@
 
 #include "lib/CryptoLibKey.h"
 
-#include "LibDebug/Debug.h"
+#include "lib_debug/Debug.h"
 
-#include "LibMacros/Check.h"
+#include "lib_macros/Check.h"
 
 #include <string.h>
 #include <stddef.h>

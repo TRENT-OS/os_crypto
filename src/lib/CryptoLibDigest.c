@@ -8,9 +8,9 @@
 #include "mbedtls/md5.h"
 #include "mbedtls/sha256.h"
 
-#include "compiler.h"
+#include "lib_compiler/compiler.h"
 
-#include "LibMacros/Check.h"
+#include "lib_macros/Check.h"
 
 #include <stdbool.h>
 #include <string.h>

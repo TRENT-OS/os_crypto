@@ -4,9 +4,9 @@
 
 #include "rpc/CryptoLibClient.h"
 
-#include "compiler.h"
+#include "lib_compiler/compiler.h"
 
-#include "LibMacros/Check.h"
+#include "lib_macros/Check.h"
 
 #include <string.h>
 #include <sys/user.h>
