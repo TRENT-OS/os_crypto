@@ -93,6 +93,8 @@ typedef struct
                                  size_t*);
     OS_Error_t (*Signature_verify)(void*, void*, const void*, const size_t,
                                    const void*, const size_t);
+    OS_Error_t (*Rsa_encrypt)(void*, void*, const void*, const size_t,
+                              const void*); //PointBlank @05.01.2021
     OS_Error_t (*Agreement_init)(void*, void**, const void*,
                                  const OS_CryptoAgreement_Alg_t);
     OS_Error_t (*Agreement_free)(void*, void*);

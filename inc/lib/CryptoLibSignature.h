@@ -48,3 +48,11 @@ CryptoLibSignature_verify(
     const void*           signature,
     const size_t          signatureSize,
     CryptoLibRng_t*       rng);
+
+// PointBlank @05.01.2021
+OS_Error_t
+CryptoLibRsa_encrypt(
+    CryptoLibSignature_t* self,
+    const void*           input,
+    const size_t          inputSize,
+    const void*           output);

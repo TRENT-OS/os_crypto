@@ -221,6 +221,37 @@ signHashImpl(
     return err;
 }
 
+//PointBlank @05.01.2021
+static OS_Error_t
+encryptInputImpl(
+    CryptoLibSignature_t* self,
+    const void*           input,
+    const size_t          inputSize,
+    const void*           output)
+{
+    OS_Error_t err = OS_ERROR_GENERIC;
+
+    switch (self->algorithm)
+    {
+    case OS_CryptoSignature_ALG_RSA_PKCS1_V15:
+    case OS_CryptoSignature_ALG_RSA_PKCS1_V21:
+        if (self->mbedtls.rsa.len != inputSize)
+        {
+            err = OS_ERROR_INVALID_PARAMETER;
+        }
+        else
+        {
+            err = mbedtls_rsa_public( &self->mbedtls.rsa, (const unsigned char*)input,
+                                      (unsigned char*)output ) != 0 ? OS_ERROR_ABORTED : OS_SUCCESS;
+        }
+        break;
+    default:
+        return OS_ERROR_NOT_SUPPORTED;
+    }
+
+    return err;
+}
+
 // Public Functions ------------------------------------------------------------
 
 OS_Error_t
@@ -307,5 +338,22 @@ CryptoLibSignature_verify(
 
     return (self->pubKey != NULL) ?
            verifyHashImpl(self, hash, hashSize, signature, signatureSize, rng) :
+           OS_ERROR_ABORTED;
+}
+
+OS_Error_t
+CryptoLibRsa_encrypt(
+    CryptoLibSignature_t* self,
+    const void*           input,
+    const size_t          inputSize,
+    const void*           output)
+{
+    CHECK_PTR_NOT_NULL(self);
+    CHECK_PTR_NOT_NULL(input);
+    CHECK_PTR_NOT_NULL(output);
+    CHECK_VALUE_NOT_ZERO(inputSize);
+
+    return (self->pubKey != NULL) ?
+           encryptInputImpl(self, input, inputSize, output) :
            OS_ERROR_ABORTED;
 }

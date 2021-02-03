@@ -288,6 +288,21 @@ Signature_verify(
                self->rng);
 }
 
+//PointBlank @05.01.2021
+static OS_Error_t
+Rsa_encrypt(
+    void*                 ctx,
+    void*                 sigObj,
+    const void*           input,
+    const size_t          inputSize,
+    const void*           output)
+{
+    CHECK_PTR_NOT_NULL(ctx);
+
+    return CryptoLibRsa_encrypt((CryptoLibSignature_t*)sigObj, input, inputSize,
+                                output);
+}
+
 // ----------------------------- Agreement API ---------------------------------
 
 static OS_Error_t
@@ -585,6 +600,7 @@ static const Crypto_Vtable_t CryptoLib_vtable =
     .Signature_free      = Signature_free,
     .Signature_sign      = Signature_sign,
     .Signature_verify    = Signature_verify,
+    .Rsa_encrypt         = Rsa_encrypt, //PointBlank @05.01.2021
     .Agreement_init      = Agreement_init,
     .Agreement_free      = Agreement_free,
     .Agreement_agree     = Agreement_agree,

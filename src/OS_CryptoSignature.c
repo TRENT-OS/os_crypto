@@ -91,3 +91,17 @@ OS_CryptoSignature_verify(
     return PROXY_CALL(self, Signature_verify, PROXY_GET_OBJ(self), hash, hashSize,
                       signature, signatureSize);
 }
+
+//PointBlank @05.01.2021
+OS_Error_t
+OS_CryptoSignature_encrypt(
+    OS_CryptoSignature_Handle_t self,
+    const void*                 input,
+    const size_t                inputSize,
+    const void*                 oputput)
+{
+    CHECK_PTR_NOT_NULL(self);
+
+    return PROXY_CALL(self, Rsa_encrypt, PROXY_GET_OBJ(self), input, inputSize,
+                      oputput);
+}
