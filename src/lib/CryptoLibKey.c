@@ -15,8 +15,10 @@
 // Internal types/defines/enums ------------------------------------------------
 
 // How often do we want to retry finding a suitable prime P and also a suitable
-// X with 2 <= X <= P-2?
-#define CryptoLibKey_DH_GEN_RETRIES    10
+// X with 2 <= X <= P-2? For generate_DHPrv, the worst case scenario is a 1/2
+// probability of X not being in the range at each try. 100 retries should be
+// enough.
+#define CryptoLibKey_DH_GEN_RETRIES    100
 // Default values for RSA/DH
 #define CryptoLibKey_DH_GENERATOR      2       ///< Generator for DH
 #define CryptoLibKey_RSA_EXPONENT      65537   ///< Public exp. 2^16+1
@@ -70,11 +72,9 @@ generate_DHParams(
     CryptoLibRng_t*          rng)
 {
     OS_Error_t err = OS_ERROR_GENERIC;
-    mbedtls_mpi Q, T, G, P;
+    mbedtls_mpi P, G;
     size_t retries;
 
-    mbedtls_mpi_init(&T);
-    mbedtls_mpi_init(&Q);
     mbedtls_mpi_init(&G);
     mbedtls_mpi_init(&P);
 
@@ -83,31 +83,18 @@ generate_DHParams(
 
     // Generate a "safe prime" P such that Q=(P-1)/2 is also prime. Then make
     // sure that for this prime P our generator generates the full group and
-    // not just a sub-group. We only need to check in two steps, see below.
+    // not just a sub-group. We only need to check P mod 8 is either 1 or 7
     for (retries = CryptoLibKey_DH_GEN_RETRIES; retries > 0; retries--)
     {
         if (!mbedtls_mpi_gen_prime(&P, bits, MBEDTLS_MPI_GEN_PRIME_FLAG_DH,
                                    CryptoLibRng_getBytesMbedtls, rng))
         {
-            // Check 1: g^2 mod P != 1
-            mbedtls_mpi_lset(&T, 2);
-            mbedtls_mpi_exp_mod(&T, &G, &T, &P, NULL);
-            if (mbedtls_mpi_cmp_int(&T, 1) == 0)
+            mbedtls_mpi_uint mod;
+            mbedtls_mpi_mod_int(&mod, &P, 8);
+            if (mod == 1u || mod == 7u)
             {
-                continue;
+                break;
             }
-
-            // Compute Q=(P-1)/2
-            mbedtls_mpi_copy(&Q, &P);
-            mbedtls_mpi_shift_r(&Q, 1);
-            // Check 2: g^Q mod P != 1
-            mbedtls_mpi_exp_mod(&T, &G, &T, &Q, NULL);
-            if (mbedtls_mpi_cmp_int(&T, 1) == 0)
-            {
-                continue;
-            }
-
-            break;
         }
     }
 
@@ -124,8 +111,6 @@ generate_DHParams(
         err = OS_ERROR_ABORTED;
     }
 
-    mbedtls_mpi_free(&T);
-    mbedtls_mpi_free(&Q);
     mbedtls_mpi_free(&P);
     mbedtls_mpi_free(&G);
 
@@ -139,7 +124,7 @@ generate_DHPrv(
 {
     OS_Error_t err = OS_ERROR_GENERIC;
     mbedtls_mpi X, GX, G, P;
-    size_t retries;
+    size_t retries, p_bit_length, x_bit_length;
 
     mbedtls_mpi_init(&X);
     mbedtls_mpi_init(&GX);
@@ -151,46 +136,53 @@ generate_DHPrv(
         mbedtls_mpi_read_binary(&P, key->params.pBytes, key->params.pLen) != 0)
     {
         err = OS_ERROR_INVALID_PARAMETER;
-        goto exit;
-    }
-
-    // Generate an X as large as possible as private scalar
-    for (retries = CryptoLibKey_DH_GEN_RETRIES; retries > 0; retries--)
-    {
-        // Create random X and make sure it is smaller than P
-        if (mbedtls_mpi_fill_random(&X, mbedtls_mpi_size(&P),
-                                    CryptoLibRng_getBytesMbedtls, rng) != 0)
-        {
-            continue;
-        }
-        while (mbedtls_mpi_cmp_mpi(&X, &P) >= 0)
-        {
-            mbedtls_mpi_shift_r(&X, 1);
-        }
-
-        // Check X is in range, generate GX = G^X mod P and check that, too
-        if ((dhm_check_range(&X, &P) != 0) ||
-            (mbedtls_mpi_exp_mod(&GX, &G, &X, &P, NULL) != 0) ||
-            (dhm_check_range(&GX, &P) != 0))
-        {
-            continue;
-        }
-
-        break;
-    }
-
-    if (retries > 0)
-    {
-        key->xLen = mbedtls_mpi_size(&X);
-        err = mbedtls_mpi_write_binary(&X, key->xBytes, key->xLen) != 0 ?
-              OS_ERROR_ABORTED : OS_SUCCESS;
     }
     else
     {
-        err = OS_ERROR_ABORTED;
+        p_bit_length = mbedtls_mpi_bitlen(&P);
+        // Generate an X as large as possible as private scalar
+        for (retries = CryptoLibKey_DH_GEN_RETRIES; retries > 0; retries--)
+        {
+            // Create random X and make sure it is smaller than P
+            if (mbedtls_mpi_fill_random(&X, mbedtls_mpi_size(&P),
+                                        CryptoLibRng_getBytesMbedtls, rng) != 0)
+            {
+                continue;
+            }
+
+            x_bit_length = mbedtls_mpi_bitlen(&X);
+            if (x_bit_length > p_bit_length)
+            {
+                //We Mask the upper part of X
+                for(size_t i = x_bit_length; i >  p_bit_length; i--)
+                {
+                    //The argument pos in mbedtls_mpi_set_bit is a Zero based 
+                    //index we use i - 1
+                    mbedtls_mpi_set_bit(&X, i - 1, 0);
+                }
+            }
+
+            // Check X is in range, generate GX = G^X mod P and check that, too
+            if ((dhm_check_range(&X, &P) != 0) ||
+                (mbedtls_mpi_exp_mod(&GX, &G, &X, &P, NULL) != 0) ||
+                (dhm_check_range(&GX, &P) != 0))
+            {
+                continue;
+            }
+            break;
+        }
+        if (retries == 0)
+        {
+            err = OS_ERROR_ABORTED;
+        }
+        else
+        {
+            key->xLen = mbedtls_mpi_size(&X);
+            err = mbedtls_mpi_write_binary(&X, key->xBytes, key->xLen) != 0 ?
+                  OS_ERROR_ABORTED : OS_SUCCESS;
+        }
     }
 
-exit:
     mbedtls_mpi_free(&GX);
     mbedtls_mpi_free(&X);
     mbedtls_mpi_free(&G);
