@@ -153,11 +153,11 @@ generate_DHPrv(
             x_bit_length = mbedtls_mpi_bitlen(&X);
             if (x_bit_length > p_bit_length)
             {
-                //We Mask the upper part of X
+                // We Mask the upper part of X
                 for (size_t i = x_bit_length; i >  p_bit_length; i--)
                 {
-                    //The argument pos in mbedtls_mpi_set_bit is a Zero based
-                    //index we use i - 1
+                    // The argument pos in mbedtls_mpi_set_bit is a Zero based
+                    // index we use i - 1
                     mbedtls_mpi_set_bit(&X, i - 1, 0);
                 }
             }
