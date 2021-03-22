@@ -8,6 +8,8 @@
 
 #include "lib_macros/Check.h"
 
+#include "mbedtls_helper.h"
+
 #include <string.h>
 
 // Internal types/defines/enums ------------------------------------------------
@@ -61,7 +63,8 @@ CryptoLibRng_init(
     rng->entropy = *entropy;
     mbedtls_ctr_drbg_init(&rng->drbg);
 
-    if (mbedtls_ctr_drbg_seed(&rng->drbg, entropyWrapper, rng, NULL, 0) != 0)
+    if (mbedtls_ctr_drbg_seed(&rng->drbg, entropyWrapper, rng, NULL, 0)
+        != MBEDTLS_OK)
     {
         err = OS_ERROR_ABORTED;
         goto err0;
@@ -107,8 +110,8 @@ CryptoLibRng_getBytes(
                           "flags are supported", flags);
     }
 
-    return (mbedtls_ctr_drbg_random(&self->drbg, buf, bufSize) != 0) ?
-           OS_ERROR_ABORTED : OS_SUCCESS;
+    return (mbedtls_ctr_drbg_random(&self->drbg, buf, bufSize) == MBEDTLS_OK) ?
+           OS_SUCCESS : OS_ERROR_ABORTED;
 }
 
 OS_Error_t
@@ -122,7 +125,7 @@ CryptoLibRng_reSeed(
     CHECK_VALUE_NOT_ZERO(seedSize);
 
     // Update RNG state with additional seed data
-    if (mbedtls_ctr_drbg_update_ret(&self->drbg, seed, seedSize) != 0)
+    if (mbedtls_ctr_drbg_update_ret(&self->drbg, seed, seedSize) != MBEDTLS_OK)
     {
         return OS_ERROR_ABORTED;
     }

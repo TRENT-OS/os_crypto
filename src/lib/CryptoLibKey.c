@@ -8,6 +8,8 @@
 
 #include "lib_macros/Check.h"
 
+#include "mbedtls_helper.h"
+
 #include <string.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -86,8 +88,9 @@ generate_DHParams(
     // not just a sub-group. We only need to check P mod 8 is either 1 or 7
     for (retries = CryptoLibKey_DH_GEN_RETRIES; retries > 0; retries--)
     {
-        if (!mbedtls_mpi_gen_prime(&P, bits, MBEDTLS_MPI_GEN_PRIME_FLAG_DH,
-                                   CryptoLibRng_getBytesMbedtls, rng))
+        if (mbedtls_mpi_gen_prime(&P, bits, MBEDTLS_MPI_GEN_PRIME_FLAG_DH,
+                                  CryptoLibRng_getBytesMbedtls,
+                                  rng) == MBEDTLS_OK)
         {
             mbedtls_mpi_uint mod;
             mbedtls_mpi_mod_int(&mod, &P, 8);
@@ -102,8 +105,10 @@ generate_DHParams(
     {
         params->pLen = mbedtls_mpi_size(&P);
         params->gLen = mbedtls_mpi_size(&G);
-        err = mbedtls_mpi_write_binary(&P, params->pBytes, params->pLen) != 0 ||
-              mbedtls_mpi_write_binary(&G, params->gBytes, params->gLen) != 0 ?
+        err = mbedtls_mpi_write_binary(&P, params->pBytes,
+                                       params->pLen) != MBEDTLS_OK ||
+              mbedtls_mpi_write_binary(&G, params->gBytes,
+                                       params->gLen) != MBEDTLS_OK ?
               OS_ERROR_ABORTED : OS_SUCCESS;
     }
     else
@@ -132,8 +137,10 @@ generate_DHPrv(
     mbedtls_mpi_init(&P);
 
     // Set group params: generator G and prime P
-    if (mbedtls_mpi_read_binary(&G, key->params.gBytes, key->params.gLen) != 0 ||
-        mbedtls_mpi_read_binary(&P, key->params.pBytes, key->params.pLen) != 0)
+    if (mbedtls_mpi_read_binary(&G, key->params.gBytes,
+                                key->params.gLen) != MBEDTLS_OK ||
+        mbedtls_mpi_read_binary(&P, key->params.pBytes,
+                                key->params.pLen) != MBEDTLS_OK)
     {
         err = OS_ERROR_INVALID_PARAMETER;
     }
@@ -145,7 +152,8 @@ generate_DHPrv(
         {
             // Create random X and make sure it is smaller than P
             if (mbedtls_mpi_fill_random(&X, mbedtls_mpi_size(&P),
-                                        CryptoLibRng_getBytesMbedtls, rng) != 0)
+                                        CryptoLibRng_getBytesMbedtls,
+                                        rng) != MBEDTLS_OK)
             {
                 continue;
             }
@@ -163,13 +171,12 @@ generate_DHPrv(
             }
 
             // Check X is in range, generate GX = G^X mod P and check that, too
-            if ((dhm_check_range(&X, &P) != 0) ||
-                (mbedtls_mpi_exp_mod(&GX, &G, &X, &P, NULL) != 0) ||
-                (dhm_check_range(&GX, &P) != 0))
+            if ((dhm_check_range(&X, &P) == MBEDTLS_OK) &&
+                (mbedtls_mpi_exp_mod(&GX, &G, &X, &P, NULL) == MBEDTLS_OK) &&
+                (dhm_check_range(&GX, &P) == MBEDTLS_OK))
             {
-                continue;
+                break;
             }
-            break;
         }
         if (retries == 0)
         {
@@ -178,8 +185,8 @@ generate_DHPrv(
         else
         {
             key->xLen = mbedtls_mpi_size(&X);
-            err = mbedtls_mpi_write_binary(&X, key->xBytes, key->xLen) != 0 ?
-                  OS_ERROR_ABORTED : OS_SUCCESS;
+            err = mbedtls_mpi_write_binary(&X, key->xBytes, key->xLen)
+                  != MBEDTLS_OK ? OS_ERROR_ABORTED : OS_SUCCESS;
         }
     }
 
@@ -206,23 +213,23 @@ make_DHPub(
     mbedtls_mpi_init(&P);
 
     // Set group params: generator G and prime P
-    if (mbedtls_mpi_read_binary(&X, prvKey->xBytes, prvKey->xLen) != 0 ||
-        mbedtls_mpi_read_binary(&P, params->pBytes, params->pLen) != 0 ||
-        mbedtls_mpi_read_binary(&G, params->gBytes, params->gLen) != 0)
+    if (mbedtls_mpi_read_binary(&X, prvKey->xBytes, prvKey->xLen) != MBEDTLS_OK ||
+        mbedtls_mpi_read_binary(&P, params->pBytes, params->pLen) != MBEDTLS_OK ||
+        mbedtls_mpi_read_binary(&G, params->gBytes, params->gLen) != MBEDTLS_OK)
     {
         err = OS_ERROR_INVALID_PARAMETER;
         goto exit;
     }
 
     // Check X is in range, generate GX = G^X mod P and check that, too
-    if ((dhm_check_range(&X, &P) == 0) &&
-        (mbedtls_mpi_exp_mod(&GX, &G, &X, &P, NULL) == 0) &&
-        (dhm_check_range(&GX, &P) == 0))
+    if ((dhm_check_range(&X, &P) == MBEDTLS_OK) &&
+        (mbedtls_mpi_exp_mod(&GX, &G, &X, &P, NULL) == MBEDTLS_OK) &&
+        (dhm_check_range(&GX, &P) == MBEDTLS_OK))
     {
         memcpy(&pubKey->params, params, sizeof(OS_CryptoKey_DhParams_t));
         pubKey->gxLen = mbedtls_mpi_size(&GX);
-        err = mbedtls_mpi_write_binary(&GX, pubKey->gxBytes, pubKey->gxLen) != 0 ?
-              OS_ERROR_ABORTED : OS_SUCCESS;
+        err = mbedtls_mpi_write_binary(&GX, pubKey->gxBytes,
+                                       pubKey->gxLen) != MBEDTLS_OK ? OS_ERROR_ABORTED : OS_SUCCESS;
     }
     else
     {
@@ -252,7 +259,7 @@ generate_RsaPrv(
     mbedtls_rsa_init(&rsa, MBEDTLS_RSA_PKCS_V15, MBEDTLS_MD_NONE);
 
     if (mbedtls_rsa_gen_key(&rsa, CryptoLibRng_getBytesMbedtls, rng, bits,
-                            CryptoLibKey_RSA_EXPONENT) != 0)
+                            CryptoLibKey_RSA_EXPONENT) != MBEDTLS_OK)
     {
         err = OS_ERROR_ABORTED;
         goto exit;
@@ -286,13 +293,15 @@ make_RsaPub(
     mbedtls_mpi_init(&Q);
     mbedtls_mpi_init(&N);
 
-    if (mbedtls_mpi_read_binary(&P, prvKey->pBytes, prvKey->pLen) != 0 ||
-        mbedtls_mpi_read_binary(&Q, prvKey->qBytes, prvKey->qLen) != 0)
+    if (mbedtls_mpi_read_binary(&P, prvKey->pBytes, prvKey->pLen)
+        != MBEDTLS_OK ||
+        mbedtls_mpi_read_binary(&Q, prvKey->qBytes, prvKey->qLen)
+        != MBEDTLS_OK)
     {
         err = OS_ERROR_INVALID_PARAMETER;
         goto exit;
     }
-    if (mbedtls_mpi_mul_mpi(&N, &P, &Q) != 0)
+    if (mbedtls_mpi_mul_mpi(&N, &P, &Q) != MBEDTLS_OK)
     {
         err = OS_ERROR_ABORTED;
         goto exit;
@@ -326,8 +335,9 @@ generate_SECP256r1Prv(
     mbedtls_ecp_group_init(&grp);
     mbedtls_mpi_init(&d);
 
-    if (mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1) != 0 ||
-        mbedtls_ecp_gen_privkey(&grp, &d, CryptoLibRng_getBytesMbedtls, rng) != 0)
+    if (mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1) != MBEDTLS_OK ||
+        mbedtls_ecp_gen_privkey(&grp, &d, CryptoLibRng_getBytesMbedtls, rng)
+        != MBEDTLS_OK)
     {
         err = OS_ERROR_ABORTED;
         goto exit;
@@ -359,13 +369,15 @@ make_SECP256r1Pub(
     mbedtls_mpi_init(&d);
     mbedtls_ecp_point_init(&Q);
 
-    if (mbedtls_mpi_read_binary(&d, prvKey->dBytes, prvKey->dLen) != 0)
+    if (mbedtls_mpi_read_binary(&d, prvKey->dBytes, prvKey->dLen)
+        != MBEDTLS_OK)
     {
         err = OS_ERROR_INVALID_PARAMETER;
         goto exit;
     }
-    if (mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1) != 0 ||
-        mbedtls_ecp_mul(&grp, &Q, &d, &grp.G, CryptoLibRng_getBytesMbedtls, rng) != 0)
+    if (mbedtls_ecp_group_load(&grp, MBEDTLS_ECP_DP_SECP256R1) != MBEDTLS_OK ||
+        mbedtls_ecp_mul(&grp, &Q, &d, &grp.G, CryptoLibRng_getBytesMbedtls, rng)
+        != MBEDTLS_OK)
     {
         err = OS_ERROR_ABORTED;
         goto exit;
@@ -778,12 +790,18 @@ loadParamsImpl(
             params->nLen = mbedtls_mpi_size(&grp.N);
             params->gxLen = mbedtls_mpi_size(&grp.G.X);
             params->gyLen = mbedtls_mpi_size(&grp.G.Y);
-            err = mbedtls_mpi_write_binary(&grp.A, params->aBytes, params->aLen) != 0 ||
-                  mbedtls_mpi_write_binary(&grp.B, params->bBytes, params->bLen) != 0 ||
-                  mbedtls_mpi_write_binary(&grp.P, params->pBytes, params->pLen) != 0 ||
-                  mbedtls_mpi_write_binary(&grp.N, params->nBytes, params->nLen) != 0 ||
-                  mbedtls_mpi_write_binary(&grp.G.X, params->gxBytes, params->gxLen) != 0 ||
-                  mbedtls_mpi_write_binary(&grp.G.Y, params->gyBytes, params->gyLen) ?
+            err = mbedtls_mpi_write_binary(&grp.A, params->aBytes,
+                                           params->aLen) != MBEDTLS_OK ||
+                  mbedtls_mpi_write_binary(&grp.B, params->bBytes,
+                                           params->bLen) != MBEDTLS_OK ||
+                  mbedtls_mpi_write_binary(&grp.P, params->pBytes,
+                                           params->pLen) != MBEDTLS_OK ||
+                  mbedtls_mpi_write_binary(&grp.N, params->nBytes,
+                                           params->nLen) != MBEDTLS_OK ||
+                  mbedtls_mpi_write_binary(&grp.G.X, params->gxBytes,
+                                           params->gxLen) != MBEDTLS_OK ||
+                  mbedtls_mpi_write_binary(&grp.G.Y, params->gyBytes,
+                                           params->gyLen) != MBEDTLS_OK ?
                   OS_ERROR_ABORTED : OS_SUCCESS;
             mbedtls_ecp_group_free(&grp);
         }
@@ -976,9 +994,10 @@ CryptoLibKey_writeRsaPub(
     return (mbedtls_rsa_import_raw(rsa,
                                    pubKey->nBytes, pubKey->nLen,
                                    NULL, 0, NULL, 0, NULL, 0,
-                                   pubKey->eBytes, pubKey->eLen) != 0)
-           || (mbedtls_rsa_complete(rsa) != 0)
-           || (mbedtls_rsa_check_pubkey(rsa) != 0) ?
+                                   pubKey->eBytes, pubKey->eLen)
+            != MBEDTLS_OK)
+           || (mbedtls_rsa_complete(rsa) != MBEDTLS_OK)
+           || (mbedtls_rsa_check_pubkey(rsa) != MBEDTLS_OK) ?
            OS_ERROR_INVALID_PARAMETER : OS_SUCCESS;
 }
 
@@ -993,9 +1012,9 @@ CryptoLibKey_writeRsaPrv(
                                    prvKey->pBytes, prvKey->pLen,
                                    prvKey->qBytes, prvKey->qLen,
                                    prvKey->dBytes, prvKey->dLen,
-                                   prvKey->eBytes, prvKey->eLen) != 0)
-           || (mbedtls_rsa_complete(rsa) != 0)
-           || (mbedtls_rsa_check_privkey(rsa) != 0) ?
+                                   prvKey->eBytes, prvKey->eLen) != MBEDTLS_OK)
+           || (mbedtls_rsa_complete(rsa) != MBEDTLS_OK)
+           || (mbedtls_rsa_check_privkey(rsa) != MBEDTLS_OK) ?
            OS_ERROR_INVALID_PARAMETER : OS_SUCCESS;
 }
 
@@ -1006,11 +1025,12 @@ CryptoLibKey_writeDhPub(
 {
     OS_CryptoKey_DhPub_t* dhKey = CryptoLibKey_getDhPub(key);
     return mbedtls_mpi_read_binary(&dh->P, dhKey->params.pBytes,
-                                   dhKey->params.pLen) != 0
+                                   dhKey->params.pLen) != MBEDTLS_OK
            || mbedtls_mpi_read_binary(&dh->G, dhKey->params.gBytes,
-                                      dhKey->params.gLen) != 0
-           || mbedtls_mpi_read_binary(&dh->GY, dhKey->gxBytes, dhKey->gxLen) != 0
-           || dhm_check_range(&dh->GY, &dh->P) != 0 ?
+                                      dhKey->params.gLen) != MBEDTLS_OK
+           || mbedtls_mpi_read_binary(&dh->GY, dhKey->gxBytes,
+                                      dhKey->gxLen) != MBEDTLS_OK
+           || dhm_check_range(&dh->GY, &dh->P) != MBEDTLS_OK ?
            OS_ERROR_INVALID_PARAMETER : OS_SUCCESS;
 }
 
@@ -1021,11 +1041,12 @@ CryptoLibKey_writeDhPrv(
 {
     OS_CryptoKey_DhPrv_t* dhKey = CryptoLibKey_getDhPrv(key);
     return mbedtls_mpi_read_binary(&dh->P, dhKey->params.pBytes,
-                                   dhKey->params.pLen) != 0
+                                   dhKey->params.pLen) != MBEDTLS_OK
            || mbedtls_mpi_read_binary(&dh->G, dhKey->params.gBytes,
-                                      dhKey->params.gLen) != 0
-           || mbedtls_mpi_read_binary(&dh->X, dhKey->xBytes, dhKey->xLen) != 0
-           || dhm_check_range(&dh->X, &dh->P) != 0 ?
+                                      dhKey->params.gLen) != MBEDTLS_OK
+           || mbedtls_mpi_read_binary(&dh->X, dhKey->xBytes,
+                                      dhKey->xLen) != MBEDTLS_OK
+           || dhm_check_range(&dh->X, &dh->P) != MBEDTLS_OK ?
            OS_ERROR_INVALID_PARAMETER : OS_SUCCESS;
 }
 
@@ -1035,10 +1056,12 @@ CryptoLibKey_writeSecp256r1Pub(
     mbedtls_ecdh_context* ecdh)
 {
     OS_CryptoKey_Secp256r1Pub_t* ecKey = CryptoLibKey_getSecp256r1Pub(key);
-    return mbedtls_mpi_read_binary(&ecdh->Qp.X, ecKey->qxBytes, ecKey->qxLen) != 0
-           || mbedtls_mpi_read_binary(&ecdh->Qp.Y, ecKey->qyBytes, ecKey->qyLen) != 0
-           || mbedtls_mpi_lset(&ecdh->Qp.Z, 1) != 0
-           || mbedtls_ecp_check_pubkey(&ecdh->grp, &ecdh->Qp) != 0 ?
+    return mbedtls_mpi_read_binary(&ecdh->Qp.X, ecKey->qxBytes,
+                                   ecKey->qxLen) != MBEDTLS_OK
+           || mbedtls_mpi_read_binary(&ecdh->Qp.Y, ecKey->qyBytes,
+                                      ecKey->qyLen) != MBEDTLS_OK
+           || mbedtls_mpi_lset(&ecdh->Qp.Z, 1) != MBEDTLS_OK
+           || mbedtls_ecp_check_pubkey(&ecdh->grp, &ecdh->Qp) != MBEDTLS_OK ?
            OS_ERROR_INVALID_PARAMETER : OS_SUCCESS;
 }
 
@@ -1048,9 +1071,11 @@ CryptoLibKey_writeSecp256r1Prv(
     mbedtls_ecdh_context* ecdh)
 {
     OS_CryptoKey_Secp256r1Prv_t* ecKey = CryptoLibKey_getSecp256r1Prv(key);
-    return mbedtls_ecp_group_load(&ecdh->grp, MBEDTLS_ECP_DP_SECP256R1) != 0
-           || mbedtls_mpi_read_binary(&ecdh->d, ecKey->dBytes, ecKey->dLen) != 0
-           || mbedtls_ecp_check_privkey(&ecdh->grp, &ecdh->d) != 0 ?
+    return mbedtls_ecp_group_load(&ecdh->grp,
+                                  MBEDTLS_ECP_DP_SECP256R1) != MBEDTLS_OK
+           || mbedtls_mpi_read_binary(&ecdh->d, ecKey->dBytes,
+                                      ecKey->dLen) != MBEDTLS_OK
+           || mbedtls_ecp_check_privkey(&ecdh->grp, &ecdh->d) != MBEDTLS_OK ?
            OS_ERROR_INVALID_PARAMETER : OS_SUCCESS;
 }
 

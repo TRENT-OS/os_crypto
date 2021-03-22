@@ -10,6 +10,8 @@
 
 #include "lib_macros/Check.h"
 
+#include "mbedtls_helper.h"
+
 #include <string.h>
 #include <stdbool.h>
 
@@ -63,7 +65,8 @@ initImpl(
     }
 
     mbedtls_md_init(&mac->mbedtls.md);
-    if (mbedtls_md_setup(&mac->mbedtls.md, mbedtls_md_info_from_type(type), 1))
+    if (mbedtls_md_setup(&mac->mbedtls.md, mbedtls_md_info_from_type(type), 1)
+        != MBEDTLS_OK)
     {
         err = OS_ERROR_ABORTED;
         goto err1;

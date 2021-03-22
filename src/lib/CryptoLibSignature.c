@@ -10,6 +10,8 @@
 
 #include <string.h>
 
+#include "mbedtls_helper.h"
+
 // Internal types/defines/enums ------------------------------------------------
 
 struct CryptoLibSignature
@@ -172,7 +174,7 @@ verifyHashImpl(
             err = mbedtls_rsa_pkcs1_verify(&self->mbedtls.rsa,
                                            CryptoLibRng_getBytesMbedtls, rng,
                                            MBEDTLS_RSA_PUBLIC, self->digest, hashSize,
-                                           hash, signature) != 0 ?
+                                           hash, signature) != MBEDTLS_OK ?
                   OS_ERROR_ABORTED : OS_SUCCESS;
         }
         break;
@@ -208,7 +210,7 @@ signHashImpl(
             err = mbedtls_rsa_pkcs1_sign(&self->mbedtls.rsa,
                                          CryptoLibRng_getBytesMbedtls, rng,
                                          MBEDTLS_RSA_PRIVATE, self->digest, hashSize,
-                                         hash, signature) != 0 ?
+                                         hash, signature) != MBEDTLS_OK ?
                   OS_ERROR_ABORTED : OS_SUCCESS;
         }
         break;
