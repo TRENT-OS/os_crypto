@@ -8,7 +8,7 @@
 
 #include "lib_macros/Check.h"
 
-#include "mbedtls_helper.h"
+#include "os_crypto_error_codes.h"
 
 #include <string.h>
 #include <stddef.h>

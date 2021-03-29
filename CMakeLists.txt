@@ -34,6 +34,9 @@ target_sources(${PROJECT_NAME}
         "src/lib/CryptoLibCipher.c"
         "src/lib/CryptoLibSignature.c"
         "src/lib/CryptoLibKey.c"
+        "src/lib/primitives/fixslicedCtrAes.c"
+        "src/lib/primitives/fixslicedAes.c"
+        "src/lib/primitives/fixslicedAesKeySchedule.c"
         "src/rpc/CryptoLibClient.c"
 )
 

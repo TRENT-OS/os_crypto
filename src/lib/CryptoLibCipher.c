@@ -1,8 +1,9 @@
-/**
+/*
  * Copyright (C) 2019-2020, Hensoldt Cyber GmbH
  */
 
 #include "lib/CryptoLibCipher.h"
+#include "primitives/fixslicedCtrAes.h"
 
 #include "mbedtls/aes.h"
 #include "mbedtls/gcm.h"
@@ -48,7 +49,6 @@ initImpl(
         return OS_ERROR_INSUFFICIENT_SPACE;
     }
 
-    memset(ciph, 0, sizeof(CryptoLibCipher_t));
     ciph->algorithm  = algorithm;
     ciph->key        = key;
     ciph->inputLen   = 0;
@@ -66,6 +66,10 @@ initImpl(
         break;
     case OS_CryptoCipher_ALG_AES_ECB_ENC:
     case OS_CryptoCipher_ALG_AES_ECB_DEC:
+        mbedtls_aes_init(&ciph->mbedtls.aes);
+        break;
+    case OS_CryptoCipher_ALG_AES_CTR_ENC:
+    case OS_CryptoCipher_ALG_AES_CTR_DEC:
         mbedtls_aes_init(&ciph->mbedtls.aes);
         break;
     case OS_CryptoCipher_ALG_AES_GCM_DEC:
@@ -100,6 +104,8 @@ freeImpl(
     case OS_CryptoCipher_ALG_AES_ECB_DEC:
     case OS_CryptoCipher_ALG_AES_CBC_ENC:
     case OS_CryptoCipher_ALG_AES_CBC_DEC:
+    case OS_CryptoCipher_ALG_AES_CTR_ENC:
+    case OS_CryptoCipher_ALG_AES_CTR_DEC:
         mbedtls_aes_free(&self->mbedtls.aes);
         break;
     case OS_CryptoCipher_ALG_AES_GCM_DEC:
@@ -134,6 +140,8 @@ setKeyImpl(
     case OS_CryptoCipher_ALG_AES_CBC_DEC:
     case OS_CryptoCipher_ALG_AES_GCM_ENC:
     case OS_CryptoCipher_ALG_AES_GCM_DEC:
+    case OS_CryptoCipher_ALG_AES_CTR_ENC:
+    case OS_CryptoCipher_ALG_AES_CTR_DEC:
         if (CryptoLibKey_getType(self->key) != OS_CryptoKey_TYPE_AES ||
             (aesKey = CryptoLibKey_getAes(self->key)) == NULL)
         {
@@ -165,6 +173,12 @@ setKeyImpl(
                                  aesKey->bytes, aesKey->len * 8) ?
               OS_ERROR_ABORTED : OS_SUCCESS;
         break;
+    case OS_CryptoCipher_ALG_AES_CTR_ENC:
+    case OS_CryptoCipher_ALG_AES_CTR_DEC:
+        err = trentos_aes_setkey_ctr(&self->mbedtls.aes,
+                                     aesKey->bytes, aesKey->len * 8) ?
+              OS_ERROR_ABORTED : OS_SUCCESS;
+        break;
     default:
         err = OS_ERROR_NOT_SUPPORTED;
     }
@@ -188,6 +202,8 @@ setIvImpl(
     {
     case OS_CryptoCipher_ALG_AES_CBC_ENC:
     case OS_CryptoCipher_ALG_AES_CBC_DEC:
+    case OS_CryptoCipher_ALG_AES_CTR_ENC:
+    case OS_CryptoCipher_ALG_AES_CTR_DEC:
         err = (iv == NULL || ivSize != OS_CryptoCipher_SIZE_AES_CBC_IV) ?
               OS_ERROR_INVALID_PARAMETER : OS_SUCCESS;
         break;
@@ -272,6 +288,19 @@ processImpl(
                            MBEDTLS_AES_ENCRYPT : MBEDTLS_AES_DECRYPT;
                 err = mbedtls_aes_crypt_cbc(&self->mbedtls.aes, mode, inputSize,
                                             self->ivLen > 0 ? self->iv : NULL, input, output) ?
+                      OS_ERROR_ABORTED : OS_SUCCESS;
+            }
+            break;
+        case OS_CryptoCipher_ALG_AES_CTR_ENC:
+        case OS_CryptoCipher_ALG_AES_CTR_DEC:
+            if (inputSize % OS_CryptoCipher_SIZE_AES_BLOCK)
+            {
+                err = OS_ERROR_INVALID_PARAMETER;
+            }
+            else
+            {
+                err = trentos_aes_crypt_ctr(&self->mbedtls.aes, input, output, inputSize,
+                                            self->ivLen > 0 ? self->iv : NULL) ?
                       OS_ERROR_ABORTED : OS_SUCCESS;
             }
             break;

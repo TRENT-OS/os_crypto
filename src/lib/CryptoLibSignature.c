@@ -10,7 +10,7 @@
 
 #include <string.h>
 
-#include "mbedtls_helper.h"
+#include "os_crypto_error_codes.h"
 
 // Internal types/defines/enums ------------------------------------------------
 
