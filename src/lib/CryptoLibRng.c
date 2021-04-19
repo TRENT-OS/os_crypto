@@ -8,7 +8,7 @@
 
 #include "lib_macros/Check.h"
 
-#include "os_crypto_error_codes.h"
+#include "CryptoErrorCodes.h"
 
 #include <string.h>
 

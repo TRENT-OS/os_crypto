@@ -1,9 +1,9 @@
 /*
- * Copyright (C) 2019-2020, Hensoldt Cyber GmbH
+ * Copyright (C) 2019-2021, Hensoldt Cyber GmbH
  */
 
 #include "lib/CryptoLibCipher.h"
-#include "primitives/fixslicedCtrAes.h"
+#include "primitives/CryptoLibAes.h"
 
 #include "mbedtls/aes.h"
 #include "mbedtls/gcm.h"
@@ -62,12 +62,8 @@ initImpl(
     {
     case OS_CryptoCipher_ALG_AES_CBC_ENC:
     case OS_CryptoCipher_ALG_AES_CBC_DEC:
-        mbedtls_aes_init(&ciph->mbedtls.aes);
-        break;
     case OS_CryptoCipher_ALG_AES_ECB_ENC:
     case OS_CryptoCipher_ALG_AES_ECB_DEC:
-        mbedtls_aes_init(&ciph->mbedtls.aes);
-        break;
     case OS_CryptoCipher_ALG_AES_CTR_ENC:
     case OS_CryptoCipher_ALG_AES_CTR_DEC:
         mbedtls_aes_init(&ciph->mbedtls.aes);
@@ -175,8 +171,8 @@ setKeyImpl(
         break;
     case OS_CryptoCipher_ALG_AES_CTR_ENC:
     case OS_CryptoCipher_ALG_AES_CTR_DEC:
-        err = trentos_aes_setkey_ctr(&self->mbedtls.aes,
-                                     aesKey->bytes, aesKey->len * 8) ?
+        err = CryptoLib_AesKeySchedule(&self->mbedtls.aes,
+                                       aesKey->bytes, aesKey->len * 8) ?
               OS_ERROR_ABORTED : OS_SUCCESS;
         break;
     default:
@@ -299,7 +295,7 @@ processImpl(
             }
             else
             {
-                err = trentos_aes_crypt_ctr(&self->mbedtls.aes, input, output, inputSize,
+                err = CryptoLib_AesCryptCTR(&self->mbedtls.aes, input, output, inputSize,
                                             self->ivLen > 0 ? self->iv : NULL) ?
                       OS_ERROR_ABORTED : OS_SUCCESS;
             }

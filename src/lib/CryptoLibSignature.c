@@ -10,7 +10,7 @@
 
 #include <string.h>
 
-#include "os_crypto_error_codes.h"
+#include "CryptoErrorCodes.h"
 
 // Internal types/defines/enums ------------------------------------------------
 
