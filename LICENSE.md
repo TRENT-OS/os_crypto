@@ -11,5 +11,4 @@ and the source from which they were obtained:
 | Name          | SPDX Identifier | Source                               |
 |---------------|-----------------|--------------------------------------|
 | mbedtls       | Apache-2.0      | <https://github.com/ARMmbed/mbedtls> |
-|---------------|-----------------|--------------------------------------|
-| fixsclicedAes | MIT             | <https://github.com/aadomn/aes>      |
+| fixslicedAes  | MIT             | <https://github.com/aadomn/aes>      |
