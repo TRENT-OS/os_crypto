@@ -30,16 +30,16 @@
 #define AES256_NUMBER_OF_ROUNDS  14
 
 
-int CryptoLib_AesKeySchedule(mbedtls_aes_context* aes,
-                             uint8_t* key,
-                             size_t key_size);
+Crypto_Error_t CryptoLib_AesKeySchedule(mbedtls_aes_context* aes,
+                                        uint8_t* key,
+                                        size_t key_size);
 
-int CryptoLib_AesCryptEcb(mbedtls_aes_context* ctx,
-                          const unsigned char input[16],
-                          unsigned char output[16]);
+Crypto_Error_t CryptoLib_AesCryptEcb(mbedtls_aes_context* ctx,
+                                     const unsigned char input[16],
+                                     unsigned char output[16]);
 
-int CryptoLib_AesCryptCTR(mbedtls_aes_context* aes,
-                          const uint8_t* input,
-                          uint8_t* output,
-                          const uint32_t input_length,
-                          uint8_t counter[AES_CTR_COUNTER_SIZE]);
+Crypto_Error_t CryptoLib_AesCryptCTR(mbedtls_aes_context* aes,
+                                     const uint8_t* input,
+                                     uint8_t* output,
+                                     const uint32_t input_length,
+                                     uint8_t counter[AES_CTR_COUNTER_SIZE]);

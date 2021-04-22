@@ -4,12 +4,15 @@
 
 #pragma once
 
-// Local constant to improve code readability using mbedtls
-#define MBEDTLS_OK              0
 
-// AES return codes
-#define KEY_SIZE_NOT_SUPPORTED  2
-#define AES_CTR_SUCCESS         0
-#define AES_CTR_FAIL            1
-#define AES_ECB_SUCCESS         0
-#define AES_ECB_FAIL            1
+typedef enum
+{
+    MBEDTLS_OK,             /**< Local constant to improve code readability using mbedtls */
+    KEY_SIZE_NOT_SUPPORTED, /**< Wrond size of key */
+    AES_CTR_FAIL,           /**< AES CTR failed to encrypt or decrypt buffer */
+    AES_ECB_FAIL,           /**< AES ECB failed to encrypt or decrypt buffer */
+
+    //----------------------------------------
+    CRYPTO_SUCCESS
+}
+Crypto_Error_t;

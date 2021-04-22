@@ -733,8 +733,9 @@ void aes256_encrypt_ffs(unsigned char* ctext0, unsigned char* ctext1,
 
 // ECB modes for one or double block
 
-int CryptoLib_AesKeySchedule(mbedtls_aes_context* aes, uint8_t* key,
-                             size_t key_size)
+Crypto_Error_t CryptoLib_AesKeySchedule(mbedtls_aes_context* aes,
+                                        uint8_t* key,
+                                        size_t key_size)
 {
     if (key_size != 128 && key_size != 256)
     {
@@ -755,7 +756,7 @@ int CryptoLib_AesKeySchedule(mbedtls_aes_context* aes, uint8_t* key,
         aes256_keyschedule_ffs(aes->rk, key, key);
     }
 #endif
-    return AES_ECB_SUCCESS;
+    return CRYPTO_SUCCESS;
 }
 
 int CryptoLib_AesSingleBlock(uint8_t out[AES_BLOCK_SIZE_IN_BYTE],
@@ -780,7 +781,7 @@ int CryptoLib_AesSingleBlock(uint8_t out[AES_BLOCK_SIZE_IN_BYTE],
         aes256_encrypt_ffs(out, out, in, in, round_keys);
     }
 #endif
-    return AES_ECB_SUCCESS;
+    return CRYPTO_SUCCESS;
 }
 
 int CryptoLib_AesDoubleBlock(uint8_t out[2 * AES_BLOCK_SIZE_IN_BYTE],
@@ -811,7 +812,7 @@ int CryptoLib_AesDoubleBlock(uint8_t out[2 * AES_BLOCK_SIZE_IN_BYTE],
                            round_keys);
     }
 #endif
-    return AES_ECB_SUCCESS;
+    return CRYPTO_SUCCESS;
 }
 
 // Helper functions for CTR mode
@@ -870,18 +871,18 @@ static void increase_parallel_counters(uint8_t counter[2 *
 
 // Public API of supported AES modes
 
-int CryptoLib_AesCryptEcb(mbedtls_aes_context* ctx,
-                          const unsigned char input[16],
-                          unsigned char output[16] )
+Crypto_Error_t CryptoLib_AesCryptEcb(mbedtls_aes_context* ctx,
+                                     const unsigned char input[16],
+                                     unsigned char output[16] )
 {
     return CryptoLib_AesSingleBlock(output, input, ctx->rk, ctx->nr);
 }
 
-int CryptoLib_AesCryptCTR(mbedtls_aes_context* aes,
-                          const uint8_t* input,
-                          uint8_t* output,
-                          const uint32_t input_length,
-                          uint8_t counter[AES_CTR_COUNTER_SIZE])
+Crypto_Error_t CryptoLib_AesCryptCTR(mbedtls_aes_context* aes,
+                                     const uint8_t* input,
+                                     uint8_t* output,
+                                     const uint32_t input_length,
+                                     uint8_t counter[AES_CTR_COUNTER_SIZE])
 {
     uint32_t encrypted_bytes = 0;
     uint8_t double_counter[2 * AES_CTR_COUNTER_SIZE];
@@ -894,11 +895,15 @@ int CryptoLib_AesCryptCTR(mbedtls_aes_context* aes,
 
     while (encrypted_bytes <= input_length - 2 * AES_CTR_COUNTER_SIZE)
     {
-        CryptoLib_AesDoubleBlock(key_stream, double_counter, aes->rk, aes->nr);
+        if(CryptoLib_AesDoubleBlock(key_stream, double_counter, aes->rk, 
+                                    aes->nr) != CRYPTO_SUCCESS){
+            return AES_CTR_FAIL;
+        }
 
         for (uint32_t i = 0; i < 2 * AES_CTR_COUNTER_SIZE; i++)
         {
-            output[i + encrypted_bytes] = input[i + encrypted_bytes] ^ key_stream[i];
+            output[i + encrypted_bytes] = input[i + encrypted_bytes] 
+                                            ^ key_stream[i];
         }
 
         increase_parallel_counters(double_counter);
@@ -907,14 +912,25 @@ int CryptoLib_AesCryptCTR(mbedtls_aes_context* aes,
 
     if (encrypted_bytes != input_length)
     {
-
-        CryptoLib_AesDoubleBlock(key_stream, double_counter, aes->rk, aes->nr);
+        Crypto_Error_t return_value = CRYPTO_SUCCESS;
+        if(input_length - encrypted_bytes > AES_BLOCK_SIZE_IN_BYTE){
+            return_value = CryptoLib_AesDoubleBlock(key_stream, double_counter,
+                                                    aes->rk, aes->nr);
+        }else{
+            return_value = CryptoLib_AesSingleBlock(key_stream, double_counter,
+                                                    aes->rk, aes->nr);
+        }
+        
+        if(return_value != CRYPTO_SUCCESS){
+            return AES_CTR_FAIL;
+        }
 
         for (uint32_t i = 0; i < input_length - encrypted_bytes; i++)
         {
-            output[i + encrypted_bytes] = input[i + encrypted_bytes] ^ key_stream[i];
+            output[i + encrypted_bytes] = input[i + encrypted_bytes] 
+                                            ^ key_stream[i];
         }
     }
 
-    return OS_SUCCESS;
+    return CRYPTO_SUCCESS;
 }
