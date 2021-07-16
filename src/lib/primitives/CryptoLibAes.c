@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021, Hensoldt Cyber GmbH
+ * Copyright (C) 2021, HENSOLDT Cyber GmbH
  *
  * The plain C implementation is based on the paper at
  * https://eprint.iacr.org/2020/1123.pdf and its implementation by
@@ -9,14 +9,16 @@
 */
 
 #include <string.h>
-#include "OS_Error.h"
 #include "CryptoLibAes.h"
 
 
 #if __ARM_FEATURE_CRYPTO == 1
 #include <arm_neon.h>
 
-void  neon_AesKeySchedule(uint8_t* round_keys, uint8_t* key, size_t key_size)
+void
+neon_AesKeySchedule(uint8_t* round_keys,
+                    uint8_t* key,
+                    size_t key_size)
 {
     uint8x16_t zero_key;
     zero_key = veorq_s8(zero_key, zero_key);
@@ -57,9 +59,11 @@ void  neon_AesKeySchedule(uint8_t* round_keys, uint8_t* key, size_t key_size)
     }
 }
 
-void neon_AesSingleBlock(uint8_t* ctext, const uint8_t* ptext,
-                         const uint32_t* round_keys,
-                         uint32_t number_of_rounds)
+void
+neon_AesSingleBlock(uint8_t* ctext,
+                    const uint8_t* ptext,
+                    const uint32_t* round_keys,
+                    uint32_t number_of_rounds)
 {
 
     uint8x16_t data = vld1q_u8(ptext);
@@ -76,9 +80,12 @@ void neon_AesSingleBlock(uint8_t* ctext, const uint8_t* ptext,
     vst1q_u8(ctext, data);
 }
 
-void neon_AesDoubleBlock(unsigned char* ctext0, unsigned char* ctext1,
-                         const unsigned char* ptext0, const unsigned char* ptext1,
-                         const uint32_t* round_keys, uint32_t number_of_rounds)
+void
+neon_AesDoubleBlock(unsigned char* ctext0,
+                    unsigned char* ctext1,
+                    const unsigned char* ptext0,
+                    const unsigned char* ptext1,
+                    const uint32_t* round_keys, uint32_t number_of_rounds)
 {
 
     uint8x16_t data0 = vld1q_u8(ptext0);
@@ -111,40 +118,53 @@ void neon_AesDoubleBlock(unsigned char* ctext0, unsigned char* ctext1,
 #define FS_AES128_RK_INT_SIZE 88
 #define FS_AES256_RK_INT_SIZE 120
 
-static inline uint32_t ror(uint32_t x, int y)
+//Only used internally with shifts 8, 16 or 24.
+static inline uint32_t
+ror(uint32_t x,
+    uint32_t y)
 {
     return (x >> y) | (x << (32 - y));
 }
 
-static inline uint32_t byte_ror_6(uint32_t x)
+static inline uint32_t
+byte_ror_6(uint32_t x)
 {
     return ((x >> 6) & 0x03030303) | ((x & 0x3f3f3f3f) << 2);
 }
 
-static inline uint32_t byte_ror_4(uint32_t x)
+static inline uint32_t
+byte_ror_4(uint32_t x)
 {
     return ((x >> 4) & 0x0f0f0f0f) | ((x & 0x0f0f0f0f) << 4);
 }
 
-static inline uint32_t byte_ror_2(uint32_t x)
+static inline uint32_t
+byte_ror_2(uint32_t x)
 {
     return ((x >> 2) & 0x3f3f3f3f) | ((x & 0x03030303) << 6);
 }
 
-static inline void swapmove(uint32_t *a, uint32_t *b, int mask, int n)
+static inline void
+swapmove(uint32_t *a,
+         uint32_t *b,
+         int mask,
+         int n)
 {
     uint32_t tmp = (*b ^ (*a >> n)) & mask;
     *b ^= tmp;
     *a ^= (tmp << n);
 }
 
-static inline uint32_t le_load_32(const uint8_t *x)
+static inline uint32_t
+le_load_32(const uint8_t *x)
 {
     return (((uint32_t) (x[3])) << 24) | (((uint32_t) (x[2])) << 16) |
            (((uint32_t) (x[1])) << 8) | ((uint32_t) x[0]);
 }
 
-static inline void le_store_32(uint8_t *x, uint32_t y)
+static inline void
+le_store_32(uint8_t *x,
+            uint32_t y)
 {
     x[0] = (uint8_t) (y & 0xff);
     x[1] = (uint8_t) ((y >> 8) & 0xff);
@@ -152,7 +172,8 @@ static inline void le_store_32(uint8_t *x, uint32_t y)
     x[3] = (uint8_t) ((y >> 24) & 0xff);
 }
 
-static void inv_shiftrows_1(uint32_t* rkey)
+static void
+inv_shiftrows_1(uint32_t* rkey)
 {
     for (int i = 0; i < 8; i++)
     {
@@ -161,7 +182,8 @@ static void inv_shiftrows_1(uint32_t* rkey)
     }
 }
 
-static void inv_shiftrows_2(uint32_t* rkey)
+static void
+inv_shiftrows_2(uint32_t* rkey)
 {
     for (int i = 0; i < 8; i++)
     {
@@ -169,7 +191,8 @@ static void inv_shiftrows_2(uint32_t* rkey)
     }
 }
 
-static void inv_shiftrows_3(uint32_t* rkey)
+static void
+inv_shiftrows_3(uint32_t* rkey)
 {
     for (int i = 0; i < 8; i++)
     {
@@ -178,7 +201,10 @@ static void inv_shiftrows_3(uint32_t* rkey)
     }
 }
 
-static void xor_columns(uint32_t* rkeys, int idx_xor, int idx_ror)
+static void
+xor_columns(uint32_t* rkeys,
+            int idx_xor,
+            int idx_ror)
 {
     rkeys[1] ^= 0xffffffff;             // NOT that are omitted in S-box
     rkeys[2] ^= 0xffffffff;             // NOT that are omitted in S-box
@@ -194,7 +220,10 @@ static void xor_columns(uint32_t* rkeys, int idx_xor, int idx_ror)
 }
 
 
-void packing(uint32_t* out, const uint8_t* in0, const uint8_t* in1)
+void
+packing(uint32_t* out,
+        const uint8_t* in0,
+        const uint8_t* in1)
 {
     out[0] = le_load_32(in0);
     out[1] = le_load_32(in1);
@@ -218,7 +247,10 @@ void packing(uint32_t* out, const uint8_t* in0, const uint8_t* in1)
     swapmove(out + 7, out + 3, 0x0f0f0f0f, 4);
 }
 
-static void unpacking(uint8_t* out0, uint8_t* out1, uint32_t* in)
+static void
+unpacking(uint8_t* out0,
+          uint8_t* out1,
+          uint32_t* in)
 {
     swapmove(in + 4, in, 0x0f0f0f0f, 4);
     swapmove(in + 5, in + 1, 0x0f0f0f0f, 4);
@@ -242,7 +274,9 @@ static void unpacking(uint8_t* out0, uint8_t* out1, uint32_t* in)
     le_store_32(out1 + 12, in[7]);
 }
 
-static void add_round_key(uint32_t* state, const uint32_t* rkey)
+static void
+add_round_key(uint32_t* state,
+              const uint32_t* rkey)
 {
     for (int i = 0; i < 8; i++)
     {
@@ -250,7 +284,8 @@ static void add_round_key(uint32_t* state, const uint32_t* rkey)
     }
 }
 
-static void double_shiftrows(uint32_t* state)
+static void
+double_shiftrows(uint32_t* state)
 {
     for (int i = 0; i < 8; i++)
     {
@@ -258,7 +293,8 @@ static void double_shiftrows(uint32_t* state)
     }
 }
 
-static void mixcolumns_0(uint32_t* state)
+static void
+mixcolumns_0(uint32_t* state)
 {
     uint32_t t0, t1, t2, t3, t4;
     t3 = ror(byte_ror_6(state[0]), 8);
@@ -287,7 +323,8 @@ static void mixcolumns_0(uint32_t* state)
     state[0] = t2 ^ t3 ^ ror(byte_ror_4(t0), 16);
 }
 
-static void mixcolumns_1(uint32_t* state)
+static void
+mixcolumns_1(uint32_t* state)
 {
     uint32_t t0, t1, t2;
     t0 = state[0] ^ ror(byte_ror_4(state[0]), 8);
@@ -337,7 +374,8 @@ static void mixcolumns_1(uint32_t* state)
     state[0] ^= ror(t1, 16);
 }
 
-static void mixcolumns_2(uint32_t* state)
+static void
+mixcolumns_2(uint32_t* state)
 {
     uint32_t t0, t1, t2, t3, t4;
     t3 = ror(byte_ror_2(state[0]), 8);
@@ -366,7 +404,8 @@ static void mixcolumns_2(uint32_t* state)
     state[0] = t2 ^ t3 ^ ror(byte_ror_4(t0), 16);
 }
 
-static void mixcolumns_3(uint32_t* state)
+static void
+mixcolumns_3(uint32_t* state)
 {
     uint32_t t0, t1, t2;
     t0 = state[7] ^ ror(state[7], 8);
@@ -387,7 +426,8 @@ static void mixcolumns_3(uint32_t* state)
     state[0] = t0 ^ ror(state[0], 8) ^ ror(t2, 16);
 }
 
-void sbox(uint32_t* state)
+void
+sbox(uint32_t* state)
 {
     uint32_t t0, t1, t2, t3, t4, t5,
              t6, t7, t8, t9, t10, t11, t12,
@@ -507,8 +547,10 @@ void sbox(uint32_t* state)
     state[4]    = t14 ^ state[3];
 }
 
-void aes128_keyschedule_ffs(uint32_t rkeys[FS_AES128_RK_INT_SIZE],
-                            const uint8_t* key0, uint8_t* key1)
+void
+aes128_keyschedule_ffs(uint32_t rkeys[FS_AES128_RK_INT_SIZE],
+                       const uint8_t* key0,
+                       const uint8_t* key1)
 {
     packing(rkeys, key0, key1);     // packs the keys into the bitsliced state
     memcpy(rkeys + 8, rkeys, 32);
@@ -575,9 +617,10 @@ void aes128_keyschedule_ffs(uint32_t rkeys[FS_AES128_RK_INT_SIZE],
 
 
 
-void aes256_keyschedule_ffs(uint32_t rkeys[FS_AES256_RK_INT_SIZE],
-                            const unsigned char* key0,
-                            const unsigned char* key1)
+void
+aes256_keyschedule_ffs(uint32_t rkeys[FS_AES256_RK_INT_SIZE],
+                       const unsigned char* key0,
+                       const unsigned char* key1)
 {
     packing(rkeys, key0, key1);         // packs the keys into the bitsliced state
     packing(rkeys + 8, key0 + 16,
@@ -656,9 +699,12 @@ void aes256_keyschedule_ffs(uint32_t rkeys[FS_AES256_RK_INT_SIZE],
 * ptext parameters.
 ******************************************************************************/
 
-void aes128_encrypt_ffs(unsigned char* ctext0, unsigned char* ctext1,
-                        const unsigned char* ptext0, const unsigned char* ptext1,
-                        const uint32_t* rkeys_ffs)
+void
+aes128_encrypt_ffs(unsigned char* ctext0,
+                   unsigned char* ctext1,
+                   const unsigned char* ptext0,
+                   const unsigned char* ptext1,
+                   const uint32_t* rkeys_ffs)
 {
     uint32_t state[8];                     // 256-bit internal state
     packing(state, ptext0, ptext1);        // packs into bitsliced representation
@@ -705,9 +751,12 @@ void aes128_encrypt_ffs(unsigned char* ctext0, unsigned char* ctext1,
 * ptext parameters.
 ******************************************************************************/
 
-void aes256_encrypt_ffs(unsigned char* ctext0, unsigned char* ctext1,
-                        const unsigned char* ptext0, const unsigned char* ptext1,
-                        const uint32_t* rkeys_ffs)
+void
+aes256_encrypt_ffs(unsigned char* ctext0,
+                   unsigned char* ctext1,
+                   const unsigned char* ptext0,
+                   const unsigned char* ptext1,
+                   const uint32_t* rkeys_ffs)
 {
     uint32_t state[8];                  // 256-bit internal state
     packing(state, ptext0, ptext1);     // packs into bitsliced representation
@@ -739,9 +788,10 @@ void aes256_encrypt_ffs(unsigned char* ctext0, unsigned char* ctext1,
 
 // ECB modes for one or double block
 
-Crypto_Error_t CryptoLib_AesKeySchedule(mbedtls_aes_context* aes,
-                                        uint8_t* key,
-                                        size_t key_size)
+OS_Error_t
+CryptoLib_AesKeySchedule(mbedtls_aes_context* aes,
+                         uint8_t* key,
+                         size_t key_size)
 {
     if (key_size != 128 && key_size != 256)
     {
@@ -762,10 +812,11 @@ Crypto_Error_t CryptoLib_AesKeySchedule(mbedtls_aes_context* aes,
         aes256_keyschedule_ffs(aes->rk, key, key);
     }
 #endif
-    return CRYPTO_SUCCESS;
+    return OS_SUCCESS;
 }
 
-int CryptoLib_AesSingleBlock(uint8_t out[AES_BLOCK_SIZE_IN_BYTE],
+OS_Error_t
+CryptoLib_AesSingleBlock(uint8_t out[AES_BLOCK_SIZE_IN_BYTE],
                              const uint8_t in[AES_BLOCK_SIZE_IN_BYTE],
                              const uint32_t* round_keys,
                              const size_t number_of_rounds)
@@ -787,12 +838,13 @@ int CryptoLib_AesSingleBlock(uint8_t out[AES_BLOCK_SIZE_IN_BYTE],
         aes256_encrypt_ffs(out, out, in, in, round_keys);
     }
 #endif
-    return CRYPTO_SUCCESS;
+    return OS_SUCCESS;
 }
 
-int CryptoLib_AesDoubleBlock(uint8_t out[2 * AES_BLOCK_SIZE_IN_BYTE],
-                             uint8_t in[2 * AES_BLOCK_SIZE_IN_BYTE],
-                             uint32_t* round_keys, size_t number_of_rounds)
+OS_Error_t
+CryptoLib_AesDoubleBlock(uint8_t out[2 * AES_BLOCK_SIZE_IN_BYTE],
+                         uint8_t in[2 * AES_BLOCK_SIZE_IN_BYTE],
+                         uint32_t* round_keys, size_t number_of_rounds)
 {
 
     if (number_of_rounds != AES128_NUMBER_OF_ROUNDS
@@ -818,12 +870,13 @@ int CryptoLib_AesDoubleBlock(uint8_t out[2 * AES_BLOCK_SIZE_IN_BYTE],
                            round_keys);
     }
 #endif
-    return CRYPTO_SUCCESS;
+    return OS_SUCCESS;
 }
 
 // Helper functions for CTR mode
 
-static void increase_single_counter(uint8_t counter[AES_CTR_COUNTER_SIZE])
+static void
+increase_single_counter(uint8_t counter[AES_CTR_COUNTER_SIZE])
 {
 
     counter[AES_CTR_COUNTER_SIZE - 1]++;
@@ -840,8 +893,8 @@ static void increase_single_counter(uint8_t counter[AES_CTR_COUNTER_SIZE])
     counter[0] += carry;
 }
 
-static void increase_parallel_counters(uint8_t counter[2 *
-                                                         AES_CTR_COUNTER_SIZE])
+static void
+increase_parallel_counters(uint8_t counter[2 * AES_CTR_COUNTER_SIZE])
 {
 
     counter[AES_CTR_COUNTER_SIZE - 1] += 1;
@@ -877,18 +930,20 @@ static void increase_parallel_counters(uint8_t counter[2 *
 
 // Public API of supported AES modes
 
-Crypto_Error_t CryptoLib_AesCryptEcb(mbedtls_aes_context* ctx,
-                                     const unsigned char input[16],
-                                     unsigned char output[16] )
+OS_Error_t
+CryptoLib_AesCryptEcb(mbedtls_aes_context* ctx,
+                      const unsigned char input[16],
+                      unsigned char output[16])
 {
     return CryptoLib_AesSingleBlock(output, input, ctx->rk, ctx->nr);
 }
 
-Crypto_Error_t CryptoLib_AesCryptCTR(mbedtls_aes_context* aes,
-                                     const uint8_t* input,
-                                     uint8_t* output,
-                                     const uint32_t input_length,
-                                     uint8_t counter[AES_CTR_COUNTER_SIZE])
+OS_Error_t
+CryptoLib_AesCryptCTR(mbedtls_aes_context* aes,
+                      const uint8_t* input,
+                      uint8_t* output,
+                      const uint32_t input_length,
+                      uint8_t counter[AES_CTR_COUNTER_SIZE])
 {
     uint32_t encrypted_bytes = 0;
     uint8_t double_counter[2 * AES_CTR_COUNTER_SIZE];
@@ -902,7 +957,7 @@ Crypto_Error_t CryptoLib_AesCryptCTR(mbedtls_aes_context* aes,
     while (encrypted_bytes <= input_length - 2 * AES_CTR_COUNTER_SIZE)
     {
         if (CryptoLib_AesDoubleBlock(key_stream, double_counter, aes->rk, 
-                                    aes->nr) != CRYPTO_SUCCESS){
+                                    aes->nr) != OS_SUCCESS){
             return AES_CTR_FAIL;
         }
 
@@ -918,7 +973,7 @@ Crypto_Error_t CryptoLib_AesCryptCTR(mbedtls_aes_context* aes,
 
     if (encrypted_bytes != input_length)
     {
-        Crypto_Error_t return_value = CRYPTO_SUCCESS;
+        OS_Error_t return_value = OS_SUCCESS;
         if (input_length - encrypted_bytes > AES_BLOCK_SIZE_IN_BYTE){
             return_value = CryptoLib_AesDoubleBlock(key_stream, double_counter,
                                                     aes->rk, aes->nr);
@@ -927,7 +982,7 @@ Crypto_Error_t CryptoLib_AesCryptCTR(mbedtls_aes_context* aes,
                                                     aes->rk, aes->nr);
         }
         
-        if (return_value != CRYPTO_SUCCESS){
+        if (return_value != OS_SUCCESS){
             return AES_CTR_FAIL;
         }
 
@@ -938,5 +993,5 @@ Crypto_Error_t CryptoLib_AesCryptCTR(mbedtls_aes_context* aes,
         }
     }
 
-    return CRYPTO_SUCCESS;
+    return OS_SUCCESS;
 }
