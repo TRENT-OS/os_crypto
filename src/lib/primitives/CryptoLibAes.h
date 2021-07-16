@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2021, HENSOLDT Cyber GmbH
  */
 
@@ -22,17 +22,17 @@
 #define AES256_NUMBER_OF_ROUNDS  14
 
 
-OS_Error_t 
+OS_Error_t
 CryptoLib_AesKeySchedule(mbedtls_aes_context* aes,
                          uint8_t* key,
                          size_t key_size);
 
-OS_Error_t 
+OS_Error_t
 CryptoLib_AesCryptEcb(mbedtls_aes_context* ctx,
                       const unsigned char input[16],
                       unsigned char output[16]);
 
-OS_Error_t 
+OS_Error_t
 CryptoLib_AesCryptCTR(mbedtls_aes_context* aes,
                       const uint8_t* input,
                       uint8_t* output,

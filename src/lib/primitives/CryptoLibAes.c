@@ -1,9 +1,9 @@
-/*
+/**
  * Copyright (C) 2021, HENSOLDT Cyber GmbH
  *
- * The plain C implementation is based on the paper at 
+ * The plain C implementation is based on the paper at
  * https://eprint.iacr.org/2020/1123.pdf and its implementation by Alexandre
- * Adomnicai, Nanyang Technological University, Singapore 
+ * Adomnicai, Nanyang Technological University, Singapore
  * alexandre.adomnicai@ntu.edu.sg
  */
 
@@ -144,8 +144,8 @@ byte_ror_2(uint32_t x)
 }
 
 static inline void
-swapmove(uint32_t *a,
-         uint32_t *b,
+swapmove(uint32_t* a,
+         uint32_t* b,
          int mask,
          int n)
 {
@@ -155,14 +155,14 @@ swapmove(uint32_t *a,
 }
 
 static inline uint32_t
-le_load_32(const uint8_t *x)
+le_load_32(const uint8_t* x)
 {
     return (((uint32_t) (x[3])) << 24) | (((uint32_t) (x[2])) << 16) |
            (((uint32_t) (x[1])) << 8) | ((uint32_t) x[0]);
 }
 
 static inline void
-le_store_32(uint8_t *x,
+le_store_32(uint8_t* x,
             uint32_t y)
 {
     x[0] = (uint8_t) (y & 0xff);
@@ -816,9 +816,9 @@ CryptoLib_AesKeySchedule(mbedtls_aes_context* aes,
 
 OS_Error_t
 CryptoLib_AesSingleBlock(uint8_t out[AES_BLOCK_SIZE_IN_BYTE],
-                             const uint8_t in[AES_BLOCK_SIZE_IN_BYTE],
-                             const uint32_t* round_keys,
-                             const size_t number_of_rounds)
+                         const uint8_t in[AES_BLOCK_SIZE_IN_BYTE],
+                         const uint32_t* round_keys,
+                         const size_t number_of_rounds)
 {
     if (number_of_rounds != AES128_NUMBER_OF_ROUNDS
         && number_of_rounds != AES256_NUMBER_OF_ROUNDS)
@@ -955,15 +955,16 @@ CryptoLib_AesCryptCTR(mbedtls_aes_context* aes,
 
     while (encrypted_bytes <= input_length - 2 * AES_CTR_COUNTER_SIZE)
     {
-        if (CryptoLib_AesDoubleBlock(key_stream, double_counter, aes->rk, 
-                                    aes->nr) != OS_SUCCESS){
+        if (CryptoLib_AesDoubleBlock(key_stream, double_counter, aes->rk,
+                                     aes->nr) != OS_SUCCESS)
+        {
             return OS_ERROR_CRYPTO_AES_CTR_FAIL;
         }
 
         for (int i = 0; i < 2 * AES_CTR_COUNTER_SIZE; i++)
         {
-            output[i + encrypted_bytes] = input[i + encrypted_bytes] 
-                                            ^ key_stream[i];
+            output[i + encrypted_bytes] = input[i + encrypted_bytes]
+                                          ^ key_stream[i];
         }
 
         increase_parallel_counters(double_counter);
@@ -973,22 +974,26 @@ CryptoLib_AesCryptCTR(mbedtls_aes_context* aes,
     if (encrypted_bytes != input_length)
     {
         OS_Error_t return_value = OS_SUCCESS;
-        if (input_length - encrypted_bytes > AES_BLOCK_SIZE_IN_BYTE){
+        if (input_length - encrypted_bytes > AES_BLOCK_SIZE_IN_BYTE)
+        {
             return_value = CryptoLib_AesDoubleBlock(key_stream, double_counter,
                                                     aes->rk, aes->nr);
-        }else {
+        }
+        else
+        {
             return_value = CryptoLib_AesSingleBlock(key_stream, double_counter,
                                                     aes->rk, aes->nr);
         }
-        
-        if (return_value != OS_SUCCESS){
+
+        if (return_value != OS_SUCCESS)
+        {
             return OS_ERROR_CRYPTO_AES_CTR_FAIL;
         }
 
         for (int i = 0; i < input_length - encrypted_bytes; i++)
         {
-            output[i + encrypted_bytes] = input[i + encrypted_bytes] 
-                                            ^ key_stream[i];
+            output[i + encrypted_bytes] = input[i + encrypted_bytes]
+                                          ^ key_stream[i];
         }
     }
 

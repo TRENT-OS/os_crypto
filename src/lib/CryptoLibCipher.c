@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2019-2021, Hensoldt Cyber GmbH
+/**
+ * Copyright (C) 2019-2021, HENSOLDT Cyber GmbH
  */
 
 #include "lib/CryptoLibCipher.h"
@@ -172,8 +172,8 @@ setKeyImpl(
     case OS_CryptoCipher_ALG_AES_CTR_ENC:
     case OS_CryptoCipher_ALG_AES_CTR_DEC:
         err = CryptoLib_AesKeySchedule(&self->mbedtls.aes,
-                                       aesKey->bytes, 
-                                       aesKey->len * 8) == CRYPTO_SUCCESS ?
+                                       aesKey->bytes,
+                                       aesKey->len * 8) == OS_SUCCESS ?
               OS_ERROR_ABORTED : OS_SUCCESS;
         break;
     default:
@@ -297,9 +297,9 @@ processImpl(
             else
             {
                 err = CryptoLib_AesCryptCTR(&self->mbedtls.aes, input, output,
-                                            inputSize, self->ivLen > 0 ? 
-                                            self->iv : NULL) == CRYPTO_SUCCESS ?
-                       OS_ERROR_ABORTED : OS_SUCCESS;
+                                            inputSize, self->ivLen > 0 ?
+                                            self->iv : NULL) == OS_SUCCESS ?
+                      OS_ERROR_ABORTED : OS_SUCCESS;
             }
             break;
         case OS_CryptoCipher_ALG_AES_GCM_ENC:
