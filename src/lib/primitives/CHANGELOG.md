@@ -6,21 +6,13 @@ the TRENTOS-M SDK will be documented in this file.
 For more details it is recommended to compare the 3rd party module at hand with
 the previous versions of the TRENTOS-M SDK or the baseline version.
 
-## [1.1]
-
-### Changed
-
-- Use OS_Error_t and rename server according to interface.
-- Limit to 8 clients.
-
-## [1.0]
-
-### Changed
-
-- Support the platform Raspberry Pi 3 Model B+ platform.
-- Apply our coding style / formatting.
+## [1.3]
 
 ### Added
 
-- Start development based on commit a76489 of
-<https://github.com/seL4/global-components/tree/master/components/TimeServer>.
+- Add AES CTR based on NEON on Fixsclicing implementation.
+
+- Add AES implementation based on NEON instruction
+
+- Start development based on commit dc95f86 of
+https://github.com/aadomn/aes/commit/dc95f86e75462494508af40d18cf2c00856ca4cb
