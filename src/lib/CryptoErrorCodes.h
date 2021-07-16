@@ -7,12 +7,12 @@
 
 typedef enum
 {
-    MBEDTLS_OK,             /**< Local constant to improve code readability using mbedtls */
-    KEY_SIZE_NOT_SUPPORTED, /**< Wrond size of key */
-    AES_CTR_FAIL,           /**< AES CTR failed to encrypt or decrypt buffer */
-    AES_ECB_FAIL,           /**< AES ECB failed to encrypt or decrypt buffer */
+    MBEDTLS_OK,                          /**< Local constant to improve code readability using mbedtls */
+    CRYPTO_ERROR_KEY_SIZE_NOT_SUPPORTED, /**< Wrond size of key */
+    AES_CTR_FAIL,                        /**< AES CTR failed to encrypt or decrypt buffer */
+    AES_ECB_FAIL,                        /**< AES ECB failed to encrypt or decrypt buffer */
 
     //----------------------------------------
-    CRYPTO_SUCCESS
+    CRYPTO_SUCCESS = OS_SUCCESS
 }
 Crypto_Error_t;
