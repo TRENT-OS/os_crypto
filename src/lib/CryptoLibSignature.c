@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019-2020, Hensoldt Cyber GmbH
+ * Copyright (C) 2019-2021, HENSOLDT Cyber GmbH
  */
 
 #include "lib/CryptoLibSignature.h"
@@ -8,9 +8,9 @@
 
 #include "lib_macros/Check.h"
 
-#include <string.h>
+#include "lib/MbedtlsHelper.h"
 
-#include "CryptoErrorCodes.h"
+#include <string.h>
 
 // Internal types/defines/enums ------------------------------------------------
 

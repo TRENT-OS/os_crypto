@@ -1,12 +1,11 @@
 /*
  * Copyright (C) 2021, HENSOLDT Cyber GmbH
  *
- * The plain C implementation is based on the paper at
- * https://eprint.iacr.org/2020/1123.pdf and its implementation by
- * Alexandre Adomnicai, Nanyang Technological University, Singapore
+ * The plain C implementation is based on the paper at 
+ * https://eprint.iacr.org/2020/1123.pdf and its implementation by Alexandre
+ * Adomnicai, Nanyang Technological University, Singapore 
  * alexandre.adomnicai@ntu.edu.sg
- * October 2020
-*/
+ */
 
 #include <string.h>
 #include "CryptoLibAes.h"
@@ -118,7 +117,7 @@ neon_AesDoubleBlock(unsigned char* ctext0,
 #define FS_AES128_RK_INT_SIZE 88
 #define FS_AES256_RK_INT_SIZE 120
 
-//Only used internally with shifts 8, 16 or 24.
+// Only used internally with shifts 8, 16 or 24.
 static inline uint32_t
 ror(uint32_t x,
     uint32_t y)
@@ -795,7 +794,7 @@ CryptoLib_AesKeySchedule(mbedtls_aes_context* aes,
 {
     if (key_size != 128 && key_size != 256)
     {
-        return CRYPTO_ERROR_KEY_SIZE_NOT_SUPPORTED;
+        return OS_ERROR_CRYPTO_KEY_SIZE_NOT_SUPPORTED;
     }
     aes->rk = aes->buf;
 #if __ARM_FEATURE_CRYPTO == 1
@@ -824,7 +823,7 @@ CryptoLib_AesSingleBlock(uint8_t out[AES_BLOCK_SIZE_IN_BYTE],
     if (number_of_rounds != AES128_NUMBER_OF_ROUNDS
         && number_of_rounds != AES256_NUMBER_OF_ROUNDS)
     {
-        return CRYPTO_ERROR_KEY_SIZE_NOT_SUPPORTED;
+        return OS_ERROR_CRYPTO_KEY_SIZE_NOT_SUPPORTED;
     }
 #if __ARM_FEATURE_CRYPTO == 1
     neon_AesSingleBlock(out, in, round_keys, number_of_rounds);
@@ -850,7 +849,7 @@ CryptoLib_AesDoubleBlock(uint8_t out[2 * AES_BLOCK_SIZE_IN_BYTE],
     if (number_of_rounds != AES128_NUMBER_OF_ROUNDS
         && number_of_rounds != AES256_NUMBER_OF_ROUNDS)
     {
-        return CRYPTO_ERROR_KEY_SIZE_NOT_SUPPORTED;
+        return OS_ERROR_CRYPTO_KEY_SIZE_NOT_SUPPORTED;
     }
 #if __ARM_FEATURE_CRYPTO == 1
     neon_AesDoubleBlock(out, out + AES_BLOCK_SIZE_IN_BYTE,
@@ -958,7 +957,7 @@ CryptoLib_AesCryptCTR(mbedtls_aes_context* aes,
     {
         if (CryptoLib_AesDoubleBlock(key_stream, double_counter, aes->rk, 
                                     aes->nr) != OS_SUCCESS){
-            return AES_CTR_FAIL;
+            return OS_ERROR_CRYPTO_AES_CTR_FAIL;
         }
 
         for (int i = 0; i < 2 * AES_CTR_COUNTER_SIZE; i++)
@@ -983,7 +982,7 @@ CryptoLib_AesCryptCTR(mbedtls_aes_context* aes,
         }
         
         if (return_value != OS_SUCCESS){
-            return AES_CTR_FAIL;
+            return OS_ERROR_CRYPTO_AES_CTR_FAIL;
         }
 
         for (int i = 0; i < input_length - encrypted_bytes; i++)

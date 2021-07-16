@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019-2020, Hensoldt Cyber GmbH
+ * Copyright (C) 2019-2021, HENSOLDT Cyber GmbH
  */
 
 #include "lib/CryptoLibMac.h"
@@ -10,7 +10,7 @@
 
 #include "lib_macros/Check.h"
 
-#include "CryptoErrorCodes.h"
+#include "lib/MbedtlsHelper.h"
 
 #include <string.h>
 #include <stdbool.h>
