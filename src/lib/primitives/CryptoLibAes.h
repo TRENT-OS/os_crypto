@@ -1,12 +1,11 @@
 /*
  * Copyright (C) 2021, Hensoldt Cyber GmbH
  *
- *  The plain C implementation is based on the paper at
+ * The plain C implementation is based on the paper at
  * https://eprint.iacr.org/2020/1123.pdf and its implementation by
  * Alexandre Adomnicai, Nanyang Technological University, Singapore
  *			alexandre.adomnicai@ntu.edu.sg
  *
- * @date		October 2020
  *
  * The optimized implementation is based on ARM NEON AES instructions
 */
@@ -31,7 +30,8 @@
 #define AES256_NUMBER_OF_ROUNDS  14
 
 
-int CryptoLib_AesKeySchedule(mbedtls_aes_context* aes, uint8_t* key,
+int CryptoLib_AesKeySchedule(mbedtls_aes_context* aes,
+                             uint8_t* key,
                              size_t key_size);
 
 int CryptoLib_AesCryptEcb(mbedtls_aes_context* ctx,
