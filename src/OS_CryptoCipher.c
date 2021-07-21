@@ -4,7 +4,6 @@
 
 #include "OS_Crypto.h"
 #include "OS_Crypto.int.h"
-
 #include "lib_macros/Check.h"
 
 OS_Error_t

@@ -173,7 +173,7 @@ setKeyImpl(
     case OS_CryptoCipher_ALG_AES_CTR_DEC:
         err = CryptoLib_AesKeySchedule(&self->mbedtls.aes,
                                        aesKey->bytes,
-                                       aesKey->len * 8) == OS_SUCCESS ?
+                                       aesKey->len * 8) ?
               OS_ERROR_ABORTED : OS_SUCCESS;
         break;
     default:
@@ -298,7 +298,7 @@ processImpl(
             {
                 err = CryptoLib_AesCryptCTR(&self->mbedtls.aes, input, output,
                                             inputSize, self->ivLen > 0 ?
-                                            self->iv : NULL) == OS_SUCCESS ?
+                                            self->iv : NULL) ?
                       OS_ERROR_ABORTED : OS_SUCCESS;
             }
             break;

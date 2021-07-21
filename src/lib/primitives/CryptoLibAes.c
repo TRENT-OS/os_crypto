@@ -792,25 +792,26 @@ CryptoLib_AesKeySchedule(mbedtls_aes_context* aes,
                          uint8_t* key,
                          size_t key_size)
 {
-    if (key_size != 128 && key_size != 256)
+    if (key_size != AES128_KEY_SIZE_IN_BITS
+        && key_size != AES256_KEY_SIZE_IN_BITS)
     {
         return OS_ERROR_CRYPTO_KEY_SIZE_NOT_SUPPORTED;
     }
     aes->rk = aes->buf;
 #if __ARM_FEATURE_CRYPTO == 1
     neon_AesKeySchedule(aes.rk, key, key_size);
-    aes->nr = key_size == 128 ? AES128_NUMBER_OF_ROUNDS :
-              AES256_NUMBER_OF_ROUNDS;
 #else
-    if (key_size == 128)
+    if (key_size == AES128_KEY_SIZE_IN_BITS)
     {
         aes128_keyschedule_ffs(aes->rk, key, key);
     }
-    else if (key_size == 256)
+    else if (key_size == AES256_KEY_SIZE_IN_BITS)
     {
         aes256_keyschedule_ffs(aes->rk, key, key);
     }
 #endif
+    aes->nr = key_size == AES128_KEY_SIZE_IN_BITS ? AES128_NUMBER_OF_ROUNDS :
+              AES256_NUMBER_OF_ROUNDS;
     return OS_SUCCESS;
 }
 
