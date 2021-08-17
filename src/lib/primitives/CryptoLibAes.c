@@ -115,6 +115,10 @@ neon_AesDoubleBlock(unsigned char* ctext0,
 // Private functions for plain C implementation
 
 #define FS_AES128_RK_INT_SIZE 88
+
+// WARNING: The define 'FS_AES256_RK_INT_SIZE' specifies the required size of
+//          the buffer 'buf' in the struct 'mbedtls_aes_context' defined in
+//          'mbedtls/aes.h'!
 #define FS_AES256_RK_INT_SIZE 120
 
 // Only used internally with shifts 8, 16 or 24.
