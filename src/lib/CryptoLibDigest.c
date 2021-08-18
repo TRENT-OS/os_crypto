@@ -66,6 +66,9 @@ initImpl(
         err = mbedtls_sha256_starts_ret(&dig->mbedtls.sha256, 0) ?
               OS_ERROR_ABORTED : OS_SUCCESS;
         break;
+
+    // TODO: Add case SHA / SHA1 here and everywhere
+
     default:
         err = OS_ERROR_NOT_SUPPORTED;
     }

@@ -55,6 +55,9 @@ initImpl(
     case OS_CryptoAgreement_ALG_ECDH:
         mbedtls_ecdh_init(&agr->mbedtls.ecdh);
         break;
+
+    // TODO: Add case RSA here and everywhere
+
     default:
         err = OS_ERROR_NOT_SUPPORTED;
     }
