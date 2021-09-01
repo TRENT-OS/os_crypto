@@ -2,8 +2,8 @@
 
 ## Overview
 
-OS Crypto Library provides a library that allows components to run crypto
-routines either locally or via the CryptoServer
+OS Crypto allows components to run crypto routines either locally or via the
+CryptoServer.
 
 ## Usage
 
@@ -13,5 +13,4 @@ etc.).
 
 ### Dependencies
 
-* configuration files
-* mbedTLS (provides the actual crypto implementation)
+- mbedTLS (provides the actual crypto implementation)
