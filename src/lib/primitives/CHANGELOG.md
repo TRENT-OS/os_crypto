@@ -11,8 +11,5 @@ the previous versions of the TRENTOS-M SDK or the baseline version.
 ### Added
 
 - Add AES CTR based on NEON on Fixsclicing implementation.
-
-- Add AES implementation based on NEON instruction
-
-- Start development based on commit dc95f86 of
-https://github.com/aadomn/aes/commit/dc95f86e75462494508af40d18cf2c00856ca4cb
+- Add AES implementation based on NEON instructions.
+- Start development based on commit dc95f86 of <https://github.com/aadomn/aes/>.
