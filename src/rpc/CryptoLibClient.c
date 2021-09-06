@@ -4,8 +4,6 @@
 
 #include "rpc/CryptoLibClient.h"
 
-#include "lib_compiler/compiler.h"
-
 #include "lib_macros/Check.h"
 
 #include <string.h>

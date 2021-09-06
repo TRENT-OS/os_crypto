@@ -8,8 +8,6 @@
 #include "mbedtls/md5.h"
 #include "mbedtls/sha256.h"
 
-#include "lib_compiler/compiler.h"
-
 #include "lib_macros/Check.h"
 
 #include <stdbool.h>
