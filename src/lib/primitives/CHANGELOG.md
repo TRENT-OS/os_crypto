@@ -8,8 +8,12 @@ the previous versions of the TRENTOS SDK or the baseline version.
 
 ## [1.3]
 
+### Changed
+
+- Update coding style.
+
 ### Added
 
-- Add AES CTR based on NEON on Fixsclicing implementation.
+- Add AES CTR mode based on the fixsliced implementation.
 - Add AES implementation based on NEON instructions.
 - Start development based on commit dc95f86 of <https://github.com/aadomn/aes/>.
