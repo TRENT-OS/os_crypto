@@ -1,11 +1,20 @@
-/**
+/*
  * Copyright (C) 2021, HENSOLDT Cyber GmbH
- *
- * The plain C implementation is based on the paper at
- * https://eprint.iacr.org/2020/1123.pdf and its implementation by Alexandre
- * Adomnicai, Nanyang Technological University, Singapore
- * alexandre.adomnicai@ntu.edu.sg
+ * SPDX-License-Identifier: MIT
  */
+
+/******************************************************************************
+* Fixsliced implementations of AES-128  and AES-256 (encryption-only) in C.
+* Fully-fixsliced implementation should run faster than the semi-fixsliced
+* version at the cost of a bigger code size.
+*
+* See the paper at https://eprint.iacr.org/2020/1123.pdf for more details.
+*
+* @author 	Alexandre Adomnicai, Nanyang Technological University, Singapore
+*			alexandre.adomnicai@ntu.edu.sg
+*
+* @date		October 2020
+******************************************************************************/
 
 #include <string.h>
 #include "CryptoLibAes.h"
