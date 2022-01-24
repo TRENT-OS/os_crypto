@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2019-2020, HENSOLDT Cyber GmbH
+ * Copyright (C) 2019-2022, HENSOLDT Cyber GmbH
  */
 
 #include "lib/CryptoLib.h"
@@ -9,6 +9,7 @@
 #include "lib_macros/Check.h"
 
 #include <string.h>
+#include <utils/util.h>
 
 // -------------------------- defines/types/variables --------------------------
 
@@ -511,21 +512,58 @@ Cipher_process(
     void*        output,
     size_t*      outputSize)
 {
+    OS_Error_t err = OS_ERROR_GENERIC;
     CryptoLib_t* self = (CryptoLib_t*) ctx;
+    size_t localOutputSize = *outputSize;
 
     CHECK_PTR_NOT_NULL(ctx);
     CHECK_PTR_NOT_NULL(input);
-    CHECK_VALUE_IN_CLOSED_INTERVAL(inputSize, 0, CryptoLib_SIZE_BUFFER);
+    CHECK_VALUE_NOT_ZERO(inputSize);
+    CHECK_VALUE_NOT_ZERO(localOutputSize);
 
-    // Make local copy of input buffer, to allow overlapping input/output buffers
-    memcpy(self->buffer, input, inputSize);
+    if (localOutputSize < inputSize)
+    {
+        // Set output size also if it was too small, so user can learn and
+        // adjust.
+        *outputSize = inputSize;
+        return OS_ERROR_BUFFER_TOO_SMALL;
+    }
 
-    return CryptoLibCipher_process(
-               (CryptoLibCipher_t*)cipherObj,
-               self->buffer,
-               inputSize,
-               output,
-               outputSize);
+    // Cast to char* for pointer arithmetic below.
+    const char* const inputBuf = (char*)input;
+    char* const outputBuf = (char*)output;
+
+    size_t sizeToProcess = inputSize;
+    size_t processedOutputSize = 0;
+
+    while (sizeToProcess > 0)
+    {
+        const size_t chunkSize = MIN(CryptoLib_SIZE_BUFFER, sizeToProcess);
+
+        // Make local copy of input buffer, to allow overlapping input/output
+        // buffers.
+        memcpy(self->buffer, &inputBuf[inputSize - sizeToProcess],
+               chunkSize);
+
+        err = CryptoLibCipher_process(
+                  (CryptoLibCipher_t*)cipherObj,
+                  self->buffer,
+                  chunkSize,
+                  &outputBuf[inputSize - sizeToProcess],
+                  &localOutputSize);
+
+        if (err != OS_SUCCESS)
+        {
+            break;
+        }
+
+        processedOutputSize += localOutputSize;
+        sizeToProcess -= chunkSize;
+    }
+
+    *outputSize = processedOutputSize;
+
+    return err;
 }
 
 static OS_Error_t
