@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2021, HENSOLDT Cyber GmbH
+ * SPDX-License-Identifier: MIT
  */
-
 
 #pragma once
 
